@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FixedJoystick : Joystick
+namespace JoystickPack
 {
+    public class FixedJoystick : Joystick
+    {
 
+    }
 }
