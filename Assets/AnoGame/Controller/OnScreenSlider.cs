@@ -15,11 +15,6 @@ public class OnScreenSlider : OnScreenControl
         SendValueToControl(direction);
     }
 
-    private void OnValueChanged(Vector2 direction)
-    {
-        SendValueToControl(direction);
-    }
-
     [InputControl(layout = "Stick")]
     [SerializeField]
     private string _controlPath = "<Gamepad>/leftStick";

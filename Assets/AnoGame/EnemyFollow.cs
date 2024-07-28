@@ -9,7 +9,6 @@ public class EnemyFollow : MonoBehaviour
     {
         if (target != null)
         {
-            Debug.Log("追跡");
             // プレイヤーの方向を計算
             Vector3 direction = target.position - transform.position;
             direction.Normalize();
