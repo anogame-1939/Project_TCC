@@ -1,0 +1,74 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+
+    <ui:Label text="=" />
+    <ui:Box class="wrapper">
+        <ui:Box class="flexbox" name = "nameBox">
+            <ui:Label text="名前" />
+        </ui:Box>
+        <ui:Box class="flexbox" name = "serihuBox">
+            <ui:Label text="セリフ" />
+        </ui:Box>
+        <ui:Box class="detail">
+            <ui:Foldout text="詳細設定" name="detailFoldOut" value="false">
+
+                <ui:Label text="背景" display-tooltip-when-elided="true" />
+                <uie:EnumField label="切り替え" name="howBack" />
+                <ui:Label text="現在の背景" name="nowBack" />
+                <uie:ObjectField name="backSprite" type="UnityEngine.Sprite, UnityEngine.CoreModule" />
+                <uie:ColorField name="backFadeColor" label="フェード色" />
+                <uie:FloatField name="backFadeSpeed" label="フェード秒数" value="0" />
+                
+                <ui:Box name="charaImage" />
+
+                <ui:Foldout text="フォント設定" value="false">
+                    <ui:Toggle label="セリフフォント変更" name="changeFont" />
+                    <ui:Box name="changeFontBox">
+                        <uie:ObjectField label="Font Asset" name="font" type="TMPro.TMP_FontAsset, Unity.TextMeshPro" />
+                        <uie:ColorField label="文字色" name="fontColor"/>
+                        <uie:IntegerField label="フォントサイズ" name="fontSize" value="0" />
+                    </ui:Box>
+                    <ui:Toggle label="名前フォント変更" name="changeNameFont" />
+                    <ui:Box name="changeNameFontBox">
+                        <uie:ObjectField label="Font Asset" name="nameFont" type="TMPro.TMP_FontAsset, Unity.TextMeshPro" />
+                        <uie:ColorField label="名前文字色" name="nameColor"/>
+                    </ui:Box> 
+                </ui:Foldout>
+
+                <ui:Foldout text="サウンド設定" value="false">
+                    <ui:Box name="BGMBox">
+                        <ui:Label text="BGM設定" display-tooltip-when-elided="true" />
+                        <uie:EnumField label="再生状態" name="BGMStyle"  />
+                        <ui:Box name="BGMPlayBox">
+                            <uie:ObjectField name="BGM" type="UnityEngine.AudioClip, UnityEngine" />
+                            <uie:EnumField label="再生方法" name="BGMLoop"  />
+                            <uie:IntegerField label="再生回数" name="BGMCount" value="0" />
+                            <uie:FloatField label="再生時間" name="BGMSecond"   />
+                            <uie:FloatField label="フェードイン秒数" name="BGMFadeTime" value="0" />
+                            <uie:FloatField label="フェードアウト秒数" name="BGMEndFadeTime" value="0" />
+                        </ui:Box>
+                    </ui:Box>
+                    <ui:Box name="SEBox">
+                        <ui:Label text="SE設定" display-tooltip-when-elided="true" />
+                        <uie:EnumField label="再生状態" name="SEStyle"  />
+                        <ui:Box name="SEPlayBox">
+                            <uie:ObjectField name="SE" type="UnityEngine.AudioClip, UnityEngine"  />
+                            <uie:EnumField label="再生方法" name="SELoop"  />
+                            <uie:IntegerField label="再生回数" name="SECount" value="0" />
+                            <uie:FloatField label="再生時間" name="SESecond"  />
+                            <uie:FloatField label="フェードイン秒数" name="SEFadeTime" value="0" />
+                            <uie:FloatField label="フェードアウト秒数" name="SEEndFadeTime" value="0" />
+                        </ui:Box>
+                    </ui:Box>
+                </ui:Foldout>
+
+                <ui:Foldout text="エフェクト設定" value="false">
+                    <uie:EnumField label="背景" name="backEffect"  />
+                    <ui:SliderInt picking-mode="Ignore" name="backEffectStrength" label="強度" value="5" high-value="10" />
+                    <ui:Box name="charaEffect" />
+                    <uie:EnumField label="セリフ枠" name="FrontEffect"  />
+                    <ui:SliderInt picking-mode="Ignore" name="FrontEffectStrength" label="強度" value="5" high-value="10" />
+                </ui:Foldout>
+            </ui:Foldout>
+        </ui:Box>
+    </ui:Box>
+</ui:UXML>

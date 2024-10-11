@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ui="UnityEngine.UIElements" 
+    xmlns:uie="UnityEditor.UIElements"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+>
+    <uie:ObjectField name="_novelData" label="Novel Data" type="NovelEditor.NovelData, rirunee.NovelEditor.Runtime" />
+    <uie:ObjectField name="_choiceButton" label="使用するボタン" type="NovelEditor.ChoiceButton,rirunee.NovelEditor.Runtime" />
+    <uie:ObjectField name="_dialogueSprite" label="使用するセリフ枠" type="UnityEngine.Sprite, UnityEngine.CoreModule" />
+    <uie:ObjectField name="_nonameDialogueSprite" label="名前なし用のセリフ枠" type="UnityEngine.Sprite, UnityEngine.CoreModule" />
+
+    <ui:Toggle label="PlayOnAwake" name="_playOnAwake" />
+    <ui:Toggle label="HideAfterPlay" name="_hideAfterPlay" />
+    <uie:FloatField label="最後消す時のフェード時間" name="_hideFadeTime" value="1" lowValue="0"/>
+    <ui:Toggle label="IsDisplay" name="_isDisplay" />
+
+    <uie:FloatField label="ディゾルブでキャラが切り替わる時間" name="_charaFadeTime" value="0.2" lowValue="0"/>
+    <ui:SliderInt  name="_textSpeed" label="テキスト速度" value="5" high-value="10" lowValue="0"/>
+    <ui:Slider  name="_BGMVolume" label="BGM音量" value="0.5" high-value="1" lowValue="0"/>
+    <ui:Slider  name="_SEVolume" label="SE音量" value="0.5" high-value="1" lowValue="0"/>
+    <uie:EnumField label="入力方法" name="Input"  />
+
+
+</engine:UXML>

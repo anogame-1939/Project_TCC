@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Label text="同じプレハブは登録できません" style="color:red"/>
+    <engine:Button text="立ち絵の情報を更新" name="prefab_button" />
+        <engine:Label text="ボタンを押すまで立ち絵位置の変更は反映されません" name="progressLabel"/>
+    <engine:ProgressBar  name="ProgressBar" />
+    
+    <engine:Button text="Open" name="open_button" />
+
+
+
+</engine:UXML>
