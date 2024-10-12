@@ -37,10 +37,10 @@ namespace NovelEditor.Sample
 
         void FixedUpdate()
         {
-            Vector3 velocity = _rigidbody.velocity;
+            Vector3 velocity = _rigidbody.linearVelocity;
             velocity.x = x * Speed;
             velocity.z = z * Speed;
-            _rigidbody.velocity = velocity;
+            _rigidbody.linearVelocity = velocity;
 
             Quaternion q = (Mathf.Abs(x) < 0.1f && Mathf.Abs(z) < 0.1f) ? _rigidbody.rotation :
                                                             Quaternion.LookRotation(new Vector3(x, 0, z), Vector3.up);
@@ -51,7 +51,7 @@ namespace NovelEditor.Sample
         void OnDisable()
         {
             _animator.SetBool("move", false);
-            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.linearVelocity = Vector3.zero;
         }
 
         void OnTriggerEnter(Collider collisionInfo)
