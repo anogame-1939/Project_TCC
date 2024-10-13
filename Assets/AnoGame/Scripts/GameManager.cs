@@ -1,12 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using AnoGame.Core;
 using UnityEngine;
 
 namespace AnoGame.Utility
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         private JsonAsyncSaveDataManager saveDataManager;
+        public Action<GameData> SaveGameData;
+        public Action<GameData> LoadGameData;
 
         private async void Start()
         {
