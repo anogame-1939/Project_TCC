@@ -110,7 +110,7 @@ namespace Unity.TinyCharacterController.Brain
             // Update Rigidbody properties
             rig.constraints = RigidbodyConstraints.FreezeRotation;
             rig.useGravity = false;
-            rig.linearDamping = 5;
+            rig.drag = 5;
             rig.mass = settings.Mass;
 
             // Update collider shape
@@ -239,7 +239,7 @@ namespace Unity.TinyCharacterController.Brain
 
             // _rigidbody.MovePosition( lastPosition );
             _rigidbody.position = lastPosition;
-            _rigidbody.linearVelocity = totalVelocity ;
+            _rigidbody.velocity = totalVelocity ;
         }
 
 
