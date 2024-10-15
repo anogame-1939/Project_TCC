@@ -27,6 +27,7 @@ namespace AnoGame.Utility
                     Debug.Log($"Item: {item.itemName}, Quantity: {item.quantity}");
                 }
             }
+            LoadGameData?.Invoke(loadedData);
         }
 
         private async void OnApplicationQuit()
@@ -43,6 +44,7 @@ namespace AnoGame.Utility
                 }
             };
             await saveDataManager.SaveDataAsync(dataToSave);
+            LoadGameData?.Invoke(dataToSave);
         }
     }
 }

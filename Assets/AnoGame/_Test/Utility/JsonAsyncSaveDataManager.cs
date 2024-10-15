@@ -51,5 +51,7 @@ namespace AnoGame.Utility
     {
         public string itemName;
         public int quantity;
+        public string description;
+        public Sprite itemImage;
     }
 }

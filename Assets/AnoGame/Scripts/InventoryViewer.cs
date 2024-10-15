@@ -1,29 +1,77 @@
 using System;
+using System.Collections.Generic;
 using AnoGame.Utility;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace AnoGame.Inventory
 {
     public class InventoryViewer : MonoBehaviour
     {
+        [SerializeField]
+        InputActionAsset _inputActionAsset;
+
+        [SerializeField]
+        List<InventoryItem> _inventoryItem;
+
+        [SerializeField]
+        List<InventoryItemUI> _inventoryItemUI;
+
+        private bool isInventoryMode = true;
+        
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            GameManager.Instance.SaveGameData += OnSaveGameData;
-            
+            GameManager.Instance.SaveGameData += UpdateInventoryItemUI;
+            GameManager.Instance.LoadGameData += UpdateInventoryItemUI;
+
+            if (_inputActionAsset == null)
+            {
+                Debug.LogError("_inputActionAssetが設定されていません。");
+                return;
+            }
+            var actionMap = _inputActionAsset.FindActionMap("Player");
+            actionMap.Enable();
+
+            var inventory = actionMap.FindAction("Inventory");
+            inventory.performed += ctx =>
+            {
+                ToggleCursorLock();
+            };
+            isInventoryMode = false;
+            Hide();
         }
 
-        private void OnSaveGameData(GameData data)
+        private void UpdateInventoryItemUI(GameData data)
         {
-            // インベントリ情報を表示する
-
-
-            throw new NotImplementedException();
+            _inventoryItem = data.inventory;
         }
 
-        private void CreateInventoryItem()
+        void ToggleCursorLock()
         {
+            isInventoryMode = !isInventoryMode;
 
+            if (isInventoryMode)
+            {
+                Show();
+            }
+            else
+            {
+                Hide();
+            }
+        }
+        public void Show()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            GetComponent<CanvasGroup>().alpha = 1;
+        }
+
+        public void Hide()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            GetComponent<CanvasGroup>().alpha = 0;
         }
     }
 }
