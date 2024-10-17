@@ -21185,16 +21185,6 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// StickBehavior.Attack
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void StickBehavior_Attack()
-		{
-			global::StickBehavior target = default(global::StickBehavior);
-			target.Attack();
-			global::Unity.VisualScripting.InstanceActionInvoker<StickBehavior> optimized = new global::Unity.VisualScripting.InstanceActionInvoker<StickBehavior>(default(global::System.Reflection.MethodInfo));
-			optimized.Invoke(default(global::StickBehavior));
-			optimized.Invoke(default(object[]));
-		}
 		
 		// AnoGame.ItemCollector.CollectItem
 		[global::UnityEngine.Scripting.PreserveAttribute()]
