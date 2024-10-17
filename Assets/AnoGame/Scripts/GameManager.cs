@@ -3,18 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using AnoGame.Core;
 using UnityEngine;
+using AnoGame.Utility;
 
-namespace AnoGame.Utility
+namespace AnoGame
 {
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
-        private JsonAsyncSaveDataManager saveDataManager;
+        private AsyncJsonDataManager saveDataManager;
         public Action<GameData> SaveGameData;
         public Action<GameData> LoadGameData;
 
         private async void Start()
         {
-            saveDataManager = new JsonAsyncSaveDataManager();
+            saveDataManager = new AsyncJsonDataManager();
             
             // データのロード
             GameData loadedData = await saveDataManager.LoadDataAsync();
