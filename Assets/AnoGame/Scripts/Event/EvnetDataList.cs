@@ -7,6 +7,7 @@ namespace AnoGame.Event
     public class EvnetDataList : ScriptableObject
     {
         [SerializeField]
-        List<EvnetData> _eventDataList = new List<EvnetData>();
+        private List<EvnetData> _eventDataList = new List<EvnetData>();
+        public List<EvnetData> EventDataList => _eventDataList;
     }
 }

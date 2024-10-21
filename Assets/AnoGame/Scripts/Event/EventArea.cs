@@ -13,18 +13,18 @@ namespace AnoGame.Event
     public class EventArea : MonoBehaviour
     {
         [SerializeField]
-        int _eventAreaId = 0;
+        int _eventId = 0;
 
         void Start()
         {
 #if UNITY_EDITOR
-            if (!TestDataManager.EventAreaIdList.Contains(_eventAreaId))
+            if (!TestDataManager.EventAreaIdList.Contains(_eventId))
             {
-                TestDataManager.EventAreaIdList.Add(_eventAreaId);
+                TestDataManager.EventAreaIdList.Add(_eventId);
             }
             else
             {
-                Debug.LogWarning($"EventAreaIdが重複しています。{_eventAreaId}, {name}", this);
+                Debug.LogWarning($"EventAreaIdが重複しています。{_eventId}, {name}", this);
                 PingObject();
             }
 
@@ -42,6 +42,7 @@ namespace AnoGame.Event
             {
                 Debug.Log("プレイヤーがトリガー内に入りました");
                 // ここにプレイヤーが入った時の処理を書きます
+                EventManager.Instance.InvokeEvent(_eventId);
             }
         }
 

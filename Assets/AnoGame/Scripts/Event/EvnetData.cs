@@ -11,7 +11,8 @@ namespace AnoGame.Event
         public string EvnentName = "default";
         public EventType EvnentType = EventType.Normal;
         [SerializeField]
-        public List<GameObject> _spwanObjects;
+        private List<GameObject> _spwanObjects;
+        public List<GameObject> SpwanObjects => _spwanObjects;
     }
 
     public enum EventType
