@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace AnoGame.Event
 {
@@ -13,6 +14,11 @@ namespace AnoGame.Event
         [SerializeField]
         private List<GameObject> _spwanObjects;
         public List<GameObject> SpwanObjects => _spwanObjects;
+
+        public Scene scene;
+        public List<Scene> Scenes; 
+
+        public SceneReference sceneReference;
     }
 
     public enum EventType
