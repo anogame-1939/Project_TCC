@@ -1,3 +1,4 @@
+// StoryData.cs
 using UnityEngine;
 using System;
 using System.Collections.Generic;
@@ -29,17 +30,15 @@ public class StoryData : ScriptableObject
     {
         public string eventName;
         public GameObject eventPrefab;
-        // イベント固有のデータをここに追加...
     }
 
     public string storyName;
     public List<ChapterData> chapters = new List<ChapterData>();
 
-    // 現在のストーリー進行状況を追跡するための変数
+    // Remove currentSceneIndex and only keep currentChapterIndex
     [HideInInspector] public int currentChapterIndex = 0;
-    [HideInInspector] public int currentSceneIndex = 0;
 
-    public SceneData GetCurrentScene()
+    public SceneData GetCurrentScene(int currentSceneIndex)
     {
         if (currentChapterIndex < chapters.Count && currentSceneIndex < chapters[currentChapterIndex].scenes.Count)
         {
@@ -48,19 +47,20 @@ public class StoryData : ScriptableObject
         return null;
     }
 
-    public void MoveToNextScene()
+    public bool MoveToNextScene(int currentSceneIndex, out int newSceneIndex)
     {
-        currentSceneIndex++;
-        if (currentSceneIndex >= chapters[currentChapterIndex].scenes.Count)
+        newSceneIndex = currentSceneIndex + 1;
+        if (newSceneIndex >= chapters[currentChapterIndex].scenes.Count)
         {
             currentChapterIndex++;
-            currentSceneIndex = 0;
+            newSceneIndex = 0;
             if (currentChapterIndex >= chapters.Count)
             {
                 Debug.Log("Story completed!");
-                // ストーリー完了時の処理をここに追加
+                return false;
             }
         }
+        return true;
     }
 }
 
