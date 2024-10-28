@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using AnoGame.Core;
 
-// StoryManager.cs
 namespace AnoGame.Event
 {
     public class StoryManager : SingletonMonoBehaviour<StoryManager>
@@ -14,7 +13,6 @@ namespace AnoGame.Event
 
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
-        private int _currentSceneIndex = 0;
 
         public void StartStory()
         {
@@ -25,9 +23,9 @@ namespace AnoGame.Event
             }
 
             _currentStoryIndex = 0;
-            _currentSceneIndex = 0;
             StoryData currentStory = _storyDataList[_currentStoryIndex];
             currentStory.currentChapterIndex = 0;
+            currentStory.currentSceneIndex = 0;
             LoadCurrentScene();
         }
 
@@ -40,11 +38,8 @@ namespace AnoGame.Event
             }
 
             StoryData currentStory = _storyDataList[_currentStoryIndex];
-            if (currentStory.MoveToNextScene(_currentSceneIndex, out int newSceneIndex))
-            {
-                _currentSceneIndex = newSceneIndex;
-                LoadCurrentScene();
-            }
+            currentStory.MoveToNextScene();
+            LoadCurrentScene();
         }
 
         public void LoadChapter(int chapterIndex)
@@ -57,7 +52,7 @@ namespace AnoGame.Event
             }
 
             currentStory.currentChapterIndex = chapterIndex;
-            _currentSceneIndex = 0;
+            currentStory.currentSceneIndex = 0;
             LoadCurrentScene();
         }
 
@@ -77,7 +72,7 @@ namespace AnoGame.Event
             }
 
             currentStory.currentChapterIndex = chapterIndex;
-            _currentSceneIndex = sceneIndex;
+            currentStory.currentSceneIndex = sceneIndex;
             LoadCurrentScene();
         }
 
@@ -88,7 +83,7 @@ namespace AnoGame.Event
 
         public int GetCurrentSceneIndex()
         {
-            return _currentSceneIndex;
+            return _storyDataList[_currentStoryIndex].currentSceneIndex;
         }
 
         public StoryData.ChapterData GetCurrentChapter()
@@ -116,7 +111,7 @@ namespace AnoGame.Event
             ClearSpawnedObjects();
 
             StoryData currentStory = _storyDataList[_currentStoryIndex];
-            StoryData.SceneData currentScene = currentStory.GetCurrentScene(_currentSceneIndex);
+            StoryData.SceneData currentScene = currentStory.GetCurrentScene();
             if (currentScene != null)
             {
                 yield return SceneManager.LoadSceneAsync(currentScene.sceneReference.scenePath, LoadSceneMode.Additive);
@@ -156,6 +151,7 @@ namespace AnoGame.Event
             _spawnedObjects.Clear();
         }
 
+        // 将来的に複数のストーリーを切り替える場合に使用できるメソッド
         public void SwitchToStory(int storyIndex)
         {
             if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
@@ -165,9 +161,9 @@ namespace AnoGame.Event
             }
 
             _currentStoryIndex = storyIndex;
-            _currentSceneIndex = 0;
             StoryData newStory = _storyDataList[_currentStoryIndex];
             newStory.currentChapterIndex = 0;
+            newStory.currentSceneIndex = 0;
             LoadCurrentScene();
         }
     }
