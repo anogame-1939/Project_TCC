@@ -1,8 +1,8 @@
-using System;
+using System.Collections    ;
 using System.Collections.Generic;
-using AnoGame.Utility;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using AnoGame.Data;
 
 namespace AnoGame.Inventory
 {
@@ -54,10 +54,7 @@ namespace AnoGame.Inventory
         private void UpdateInventoryItemUI(GameData data)
         {
             _inventoryItem = data.inventory;
-
-
             _inventoryManager.UpdateInventory(_inventoryItem);
-
         }
 
         void ToggleCursorLock()

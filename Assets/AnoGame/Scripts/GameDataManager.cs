@@ -1,8 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AnoGame.Core;
 using UnityEngine;
+using AnoGame.Core;
+using AnoGame.Data;
 using AnoGame.Utility;
 
 namespace AnoGame

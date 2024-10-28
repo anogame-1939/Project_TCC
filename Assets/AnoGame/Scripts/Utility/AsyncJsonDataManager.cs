@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using AnoGame.Data;
 
 namespace AnoGame.Utility
 {
@@ -37,20 +38,5 @@ namespace AnoGame.Utility
         }
     }
 
-    [System.Serializable]
-    public class GameData
-    {
-        public int score;
-        public string playerName;
-        public List<InventoryItem> inventory;
-    }
 
-    [System.Serializable]
-    public class InventoryItem
-    {
-        public string itemName;
-        public int quantity;
-        public string description;
-        public Sprite itemImage;
-    }
 }

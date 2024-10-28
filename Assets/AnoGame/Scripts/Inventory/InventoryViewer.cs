@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using AnoGame.Utility;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using AnoGame.Data;
 
 namespace AnoGame.Inventory
 {

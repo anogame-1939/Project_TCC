@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using AnoGame.Utility;
+using AnoGame.Data;
 public class InventorySlot : MonoBehaviour
 {
     [SerializeField] private Image itemImage;

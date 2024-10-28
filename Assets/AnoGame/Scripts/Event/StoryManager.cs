@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using AnoGame.Core;
+using AnoGame.Data;
 
 namespace AnoGame.Event
 {
@@ -13,6 +14,58 @@ namespace AnoGame.Event
 
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
+
+        private void Start()
+        {
+            // GameManagerのLoadGameDataイベントを購読
+            GameManager.Instance.LoadGameData += OnLoadGameData;
+            GameManager.Instance.SaveGameData += OnSaveGameData;
+        }
+
+        private void OnDestroy()
+        {
+            // イベント購読の解除
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadGameData -= OnLoadGameData;
+                GameManager.Instance.SaveGameData -= OnSaveGameData;
+            }
+        }
+
+        private void OnLoadGameData(GameData gameData)
+        {
+            if (gameData == null) return;
+
+            // ストーリー進行状況の復元
+            if (gameData.storyProgress != null)
+            {
+                _currentStoryIndex = gameData.storyProgress.currentStoryIndex;
+                if (_currentStoryIndex < _storyDataList.Count)
+                {
+                    StoryData currentStory = _storyDataList[_currentStoryIndex];
+                    currentStory.currentChapterIndex = gameData.storyProgress.currentChapterIndex;
+                    currentStory.currentSceneIndex = gameData.storyProgress.currentSceneIndex;
+                    LoadCurrentScene();
+                }
+            }
+        }
+
+        private void OnSaveGameData(GameData gameData)
+        {
+            // 現在のストーリー進行状況を保存
+            if (gameData.storyProgress == null)
+            {
+                gameData.storyProgress = new StoryProgress();
+            }
+
+            gameData.storyProgress.currentStoryIndex = _currentStoryIndex;
+            if (_currentStoryIndex < _storyDataList.Count)
+            {
+                StoryData currentStory = _storyDataList[_currentStoryIndex];
+                gameData.storyProgress.currentChapterIndex = currentStory.currentChapterIndex;
+                gameData.storyProgress.currentSceneIndex = currentStory.currentSceneIndex;
+            }
+        }
 
         public void StartStory()
         {
@@ -165,6 +218,22 @@ namespace AnoGame.Event
             newStory.currentChapterIndex = 0;
             newStory.currentSceneIndex = 0;
             LoadCurrentScene();
+        }
+
+        public StoryProgress GetCurrentProgress()
+        {
+            return new StoryProgress
+            {
+                currentStoryIndex = _currentStoryIndex,
+                currentChapterIndex = _storyDataList[_currentStoryIndex].currentChapterIndex,
+                currentSceneIndex = _storyDataList[_currentStoryIndex].currentSceneIndex
+            };
+        }
+
+        // エディタ拡張用のメソッド
+        public List<StoryData> GetStoryList()
+        {
+            return _storyDataList;
         }
     }
 }
