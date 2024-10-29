@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AnoGame.Core;
 
-namespace AnoGame.Event
+namespace AnoGame.Story
 {
     public class EventManager : SingletonMonoBehaviour<EventManager>
     {   

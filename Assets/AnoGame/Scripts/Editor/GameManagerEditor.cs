@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using AnoGame;
-using AnoGame.Event;
+using AnoGame.Story;
 using AnoGame.Data;
 using AnoGame.Utility;
 using System.Threading.Tasks;

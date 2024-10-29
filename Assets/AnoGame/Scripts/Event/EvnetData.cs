@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace AnoGame.Event
+namespace AnoGame.Story
 {
     [Serializable]
     public class EvnetData

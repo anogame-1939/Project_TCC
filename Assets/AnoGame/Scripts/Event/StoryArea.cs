@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEditor;
 #endif
 
-namespace AnoGame.Event
+namespace AnoGame.Story
 {
     [RequireComponent(typeof(Collider))]
     public class StoryArea : MonoBehaviour

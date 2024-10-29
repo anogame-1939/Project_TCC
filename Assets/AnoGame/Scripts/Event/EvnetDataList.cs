@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AnoGame.Event
+namespace AnoGame.Story
 {
     public class EvnetDataList : ScriptableObject
     {

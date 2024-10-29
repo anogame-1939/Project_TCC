@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using AnoGame.Core;
 using AnoGame.Data;
 
-namespace AnoGame.Event
+namespace AnoGame.Story
 {
     public class StoryManager : SingletonMonoBehaviour<StoryManager>
     {   
