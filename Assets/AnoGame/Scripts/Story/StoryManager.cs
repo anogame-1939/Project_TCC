@@ -19,7 +19,7 @@ namespace AnoGame.Story
         {
             // GameManagerのLoadGameDataイベントを購読
             GameManager.Instance.LoadGameData += OnLoadGameData;
-            GameManager.Instance.SaveGameData += OnSaveGameData;
+            // GameManager.Instance.SaveGameData += OnSaveGameData;
         }
 
         private void OnDestroy()
@@ -28,7 +28,7 @@ namespace AnoGame.Story
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.LoadGameData -= OnLoadGameData;
-                GameManager.Instance.SaveGameData -= OnSaveGameData;
+                // GameManager.Instance.SaveGameData -= OnSaveGameData;
             }
         }
 
@@ -50,8 +50,10 @@ namespace AnoGame.Story
             }
         }
 
-        private void OnSaveGameData(GameData gameData)
+        public void SaveGameData()
         {
+            GameData gameData = GameManager.Instance.CurrentGameData;
+            
             // 現在のストーリー進行状況を保存
             if (gameData.storyProgress == null)
             {

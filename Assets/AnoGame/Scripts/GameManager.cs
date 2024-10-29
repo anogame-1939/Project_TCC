@@ -10,37 +10,38 @@ namespace AnoGame
 {
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
-        private AsyncJsonDataManager saveDataManager;
+        private AsyncJsonDataManager _saveDataManager;
         public Action<GameData> SaveGameData;
         public Action<GameData> LoadGameData;
 
-        private GameData currentGameData;
+        private GameData _currentGameData;
+        public GameData CurrentGameData => _currentGameData;
 
         private async void Start()
         {
-            saveDataManager = new AsyncJsonDataManager();
+            _saveDataManager = new AsyncJsonDataManager();
             await InitializeGameData();
         }
 
         private async System.Threading.Tasks.Task InitializeGameData()
         {
             // Try to load existing save data
-            GameData loadedData = await saveDataManager.LoadDataAsync();
+            GameData loadedData = await _saveDataManager.LoadDataAsync();
 
             if (loadedData != null)
             {
-                currentGameData = loadedData;
+                _currentGameData = loadedData;
                 Debug.Log("Loaded existing save data");
             }
             else
             {
                 // Create new game data if no save exists
-                currentGameData = CreateNewGameData();
+                _currentGameData = CreateNewGameData();
                 Debug.Log("Created new game data");
             }
 
             // Notify subscribers about the loaded/initialized data
-            LoadGameData?.Invoke(currentGameData);
+            LoadGameData?.Invoke(_currentGameData);
         }
 
         private GameData CreateNewGameData()
@@ -59,30 +60,30 @@ namespace AnoGame
             };
         }
 
-        public void UpdateGameState(Action<GameData> updateAction)
+        public void UpdateGameState(GameData newGameData)
         {
-            if (currentGameData != null)
+            _currentGameData = newGameData;
+            if (_currentGameData != null)
             {
-                updateAction?.Invoke(currentGameData);
-                SaveGameData?.Invoke(currentGameData);
+                SaveGameData?.Invoke(_currentGameData);
             }
         }
 
         public async void SaveCurrentGameState()
         {
-            if (currentGameData != null)
+            if (_currentGameData != null)
             {
-                await saveDataManager.SaveDataAsync(currentGameData);
+                await _saveDataManager.SaveDataAsync(_currentGameData);
                 Debug.Log("Game state saved successfully");
             }
         }
 
         private async void OnApplicationQuit()
         {
-            if (currentGameData != null)
+            if (_currentGameData != null)
             {
-                SaveGameData?.Invoke(currentGameData); // 最終的な状態更新を取得
-                await saveDataManager.SaveDataAsync(currentGameData);
+                SaveGameData?.Invoke(_currentGameData); // 最終的な状態更新を取得
+                await _saveDataManager.SaveDataAsync(_currentGameData);
                 Debug.Log("Game state saved on application quit");
             }
         }
@@ -90,16 +91,16 @@ namespace AnoGame
         // ゲームの状態を取得するためのヘルパーメソッド
         public GameData GetCurrentGameState()
         {
-            return currentGameData;
+            return _currentGameData;
         }
 
         // 明示的なセーブポイントを作成するためのメソッド
         public async void CreateSavePoint()
         {
-            if (currentGameData != null)
+            if (_currentGameData != null)
             {
-                SaveGameData?.Invoke(currentGameData);
-                await saveDataManager.SaveDataAsync(currentGameData);
+                SaveGameData?.Invoke(_currentGameData);
+                await _saveDataManager.SaveDataAsync(_currentGameData);
                 Debug.Log("Save point created successfully");
             }
         }

@@ -2,17 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StoryController : MonoBehaviour
+namespace AnoGame.Story
 {
-    // Start is called before the first frame update
-    void Start()
+    public class StoryController : MonoBehaviour
     {
-        
-    }
+        [SerializeField]
+        bool _runAtStart = false;
+        [SerializeField]
+        int _chapterIndex = 0;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        void Start()
+        {
+            if (_runAtStart)
+            {
+                LoadChapter();
+            }
+        }
+
+        public void LoadChapter()
+        {
+            StoryManager.Instance.LoadChapter(_chapterIndex);
+            StoryManager.Instance.SaveGameData();
+        }
     }
 }
