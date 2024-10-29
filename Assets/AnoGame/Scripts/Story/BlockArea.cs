@@ -1,7 +1,9 @@
 using UnityEngine;
+using DG.Tweening;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Story
 {
@@ -10,6 +12,12 @@ namespace AnoGame.Story
     {
         [SerializeField]
         Transform returnPosition;
+
+        [SerializeField]
+        private float returnDuration = 1.0f; // 移動にかかる時間
+
+        [SerializeField]
+        private Ease returnEase = Ease.InOutQuad; // イージングの種類
 
         private void Start()
         {
@@ -24,18 +32,29 @@ namespace AnoGame.Story
             if (other.CompareTag("Player"))
             {
                 Debug.Log("プレイヤーがトリガー内に入りました");
+                CharacterBrain characterBrain = other.GetComponent<CharacterBrain>();
+                characterBrain.enabled = false;
+
+                // Animatorを探して取得
+                Animator animator = FindAnimatorInHierarchy(other.gameObject);
+                if (animator != null)
+                {
+                    Debug.Log($"Found Animator on {animator.gameObject.name}");
+                    // ここでAnimatorに対する処理を追加できます
+                }
                 
                 if (returnPosition != null)
                 {
-                    // 現在のY座標を保持した新しい位置を作成
+                    // 以下、既存のコード
                     Vector3 newPosition = returnPosition.position;
                     newPosition.y = other.transform.position.y;
                     
-                    // プレイヤーの位置と回転を設定
-                    other.transform.position = newPosition;
-                    other.transform.rotation = returnPosition.rotation;
-
-                    StoryManager.Instance.LoadChapter(1);
+                    other.transform.DOMove(newPosition, returnDuration)
+                        .SetEase(returnEase)
+                        .OnComplete(() => 
+                        {
+                            characterBrain.enabled = true;
+                        });
                 }
                 else
                 {
@@ -43,7 +62,7 @@ namespace AnoGame.Story
                 }
             }
         }
-
+        
         private void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Player"))
@@ -51,6 +70,26 @@ namespace AnoGame.Story
                 Debug.Log("プレイヤーがトリガーから出ました");
             }
         }
+
+        private Animator FindAnimatorInHierarchy(GameObject targetObject)
+        {
+            // 直接アタッチされているAnimatorを確認
+            Animator animator = targetObject.GetComponent<Animator>();
+            if (animator != null)
+            {
+                return animator;
+            }
+
+            // 子オブジェクトを再帰的に検索
+            Animator[] childAnimators = targetObject.GetComponentsInChildren<Animator>();
+            if (childAnimators != null && childAnimators.Length > 0)
+            {
+                return childAnimators[0]; // 最初に見つかったAnimatorを返す
+            }
+
+            return null;
+        }
+
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
