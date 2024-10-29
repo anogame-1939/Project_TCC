@@ -14,6 +14,8 @@ public class StoryData : ScriptableObject
     {
         public string sceneName;
         public SceneReference sceneReference;
+
+        // NOTE:チャプターシーンにどんどんオブジェクトを配置するので、これはいらいないかも
         public List<EventData> events = new List<EventData>();
     }
 

@@ -10,7 +10,7 @@ using UnityEditor;
 namespace AnoGame.Event
 {
     [RequireComponent(typeof(Collider))]
-    public class EventArea : MonoBehaviour
+    public class StoryArea : MonoBehaviour
     {
         [SerializeField]
         int _eventId = 0;
@@ -42,7 +42,7 @@ namespace AnoGame.Event
             {
                 Debug.Log("プレイヤーがトリガー内に入りました");
                 // ここにプレイヤーが入った時の処理を書きます
-                EventManager.Instance.InvokeEvent(_eventId);
+                StoryManager.Instance.LoadChapter(1);
             }
         }
 
