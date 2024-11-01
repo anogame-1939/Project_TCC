@@ -43,7 +43,7 @@ namespace AnoGame.Story
                 Debug.Log("プレイヤーがトリガー内に入りました");
                 // ここにプレイヤーが入った時の処理を書きます
                 StoryManager.Instance.LoadChapter(_chapterIndex);
-                StoryManager.Instance.SaveGameData();
+                StoryManager.Instance.UpdateGameData();
             }
         }
 

@@ -22,7 +22,7 @@ namespace AnoGame.Story
         public void LoadChapter()
         {
             StoryManager.Instance.LoadChapter(_chapterIndex);
-            StoryManager.Instance.SaveGameData();
+            StoryManager.Instance.UpdateGameData();
         }
     }
 }

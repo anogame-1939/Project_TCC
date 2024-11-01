@@ -50,7 +50,7 @@ namespace AnoGame.Story
             }
         }
 
-        public void SaveGameData()
+        public void UpdateGameData()
         {
             GameData gameData = GameManager.Instance.CurrentGameData;
             
