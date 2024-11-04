@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -9,13 +10,15 @@ namespace AnoGame.Story
 {
     public class StoryManager : SingletonMonoBehaviour<StoryManager>
     {   
+        public event Action ChapterLoaded;
+        
         [SerializeField]
         private List<StoryData> _storyDataList;
 
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
 
-        private void Start()
+        private void Awake()
         {
             // GameManagerのLoadGameDataイベントを購読
             GameManager.Instance.LoadGameData += OnLoadGameData;
@@ -180,6 +183,7 @@ namespace AnoGame.Story
             {
                 Debug.Log("Current story completed or no more scenes available.");
             }
+            ChapterLoaded?.Invoke();
         }
 
         private void SpawnSceneEvents(StoryData.SceneData sceneData)
