@@ -3,7 +3,7 @@ using AnoGame.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AnoGame.Inventory
+namespace AnoGame.Application.Inventory
 {
     public class InventoryItemUI : MonoBehaviour
     {

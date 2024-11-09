@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using AnoGame.Data;
+using AnoGame.Application;
 
-namespace AnoGame.Inventory
+namespace AnoGame.Application.Inventory
 {
     public class InventoryViewer : MonoBehaviour
     {

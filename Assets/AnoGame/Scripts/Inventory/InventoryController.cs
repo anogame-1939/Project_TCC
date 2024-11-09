@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using AnoGame.Data;
 
-namespace AnoGame.Inventory
+namespace AnoGame.Application.Inventory
 {
     public class InventoryController : MonoBehaviour
     {
