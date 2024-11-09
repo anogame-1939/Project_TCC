@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using AnoGame.Infrastructure.Scene;
 
 namespace AnoGame.Application.Story
 {

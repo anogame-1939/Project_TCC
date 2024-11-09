@@ -1,3 +1,8 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using System;
+using Cysharp.Threading.Tasks;
+
 namespace AnoGame.Infrastructure.Scene
 {
     [System.Serializable]
@@ -13,13 +18,13 @@ namespace AnoGame.Infrastructure.Scene
 
     public interface ISceneLoader
     {
-        Task LoadSceneAsync(SceneReference scene, LoadSceneMode mode = LoadSceneMode.Single);
-        Task UnloadSceneAsync(SceneReference scene);
+        UniTask LoadSceneAsync(SceneReference scene, LoadSceneMode mode = LoadSceneMode.Single);
+        UniTask UnloadSceneAsync(SceneReference scene);
     }
 
     public class SceneLoader : ISceneLoader
     {
-        public async Task LoadSceneAsync(SceneReference scene, LoadSceneMode mode = LoadSceneMode.Single)
+        public async UniTask LoadSceneAsync(SceneReference scene, LoadSceneMode mode = LoadSceneMode.Single)
         {
             if (string.IsNullOrEmpty(scene.ScenePath))
             {
@@ -37,7 +42,7 @@ namespace AnoGame.Infrastructure.Scene
             }
         }
 
-        public async Task UnloadSceneAsync(SceneReference scene)
+        public async UniTask UnloadSceneAsync(SceneReference scene)
         {
             if (string.IsNullOrEmpty(scene.ScenePath))
             {

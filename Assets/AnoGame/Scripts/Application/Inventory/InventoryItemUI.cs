@@ -1,5 +1,4 @@
 using System;
-using AnoGame.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 

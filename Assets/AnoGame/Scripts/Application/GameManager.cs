@@ -1,47 +1,58 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
-using AnoGame.Utility;
+using AnoGame.Application.SaveData;
 
 namespace AnoGame.Application
 {
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
-        private AsyncJsonDataManager _saveDataManager;
+        private readonly GameDataRepository _repository;
+
         public Action<GameData> SaveGameData;
         public Action<GameData> LoadGameData;
 
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
 
+        public GameManager()
+        {
+            _repository = new GameDataRepository();
+        }
+
         private async void Start()
         {
-            _saveDataManager = new AsyncJsonDataManager();
             await InitializeGameData();
         }
 
-        private async System.Threading.Tasks.Task InitializeGameData()
+        private async Task InitializeGameData()
         {
-            // Try to load existing save data
-            GameData loadedData = await _saveDataManager.LoadDataAsync();
+            try
+            {
+                GameData loadedData = await _repository.LoadDataAsync();
 
-            if (loadedData != null)
-            {
-                _currentGameData = loadedData;
-                Debug.Log("Loaded existing save data");
+                if (loadedData != null)
+                {
+                    _currentGameData = loadedData;
+                    Debug.Log("Loaded existing save data");
+                }
+                else
+                {
+                    _currentGameData = CreateNewGameData();
+                    Debug.Log("Created new game data");
+                }
+
+                LoadGameData?.Invoke(_currentGameData);
             }
-            else
+            catch (Exception ex)
             {
-                // Create new game data if no save exists
+                Debug.LogError($"Failed to initialize game data: {ex.Message}");
                 _currentGameData = CreateNewGameData();
-                Debug.Log("Created new game data");
+                LoadGameData?.Invoke(_currentGameData);
             }
-
-            // Notify subscribers about the loaded/initialized data
-            LoadGameData?.Invoke(_currentGameData);
         }
 
         private GameData CreateNewGameData()
@@ -69,12 +80,18 @@ namespace AnoGame.Application
             }
         }
 
-        public async void SaveCurrentGameState()
+        public async Task SaveCurrentGameState()
         {
-            if (_currentGameData != null)
+            if (_currentGameData == null) return;
+
+            try
             {
-                await _saveDataManager.SaveDataAsync(_currentGameData);
+                await _repository.SaveDataAsync(_currentGameData);
                 Debug.Log("Game state saved successfully");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to save game state: {ex.Message}");
             }
         }
 
@@ -82,26 +99,34 @@ namespace AnoGame.Application
         {
             if (_currentGameData != null)
             {
-                SaveGameData?.Invoke(_currentGameData); // 最終的な状態更新を取得
-                await _saveDataManager.SaveDataAsync(_currentGameData);
-                Debug.Log("Game state saved on application quit");
+                SaveGameData?.Invoke(_currentGameData);
+                try
+                {
+                    await _repository.SaveDataAsync(_currentGameData);
+                    Debug.Log("Game state saved on application quit");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to save game state on quit: {ex.Message}");
+                }
             }
         }
 
-        // ゲームの状態を取得するためのヘルパーメソッド
-        public GameData GetCurrentGameState()
+        public async Task<bool> CreateSavePoint()
         {
-            return _currentGameData;
-        }
+            if (_currentGameData == null) return false;
 
-        // 明示的なセーブポイントを作成するためのメソッド
-        public async void CreateSavePoint()
-        {
-            if (_currentGameData != null)
+            try
             {
                 SaveGameData?.Invoke(_currentGameData);
-                await _saveDataManager.SaveDataAsync(_currentGameData);
+                await _repository.SaveDataAsync(_currentGameData);
                 Debug.Log("Save point created successfully");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to create save point: {ex.Message}");
+                return false;
             }
         }
     }
