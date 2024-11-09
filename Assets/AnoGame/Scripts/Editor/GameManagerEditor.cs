@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using AnoGame;
 using AnoGame.Application;
+using AnoGame.Application.Story;
 using AnoGame.Data;
 using AnoGame.Utility;
 using System.Threading.Tasks;
