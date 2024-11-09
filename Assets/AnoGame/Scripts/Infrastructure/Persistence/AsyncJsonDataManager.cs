@@ -1,23 +1,30 @@
 using UnityEngine;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
-// Infrastructure/Runtime/Persistence/AsyncJsonDataManager.cs
 namespace AnoGame.Infrastructure.Persistence
 {
     public class AsyncJsonDataManager
     {
-        private readonly string _basePath;
+        private string _basePath;
 
-        public AsyncJsonDataManager(string basePath = null)
+        public AsyncJsonDataManager()
         {
-            _basePath = basePath ?? Application.persistentDataPath;
+            // コンストラクタでは初期化しない
+        }
+
+        private void InitializePath()
+        {
+            if (string.IsNullOrEmpty(_basePath))
+            {
+                _basePath = UnityEngine.Application.persistentDataPath;
+            }
         }
 
         public async Task SaveDataAsync<T>(string fileName, T data)
         {
+            InitializePath();
             string path = Path.Combine(_basePath, fileName);
             string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
             
@@ -27,6 +34,7 @@ namespace AnoGame.Infrastructure.Persistence
 
         public async Task<T> LoadDataAsync<T>(string fileName) where T : class
         {
+            InitializePath();
             string path = Path.Combine(_basePath, fileName);
             
             if (!File.Exists(path))
@@ -40,6 +48,11 @@ namespace AnoGame.Infrastructure.Persistence
             
             Debug.Log($"Data loaded asynchronously from JSON: {path}");
             return loadedData;
+        }
+
+        public void SetCustomPath(string path)
+        {
+            _basePath = path;
         }
     }
 }

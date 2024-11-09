@@ -14,6 +14,12 @@ namespace AnoGame.Application.SaveData
             _jsonManager = new AsyncJsonDataManager();
         }
 
+        public void Initialize()
+        {
+            // 必要に応じてカスタムパスを設定
+            // _jsonManager.SetCustomPath(customPath);
+        }
+
         public async Task SaveDataAsync(GameData data)
         {
             await _jsonManager.SaveDataAsync(SaveFileName, data);
