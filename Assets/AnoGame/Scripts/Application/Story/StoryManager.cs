@@ -165,15 +165,18 @@ namespace AnoGame.Application.Story
 
         private IEnumerator LoadSceneCoroutine()
         {
-            // 前のストーリーシーンをすべてアンロード
-            foreach (var scene in _loadedStoryScenes)
+            // 現在のシーンリストのコピーを作成
+            var scenesToUnload = new List<Scene>(_loadedStoryScenes);
+            
+            // コピーしたリストを使用してアンロード
+            foreach (var scene in scenesToUnload)
             {
-                if (scene.isLoaded) // シーンがまだロードされているか確認
+                if (scene.isLoaded)
                 {
                     yield return SceneManager.UnloadSceneAsync(scene);
                 }
             }
-            _loadedStoryScenes.Clear(); // リストをクリア
+            _loadedStoryScenes.Clear(); // 元のリストをクリア
 
             ClearSpawnedObjects();
 
@@ -181,14 +184,11 @@ namespace AnoGame.Application.Story
             StoryData.SceneData currentScene = currentStory.GetCurrentScene();
             if (currentScene != null)
             {
-                // 新しいシーンをロード
                 yield return SceneManager.LoadSceneAsync(currentScene.sceneReference.scenePath, LoadSceneMode.Additive);
                 
-                // 新しくロードしたシーンを取得して保存
                 Scene newScene = SceneManager.GetSceneByPath(currentScene.sceneReference.scenePath);
                 _loadedStoryScenes.Add(newScene);
                 
-                // アクティブシーンとして設定
                 SceneManager.SetActiveScene(newScene);
 
                 SpawnSceneEvents(currentScene);
@@ -228,6 +228,8 @@ namespace AnoGame.Application.Story
             }
             _loadedStoryScenes.Clear();
         }
+
+        
         private void SpawnSceneEvents(StoryData.SceneData sceneData)
         {
             foreach (var eventData in sceneData.events)
