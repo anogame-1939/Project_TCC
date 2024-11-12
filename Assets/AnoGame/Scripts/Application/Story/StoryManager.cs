@@ -19,6 +19,9 @@ namespace AnoGame.Application.Story
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
 
+        private List<Scene> _loadedStoryScenes = new List<Scene>();
+
+
         private void Awake()
         {
             // GameManagerのLoadGameDataイベントを購読
@@ -162,10 +165,15 @@ namespace AnoGame.Application.Story
 
         private IEnumerator LoadSceneCoroutine()
         {
-            if (SceneManager.sceneCount > 1)
+            // 前のストーリーシーンをすべてアンロード
+            foreach (var scene in _loadedStoryScenes)
             {
-                yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
+                if (scene.isLoaded) // シーンがまだロードされているか確認
+                {
+                    yield return SceneManager.UnloadSceneAsync(scene);
+                }
             }
+            _loadedStoryScenes.Clear(); // リストをクリア
 
             ClearSpawnedObjects();
 
@@ -173,9 +181,14 @@ namespace AnoGame.Application.Story
             StoryData.SceneData currentScene = currentStory.GetCurrentScene();
             if (currentScene != null)
             {
+                // 新しいシーンをロード
                 yield return SceneManager.LoadSceneAsync(currentScene.sceneReference.scenePath, LoadSceneMode.Additive);
-
+                
+                // 新しくロードしたシーンを取得して保存
                 Scene newScene = SceneManager.GetSceneByPath(currentScene.sceneReference.scenePath);
+                _loadedStoryScenes.Add(newScene);
+                
+                // アクティブシーンとして設定
                 SceneManager.SetActiveScene(newScene);
 
                 SpawnSceneEvents(currentScene);
@@ -187,6 +200,34 @@ namespace AnoGame.Application.Story
             ChapterLoaded?.Invoke();
         }
 
+        // オプション: シーンがアンロードされたことを確認するユーティリティメソッド
+        private bool IsSceneLoaded(Scene scene)
+        {
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                if (SceneManager.GetSceneAt(i) == scene)
+                    return true;
+            }
+            return false;
+        }
+
+        // オプション: 明示的にすべてのストーリーシーンをアンロードするメソッド
+        public void UnloadAllStoryScenes()
+        {
+            StartCoroutine(UnloadAllStoryScenesCoroutine());
+        }
+
+        private IEnumerator UnloadAllStoryScenesCoroutine()
+        {
+            foreach (var scene in _loadedStoryScenes)
+            {
+                if (scene.isLoaded)
+                {
+                    yield return SceneManager.UnloadSceneAsync(scene);
+                }
+            }
+            _loadedStoryScenes.Clear();
+        }
         private void SpawnSceneEvents(StoryData.SceneData sceneData)
         {
             foreach (var eventData in sceneData.events)
