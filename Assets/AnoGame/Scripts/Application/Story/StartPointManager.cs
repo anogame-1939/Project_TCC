@@ -17,7 +17,15 @@ namespace AnoGame.Application.Story
 
         private Transform GetStartPoint()
         {
-            return GameObject.FindWithTag(TAG_START_POINT).transform;
+            var startPoint = GameObject.FindWithTag(TAG_START_POINT);
+            if (startPoint == null)
+            {
+                return null;
+            }
+            else
+            {
+                return startPoint.transform;
+            }
         }
 
         private GameObject GetPlayeyr()
