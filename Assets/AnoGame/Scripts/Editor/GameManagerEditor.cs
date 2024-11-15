@@ -10,12 +10,21 @@ namespace AnoGame.Editor
     [CustomEditor(typeof(GameManager))]
     public class GameManagerEditor : UnityEditor.Editor
     {
-      private bool showDebugOptions = true;
+        private bool showDebugOptions = true;
         private bool showStoryOptions = true;
+        private bool showStartOptions = true;
         private Vector2 scrollPosition;
         private GameData currentGameData;
         private StoryManager storyManager;
         private const string SAVE_FILE_NAME = "savedata.json";
+
+        // 追加: スタート方法の選択肢
+        private enum StartPointType
+        {
+            StartPoint,
+            RetryPoint
+        }
+        private StartPointType selectedStartType = StartPointType.StartPoint;
 
         private void OnEnable()
         {
@@ -31,6 +40,7 @@ namespace AnoGame.Editor
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 DrawDebugOptions();
+                DrawStartOptions(); // 追加: スタート設定の描画
                 DrawStoryOptions();
             }
         }
@@ -67,9 +77,28 @@ namespace AnoGame.Editor
             }
         }
 
+        private void DrawStartOptions()
+        {
+            showStartOptions = EditorGUILayout.Foldout(showStartOptions, "Start Options", true, EditorStyles.foldoutHeader);
+            
+            if (showStartOptions)
+            {
+                EditorGUI.indentLevel++;
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                {
+                    selectedStartType = (StartPointType)EditorGUILayout.EnumPopup("Start From", selectedStartType);
+                    EditorGUILayout.HelpBox(
+                        selectedStartType == StartPointType.StartPoint ? 
+                        "チャプターの開始位置からスタートします" : 
+                        "前回のリトライポイントからスタートします", 
+                        MessageType.Info
+                    );
+                }
+                EditorGUI.indentLevel--;
+            }
+        }
         private void DrawStoryOptions()
         {
-            // 初期状態で開いた状態にし、foldoutの矢印を右向きにする
             showStoryOptions = EditorGUILayout.Foldout(showStoryOptions, "Story Debug Options", true, EditorStyles.foldoutHeader);
             
             if (showStoryOptions && storyManager != null)
@@ -94,7 +123,7 @@ namespace AnoGame.Editor
                                 EditorGUILayout.LabelField($"Chapter {chapterIndex}: {chapter.chapterName}");
                                 if (GUILayout.Button("Start from here", GUILayout.Width(100)))
                                 {
-                                    StartFromChapter(storyIndex, chapterIndex);
+                                    StartFromChapter(storyIndex, chapterIndex, selectedStartType == StartPointType.RetryPoint);
                                 }
                                 EditorGUILayout.EndHorizontal();
                             }
@@ -179,7 +208,7 @@ namespace AnoGame.Editor
             }
         }
 
-        private void StartFromChapter(int storyIndex, int chapterIndex)
+        private void StartFromChapter(int storyIndex, int chapterIndex, bool useRetryPoint)
         {
             if (!UnityEngine.Application.isPlaying)
             {
@@ -191,8 +220,8 @@ namespace AnoGame.Editor
 
             if (storyManager != null)
             {
-                storyManager.SwitchToStory(storyIndex);
-                storyManager.LoadChapter(chapterIndex);
+                // 単一のメソッド呼び出しに変更
+                storyManager.SwitchToChapterInStory(storyIndex, chapterIndex, useRetryPoint);
             }
         }
 

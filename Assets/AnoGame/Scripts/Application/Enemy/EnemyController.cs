@@ -36,5 +36,18 @@ namespace AnoGame.Application.Enemy
         {
             _characterBrain.enabled = true;
         }
+
+        /// <summary>
+        /// キャラクターの動きを停止させる
+        /// </summary>
+        public void StopMoving()
+        {
+            _characterBrain.enabled = false;
+        }
+
+        /// <summary>
+        /// キャラクターが動いているかどうかを取得
+        /// </summary>
+        public bool IsMoving => _characterBrain != null && _characterBrain.enabled;
     }
 }

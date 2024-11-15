@@ -11,7 +11,7 @@ namespace AnoGame.Application.Story
 {
     public class StoryManager : SingletonMonoBehaviour<StoryManager>
     {   
-        public event Action ChapterLoaded;
+        public event Action<bool> ChapterLoaded;
         
         [SerializeField]
         private List<StoryData> _storyDataList;
@@ -92,10 +92,10 @@ namespace AnoGame.Application.Story
 
             StoryData currentStory = _storyDataList[_currentStoryIndex];
             currentStory.MoveToNextScene();
-            LoadCurrentScene();
+            LoadCurrentScene(false); // 次のシーンは常にスタートポイントから
         }
 
-        public void LoadChapter(int chapterIndex)
+        public void LoadChapter(int chapterIndex, bool useRetryPoint = false)
         {
             StoryData currentStory = _storyDataList[_currentStoryIndex];
             if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
@@ -106,7 +106,7 @@ namespace AnoGame.Application.Story
 
             currentStory.currentChapterIndex = chapterIndex;
             currentStory.currentSceneIndex = 0;
-            LoadCurrentScene();
+            LoadCurrentScene(useRetryPoint);
         }
 
         public void LoadChapterScene(int chapterIndex, int sceneIndex)
@@ -129,12 +129,13 @@ namespace AnoGame.Application.Story
             LoadCurrentScene();
         }
 
-        private void LoadCurrentScene()
+        private void LoadCurrentScene(bool useRetryPoint = false)
         {
-            StartCoroutine(LoadSceneCoroutine());
+            Debug.Log($"LoadCurrentScene:{useRetryPoint}");
+            StartCoroutine(LoadSceneCoroutine(useRetryPoint));
         }
 
-        private IEnumerator LoadSceneCoroutine()
+        private IEnumerator LoadSceneCoroutine(bool useRetryPoint)
         {
             if (_isLoadingScene)
             {
@@ -148,7 +149,9 @@ namespace AnoGame.Application.Story
             yield return LoadNewSceneCoroutine();
 
             _isLoadingScene = false;
-            ChapterLoaded?.Invoke();
+            
+            // 単一のイベントでスポーン方法も通知
+            ChapterLoaded?.Invoke(useRetryPoint);
         }
 
         private IEnumerator LoadNewSceneCoroutine()
@@ -266,7 +269,32 @@ namespace AnoGame.Application.Story
             _spawnedObjects.Clear();
         }
 
-        public void SwitchToStory(int storyIndex)
+        public void SwitchToChapterInStory(int storyIndex, int chapterIndex, bool useRetryPoint = false)
+        {
+            if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
+            {
+                Debug.LogError($"Invalid story index: {storyIndex}");
+                return;
+            }
+
+            StoryData targetStory = _storyDataList[storyIndex];
+            if (chapterIndex < 0 || chapterIndex >= targetStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+
+            // ストーリーとチャプターの状態を更新
+            _currentStoryIndex = storyIndex;
+            targetStory.currentChapterIndex = chapterIndex;
+            targetStory.currentSceneIndex = 0;
+
+            // シーンのロードを一度だけ実行
+            LoadCurrentScene(useRetryPoint);
+        }
+
+        // 既存のパブリックメソッドをprivateに変更
+        private void SwitchToStory(int storyIndex)
         {
             if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
             {
@@ -278,7 +306,19 @@ namespace AnoGame.Application.Story
             StoryData newStory = _storyDataList[_currentStoryIndex];
             newStory.currentChapterIndex = 0;
             newStory.currentSceneIndex = 0;
-            LoadCurrentScene();
+        }
+
+        private void LoadChapter(int chapterIndex)
+        {
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+
+            currentStory.currentChapterIndex = chapterIndex;
+            currentStory.currentSceneIndex = 0;
         }
 
         public StoryProgress GetCurrentProgress()

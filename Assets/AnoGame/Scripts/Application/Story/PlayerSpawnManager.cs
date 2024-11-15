@@ -49,6 +49,35 @@ namespace AnoGame.Application.Story
             }
         }
 
+        // ChapterLoadedイベントハンドラを修正
+        private void OnChapterLoaded(bool useRetryPoint)
+        {
+            if (useRetryPoint)
+            {
+                Debug.Log("リトライポイントからチャプターを開始します。");
+                SpawnPlayerAtRetryPoint();
+            }
+            else
+            {
+                Debug.Log("スタートポイントからチャプターを開始します。");
+                SpawnPlayerAtStart();
+            }
+        }
+
+        private void OnChapterStartRequested(bool useRetryPoint)
+        {
+            if (useRetryPoint)
+            {
+                Debug.Log("リトライポイントからチャプターを開始します。");
+                SpawnPlayerAtRetryPoint();
+            }
+            else
+            {
+                Debug.Log("スタートポイントからチャプターを開始します。");
+                SpawnPlayerAtStart();
+            }
+        }
+
         private void OnChapterLoaded()
         {
             Debug.Log("新しいチャプターを開始します。プレイヤーをスタートポイントに配置します。");
