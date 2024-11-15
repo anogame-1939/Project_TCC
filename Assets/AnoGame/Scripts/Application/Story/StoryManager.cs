@@ -18,50 +18,41 @@ namespace AnoGame.Application.Story
 
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
-
         private List<Scene> _loadedStoryScenes = new List<Scene>();
-
+        private Scene _mainScene;
+        private bool _isLoadingScene = false;
 
         private void Awake()
         {
-            // GameManagerのLoadGameDataイベントを購読
+            _mainScene = SceneManager.GetActiveScene();
             GameManager.Instance.LoadGameData += OnLoadGameData;
-            // GameManager.Instance.SaveGameData += OnSaveGameData;
         }
 
         private void OnDestroy()
         {
-            // イベント購読の解除
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.LoadGameData -= OnLoadGameData;
-                // GameManager.Instance.SaveGameData -= OnSaveGameData;
             }
         }
 
         private void OnLoadGameData(GameData gameData)
         {
-            if (gameData == null) return;
+            if (gameData == null || gameData.storyProgress == null) return;
 
-            // ストーリー進行状況の復元
-            if (gameData.storyProgress != null)
+            _currentStoryIndex = gameData.storyProgress.currentStoryIndex;
+            if (_currentStoryIndex < _storyDataList.Count)
             {
-                _currentStoryIndex = gameData.storyProgress.currentStoryIndex;
-                if (_currentStoryIndex < _storyDataList.Count)
-                {
-                    StoryData currentStory = _storyDataList[_currentStoryIndex];
-                    currentStory.currentChapterIndex = gameData.storyProgress.currentChapterIndex;
-                    currentStory.currentSceneIndex = gameData.storyProgress.currentSceneIndex;
-                    LoadCurrentScene();
-                }
+                StoryData currentStory = _storyDataList[_currentStoryIndex];
+                currentStory.currentChapterIndex = gameData.storyProgress.currentChapterIndex;
+                currentStory.currentSceneIndex = gameData.storyProgress.currentSceneIndex;
+                LoadCurrentScene();
             }
         }
 
         public void UpdateGameData()
         {
             GameData gameData = GameManager.Instance.CurrentGameData;
-            
-            // 現在のストーリー進行状況を保存
             if (gameData.storyProgress == null)
             {
                 gameData.storyProgress = new StoryProgress();
@@ -138,26 +129,6 @@ namespace AnoGame.Application.Story
             LoadCurrentScene();
         }
 
-        public int GetCurrentChapterIndex()
-        {
-            return _storyDataList[_currentStoryIndex].currentChapterIndex;
-        }
-
-        public int GetCurrentSceneIndex()
-        {
-            return _storyDataList[_currentStoryIndex].currentSceneIndex;
-        }
-
-        public StoryData.ChapterData GetCurrentChapter()
-        {
-            StoryData currentStory = _storyDataList[_currentStoryIndex];
-            if (currentStory.currentChapterIndex < currentStory.chapters.Count)
-            {
-                return currentStory.chapters[currentStory.currentChapterIndex];
-            }
-            return null;
-        }
-
         private void LoadCurrentScene()
         {
             StartCoroutine(LoadSceneCoroutine());
@@ -165,80 +136,121 @@ namespace AnoGame.Application.Story
 
         private IEnumerator LoadSceneCoroutine()
         {
-            // 現在のシーンリストのコピーを作成
-            var scenesToUnload = new List<Scene>(_loadedStoryScenes);
-            
-            // コピーしたリストを使用してアンロード
-            foreach (var scene in scenesToUnload)
+            if (_isLoadingScene)
             {
-                if (scene.isLoaded)
-                {
-                    yield return SceneManager.UnloadSceneAsync(scene);
-                }
+                Debug.LogWarning("Scene loading is already in progress");
+                yield break;
             }
-            _loadedStoryScenes.Clear(); // 元のリストをクリア
 
-            ClearSpawnedObjects();
+            _isLoadingScene = true;
 
-            StoryData currentStory = _storyDataList[_currentStoryIndex];
-            StoryData.SceneData currentScene = currentStory.GetCurrentScene();
-            if (currentScene != null)
-            {
-                yield return SceneManager.LoadSceneAsync(currentScene.sceneReference.scenePath, LoadSceneMode.Additive);
-                
-                Scene newScene = SceneManager.GetSceneByPath(currentScene.sceneReference.scenePath);
-                _loadedStoryScenes.Add(newScene);
-                
-                SceneManager.SetActiveScene(newScene);
+            yield return UnloadCurrentScenesCoroutine();
+            yield return LoadNewSceneCoroutine();
 
-                SpawnSceneEvents(currentScene);
-            }
-            else
-            {
-                Debug.Log("Current story completed or no more scenes available.");
-            }
+            _isLoadingScene = false;
             ChapterLoaded?.Invoke();
         }
 
-        // オプション: シーンがアンロードされたことを確認するユーティリティメソッド
-        private bool IsSceneLoaded(Scene scene)
+        private IEnumerator LoadNewSceneCoroutine()
         {
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            StoryData.SceneData currentScene = currentStory.GetCurrentScene();
+            
+            if (currentScene == null)
             {
-                if (SceneManager.GetSceneAt(i) == scene)
-                    return true;
+                Debug.Log("Current story completed or no more scenes available.");
+                yield break;
             }
-            return false;
-        }
 
-        // オプション: 明示的にすべてのストーリーシーンをアンロードするメソッド
-        public void UnloadAllStoryScenes()
-        {
-            StartCoroutine(UnloadAllStoryScenesCoroutine());
-        }
-
-        private IEnumerator UnloadAllStoryScenesCoroutine()
-        {
-            foreach (var scene in _loadedStoryScenes)
+            AsyncOperation loadOperation = null;
+            try
             {
-                if (scene.isLoaded)
+                loadOperation = SceneManager.LoadSceneAsync(
+                    currentScene.sceneReference.scenePath, 
+                    LoadSceneMode.Additive
+                );
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to start scene loading: {ex.Message}");
+                yield break;
+            }
+
+            if (loadOperation == null)
+            {
+                Debug.LogError("Failed to start scene loading operation");
+                yield break;
+            }
+
+            yield return loadOperation;
+
+            Scene newScene = SceneManager.GetSceneByPath(
+                currentScene.sceneReference.scenePath
+            );
+            
+            if (newScene.IsValid())
+            {
+                _loadedStoryScenes.Add(newScene);
+                SceneManager.SetActiveScene(newScene);
+                yield return SpawnSceneEventsCoroutine(currentScene);
+            }
+            else
+            {
+                Debug.LogError($"Failed to load scene: {currentScene.sceneReference.scenePath}");
+            }
+        }
+
+        private IEnumerator UnloadCurrentScenesCoroutine()
+        {
+            var scenesToUnload = new List<Scene>(_loadedStoryScenes);
+            
+            foreach (var scene in scenesToUnload)
+            {
+                if (!scene.isLoaded || !scene.IsValid()) continue;
+
+                AsyncOperation unloadOperation = null;
+                try
                 {
-                    yield return SceneManager.UnloadSceneAsync(scene);
+                    unloadOperation = SceneManager.UnloadSceneAsync(scene);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to unload scene {scene.path}: {ex.Message}");
+                    continue;
+                }
+
+                if (unloadOperation != null)
+                {
+                    yield return unloadOperation;
                 }
             }
+
+            ClearSpawnedObjects();
             _loadedStoryScenes.Clear();
+
+            if (_mainScene.IsValid())
+            {
+                SceneManager.SetActiveScene(_mainScene);
+            }
         }
 
-        
-        private void SpawnSceneEvents(StoryData.SceneData sceneData)
+        private IEnumerator SpawnSceneEventsCoroutine(StoryData.SceneData sceneData)
         {
             foreach (var eventData in sceneData.events)
             {
-                if (eventData.eventPrefab != null)
+                if (eventData.eventPrefab == null) continue;
+
+                try
                 {
                     GameObject spawnedEvent = Instantiate(eventData.eventPrefab);
                     _spawnedObjects.Add(spawnedEvent);
                 }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to spawn event: {ex.Message}");
+                }
+
+                yield return null;
             }
         }
 
@@ -254,7 +266,6 @@ namespace AnoGame.Application.Story
             _spawnedObjects.Clear();
         }
 
-        // 将来的に複数のストーリーを切り替える場合に使用できるメソッド
         public void SwitchToStory(int storyIndex)
         {
             if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
@@ -280,10 +291,14 @@ namespace AnoGame.Application.Story
             };
         }
 
-        // エディタ拡張用のメソッド
         public List<StoryData> GetStoryList()
         {
             return _storyDataList;
+        }
+
+        public bool IsLoadingScene()
+        {
+            return _isLoadingScene;
         }
     }
 }
