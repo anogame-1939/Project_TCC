@@ -1,5 +1,11 @@
 using UnityEngine;
 using Unity.TinyCharacterController.Brain;
+using Unity.TinyCharacterController.Utility;
+using AnoGame.Data;
+using AnoGame.Infrastructure;
+using System.Data;
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,12 +13,10 @@ using UnityEditor;
 
 namespace AnoGame.Application.Story
 {
-    public class PlayerSpawnManager : MonoBehaviour
+    public class PlayerSpawnManager : SingletonMonoBehaviour<PlayerSpawnManager>
     {   
         private const string TAG_START_POINT = "StartPoint";
         private const string TAG_RETRY_POINT = "RetryPoint";
-        private const string TAG_PLAYER = "Player";
-
         private Transform _currentRetryPoint;
 
         private Transform GetStartPoint()
@@ -33,7 +37,7 @@ namespace AnoGame.Application.Story
 
         private GameObject GetPlayer()
         {
-            return GameObject.FindWithTag(TAG_PLAYER);
+            return GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
         }
 
         private void Awake()

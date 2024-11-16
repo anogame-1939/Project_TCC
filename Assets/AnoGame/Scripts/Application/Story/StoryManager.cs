@@ -129,6 +129,11 @@ namespace AnoGame.Application.Story
             LoadCurrentScene();
         }
 
+        public void RetyrCurrentScene()
+        {
+            LoadCurrentScene(true);
+        }
+
         private void LoadCurrentScene(bool useRetryPoint = false)
         {
             Debug.Log($"LoadCurrentScene:{useRetryPoint}");

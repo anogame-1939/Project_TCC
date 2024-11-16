@@ -105,9 +105,10 @@ GameObject:
   - component: {fileID: 8767099837496873908}
   - component: {fileID: 1141397107372657069}
   - component: {fileID: 209838264505659984}
-  - component: {fileID: 518091242443245079}
   - component: {fileID: 4198544048319232763}
   - component: {fileID: 3449351817243072097}
+  - component: {fileID: 518091242443245079}
+  - component: {fileID: 5581002343617322569}
   m_Layer: 3
   m_Name: Player_1
   m_TagString: Player
@@ -325,23 +326,6 @@ MonoBehaviour:
   _onChangeGroundObject:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &518091242443245079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4536223424420877434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e244f9263e9f44e46b7b455f8e6b66fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collectRadius: 0.6
-  itemLayer:
-    serializedVersion: 2
-    m_Bits: 33554432
-  viewAngle: 360
 --- !u!114 &4198544048319232763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,6 +389,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tagSpecificElements: []
   layerSpecificElements: []
+--- !u!114 &518091242443245079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4536223424420877434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e244f9263e9f44e46b7b455f8e6b66fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collectRadius: 0.6
+  itemLayer:
+    serializedVersion: 2
+    m_Bits: 33554432
+  viewAngle: 360
+--- !u!114 &5581002343617322569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4536223424420877434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e378e6fd073acd45bb8f573693d8077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 1
+  _invincibilityDuration: 1
 --- !u!1 &6308477388476660970
 GameObject:
   m_ObjectHideFlags: 0
