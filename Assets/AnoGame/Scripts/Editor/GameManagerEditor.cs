@@ -124,6 +124,8 @@ namespace AnoGame.Editor
                                 if (GUILayout.Button("Start from here", GUILayout.Width(100)))
                                 {
                                     StartFromChapter(storyIndex, chapterIndex, selectedStartType == StartPointType.RetryPoint);
+                                    PlayerSpawnManager.Instance.OnChapterLoaded(selectedStartType == StartPointType.RetryPoint);
+
                                 }
                                 EditorGUILayout.EndHorizontal();
                             }
@@ -220,7 +222,6 @@ namespace AnoGame.Editor
 
             if (storyManager != null)
             {
-                // 単一のメソッド呼び出しに変更
                 storyManager.SwitchToChapterInStory(storyIndex, chapterIndex, useRetryPoint);
             }
         }

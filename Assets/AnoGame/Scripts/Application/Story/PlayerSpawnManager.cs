@@ -42,19 +42,15 @@ namespace AnoGame.Application.Story
 
         private void Awake()
         {
-            StoryManager.Instance.ChapterLoaded += OnChapterLoaded;
+            // StoryManager.Instance.ChapterLoaded += OnChapterLoaded;
         }
 
         private void OnDestroy()
         {
-            if (StoryManager.Instance != null)
-            {
-                StoryManager.Instance.ChapterLoaded -= OnChapterLoaded;
-            }
         }
 
         // ChapterLoadedイベントハンドラを修正
-        private void OnChapterLoaded(bool useRetryPoint)
+        public void OnChapterLoaded(bool useRetryPoint)
         {
             if (useRetryPoint)
             {
