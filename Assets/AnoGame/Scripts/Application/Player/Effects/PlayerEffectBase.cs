@@ -13,7 +13,12 @@ namespace AnoGame.Application.Player.Effects
 
         protected virtual void Start()
         {
-            moveController = GetComponent<MoveControl>();
+            moveController = GetComponentInParent<MoveControl>();
+            
+            if (moveController == null)
+            {
+                Debug.LogError($"MoveControlが親オブジェクトに見つけられません。 {GetType().Name}", this);
+            }
         }
 
         public virtual void TriggerEffect(float duration)
