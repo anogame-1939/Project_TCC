@@ -1,23 +1,20 @@
-// Assets/AnoGame/Scripts/Application/Player/Effects/VisionReductionEffect.cs
 using UnityEngine;
 
 namespace AnoGame.Application.Player.Effects
 {
-    public class VisionReductionEffect : PlayerEffectBase
+    public sealed class VisionReductionEffect : PlayerEffectBase
     {
         [SerializeField] private Camera playerCamera;
         [SerializeField] private float normalFOV = 60f;
         [SerializeField] private float reducedFOV = 40f;
 
-        public override void TriggerEffect(float duration)
+        protected override void OnEffectStart()
         {
-            base.TriggerEffect(duration);
             playerCamera.fieldOfView = reducedFOV;
         }
 
-        protected override void EndEffect()
+        protected override void OnEffectEnd()
         {
-            base.EndEffect();
             playerCamera.fieldOfView = normalFOV;
         }
     }

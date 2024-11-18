@@ -7,16 +7,14 @@ namespace AnoGame.Application.Player.Effects
         [SerializeField] private float slowFactor = 0.5f;
         private float originalSpeed;
 
-        public override void TriggerEffect(float duration)
+        protected override void OnEffectStart()
         {
-            base.TriggerEffect(duration);
             originalSpeed = moveController.MoveSpeed;
             moveController.MoveSpeed *= slowFactor;
         }
 
-        protected override void EndEffect()
+        protected override void OnEffectEnd()
         {
-            base.EndEffect();
             moveController.MoveSpeed = originalSpeed;
         }
     }

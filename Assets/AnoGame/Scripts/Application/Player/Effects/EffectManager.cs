@@ -28,19 +28,14 @@ namespace AnoGame.Application.Player.Effects
         [SerializeField] private KnockbackEffect knockback;
         [SerializeField] private InstantDeath instantDeath;
 
-        // アクティブな効果を追跡
-        private readonly HashSet<CollisionType> _activeEffects = new();
+        // 即時効果のみを追跡
+        private readonly HashSet<CollisionType> _activeInstantEffects = new();
 
-        // 効果の適用
         public void ApplyEffect(CollisionType effectType)
         {
-            if (_activeEffects.Contains(effectType))
-                return; // 既に効果が適用中の場合はスキップ
-
-            _activeEffects.Add(effectType);
-
             switch (effectType)
             {
+                // デバフ効果：重複可能で時間延長
                 case CollisionType.VisionReduction:
                     visionEffect.TriggerEffect(settings.visionReductionDuration);
                     break;
@@ -53,38 +48,49 @@ namespace AnoGame.Application.Player.Effects
                     slowEffect.TriggerEffect(settings.slowDuration);
                     break;
                     
+                // 即時効果：重複不可
                 case CollisionType.EnemyAware:
-                    enemyAwareness.SpawnNearPlayer();
-                    _activeEffects.Remove(effectType); // 即時効果なので直ぐに削除
+                    if (!_activeInstantEffects.Contains(effectType))
+                    {
+                        _activeInstantEffects.Add(effectType);
+                        enemyAwareness.SpawnNearPlayer();
+                        _activeInstantEffects.Remove(effectType);
+                    }
                     break;
                     
                 case CollisionType.Teleport:
-                    teleporter.TeleportToRandom();
-                    _activeEffects.Remove(effectType); // 即時効果なので直ぐに削除
+                    if (!_activeInstantEffects.Contains(effectType))
+                    {
+                        _activeInstantEffects.Add(effectType);
+                        teleporter.TeleportToRandom();
+                        _activeInstantEffects.Remove(effectType);
+                    }
                     break;
                     
                 case CollisionType.Knockback:
-                    knockback.ApplyKnockback(transform.forward);
-                    _activeEffects.Remove(effectType); // 即時効果なので直ぐに削除
+                    if (!_activeInstantEffects.Contains(effectType))
+                    {
+                        _activeInstantEffects.Add(effectType);
+                        knockback.ApplyKnockback(transform.forward);
+                        _activeInstantEffects.Remove(effectType);
+                    }
                     break;
                     
                 case CollisionType.InstantDeath:
-                    instantDeath.Kill();
-                    _activeEffects.Remove(effectType); // 即時効果なので直ぐに削除
+                    if (!_activeInstantEffects.Contains(effectType))
+                    {
+                        _activeInstantEffects.Add(effectType);
+                        instantDeath.Kill();
+                        _activeInstantEffects.Remove(effectType);
+                    }
                     break;
             }
         }
 
-        // 効果の終了通知を受け取るメソッド
-        public void NotifyEffectEnd(CollisionType effectType)
-        {
-            _activeEffects.Remove(effectType);
-        }
-
-        // 特定の効果が適用中かチェック
+        // 即時効果のアクティブ状態のみをチェック
         public bool IsEffectActive(CollisionType effectType)
         {
-            return _activeEffects.Contains(effectType);
+            return _activeInstantEffects.Contains(effectType);
         }
     }
 }

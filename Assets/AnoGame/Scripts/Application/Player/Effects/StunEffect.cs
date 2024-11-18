@@ -7,22 +7,14 @@ namespace AnoGame.Application.Player.Effects
     {
         private int originalMovePriority;
 
-        public override void TriggerEffect(float duration)
+        protected override void OnEffectStart()
         {
-            base.TriggerEffect(duration);
-            
-            // 現在の優先度を保存
             originalMovePriority = moveController.MovePriority;
-            
-            // 移動を停止
             moveController.MovePriority = 0;
         }
 
-        protected override void EndEffect()
+        protected override void OnEffectEnd()
         {
-            base.EndEffect();
-            
-            // 元の優先度を復元
             moveController.MovePriority = originalMovePriority;
         }
     }

@@ -1,14 +1,12 @@
 using UnityEngine;
 using Unity.TinyCharacterController.Control;
 
-
 namespace AnoGame.Application.Player.Effects
 {
     public abstract class PlayerEffectBase : MonoBehaviour
     {
         protected MoveControl moveController;
         protected bool isActive = false;
-        protected float duration;
         protected float timer;
 
         protected virtual void Start()
@@ -23,9 +21,17 @@ namespace AnoGame.Application.Player.Effects
 
         public virtual void TriggerEffect(float duration)
         {
-            this.duration = duration;
-            timer = duration;
-            isActive = true;
+            if (isActive)
+            {
+                // 既に効果が適用中の場合は、より長い方の時間を採用
+                timer = Mathf.Max(timer, duration);
+            }
+            else
+            {
+                timer = duration;
+                isActive = true;
+                OnEffectStart();
+            }
         }
 
         protected virtual void Update()
@@ -42,6 +48,13 @@ namespace AnoGame.Application.Player.Effects
         protected virtual void EndEffect()
         {
             isActive = false;
+            OnEffectEnd();
         }
+
+        // 効果開始時の処理
+        protected abstract void OnEffectStart();
+
+        // 効果終了時の処理
+        protected abstract void OnEffectEnd();
     }
 }
