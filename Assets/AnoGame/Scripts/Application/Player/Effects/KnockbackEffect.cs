@@ -1,22 +1,51 @@
-
-// Assets/AnoGame/Scripts/Application/Player/Effects/KnockbackEffect.cs
 using UnityEngine;
 
 namespace AnoGame.Application.Player.Effects
 {
-    public class KnockbackEffect : MonoBehaviour
+    public class KnockbackEffect : PlayerEffectBase
     {
         [SerializeField] private float knockbackForce = 10f;
-        private Rigidbody rb;
+        
+        private Vector3 knockbackDirection;
+        private float originalMoveSpeed;
+        private int originalMovePriority;
 
-        private void Start()
+        public void ApplyKnockback(Vector3 direction, float duration)
         {
-            rb = GetComponent<Rigidbody>();
+            knockbackDirection = direction.normalized;
+            TriggerEffect(duration);
         }
 
-        public void ApplyKnockback(Vector3 direction)
+        protected override void OnEffectStart()
         {
-            rb.AddForce(direction.normalized * knockbackForce, ForceMode.Impulse);
+            // Store original values
+            originalMovePriority = moveController.MovePriority;
+            originalMoveSpeed = moveController.MoveSpeed;
+
+            // Override movement control
+            moveController.MovePriority = 999;
+            moveController.MoveSpeed = knockbackForce;
+            moveController.Velocity = knockbackDirection * knockbackForce;
+        }
+
+        protected override void OnEffectEnd()
+        {
+            // Restore original values
+            moveController.MovePriority = originalMovePriority;
+            moveController.MoveSpeed = originalMoveSpeed;
+            moveController.Velocity = Vector3.zero;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!isActive) return;
+
+            // ノックバック効果の減衰（より急激な初期ノックバックと自然な減衰）
+            float normalizedTime = timer / timer;
+            float forceMultiplier = Mathf.Pow(normalizedTime, 2f); // 二次関数的な減衰
+            moveController.Velocity = knockbackDirection * (knockbackForce * forceMultiplier);
         }
     }
 }

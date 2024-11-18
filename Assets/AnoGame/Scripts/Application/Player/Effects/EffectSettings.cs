@@ -9,5 +9,6 @@ namespace AnoGame.Application.Player.Effects
         public float visionReductionDuration = 3f;
         public float stunDuration = 2f;
         public float slowDuration = 5f;
+        public float knockbackDuration = 0.5f;
     }
 }

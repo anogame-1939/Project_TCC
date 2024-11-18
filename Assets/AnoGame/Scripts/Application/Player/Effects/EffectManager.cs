@@ -31,7 +31,7 @@ namespace AnoGame.Application.Player.Effects
         // 即時効果のみを追跡
         private readonly HashSet<CollisionType> _activeInstantEffects = new();
 
-        public void ApplyEffect(CollisionType effectType)
+        public void ApplyEffect(CollisionType effectType, Vector3? direction = null)
         {
             switch (effectType)
             {
@@ -71,7 +71,7 @@ namespace AnoGame.Application.Player.Effects
                     if (!_activeInstantEffects.Contains(effectType))
                     {
                         _activeInstantEffects.Add(effectType);
-                        knockback.ApplyKnockback(transform.forward);
+                        knockback.ApplyKnockback(direction ?? transform.forward, settings.knockbackDuration);
                         _activeInstantEffects.Remove(effectType);
                     }
                     break;
