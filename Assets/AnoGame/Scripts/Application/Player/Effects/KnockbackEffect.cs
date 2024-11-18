@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace AnoGame.Application.Player.Effects
 {
@@ -12,12 +13,14 @@ namespace AnoGame.Application.Player.Effects
 
         public void ApplyKnockback(Vector3 direction, float duration)
         {
+            Debug.Log("ApplyKnockback");
             knockbackDirection = direction.normalized;
             TriggerEffect(duration);
         }
 
         protected override void OnEffectStart()
         {
+            Debug.Log("OnEffectStart");
             // Store original values
             originalMovePriority = moveController.MovePriority;
             originalMoveSpeed = moveController.MoveSpeed;
@@ -26,14 +29,23 @@ namespace AnoGame.Application.Player.Effects
             moveController.MovePriority = 999;
             moveController.MoveSpeed = knockbackForce;
             moveController.Velocity = knockbackDirection * knockbackForce;
+            moveController.enabled = false;
+
+            var playerInput = GetComponentInParent<PlayerInput>();
+            playerInput.enabled = false;
         }
 
         protected override void OnEffectEnd()
         {
+            Debug.Log("OnEffectEnd");
             // Restore original values
             moveController.MovePriority = originalMovePriority;
             moveController.MoveSpeed = originalMoveSpeed;
             moveController.Velocity = Vector3.zero;
+            moveController.enabled = true;
+
+            var playerInput = GetComponentInParent<PlayerInput>();
+            playerInput.enabled = true;
         }
 
         protected override void Update()

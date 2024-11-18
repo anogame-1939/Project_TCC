@@ -71,7 +71,7 @@ namespace AnoGame.Application.Player.Effects
                     if (!_activeInstantEffects.Contains(effectType))
                     {
                         _activeInstantEffects.Add(effectType);
-                        knockback.ApplyKnockback(direction ?? transform.forward, settings.knockbackDuration);
+                        knockback.ApplyKnockback(direction ?? - transform.forward, settings.knockbackDuration);
                         _activeInstantEffects.Remove(effectType);
                     }
                     break;
