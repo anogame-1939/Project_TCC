@@ -1,18 +1,19 @@
-// Assets/AnoGame/Scripts/Application/Player/Effects/Base/PlayerEffectBase.cs
 using UnityEngine;
+using Unity.TinyCharacterController.Control;
+
 
 namespace AnoGame.Application.Player.Effects
 {
     public abstract class PlayerEffectBase : MonoBehaviour
     {
-        protected PlayerController playerController;
+        protected MoveControl moveController;
         protected bool isActive = false;
         protected float duration;
         protected float timer;
 
         protected virtual void Start()
         {
-            playerController = GetComponent<PlayerController>();
+            moveController = GetComponent<MoveControl>();
         }
 
         public virtual void TriggerEffect(float duration)
