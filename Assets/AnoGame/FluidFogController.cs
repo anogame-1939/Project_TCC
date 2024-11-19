@@ -27,12 +27,6 @@ namespace AnoGame
         public float turbulence = 0.5f;
         [Range(0, 1)]
         public float distortionStrength = 0.1f;
-        [Range(0, 100)]
-        public float fogStart = 0f;
-        [Range(0, 100)]
-        public float fogEnd = 100f;
-        [Range(0, 1)]
-        public float heightFalloff = 0.1f;
 
         void Update()
         {
@@ -48,19 +42,17 @@ namespace AnoGame
                 
                 // ノイズ設定 - 周期的なアニメーション
                 Vector3 timeOffset = new Vector3(
-                    Mathf.Repeat(Time.time * noiseSpeed.x, 0.1f),
-                    Mathf.Repeat(Time.time * noiseSpeed.y, 0.1f),
-                    Mathf.Repeat(Time.time * noiseSpeed.z, 0.1f)
+                    Mathf.Repeat(Time.time * noiseSpeed.x, 1.0f),
+                    Mathf.Repeat(Time.time * noiseSpeed.y, 1.0f),
+                    Mathf.Repeat(Time.time * noiseSpeed.z, 1.0f)
                 );
+                Debug.Log($"timeOffset...{timeOffset.x}, {timeOffset.y}, {timeOffset.z}");
                 fogMaterial.SetFloat("_NoiseScale", noiseScale);
                 fogMaterial.SetVector("_NoiseSpeed", new Vector4(timeOffset.x, timeOffset.y, timeOffset.z, 0));
                 
                 // エフェクト設定
                 fogMaterial.SetFloat("_Turbulence", turbulence);
                 fogMaterial.SetFloat("_DistortionStrength", distortionStrength);
-                fogMaterial.SetFloat("_FogStart", fogStart);
-                fogMaterial.SetFloat("_FogEnd", fogEnd);
-                fogMaterial.SetFloat("_HeightFalloff", heightFalloff);
             }
         }
     }

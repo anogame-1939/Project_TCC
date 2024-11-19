@@ -56,20 +56,23 @@ Shader "Custom/FluidFogEffect"
             float _Turbulence;
             float _DistortionStrength;
             
-            // 3Dノイズをサンプリング
+            // 3Dノイズをサンプリング（修正版）
             float SampleNoise(float3 pos, float time)
             {
-                float3 samplePos = pos * _NoiseScale + _NoiseSpeed.xyz * time;
-                return SAMPLE_TEXTURE3D(_NoiseTex, sampler_NoiseTex, samplePos).r;
+                // frac関数を使用して周期的な動きを実現
+                float3 samplePos = pos * _NoiseScale;
+                samplePos += frac(_NoiseSpeed.xyz * time);
+                return SAMPLE_TEXTURE3D(_NoiseTex, sampler_NoiseTex, frac(samplePos)).r;
             }
             
-            // 流体の動きを計算
+            // 流体の動きを計算（修正版）
             float3 FlowMovement(float3 worldPos, float time)
             {
-                float3 flowOffset = _FlowDirection.xyz * time;
+                // フローの基本移動
+                float3 flowOffset = _FlowDirection.xyz * frac(time * 0.1);
                 float3 pos = worldPos + flowOffset;
                 
-                // 乱流の追加
+                // 乱流の計算
                 float turbulence = SampleNoise(pos * 2.0, time * 0.5) * _Turbulence;
                 pos += float3(
                     SampleNoise(pos + float3(0, turbulence, 0), time),
