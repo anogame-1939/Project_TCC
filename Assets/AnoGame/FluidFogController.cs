@@ -28,6 +28,8 @@ namespace AnoGame
         [Range(0, 1)]
         public float distortionStrength = 0.1f;
 
+        private Vector3 currentOffset;
+
         void Update()
         {
             if (fogMaterial)
@@ -40,15 +42,10 @@ namespace AnoGame
                 Vector3 normalizedFlow = flowDirection.normalized * flowSpeed;
                 fogMaterial.SetVector("_FlowDirection", new Vector4(normalizedFlow.x, normalizedFlow.y, normalizedFlow.z, 0));
                 
-                // ノイズ設定 - 周期的なアニメーション
-                Vector3 timeOffset = new Vector3(
-                    Mathf.Repeat(Time.time * noiseSpeed.x, 1.0f),
-                    Mathf.Repeat(Time.time * noiseSpeed.y, 1.0f),
-                    Mathf.Repeat(Time.time * noiseSpeed.z, 1.0f)
-                );
-                Debug.Log($"timeOffset...{timeOffset.x}, {timeOffset.y}, {timeOffset.z}");
+                // 連続的な時間オフセット
+                currentOffset += noiseSpeed * Time.deltaTime;
                 fogMaterial.SetFloat("_NoiseScale", noiseScale);
-                fogMaterial.SetVector("_NoiseSpeed", new Vector4(timeOffset.x, timeOffset.y, timeOffset.z, 0));
+                fogMaterial.SetVector("_NoiseSpeed", new Vector4(currentOffset.x, currentOffset.y, currentOffset.z, 0));
                 
                 // エフェクト設定
                 fogMaterial.SetFloat("_Turbulence", turbulence);

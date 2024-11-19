@@ -56,31 +56,31 @@ Shader "Custom/FluidFogEffect"
             float _Turbulence;
             float _DistortionStrength;
             
-            // 3Dノイズをサンプリング（修正版）
-            float SampleNoise(float3 pos, float time)
+            float SampleNoise(float3 pos, float3 timeOffset)
             {
-                // frac関数を使用して周期的な動きを実現
                 float3 samplePos = pos * _NoiseScale;
-                samplePos += frac(_NoiseSpeed.xyz * time);
+                samplePos += _NoiseSpeed.xyz; // 直接オフセットを使用
                 return SAMPLE_TEXTURE3D(_NoiseTex, sampler_NoiseTex, frac(samplePos)).r;
             }
             
-            // 流体の動きを計算（修正版）
-            float3 FlowMovement(float3 worldPos, float time)
+            float3 FlowMovement(float3 worldPos, float3 timeOffset)
             {
                 // フローの基本移動
-                float3 flowOffset = _FlowDirection.xyz * frac(time * 0.1);
+                float3 flowOffset = _FlowDirection.xyz * frac(_Time.y * 0.1);
                 float3 pos = worldPos + flowOffset;
                 
                 // 乱流の計算
-                float turbulence = SampleNoise(pos * 2.0, time * 0.5) * _Turbulence;
-                pos += float3(
-                    SampleNoise(pos + float3(0, turbulence, 0), time),
-                    SampleNoise(pos + float3(turbulence, 0, 0), time),
-                    SampleNoise(pos + float3(0, 0, turbulence), time)
+                float baseNoise = SampleNoise(pos * 2.0, timeOffset);
+                float turbulence = baseNoise * _Turbulence;
+                
+                // ディストーションの計算
+                float3 distortion = float3(
+                    SampleNoise(pos + float3(0, turbulence, 0), timeOffset),
+                    SampleNoise(pos + float3(turbulence, 0, 0), timeOffset),
+                    SampleNoise(pos + float3(0, 0, turbulence), timeOffset)
                 ) * _DistortionStrength;
                 
-                return pos;
+                return pos + distortion;
             }
             
             Varyings vert(Attributes input)
@@ -95,17 +95,16 @@ Shader "Custom/FluidFogEffect"
             
             float4 frag(Varyings input) : SV_Target
             {
-                float time = _Time.y;
-                float3 flowPos = FlowMovement(input.worldPos, time);
+                float3 flowPos = FlowMovement(input.worldPos, _NoiseSpeed.xyz);
                 
-                // 複数レイヤーのノイズを合成
+                // ノイズレイヤーの合成
                 float noise = 0;
                 float amplitude = 1.0;
                 float frequency = 1.0;
                 
                 for(int i = 0; i < 3; i++)
                 {
-                    noise += SampleNoise(flowPos * frequency, time) * amplitude;
+                    noise += SampleNoise(flowPos * frequency, _NoiseSpeed.xyz) * amplitude;
                     amplitude *= 0.5;
                     frequency *= 2.0;
                 }
