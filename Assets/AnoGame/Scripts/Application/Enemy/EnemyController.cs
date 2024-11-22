@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using TinyCharacterController;
 using Unity.TinyCharacterController.Brain;
 
@@ -8,7 +7,9 @@ namespace AnoGame.Application.Enemy
 {
     public class EnemyController : MonoBehaviour
     {
+        [SerializeField] private float spawnDistance = 5f;
         private CharacterBrain _characterBrain;
+        private NavMeshAgent _agent;
 
         void Start()
         {
@@ -20,13 +21,38 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
+            // NavMeshAgentの取得
+            _agent = GetComponentInChildren<NavMeshAgent>();
+            if (_agent == null)
+            {
+                Debug.LogError($"NavMeshAgentが設定されていません。: {gameObject.name}");
+                return;
+            }
+
             // キャラクターの動きを止める
-            _characterBrain.enabled = false;
+            StopMoving();
         }
 
-        void Update()
+        /// <summary>
+        /// プレイヤーの近くの有効な位置にスポーンする
+        /// </summary>
+        /// <param name="playerPosition">プレイヤーの位置</param>
+        public void SpawnNearPlayer(Vector3 playerPosition)
         {
+            Vector3 randomDirection = Random.insideUnitSphere * spawnDistance;
+            randomDirection.y = 0;
+            Vector3 spawnPosition = playerPosition + randomDirection;
             
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(spawnPosition, out hit, spawnDistance, NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
+                StartMoving(); // スポーン後に動き出す
+            }
+            else
+            {
+                Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
+            }
         }
 
         /// <summary>
@@ -35,6 +61,10 @@ namespace AnoGame.Application.Enemy
         public void StartMoving()
         {
             _characterBrain.enabled = true;
+            if (_agent != null)
+            {
+                _agent.isStopped = false;
+            }
         }
 
         /// <summary>
@@ -43,6 +73,10 @@ namespace AnoGame.Application.Enemy
         public void StopMoving()
         {
             _characterBrain.enabled = false;
+            if (_agent != null)
+            {
+                _agent.isStopped = true;
+            }
         }
 
         /// <summary>

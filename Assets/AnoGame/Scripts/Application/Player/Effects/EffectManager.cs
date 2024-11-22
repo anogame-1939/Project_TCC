@@ -23,7 +23,7 @@ namespace AnoGame.Application.Player.Effects
         [SerializeField] private VisionReductionEffect visionEffect;
         [SerializeField] private StunEffect stunEffect;
         [SerializeField] private SlowEffect slowEffect;
-        [SerializeField] private EnemyAwareness enemyAwareness;
+        [SerializeField] private EnemySpawner enemySpawner; // EnemyAwarenessから変更
         [SerializeField] private PlayerTeleporter teleporter;
         [SerializeField] private KnockbackEffect knockback;
         [SerializeField] private InstantDeath instantDeath;
@@ -48,12 +48,11 @@ namespace AnoGame.Application.Player.Effects
                     slowEffect.TriggerEffect(settings.slowDuration);
                     break;
                     
-                // 即時効果：重複不可
                 case CollisionType.EnemyAware:
                     if (!_activeInstantEffects.Contains(effectType))
                     {
                         _activeInstantEffects.Add(effectType);
-                        enemyAwareness.SpawnNearPlayer();
+                        enemySpawner.TriggerEnemySpawn();
                         _activeInstantEffects.Remove(effectType);
                     }
                     break;
