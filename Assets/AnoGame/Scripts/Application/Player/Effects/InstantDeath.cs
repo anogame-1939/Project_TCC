@@ -1,17 +1,19 @@
 
-// Assets/AnoGame/Scripts/Application/Player/Effects/InstantDeath.cs
-using System;
 using UnityEngine;
+using AnoGame.Application.Damage;
 
 namespace AnoGame.Application.Player.Effects
 {
     public class InstantDeath : MonoBehaviour
     {
-        public event Action OnPlayerDeath;
-
         public void Kill()
         {
-            OnPlayerDeath?.Invoke();
+            // プレイヤーのダメージ処理用インターフェース取得
+            var damageable = GetComponentInParent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(999);
+            }
         }
     }
 }
