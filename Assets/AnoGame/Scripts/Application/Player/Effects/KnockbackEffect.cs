@@ -31,8 +31,7 @@ namespace AnoGame.Application.Player.Effects
             moveController.Velocity = knockbackDirection * knockbackForce;
             moveController.enabled = false;
 
-            var playerInput = GetComponentInParent<PlayerInput>();
-            playerInput.enabled = false;
+            stateManager.SetInputEnabled(false);
         }
 
         protected override void OnEffectEnd()
@@ -43,9 +42,7 @@ namespace AnoGame.Application.Player.Effects
             moveController.MoveSpeed = originalMoveSpeed;
             moveController.Velocity = Vector3.zero;
             moveController.enabled = true;
-
-            var playerInput = GetComponentInParent<PlayerInput>();
-            playerInput.enabled = true;
+            stateManager.SetInputEnabled(true);
         }
 
         protected override void Update()

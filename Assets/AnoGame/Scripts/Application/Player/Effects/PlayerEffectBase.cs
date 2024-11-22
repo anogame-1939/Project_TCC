@@ -9,13 +9,16 @@ namespace AnoGame.Application.Player.Effects
         protected bool isActive = false;
         protected float timer;
 
+        protected PlayerEffectStateManager stateManager;
+
         protected virtual void Start()
         {
             moveController = GetComponentInParent<MoveControl>();
+            stateManager = GetComponentInParent<PlayerEffectStateManager>();
             
-            if (moveController == null)
+            if (moveController == null || stateManager == null)
             {
-                Debug.LogError($"MoveControlが親オブジェクトに見つけられません。 {GetType().Name}", this);
+                Debug.LogError($"必要なコンポーネントが親オブジェクトに見つかりません. {GetType().Name}", this);
             }
         }
 
