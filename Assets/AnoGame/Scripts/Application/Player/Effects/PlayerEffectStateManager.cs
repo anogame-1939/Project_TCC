@@ -2,27 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.VisualScripting;
+using AnoGame.Application.Player.Control;
 
 namespace AnoGame.Application.Player.Effects
 {
     public class PlayerEffectStateManager : MonoBehaviour
     {
-        private static readonly string INPUT_ENABLED_VAR = "IsInputEnabled";
+        PlayerActionController playerActionController;
         
         private void Start()
         {
+            playerActionController = GetComponent<PlayerActionController>();
+            
             // 初期状態を設定
             SetInputEnabled(true);
         }
 
         public void SetInputEnabled(bool enabled)
         {
-            Variables.Object(gameObject).Set(INPUT_ENABLED_VAR, enabled);
+            playerActionController.SetInputEnabled(enabled);
         }
 
         public bool GetInputEnabled()
         {
-            return Variables.Object(gameObject).Get<bool>(INPUT_ENABLED_VAR);
+            return false;
         }
     }
 }
