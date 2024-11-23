@@ -7,7 +7,7 @@ using AnoGame.Application;
 [CustomEditor(typeof(NoiseTextureGenerator))]
 public class NoiseTextureGeneratorEditor : Editor
 {
-    private const string SavePathBase = "Assets/AnoGmae/NoiseTextures/GeneratedNoise";
+    private const string SavePathBase = "Assets/AnoGame/NoiseTextures/GeneratedNoise";
 
     public override void OnInspectorGUI()
     {
