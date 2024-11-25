@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
-using AnoGame.Application;
 
 namespace AnoGame.Application.Story
 {

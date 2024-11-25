@@ -67,7 +67,8 @@ namespace AnoGame.Application
                     currentStoryIndex = 0,
                     currentChapterIndex = 0,
                     currentSceneIndex = 0
-                }
+                },
+                playerPosition = new PlayerPositionData()
             };
         }
 
