@@ -11,8 +11,57 @@ namespace AnoGame.Data
         public string playerName;
         public StoryProgress storyProgress;
         public List<InventoryItem> inventory;
+        public PlayerPositionData playerPosition; // 位置情報を追加
     }
 
+    [Serializable]
+    public class PlayerPositionData
+    {
+        // 基本的な位置情報
+        public Vector3SerializableData position;
+        public Vector3SerializableData rotation;
+        
+        // 現在のマップ/エリア情報
+        public string currentMapId;
+        public string currentAreaId;
+        
+        // 最後にセーブされたセーフポイント情報
+        public string lastCheckpointId;
+        public Vector3SerializableData lastCheckpointPosition;
+        
+        // リスポーン位置（必要な場合）
+        public Vector3SerializableData respawnPosition;
+    }
+
+    // Vector3をシリアル化可能な形式に変換するためのクラス
+    [Serializable]
+    public class Vector3SerializableData
+    {
+        public float x;
+        public float y;
+        public float z;
+
+        public Vector3SerializableData() { }
+
+        public Vector3SerializableData(Vector3 vector)
+        {
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+        }
+
+        public Vector3 ToVector3()
+        {
+            return new Vector3(x, y, z);
+        }
+
+        public static Vector3SerializableData FromVector3(Vector3 vector)
+        {
+            return new Vector3SerializableData(vector);
+        }
+    }
+
+    // 既存のクラスはそのまま
     [Serializable]
     public class StoryProgress
     {
