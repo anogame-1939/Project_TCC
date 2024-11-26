@@ -1,7 +1,8 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
 using AnoGame.Application.SaveData;
@@ -23,12 +24,12 @@ namespace AnoGame.Application
             _repository = new GameDataRepository();
         }
 
-        private async void Start()
+        private void Start()
         {
-            await InitializeGameData();
+            InitializeGameData().Forget();
         }
 
-        private async Task InitializeGameData()
+        private async UniTaskVoid InitializeGameData()
         {
             try
             {
@@ -81,7 +82,7 @@ namespace AnoGame.Application
             }
         }
 
-        public async Task SaveCurrentGameState()
+        public async UniTask SaveCurrentGameState()
         {
             if (_currentGameData == null) return;
 
@@ -96,15 +97,15 @@ namespace AnoGame.Application
             }
         }
 
-        private async void OnApplicationQuit()
+        private void OnApplicationQuit()
         {
             if (_currentGameData != null)
             {
                 SaveGameData?.Invoke(_currentGameData);
                 try
                 {
-                    await _repository.SaveDataAsync(_currentGameData);
-                    Debug.Log("Game state saved on application quit");
+                    // アプリケーション終了時は同期的に保存を実行
+                    SaveCurrentGameState().SuppressCancellationThrow().Forget();
                 }
                 catch (Exception ex)
                 {
@@ -113,7 +114,7 @@ namespace AnoGame.Application
             }
         }
 
-        public async Task<bool> CreateSavePoint()
+        public async UniTask<bool> CreateSavePoint()
         {
             if (_currentGameData == null) return false;
 
