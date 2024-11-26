@@ -18,8 +18,8 @@ namespace AnoGame.Application.Story.Manager
             _storyManager.ChapterLoaded += OnChapterLoaded;
             
             // GameManagerのセーブ/ロードイベントを購読
-            _gameManager.SaveGameData += OnSaveGameData;
-            _gameManager.LoadGameData += OnLoadGameData;
+            // _gameManager.SaveGameData += OnSaveGameData;
+            // _gameManager.LoadGameData += OnLoadGameData;
         }
 
         private void OnDestroy()
