@@ -1,5 +1,6 @@
 using UnityEngine;
 using AnoGame.Application.Story;
+using System.Collections;
 
 namespace AnoGame.Application.Enemy
 {
@@ -67,5 +68,40 @@ namespace AnoGame.Application.Enemy
                 _spawnManager.StopEnemyMovement();
             }
         }
+
+        public void EnableBrain()
+        {
+            _spawnManager.EnabaleEnamy();
+        }
+
+        public void DisableBrain()
+        {
+            _spawnManager.DisabaleEnamy();
+        }
+
+        public void Appear()
+        {
+            StartCoroutine(AppearCor());
+        }
+
+        private IEnumerator AppearCor()
+        {
+
+            yield return null;
+            EnableBrain();
+        }
+
+        public void Disappear()
+        {
+            StartCoroutine(DisappearCor());
+        }
+
+        private IEnumerator DisappearCor()
+        {
+            DisableBrain();
+
+            yield return null;
+        }
+
     }
 }
