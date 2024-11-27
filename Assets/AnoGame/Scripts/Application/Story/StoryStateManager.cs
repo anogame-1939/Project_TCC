@@ -1,7 +1,6 @@
 using UnityEngine;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
-using Unity.TinyCharacterController.Control;
 using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Application.Story.Manager
@@ -11,7 +10,7 @@ namespace AnoGame.Application.Story.Manager
         private GameManager _gameManager;
         private StoryManager _storyManager;
         
-        private void Start()
+        private void Awake()
         {
             _gameManager = GameManager.Instance;
             _storyManager = StoryManager.Instance;
@@ -21,7 +20,7 @@ namespace AnoGame.Application.Story.Manager
             
             // GameManagerのセーブ/ロードイベントを購読
             // _gameManager.SaveGameData += OnSaveGameData;
-            // _gameManager.LoadGameData += OnLoadGameData;
+            _gameManager.LoadGameData += OnLoadGameData;
         }
 
         private void OnDestroy()
@@ -66,6 +65,14 @@ namespace AnoGame.Application.Story.Manager
             
             // StoryManagerの進行状況を更新
             _storyManager.UpdateGameData();
+
+            // プレイヤーを前回終了位置に配置
+            var player = GameObject.FindGameObjectWithTag(SLFBRules.TAG_PLAYER);
+            if (player != null)
+            {
+                var brain = player.GetComponent<CharacterBrain>();
+                brain.Warp(gameData.playerPosition.position.ToVector3(), gameData.playerPosition.rotation.ToQuaternion());
+            }
         }
 
         private void UpdateGameDataProgress()
@@ -83,6 +90,19 @@ namespace AnoGame.Application.Story.Manager
             currentGameData.storyProgress.currentStoryIndex = progress.currentStoryIndex;
             currentGameData.storyProgress.currentChapterIndex = progress.currentChapterIndex;
             currentGameData.storyProgress.currentSceneIndex = progress.currentSceneIndex;
+
+            // ここで位置情報を取得して保存
+            if (currentGameData.playerPosition == null)
+            {
+                currentGameData.playerPosition = new PlayerPositionData();
+            }
+
+            var player = GameObject.FindGameObjectWithTag(SLFBRules.TAG_PLAYER);
+            if (player != null)
+            {
+                currentGameData.playerPosition.position = new Vector3SerializableData(player.transform.position);
+                currentGameData.playerPosition.rotation = new QuaternionSerializableData(player.transform.rotation);
+            }
 
             // GameManagerに更新を通知
             _gameManager.UpdateGameState(currentGameData);
