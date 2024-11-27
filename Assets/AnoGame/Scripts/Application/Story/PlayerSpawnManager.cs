@@ -101,9 +101,17 @@ namespace AnoGame.Application.Story
             // リトライポイントが存在しない場合は前回セーブした位置からスポーンする
             if (targetPoint == null)
             {
-                var position = currentGameData.playerPosition.position.ToVector3();
-                var rotation = currentGameData.playerPosition.rotation.ToQuaternion();
-                WarpPlayerTo(position, rotation);
+                var gameData = GameManager.Instance.CurrentGameData;
+                var playerPosition = gameData.playerPosition;
+                if (playerPosition != null)
+                {
+                    if (playerPosition.IsPositionValid)
+                    {
+                        var position = currentGameData.playerPosition.position.ToVector3();
+                        var rotation = currentGameData.playerPosition.rotation.ToQuaternion();
+                        WarpPlayerTo(position, rotation);
+                    }
+                }
             }
             else
             {

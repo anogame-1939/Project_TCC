@@ -57,7 +57,9 @@ namespace AnoGame.Application.Player
             // 死亡時の処理を実装
             // 例：ゲームオーバー画面表示、リスポーン処理など
             // リトライポイントへ
-            StoryManager.Instance.RetyrCurrentScene();
+            // StoryManager.Instance.RetyrCurrentScene();
+            // TODO:とりあえず、リトライポイントからスポーンする作りになっている。エネミーのリスポーンはまだなので直すこと。
+            PlayerSpawnManager.Instance.SpawnPlayerAtRetryPoint();
         }
 
         // HP回復メソッド

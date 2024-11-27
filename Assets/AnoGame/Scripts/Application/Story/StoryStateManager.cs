@@ -50,7 +50,8 @@ namespace AnoGame.Application.Story.Manager
                 {
                     if (playerPosition.IsPositionValid)
                     {
-                        SpawnPlayer(playerPosition);
+                        // いらない？？
+                        // SpawnPlayer(playerPosition);
                     }
                 }
             }
