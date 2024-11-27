@@ -1,11 +1,7 @@
 using UnityEngine;
 using Unity.TinyCharacterController.Brain;
-using Unity.TinyCharacterController.Utility;
 using AnoGame.Data;
 using AnoGame.Infrastructure;
-using System.Data;
-
-
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -90,26 +86,44 @@ namespace AnoGame.Application.Story
             var startPoint = GetStartPoint();
             if (startPoint == null) return;
 
-            WarpPlayerTo(startPoint);
+            WarpPlayerTo(startPoint.position, startPoint.rotation);
         }
 
         // 外部から呼び出し専用のリトライポイントワープ
         public void SpawnPlayerAtRetryPoint()
         {
+            // リトライポイント取得
             Transform targetPoint = _currentRetryPoint ?? GetRetryPoint();
-            
-            // リトライポイントが存在しない場合はスタートポイントを使用
+
+            // 前回セーブした位置を保存
+            var currentGameData = GameManager.instance.CurrentGameData;
+
+            // リトライポイントが存在しない場合は前回セーブした位置からスポーンする
             if (targetPoint == null)
             {
-                Debug.LogWarning("リトライポイントが見つかりません。スタートポイントを使用します。");
-                SpawnPlayerAtStart();
-                return;
+                var position = currentGameData.playerPosition.position.ToVector3();
+                var rotation = currentGameData.playerPosition.rotation.ToQuaternion();
+                WarpPlayerTo(position, rotation);
             }
+            else
+            {
+                WarpPlayerTo(targetPoint.position, targetPoint.rotation);
+            }
+        }
+        
 
-            WarpPlayerTo(targetPoint);
+        private void SpawnPlayer(GameData gameData)
+        {
+            // プレイヤーを前回終了位置に配置
+            var player = GameObject.FindGameObjectWithTag(SLFBRules.TAG_PLAYER);
+            if (player != null)
+            {
+                var brain = player.GetComponent<CharacterBrain>();
+                brain.Warp(gameData.playerPosition.position.ToVector3(), gameData.playerPosition.rotation.ToQuaternion());
+            }
         }
 
-        private void WarpPlayerTo(Transform target)
+        private void WarpPlayerTo(Vector3 position, Quaternion rotation)
         {
             var player = GetPlayer();
             if (player == null)
@@ -121,8 +135,8 @@ namespace AnoGame.Application.Story
             var brain = player.GetComponent<CharacterBrain>();
             if (brain != null)
             {
-                brain.Warp(target.position, target.rotation);
-                Debug.Log($"プレイヤーを {target.name} の位置に移動しました。");
+                brain.Warp(position, rotation);
+                Debug.Log($"プレイヤーを ({position}) の位置に移動しました。");
             }
             else
             {

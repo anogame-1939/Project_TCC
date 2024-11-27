@@ -31,6 +31,22 @@ namespace AnoGame.Data
         
         // リスポーン位置（必要な場合）
         public Vector3SerializableData respawnPosition;
+
+        // 位置情報が設定されているかを確認するプロパティ
+        public bool HasPosition => position != null;
+        
+        // 回転情報が設定されているかを確認するプロパティ
+        public bool HasRotation => rotation != null;
+        
+        // 位置と回転の両方が設定されているかを確認するプロパティ
+        public bool IsPositionValid => HasPosition && HasRotation;
+
+        // デフォルト値を設定するメソッド
+        public void SetDefaultPosition(Vector3 defaultPosition, Quaternion defaultRotation)
+        {
+            position = new Vector3SerializableData(defaultPosition);
+            rotation = new QuaternionSerializableData(defaultRotation);
+        }
     }
 
     // Vector3をシリアル化可能な形式に変換するためのクラス

@@ -41,13 +41,23 @@ namespace AnoGame.Application.Story.Manager
         {
             if (_gameManager == null || _storyManager == null) return;
 
-            // 現在のストーリー進行状況をGameDataに反映
-            UpdateGameDataProgress();
-            
-            // セーブポイントを作成（リトライポイントからのロードでない場合）
-            if (!useRetryPoint)
+
+            if (useRetryPoint)
             {
-                CreateSavePoint();
+                var gameData = GameManager.Instance.CurrentGameData;
+                var playerPosition = gameData.playerPosition;
+                if (playerPosition != null)
+                {
+                    if (playerPosition.IsPositionValid)
+                    {
+                        SpawnPlayer(playerPosition);
+                    }
+                }
+            }
+            else
+            {
+                // 現在のストーリー進行状況をGameDataに反映
+                UpdateGameDataProgress();
             }
         }
 
@@ -66,12 +76,24 @@ namespace AnoGame.Application.Story.Manager
             // StoryManagerの進行状況を更新
             _storyManager.UpdateGameData();
 
+            var playerPosition = gameData.playerPosition;
+            if (playerPosition != null)
+            {
+                if (playerPosition.IsPositionValid)
+                {
+                    SpawnPlayer(playerPosition);
+                }
+            }
+        }
+
+        private void SpawnPlayer(PlayerPositionData playerPosition)
+        {
             // プレイヤーを前回終了位置に配置
             var player = GameObject.FindGameObjectWithTag(SLFBRules.TAG_PLAYER);
             if (player != null)
             {
                 var brain = player.GetComponent<CharacterBrain>();
-                brain.Warp(gameData.playerPosition.position.ToVector3(), gameData.playerPosition.rotation.ToQuaternion());
+                brain.Warp(playerPosition.position.ToVector3(), playerPosition.rotation.ToQuaternion());
             }
         }
 
