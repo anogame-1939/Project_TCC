@@ -1,5 +1,6 @@
 using UnityEngine;
 using AnoGame.Infrastructure;
+using AnoGame.Application.Enemy;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,12 +10,31 @@ namespace AnoGame.Application.Story
 {
     public class EnemySpawnManager : SingletonMonoBehaviour<EnemySpawnManager>
     {   
-        [SerializeField] private GameObject enemyPrefab;
-        private const string TAG_START_POINT_ENEMY = "StartPointEnemy";
-        private const string TAG_RETRY_POINT_ENEMY = "RetryPointEnemy";
-        
-        private GameObject _currentEnemyInstance;
-        private Transform _currentRetryPoint;
+    [SerializeField] private GameObject enemyPrefab;
+    private GameObject _currentEnemyInstance;
+    private EnemyController _currentEnemyController;  // EnemyControllerへの参照を保持
+    
+    private const string TAG_START_POINT_ENEMY = "StartPointEnemy";
+    private const string TAG_RETRY_POINT_ENEMY = "RetryPointEnemy";
+    
+    private Transform _currentRetryPoint;
+
+        private void Start()
+        {
+            InitializeEnemy();
+        }
+
+        private void InitializeEnemy()
+        {
+            if (enemyPrefab == null)
+            {
+                Debug.LogError("Enemy Prefabが設定されていません。");
+                return;
+            }
+
+            // スタートポイントから初期スポーン
+            SpawnEnemyAtStart();
+        }
 
         private Transform GetStartPoint()
         {
@@ -32,7 +52,6 @@ namespace AnoGame.Application.Story
             return retryPoint?.transform;
         }
 
-        // ChapterLoadedイベントハンドラ
         public void OnChapterLoaded(bool useRetryPoint)
         {
             if (useRetryPoint)
@@ -47,7 +66,6 @@ namespace AnoGame.Application.Story
             }
         }
 
-        // 基本的なスポーン処理
         public void SpawnEnemyAtStart()
         {
             var startPoint = GetStartPoint();
@@ -56,7 +74,6 @@ namespace AnoGame.Application.Story
             SpawnEnemyAt(startPoint.position, startPoint.rotation);
         }
 
-        // リトライポイントからのスポーン
         public void SpawnEnemyAtRetryPoint()
         {
             Transform targetPoint = _currentRetryPoint ?? GetRetryPoint();
@@ -83,14 +100,47 @@ namespace AnoGame.Application.Story
             if (_currentEnemyInstance != null)
             {
                 Destroy(_currentEnemyInstance);
+                _currentEnemyController = null;
             }
 
             // 新しい敵をスポーン
             _currentEnemyInstance = Instantiate(enemyPrefab, position, rotation);
+            // EnemyControllerの参照を保持
+            _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+            
+            if (_currentEnemyController == null)
+            {
+                Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
+            }
+            
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
 
-        // リトライポイントの設定
+        // 敵の状態を制御するためのメソッド群
+        public void StartEnemyMovement()
+        {
+            if (_currentEnemyController != null)
+            {
+                _currentEnemyController.StartMoving();
+            }
+        }
+
+        public void StopEnemyMovement()
+        {
+            if (_currentEnemyController != null)
+            {
+                _currentEnemyController.StopMoving();
+            }
+        }
+
+        public void SpawnEnemyNearPlayer(Vector3 playerPosition)
+        {
+            if (_currentEnemyController != null)
+            {
+                _currentEnemyController.SpawnNearPlayer(playerPosition);
+            }
+        }
+
         public void SetRetryPoint(Transform point)
         {
             if (point != null)
@@ -100,7 +150,6 @@ namespace AnoGame.Application.Story
             }
         }
 
-        // 現在位置をリトライポイントとして設定
         public void SetCurrentPositionAsRetryPoint()
         {
             if (_currentEnemyInstance == null)
