@@ -1,6 +1,8 @@
 using UnityEngine;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
+using Unity.TinyCharacterController.Control;
+using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Application.Story.Manager
 {

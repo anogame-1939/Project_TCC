@@ -191,8 +191,9 @@ namespace AnoGame.Editor
 
                             if (currentGameData.playerPosition.rotation != null)
                             {
-                                EditorGUILayout.Vector3Field("Current Rotation", 
-                                    currentGameData.playerPosition.rotation.ToVector3());
+                                var rotation = currentGameData.playerPosition.rotation;
+                                EditorGUILayout.Vector4Field("Current Rotation (Quaternion)", 
+                                    new Vector4(rotation.x, rotation.y, rotation.z, rotation.w));
                             }
 
                             // マップ情報

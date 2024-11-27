@@ -19,7 +19,7 @@ namespace AnoGame.Data
     {
         // 基本的な位置情報
         public Vector3SerializableData position;
-        public Vector3SerializableData rotation;
+        public QuaternionSerializableData rotation;
         
         // 現在のマップ/エリア情報
         public string currentMapId;
@@ -58,6 +58,35 @@ namespace AnoGame.Data
         public static Vector3SerializableData FromVector3(Vector3 vector)
         {
             return new Vector3SerializableData(vector);
+        }
+    }
+
+    [Serializable]
+    public class QuaternionSerializableData
+    {
+        public float x;
+        public float y;
+        public float z;
+        public float w;
+
+        public QuaternionSerializableData() { }
+
+        public QuaternionSerializableData(Quaternion quaternion)
+        {
+            x = quaternion.x;
+            y = quaternion.y;
+            z = quaternion.z;
+            w = quaternion.w;
+        }
+
+        public Quaternion ToQuaternion()
+        {
+            return new Quaternion(x, y, z, w);
+        }
+
+        public static QuaternionSerializableData FromQuaternion(Quaternion quaternion)
+        {
+            return new QuaternionSerializableData(quaternion);
         }
     }
 
