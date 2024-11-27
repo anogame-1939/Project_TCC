@@ -33,6 +33,16 @@ namespace AnoGame.Application.Enemy
             StopMoving();
         }
 
+        public void EnableBrain()
+        {
+            GetComponent<CharacterBrain>().enabled = true;
+        }
+
+        public void DisableBrain()
+        {
+            GetComponent<CharacterBrain>().enabled = false;
+        }
+
         /// <summary>
         /// プレイヤーの近くの有効な位置にスポーンする
         /// </summary>

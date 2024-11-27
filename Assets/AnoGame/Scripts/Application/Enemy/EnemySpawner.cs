@@ -17,13 +17,13 @@ namespace AnoGame.Application.Enemy
         }
 
         /// <summary>
-        /// このスポナーの位置の近くに敵をスポーンさせる
+        /// エネミーのスタートポイントに出現させる
         /// </summary>
         public void TriggerEnemySpawn()
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyNearPlayer(transform.position);
+                _spawnManager.SpawnEnemyAtStart();
             }
             else
             {

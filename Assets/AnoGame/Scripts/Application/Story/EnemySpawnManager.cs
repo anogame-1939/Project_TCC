@@ -72,6 +72,7 @@ namespace AnoGame.Application.Story
             if (startPoint == null) return;
 
             SpawnEnemyAt(startPoint.position, startPoint.rotation);
+            EnabaleEnamy();
         }
 
         public void SpawnEnemyAtRetryPoint()
@@ -86,6 +87,7 @@ namespace AnoGame.Application.Story
             }
 
             SpawnEnemyAt(targetPoint.position, targetPoint.rotation);
+            EnabaleEnamy();
         }
 
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation)
@@ -112,8 +114,18 @@ namespace AnoGame.Application.Story
             {
                 Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
             }
-            
+
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
+        }
+
+        public void EnabaleEnamy()
+        {
+            _currentEnemyController.EnableBrain();
+        }
+
+        public void DisabaleEnamy()
+        {
+            _currentEnemyController.DisableBrain();
         }
 
         // 敵の状態を制御するためのメソッド群
