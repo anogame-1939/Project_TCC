@@ -58,8 +58,9 @@ namespace AnoGame.Application.Player
             // 例：ゲームオーバー画面表示、リスポーン処理など
             // リトライポイントへ
             // StoryManager.Instance.RetyrCurrentScene();
-            // TODO:とりあえず、リトライポイントからスポーンする作りになっている。エネミーのリスポーンはまだなので直すこと。
             PlayerSpawnManager.Instance.SpawnPlayerAtRetryPoint();
+            // NOTE:エネミーもリトライポイントに移動させるのはいいが、ここでいいのか。。
+            EnemySpawnManager.Instance.SpawnEnemyAtRetryPoint();
         }
 
         // HP回復メソッド
