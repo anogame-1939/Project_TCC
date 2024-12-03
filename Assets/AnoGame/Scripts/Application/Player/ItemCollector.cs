@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using AnoGame.Data;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AnoGame.Application.Player
 {
@@ -19,6 +20,7 @@ namespace AnoGame.Application.Player
 
         private PlayerInput _playerInput;
         private InputAction _interactAction;
+        private GameManager _gameManager;
 
         private void Awake()
         {
@@ -28,6 +30,8 @@ namespace AnoGame.Application.Player
                 // Interactアクションの参照を取得
                 _interactAction = _playerInput.actions["Interact"];
             }
+
+            _gameManager = GameManager.Instance;
         }
 
         private void OnEnable()
@@ -107,21 +111,43 @@ namespace AnoGame.Application.Player
                 itemName = collectableItem.ItemName,
                 quantity = collectableItem.Quantity,
                 description = collectableItem.Description,
-                itemImage = collectableItem.ItemImage
+                // itemImage = collectableItem.ItemImage
             };
 
-            // 既存のアイテムがある場合は数量を加算
+            // まず古いアイテムをInventoryから削除
             InventoryItem existingItem = inventory.Find(item => item.itemName == newItem.itemName);
             if (existingItem != null)
             {
-                existingItem.quantity += newItem.quantity;
-            }
-            else
-            {
-                inventory.Add(newItem);
+                inventory.Remove(existingItem);
+                // 数量を加算
+                newItem.quantity += existingItem.quantity;
             }
 
+            // 新しいアイテムを追加
+            inventory.Add(newItem);
             Debug.Log($"Collected: {newItem.itemName} x{newItem.quantity}");
+
+            // GameManagerの状態を更新
+            AddItemToInventory2(newItem);
+        }
+
+        private void AddItemToInventory2(InventoryItem newItem)
+        {
+            var currentGameData = _gameManager.CurrentGameData;
+            if (currentGameData == null) return;
+
+            // 同じitemNameのアイテムを削除
+            var existingItem = currentGameData.inventory.FirstOrDefault(x => x.itemName == newItem.itemName);
+            if (existingItem != null)
+            {
+                currentGameData.inventory.Remove(existingItem);
+            }
+
+            // 新しいアイテムを追加
+            currentGameData.inventory.Add(newItem);
+
+            // GameManagerに更新を通知
+            _gameManager.UpdateGameState(currentGameData);
         }
 
         public List<InventoryItem> GetInventory()

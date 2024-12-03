@@ -121,6 +121,6 @@ namespace AnoGame.Data
         public string itemName;
         public int quantity;
         public string description;
-        public Sprite itemImage;
+        // public Sprite itemImage;
     }
 }

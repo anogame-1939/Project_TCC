@@ -10,11 +10,11 @@ public class InventorySlot : MonoBehaviour
 
     public void SetItem(InventoryItem item)
     {
-        itemImage.sprite = item.itemImage;
+        // itemImage.sprite = item.itemImage;
         itemImage.enabled = true;
         itemNameText.text = item.itemName;
         descriptionText.text = item.description;
-        gameObject.SetActive(true);
+        // gameObject.SetActive(true);
     }
 
     public void Clear()

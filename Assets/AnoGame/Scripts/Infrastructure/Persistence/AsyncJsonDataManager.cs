@@ -19,6 +19,7 @@ namespace AnoGame.Infrastructure.Persistence
             if (string.IsNullOrEmpty(_basePath))
             {
                 _basePath = UnityEngine.Application.persistentDataPath;
+                Debug.Log($"UnityEngine.Application.persistentDataPath:{_basePath}");
             }
         }
 
