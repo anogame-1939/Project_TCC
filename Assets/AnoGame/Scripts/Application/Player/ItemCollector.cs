@@ -106,11 +106,12 @@ namespace AnoGame.Application.Player
 
         private void AddItemToInventory(CollectableItem collectableItem)
         {
+            var itemData = collectableItem.ItemData;
             InventoryItem newItem = new InventoryItem
             {
-                itemName = collectableItem.ItemName,
+                itemName = itemData.ItemName,
                 quantity = collectableItem.Quantity,
-                description = collectableItem.Description,
+                description = itemData.Description,
                 // itemImage = collectableItem.ItemImage
             };
 
@@ -141,6 +142,7 @@ namespace AnoGame.Application.Player
             if (existingItem != null)
             {
                 currentGameData.inventory.Remove(existingItem);
+                newItem.quantity += existingItem.quantity;
             }
 
             // 新しいアイテムを追加

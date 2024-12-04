@@ -74,14 +74,14 @@ namespace AnoGame.Application.Inventory
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            _inventoryManager.GetComponent<CanvasGroup>().alpha = 1;
+            GetComponent<CanvasGroup>().alpha = 1;
         }
 
         public void Hide()
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            _inventoryManager.GetComponent<CanvasGroup>().alpha = 0;
+            GetComponent<CanvasGroup>().alpha = 0;
         }
     }
 }

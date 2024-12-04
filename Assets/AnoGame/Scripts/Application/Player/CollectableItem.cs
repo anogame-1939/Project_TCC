@@ -5,14 +5,26 @@ namespace AnoGame
     [AddComponentMenu("Inventory/" + nameof(CollectableItem))]
     public class CollectableItem : MonoBehaviour
     {
-        [SerializeField] private string itemName;
+        [SerializeField] private ItemData itemData;
         [SerializeField] private int quantity = 1;
-        [SerializeField] private string description;
-        [SerializeField] private Sprite itemImage;
 
-        public string ItemName => itemName;
+        public ItemData ItemData => itemData;
         public int Quantity => quantity;
-        public string Description => description;
-        public Sprite ItemImage => itemImage;
+
+        private void OnValidate()
+        {
+            // ItemDataが設定されている場合、quantityの値をチェック
+            if (itemData != null)
+            {
+                if (itemData.IsStackable)
+                {
+                    quantity = Mathf.Clamp(quantity, 1, itemData.MaxStackSize);
+                }
+                else
+                {
+                    quantity = 1;
+                }
+            }
+        }
     }
 }
