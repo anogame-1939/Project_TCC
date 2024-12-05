@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 using System.Collections.Generic;
 using AnoGame.Data;
 
@@ -20,8 +21,6 @@ namespace AnoGame.Application.Inventory
         private void Start()
         {
             InitializeVisibleSlots();
-            // nextPageButton.onClick.AddListener(NextPage);
-            // prevPageButton.onClick.AddListener(PreviousPage);
             UpdatePageButtonsVisibility();
         }
 
@@ -31,16 +30,143 @@ namespace AnoGame.Application.Inventory
             {
                 InventorySlot slot = Instantiate(slotPrefab, contentParent);
                 visibleSlots.Add(slot);
-                slot.Clear(); // 初期状態はクリア
+                // slot.Clear();
             }
         }
 
         public void UpdateInventory(List<InventoryItem> newItems)
         {
-            _allItems = newItems;
-            currentPage = 0; // 更新時は最初のページに戻る
+            // 差分更新の実装
+            var changes = CalculateInventoryChanges(_allItems, newItems);
+            ApplyInventoryChanges(changes);
+            
+            _allItems = new List<InventoryItem>(newItems); // 新しいリストで更新
             UpdateVisibleItems();
             UpdatePageButtonsVisibility();
+        }
+
+        private class InventoryChange
+        {
+            public InventoryItem Item { get; set; }
+            public ChangeType Type { get; set; }
+            public int OldIndex { get; set; }
+            public int NewIndex { get; set; }
+        }
+
+        private enum ChangeType
+        {
+            Add,
+            Remove,
+            Modify,
+            Move
+        }
+
+        private List<InventoryChange> CalculateInventoryChanges(List<InventoryItem> oldItems, List<InventoryItem> newItems)
+        {
+            var changes = new List<InventoryChange>();
+
+            // アイテムの辞書を作成（名前をキーとして使用）
+            var oldItemDict = oldItems.Select((item, index) => new { Item = item, Index = index })
+                                    .ToDictionary(x => x.Item.itemName, x => x);
+            var newItemDict = newItems.Select((item, index) => new { Item = item, Index = index })
+                                    .ToDictionary(x => x.Item.itemName, x => x);
+
+            // 削除されたアイテムを検出
+            foreach (var oldItem in oldItems)
+            {
+                if (!newItemDict.ContainsKey(oldItem.itemName))
+                {
+                    changes.Add(new InventoryChange
+                    {
+                        Item = oldItem,
+                        Type = ChangeType.Remove,
+                        OldIndex = oldItemDict[oldItem.itemName].Index
+                    });
+                }
+            }
+
+            // 追加・変更されたアイテムを検出
+            foreach (var newItem in newItems)
+            {
+                if (!oldItemDict.ContainsKey(newItem.itemName))
+                {
+                    // 新規追加
+                    changes.Add(new InventoryChange
+                    {
+                        Item = newItem,
+                        Type = ChangeType.Add,
+                        NewIndex = newItemDict[newItem.itemName].Index
+                    });
+                }
+                else
+                {
+                    var oldItem = oldItems[oldItemDict[newItem.itemName].Index];
+                    var oldIndex = oldItemDict[newItem.itemName].Index;
+                    var newIndex = newItemDict[newItem.itemName].Index;
+
+                    if (newItem.quantity != oldItem.quantity || 
+                        newItem.description != oldItem.description)
+                    {
+                        // 内容の変更
+                        changes.Add(new InventoryChange
+                        {
+                            Item = newItem,
+                            Type = ChangeType.Modify,
+                            OldIndex = oldIndex,
+                            NewIndex = newIndex
+                        });
+                    }
+                    else if (oldIndex != newIndex)
+                    {
+                        // 位置の変更
+                        changes.Add(new InventoryChange
+                        {
+                            Item = newItem,
+                            Type = ChangeType.Move,
+                            OldIndex = oldIndex,
+                            NewIndex = newIndex
+                        });
+                    }
+                }
+            }
+
+            return changes;
+        }
+
+        private void ApplyInventoryChanges(List<InventoryChange> changes)
+        {
+            foreach (var change in changes)
+            {
+                var slotIndex = change.NewIndex % maxVisibleSlots;
+                var changePage = change.NewIndex / maxVisibleSlots;
+
+                if (changePage == currentPage)
+                {
+                    switch (change.Type)
+                    {
+                        case ChangeType.Add:
+                        case ChangeType.Modify:
+                            visibleSlots[slotIndex].SetItem(change.Item);
+                            break;
+
+                        case ChangeType.Remove:
+                            if (change.OldIndex / maxVisibleSlots == currentPage)
+                            {
+                                visibleSlots[change.OldIndex % maxVisibleSlots].Clear();
+                            }
+                            break;
+
+                        case ChangeType.Move:
+                            // 同じページ内での移動の場合
+                            if (change.OldIndex / maxVisibleSlots == currentPage)
+                            {
+                                visibleSlots[change.OldIndex % maxVisibleSlots].Clear();
+                            }
+                            visibleSlots[slotIndex].SetItem(change.Item);
+                            break;
+                    }
+                }
+            }
         }
 
         private void UpdateVisibleItems()
@@ -82,9 +208,11 @@ namespace AnoGame.Application.Inventory
 
         private void UpdatePageButtonsVisibility()
         {
-            return;
-            prevPageButton.interactable = (currentPage > 0);
-            nextPageButton.interactable = ((currentPage + 1) * maxVisibleSlots < _allItems.Count);
+            if (nextPageButton != null && prevPageButton != null)
+            {
+                prevPageButton.interactable = (currentPage > 0);
+                nextPageButton.interactable = ((currentPage + 1) * maxVisibleSlots < _allItems.Count);
+            }
         }
     }
 }

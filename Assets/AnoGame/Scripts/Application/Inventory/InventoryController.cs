@@ -21,6 +21,7 @@ namespace AnoGame.Application.Inventory
         InventoryManager _inventoryManager;
 
         private bool isInventoryMode = true;
+        private CanvasGroup _canvasGroup;
         
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -48,6 +49,7 @@ namespace AnoGame.Application.Inventory
                 ToggleCursorLock();
             };
             isInventoryMode = false;
+            _canvasGroup = GetComponent<CanvasGroup>();
             Hide();
         }
 
@@ -74,14 +76,14 @@ namespace AnoGame.Application.Inventory
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            GetComponent<CanvasGroup>().alpha = 1;
+            _canvasGroup.alpha = 1;
         }
 
         public void Hide()
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            GetComponent<CanvasGroup>().alpha = 0;
+            _canvasGroup.alpha = 0;
         }
     }
 }
