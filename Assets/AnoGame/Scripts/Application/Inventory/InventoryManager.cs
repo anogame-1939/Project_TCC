@@ -1,13 +1,26 @@
-using UnityEngine;
-using UnityEngine.UI;
+using System;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using AnoGame.Data;
 
 namespace AnoGame.Application.Inventory
 {
     public class InventoryManager : MonoBehaviour
     {
+        [SerializeField] private ItemDatabase itemDatabase;
+        private Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
+        private Dictionary<string, AsyncOperationHandle<Sprite>> loadOperations = new Dictionary<string, AsyncOperationHandle<Sprite>>();
+
+        // InventorySlotをシンプルな表示用クラスに変更
+        public class InventorySlotData
+        {
+            public InventoryItem Item { get; set; }
+            public Sprite Sprite { get; set; }
+        }
         [SerializeField] private InventorySlot slotPrefab;
         [SerializeField] private Transform contentParent;
         [SerializeField] private int maxVisibleSlots = 16; // 4x4
@@ -36,10 +49,19 @@ namespace AnoGame.Application.Inventory
 
         public void UpdateInventory(List<InventoryItem> newItems)
         {
+            Debug.Log("なう");
+            foreach (var item in newItems)
+            {
+                if (!spriteCache.ContainsKey(item.itemName))
+                {
+                    LoadSprite(item.itemName);
+                }
+            }
+
             // 差分更新の実装
             var changes = CalculateInventoryChanges(_allItems, newItems);
             ApplyInventoryChanges(changes);
-            
+
             _allItems = new List<InventoryItem>(newItems); // 新しいリストで更新
             UpdateVisibleItems();
             UpdatePageButtonsVisibility();
@@ -146,7 +168,17 @@ namespace AnoGame.Application.Inventory
                     {
                         case ChangeType.Add:
                         case ChangeType.Modify:
-                            visibleSlots[slotIndex].SetItem(change.Item);
+                            if (spriteCache.TryGetValue(change.Item.itemName, out var sprite))
+                            {
+                                visibleSlots[slotIndex].SetItem(change.Item, sprite);
+                            }
+                            else
+                            {
+                                // スプライトがまだロードされていない場合は、空のスプライトで設定
+                                visibleSlots[slotIndex].SetItem(change.Item, null);
+                                // LoadSpriteメソッドが非同期でスプライトをロードし、
+                                // UpdateSlotsWithItemメソッドで後からスプライトが更新される
+                            }
                             break;
 
                         case ChangeType.Remove:
@@ -157,12 +189,18 @@ namespace AnoGame.Application.Inventory
                             break;
 
                         case ChangeType.Move:
-                            // 同じページ内での移動の場合
                             if (change.OldIndex / maxVisibleSlots == currentPage)
                             {
                                 visibleSlots[change.OldIndex % maxVisibleSlots].Clear();
                             }
-                            visibleSlots[slotIndex].SetItem(change.Item);
+                            if (spriteCache.TryGetValue(change.Item.itemName, out var moveSprite))
+                            {
+                                visibleSlots[slotIndex].SetItem(change.Item, moveSprite);
+                            }
+                            else
+                            {
+                                visibleSlots[slotIndex].SetItem(change.Item, null);
+                            }
                             break;
                     }
                 }
@@ -177,7 +215,15 @@ namespace AnoGame.Application.Inventory
                 int itemIndex = startIndex + i;
                 if (itemIndex < _allItems.Count)
                 {
-                    visibleSlots[i].SetItem(_allItems[itemIndex]);
+                    var item = _allItems[itemIndex];
+                    if (spriteCache.TryGetValue(item.itemName, out var sprite))
+                    {
+                        visibleSlots[i].SetItem(item, sprite);
+                    }
+                    else
+                    {
+                        visibleSlots[i].SetItem(item, null);
+                    }
                 }
                 else
                 {
@@ -212,6 +258,60 @@ namespace AnoGame.Application.Inventory
             {
                 prevPageButton.interactable = (currentPage > 0);
                 nextPageButton.interactable = ((currentPage + 1) * maxVisibleSlots < _allItems.Count);
+            }
+        }
+
+        private async void LoadSprite(string itemName)
+        {
+            if (spriteCache.ContainsKey(itemName)) return;
+            if (loadOperations.ContainsKey(itemName)) return;
+
+            var itemData = itemDatabase.GetItemById(itemName);
+            if (itemData == null) return;
+
+            try
+            {
+                var operation = itemData.AssetReference.LoadAssetAsync<Sprite>();
+                loadOperations[itemName] = operation;
+                
+                var sprite = await operation.Task;
+                if (sprite != null)
+                {
+                    spriteCache[itemName] = sprite;
+                    UpdateSlotsWithItem(itemName); // 関連するスロットを更新
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to load sprite for {itemName}: {e.Message}");
+            }
+            finally
+            {
+                loadOperations.Remove(itemName);
+            }
+        }
+
+        private void UpdateSlotsWithItem(string itemName)
+        {
+            // 表示中の該当アイテムのスロットを更新
+            foreach (var slot in visibleSlots)
+            {
+                if (slot.CurrentItem?.itemName == itemName && spriteCache.TryGetValue(itemName, out var sprite))
+                {
+                    slot.UpdateSprite(sprite);
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // キャッシュのクリーンアップ
+            foreach (var operation in loadOperations.Values)
+            {
+                if (operation.IsValid())
+                {
+                    Addressables.Release(operation);
+                }
             }
         }
     }

@@ -2,27 +2,45 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using AnoGame.Data;
-public class InventorySlot : MonoBehaviour
+
+namespace AnoGame.Application.Inventory
 {
-    [SerializeField] private Image itemImage;
-    [SerializeField] private TextMeshProUGUI itemNameText;
-    [SerializeField] private TextMeshProUGUI descriptionText;
-
-    public void SetItem(InventoryItem item)
+    public class InventorySlot : MonoBehaviour
     {
-        // itemImage.sprite = item.itemImage;
-        itemImage.enabled = true;
-        itemNameText.text = item.itemName;
-        descriptionText.text = item.description;
-        // gameObject.SetActive(true);
-    }
+        [SerializeField] private Image itemImage;
+        [SerializeField] private TextMeshProUGUI itemNameText;
+        [SerializeField] private TextMeshProUGUI descriptionText;
+        [SerializeField] private TextMeshProUGUI quantityText;
 
-    public void Clear()
-    {
-        itemImage.sprite = null;
-        itemImage.enabled = false;
-        itemNameText.text = "";
-        descriptionText.text = "";
-        gameObject.SetActive(false);
+        public InventoryItem CurrentItem { get; private set; }
+
+        public void SetItem(InventoryItem item, Sprite sprite)
+        {
+            CurrentItem = item;
+            
+            itemNameText.text = item.itemName;
+            descriptionText.text = item.description;
+            quantityText.text = item.quantity > 1 ? item.quantity.ToString() : string.Empty;
+            
+            UpdateSprite(sprite);
+            gameObject.SetActive(true);
+        }
+
+        public void UpdateSprite(Sprite sprite)
+        {
+            itemImage.sprite = sprite;
+            itemImage.enabled = sprite != null;
+        }
+
+        public void Clear()
+        {
+            CurrentItem = null;
+            itemImage.sprite = null;
+            itemImage.enabled = false;
+            itemNameText.text = string.Empty;
+            descriptionText.text = string.Empty;
+            quantityText.text = string.Empty;
+            gameObject.SetActive(false);
+        }
     }
 }
