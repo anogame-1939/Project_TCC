@@ -3,12 +3,26 @@ using UnityEngine.InputSystem;
 using AnoGame.Data;
 using System.Collections.Generic;
 using System.Linq;
+using VContainer;
+using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Application.Player
 {
     [AddComponentMenu("Inventory/" + nameof(ItemCollector))]
     public class ItemCollector : MonoBehaviour
     {
+        [Inject] private IEventService _eventService;
+        [Inject] private IKeyItemService _keyItemService;
+
+        [Inject]
+        public void Construct(
+            IEventService eventService,
+            IKeyItemService keyItemService)
+        {
+            _eventService = eventService;
+            _keyItemService = keyItemService;
+        }
+
         [Header("Collection Settings")]
         [SerializeField] private float collectRadius = 2.0f;
         [SerializeField] private LayerMask itemLayer;
@@ -122,21 +136,25 @@ namespace AnoGame.Application.Player
                 description = itemData.Description
             };
 
-            // 既存のアイテムを検索し、存在する場合は数量を加算
+            // キーアイテムの場合、イベントをトリガー
+            if (_keyItemService.IsKeyItem(newItem.itemName))
+            {
+                _eventService.TriggerKeyItemEvent(newItem.itemName);
+            }
+
+            // 既存のインベントリ処理
             var existingItem = Inventory.FirstOrDefault(item => item.itemName == newItem.itemName);
             if (existingItem != null)
             {
                 existingItem.quantity += newItem.quantity;
-                Debug.Log($"Updated quantity: {existingItem.itemName} x{existingItem.quantity}");
             }
             else
             {
                 Inventory.Add(newItem);
-                Debug.Log($"Added new item: {newItem.itemName} x{newItem.quantity}");
             }
 
-            // GameManagerの状態を更新
-            _gameManager.UpdateGameState(_gameManager.CurrentGameData);
+            // ゲームデータの更新
+            // _gameDataService.UpdateGameData(_gameDataService.CurrentGameData);
         }
 
         public IReadOnlyList<InventoryItem> GetInventory()
