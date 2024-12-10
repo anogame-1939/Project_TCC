@@ -15,23 +15,29 @@ namespace AnoGame.Application.Player
         [SerializeField] private float viewAngle = 90.0f;
 
         [Header("Inventory Settings")]
-        [SerializeField] private List<InventoryItem> inventory = new List<InventoryItem>();
         [SerializeField] private int maxInventorySize = 20;
 
         private PlayerInput _playerInput;
         private InputAction _interactAction;
         private GameManager _gameManager;
 
+        // インベントリデータへの直接アクセスを制限し、GameManagerを通じて管理
+        private List<InventoryItem> Inventory => _gameManager?.CurrentGameData?.inventory;
+
         private void Awake()
         {
             _playerInput = GetComponent<PlayerInput>();
             if (_playerInput != null)
             {
-                // Interactアクションの参照を取得
                 _interactAction = _playerInput.actions["Interact"];
             }
 
             _gameManager = GameManager.Instance;
+            if (_gameManager == null)
+            {
+                Debug.LogError($"{nameof(GameManager)} not found!");
+                enabled = false;
+            }
         }
 
         private void OnEnable()
@@ -60,9 +66,9 @@ namespace AnoGame.Application.Player
 
         public void CollectItem()
         {
-            if (inventory.Count >= maxInventorySize)
+            if (Inventory == null || Inventory.Count >= maxInventorySize)
             {
-                Debug.LogWarning("Inventory is full!");
+                Debug.LogWarning("Inventory is full or not initialized!");
                 return;
             }
 
@@ -106,55 +112,36 @@ namespace AnoGame.Application.Player
 
         private void AddItemToInventory(CollectableItem collectableItem)
         {
+            if (Inventory == null) return;
+
             var itemData = collectableItem.ItemData;
             InventoryItem newItem = new InventoryItem
             {
                 itemName = itemData.ItemName,
                 quantity = collectableItem.Quantity,
-                description = itemData.Description,
-                // itemImage = collectableItem.ItemImage
+                description = itemData.Description
             };
 
-            // まず古いアイテムをInventoryから削除
-            InventoryItem existingItem = inventory.Find(item => item.itemName == newItem.itemName);
+            // 既存のアイテムを検索し、存在する場合は数量を加算
+            var existingItem = Inventory.FirstOrDefault(item => item.itemName == newItem.itemName);
             if (existingItem != null)
             {
-                inventory.Remove(existingItem);
-                // 数量を加算
-                newItem.quantity += existingItem.quantity;
+                existingItem.quantity += newItem.quantity;
+                Debug.Log($"Updated quantity: {existingItem.itemName} x{existingItem.quantity}");
             }
-
-            // 新しいアイテムを追加
-            inventory.Add(newItem);
-            Debug.Log($"Collected: {newItem.itemName} x{newItem.quantity}");
+            else
+            {
+                Inventory.Add(newItem);
+                Debug.Log($"Added new item: {newItem.itemName} x{newItem.quantity}");
+            }
 
             // GameManagerの状態を更新
-            AddItemToInventory2(newItem);
+            _gameManager.UpdateGameState(_gameManager.CurrentGameData);
         }
 
-        private void AddItemToInventory2(InventoryItem newItem)
+        public IReadOnlyList<InventoryItem> GetInventory()
         {
-            var currentGameData = _gameManager.CurrentGameData;
-            if (currentGameData == null) return;
-
-            // 同じitemNameのアイテムを削除
-            var existingItem = currentGameData.inventory.FirstOrDefault(x => x.itemName == newItem.itemName);
-            if (existingItem != null)
-            {
-                currentGameData.inventory.Remove(existingItem);
-                newItem.quantity += existingItem.quantity;
-            }
-
-            // 新しいアイテムを追加
-            currentGameData.inventory.Add(newItem);
-
-            // GameManagerに更新を通知
-            _gameManager.UpdateGameState(currentGameData);
-        }
-
-        public List<InventoryItem> GetInventory()
-        {
-            return inventory;
+            return Inventory?.AsReadOnly();
         }
 
         private void OnDrawGizmosSelected()
