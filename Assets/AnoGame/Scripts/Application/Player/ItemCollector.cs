@@ -155,6 +155,7 @@ namespace AnoGame.Application.Player
 
             // ゲームデータの更新
             // _gameDataService.UpdateGameData(_gameDataService.CurrentGameData);
+            _gameManager.UpdateGameState(_gameManager.CurrentGameData);
         }
 
         public IReadOnlyList<InventoryItem> GetInventory()
