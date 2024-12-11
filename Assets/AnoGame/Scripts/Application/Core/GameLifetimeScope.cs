@@ -22,9 +22,13 @@ namespace AnoGame.Application.Core
             builder.Register<IEventService, EventService>(Lifetime.Singleton);
             builder.Register<IKeyItemService, KeyItemService>(Lifetime.Singleton);
             builder.Register<IKeyItemService>(container => 
-                new KeyItemService(itemDatabase.Items.ToArray()), 
+                new KeyItemService(itemDatabase.Items.ToArray(), 
+                container.Resolve<IEventService>()), 
                 Lifetime.Singleton);
             // builder.Register<IGameDataService, GameDataService>(Lifetime.Singleton);
+
+            // シングルトンへの注入を有効にする
+            builder.RegisterComponentInHierarchy<GameManager>();
 
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();

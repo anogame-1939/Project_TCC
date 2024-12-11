@@ -1,10 +1,12 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using VContainer;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
+using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.SaveData;
 
 namespace AnoGame.Application
@@ -19,9 +21,18 @@ namespace AnoGame.Application
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
 
+        [Inject] private IKeyItemService _keyItemService;
+
         public GameManager()
         {
             _repository = new GameDataRepository();
+        }
+
+        [Inject]
+        public void Construct(IKeyItemService keyItemService)
+        {
+            Debug.Log("_keyItemService = keyItemService;");
+            _keyItemService = keyItemService;
         }
 
         private void Start()
@@ -39,6 +50,26 @@ namespace AnoGame.Application
                 {
                     _currentGameData = loadedData;
                     Debug.Log("Loaded existing save data");
+                    
+                    // セーブデータからキーアイテム状態を復元
+                    if (_currentGameData.inventory != null)
+                    {
+                        var collectedItems = _currentGameData.inventory
+                            .Select(item => item.itemName)
+                            .ToList();
+                        
+                        // キーアイテム状態を復元（これにより関連するドアなどが開く）
+                        _keyItemService.RestoreKeyItemStates(collectedItems);
+
+                        // シーン上の取得済みアイテムを非表示に
+                        foreach (var collectableItem in FindObjectsOfType<CollectableItem>())
+                        {
+                            if (collectedItems.Contains(collectableItem.ItemData.ItemName))
+                            {
+                                collectableItem.gameObject.SetActive(false);
+                            }
+                        }
+                    }
                 }
                 else
                 {

@@ -1,4 +1,5 @@
-using  AnoGame.Domain.Item.Models;
+using System.Collections.Generic;
+using AnoGame.Domain.Item.Models;
 
 namespace AnoGame.Domain.Inventory.Services
 {
@@ -12,8 +13,8 @@ namespace AnoGame.Domain.Inventory.Services
     public interface IKeyItemService
     {
         bool IsKeyItem(string itemName);
-        // ItemDataを直接受け取るメソッドも追加
         bool IsKeyItem(IItem itemData);
+        void RestoreKeyItemStates(IEnumerable<string> collectedKeyItems);
     }
 }
 

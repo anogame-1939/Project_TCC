@@ -6,16 +6,29 @@ namespace AnoGame.Infrastructure.Services
 {
     public class KeyItemService : IKeyItemService
     {
-        private readonly HashSet<string> _keyItems = new();
-        
-        // コンストラクタでItemDataの配列を受け取る
-        public KeyItemService(IItem[] keyItems)
-        {
-            foreach (var item in keyItems)
-            {
-                _keyItems.Add(item.ItemName);
-            }
-        }
+		private readonly HashSet<string> _keyItems = new();
+		private readonly IEventService _eventService;
+
+		public KeyItemService(IItem[] keyItems, IEventService eventService)
+		{
+			_eventService = eventService;
+			foreach (var item in keyItems)
+			{
+				_keyItems.Add(item.ItemName);
+			}
+		}
+
+		public void RestoreKeyItemStates(IEnumerable<string> collectedKeyItems)
+		{
+			foreach (var itemName in collectedKeyItems)
+			{
+				if (IsKeyItem(itemName))
+				{
+					// 各キーアイテムに対してイベントを発火
+					_eventService.TriggerKeyItemEvent(itemName);
+				}
+			}
+		}
 
         public bool IsKeyItem(string itemName)
         {
@@ -26,6 +39,7 @@ namespace AnoGame.Infrastructure.Services
         {
             return item != null && _keyItems.Contains(item.ItemName);
         }
+		
     }
 }
 
