@@ -49,7 +49,6 @@ namespace AnoGame.Application.Inventory
 
         public void UpdateInventory(List<InventoryItem> newItems)
         {
-            Debug.Log("なう");
             foreach (var item in newItems)
             {
                 if (!spriteCache.ContainsKey(item.itemName))

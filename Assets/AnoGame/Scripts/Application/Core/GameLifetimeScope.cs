@@ -4,6 +4,7 @@ using AnoGame.Domain.Inventory.Services;
 using AnoGame.Infrastructure.Services.Inventory;
 using AnoGame.Application.Player;
 using AnoGame.Application.Inventory.Components;
+using AnoGame.Infrastructure.Services;
 
 namespace AnoGame.Application.Core
 {
@@ -21,4 +22,5 @@ namespace AnoGame.Application.Core
             // builder.RegisterComponentInHierarchy<KeyDoor>();
         }
     }
+
 }
