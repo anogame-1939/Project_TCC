@@ -7,7 +7,6 @@ using AnoGame.Infrastructure.Services;
 using UnityEngine;
 using AnoGame.Data;
 using System.Linq;
-using AnoGame.Application.Inventory.Components;
 
 namespace AnoGame.Application.Core
 {

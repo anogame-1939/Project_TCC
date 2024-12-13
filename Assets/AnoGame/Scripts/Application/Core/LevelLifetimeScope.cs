@@ -1,12 +1,5 @@
 using VContainer;
 using VContainer.Unity;
-using AnoGame.Domain.Inventory.Services;
-using AnoGame.Infrastructure.Services.Inventory;
-using AnoGame.Application.Player;
-using AnoGame.Infrastructure.Services;
-using UnityEngine;
-using AnoGame.Data;
-using System.Linq;
 using AnoGame.Application.Inventory.Components;
 
 namespace AnoGame.Application.Core
@@ -20,6 +13,9 @@ namespace AnoGame.Application.Core
             {
                 builder.RegisterComponentInHierarchy<KeyDoor>();
             }
+
+            // このスコープの初期化完了時のコールバックを登録
+            builder.RegisterEntryPoint<LevelInitializer>();
         }
     }
 
