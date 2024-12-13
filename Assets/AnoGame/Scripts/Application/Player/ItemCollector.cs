@@ -133,7 +133,8 @@ namespace AnoGame.Application.Player
             {
                 itemName = itemData.ItemName,
                 quantity = collectableItem.Quantity,
-                description = itemData.Description
+                description = itemData.Description,
+                uniqueId = collectableItem.UniqueId,
             };
 
             // キーアイテムの場合、イベントをトリガー

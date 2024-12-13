@@ -17,6 +17,8 @@ namespace AnoGame.Application.Inventory.Components
         public void Construct(IEventService eventService)
         {
             _eventService = eventService;
+
+            // キーアイテム取得時の処理を登録
             _eventService.RegisterKeyItemHandler(requiredKeyItem.ItemName, OpenDoor);
         }
 
