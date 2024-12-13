@@ -1,3 +1,4 @@
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using AnoGame.Application.Inventory.Components;
@@ -8,13 +9,19 @@ namespace AnoGame.Application.Core
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            // KeyDoorは存在する場合のみ登録
-            if (FindFirstObjectByType<KeyDoor>() != null)
+            var keyDoors = FindObjectsByType<KeyDoor>(FindObjectsSortMode.None);
+            var collectables = FindObjectsByType<CollectableItem>(FindObjectsSortMode.None);
+
+            foreach (var door in keyDoors)
             {
-                builder.RegisterComponentInHierarchy<KeyDoor>();
+                builder.RegisterBuildCallback(resolver => resolver.Inject(door));
             }
 
-            // このスコープの初期化完了時のコールバックを登録
+            foreach (var item in collectables)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(item));
+            }
+
             builder.RegisterEntryPoint<LevelInitializer>();
         }
     }

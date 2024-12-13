@@ -13,14 +13,18 @@ namespace AnoGame.Application.Player
     {
         [Inject] private IEventService _eventService;
         [Inject] private IKeyItemService _keyItemService;
+        [Inject] private IItemCollectionEventService _itemCollectionService;
 
         [Inject]
         public void Construct(
             IEventService eventService,
-            IKeyItemService keyItemService)
+            IKeyItemService keyItemService,
+            IItemCollectionEventService itemCollectionService
+            )
         {
             _eventService = eventService;
             _keyItemService = keyItemService;
+            _itemCollectionService = itemCollectionService;
         }
 
         [Header("Collection Settings")]
@@ -129,33 +133,56 @@ namespace AnoGame.Application.Player
             if (Inventory == null) return;
 
             var itemData = collectableItem.ItemData;
-            InventoryItem newItem = new InventoryItem
-            {
-                itemName = itemData.ItemName,
-                quantity = collectableItem.Quantity,
-                description = itemData.Description,
-                uniqueId = collectableItem.UniqueId,
-            };
+            var existingItem = Inventory.FirstOrDefault(item => item.itemName == itemData.ItemName);
 
-            // キーアイテムの場合、イベントをトリガー
-            if (_keyItemService.IsKeyItem(newItem.itemName))
-            {
-                _eventService.TriggerKeyItemEvent(newItem.itemName);
-            }
-
-            // 既存のインベントリ処理
-            var existingItem = Inventory.FirstOrDefault(item => item.itemName == newItem.itemName);
             if (existingItem != null)
             {
-                existingItem.quantity += newItem.quantity;
+                // 既存アイテムの数量を更新
+                existingItem.quantity += collectableItem.Quantity;
+                
+                // スタック可能なアイテムの場合、ユニークIDを追加
+                if (itemData.IsStackable)
+                {
+                    existingItem.uniqueIds.Add(collectableItem.UniqueId);
+                    // 個別にイベント発火
+                    _itemCollectionService.TriggerItemCollected(
+                        itemData.ItemName,
+                        collectableItem.UniqueId
+                    );
+                }
             }
             else
             {
+                // 新しいアイテムを作成
+                var newItem = new InventoryItem
+                {
+                    itemName = itemData.ItemName,
+                    quantity = collectableItem.Quantity,
+                    description = itemData.Description,
+                    uniqueIds = new List<string>()
+                };
+
+                // スタック可能なアイテムの場合、ユニークIDを追加
+                if (itemData.IsStackable)
+                {
+                    newItem.uniqueIds.Add(collectableItem.UniqueId);
+                }
+
                 Inventory.Add(newItem);
+                
+                // イベント発火
+                _itemCollectionService.TriggerItemCollected(
+                    itemData.ItemName,
+                    itemData.IsStackable ? collectableItem.UniqueId : null
+                );
             }
 
-            // ゲームデータの更新
-            // _gameDataService.UpdateGameData(_gameDataService.CurrentGameData);
+            // キーアイテムの場合のイベント
+            if (_keyItemService.IsKeyItem(itemData))
+            {
+                _eventService.TriggerKeyItemEvent(itemData.ItemName);
+            }
+
             _gameManager.UpdateGameState(_gameManager.CurrentGameData);
         }
 

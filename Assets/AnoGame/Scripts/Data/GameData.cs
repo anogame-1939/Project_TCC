@@ -122,6 +122,6 @@ namespace AnoGame.Data
         public int quantity;
         public string description;
         public string uniqueId;
-        // public Sprite itemImage;
+        public List<string> uniqueIds = new();  
     }
 }

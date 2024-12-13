@@ -22,6 +22,7 @@ namespace AnoGame.Application
         public GameData CurrentGameData => _currentGameData;
 
         [Inject] private IKeyItemService _keyItemService;
+        [Inject] private IItemCollectionEventService _itemCollectionService;
 
         public GameManager()
         {
@@ -29,10 +30,12 @@ namespace AnoGame.Application
         }
 
         [Inject]
-        public void Construct(IKeyItemService keyItemService)
+        public void Construct(
+            IKeyItemService keyItemService,
+            IItemCollectionEventService itemCollectionService)
         {
-            Debug.Log("_keyItemService = keyItemService;");
             _keyItemService = keyItemService;
+            _itemCollectionService = itemCollectionService;
         }
 
         private void Start()
@@ -61,12 +64,23 @@ namespace AnoGame.Application
                         // キーアイテム状態を復元（これにより関連するドアなどが開く）
                         _keyItemService.RestoreKeyItemStates(collectedItems);
 
-                        // シーン上の取得済みアイテムを非表示に
-                        foreach (var collectableItem in FindObjectsOfType<CollectableItem>())
+                        foreach (var inventory in _currentGameData.inventory)
                         {
-                            if (collectedItems.Contains(collectableItem.ItemData.ItemName))
+                            if (inventory.uniqueIds.Count > 0)
                             {
-                                collectableItem.gameObject.SetActive(false);
+                                foreach (var uniqueId in inventory.uniqueIds)
+                                {
+                                    _itemCollectionService.TriggerItemCollected(
+                                        inventory.itemName,
+                                        uniqueId
+                                    );
+                                }
+                            }
+                            else
+                            {
+                                _itemCollectionService.TriggerItemCollected(
+                                    inventory.itemName
+                                );
                             }
                         }
                     }

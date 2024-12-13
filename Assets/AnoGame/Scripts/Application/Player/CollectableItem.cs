@@ -17,43 +17,38 @@ namespace AnoGame
         public int Quantity => quantity;
         public string UniqueId => uniqueId;
 
-        [Inject] private IEventService _eventService;
+        [Inject] private IItemCollectionEventService _itemCollectionService;
 
         [Inject]
-        public void Construct(IEventService eventService)
+        public void Construct(IItemCollectionEventService itemCollectionService)
         {
-            _eventService = eventService;
-
-            if (itemData.IsStackable)
-            {
-                // スタッカブルアイテムはユニークIDで登録
-                _eventService.RegisterKeyItemHandler(uniqueId, DisableItem);
-            }
-            else
-            {
-                // 非スタッカブルアイテムはアイテム名で登録
-                _eventService.RegisterKeyItemHandler(itemData.ItemName, DisableItem);
-            }
+            _itemCollectionService = itemCollectionService;
+            
+            // アイテム収集イベントのハンドラを登録
+            _itemCollectionService.RegisterItemHandler(itemData.ItemName, OnItemCollected);
         }
 
         private void OnDestroy()
         {
-            if (itemData != null)
-            {
-                if (itemData.IsStackable)
-                {
-                    _eventService?.UnregisterKeyItemHandler(uniqueId, DisableItem);
-                }
-                else
-                {
-                    _eventService?.UnregisterKeyItemHandler(itemData.ItemName, DisableItem);
-                }
-            }
+            _itemCollectionService?.UnregisterItemHandler(itemData.ItemName, OnItemCollected);
         }
 
-        private void DisableItem()
+        private void OnItemCollected(string collectedUniqueId)
         {
-            gameObject.SetActive(false);
+            Debug.Log($"itemData:{itemData.ItemName}, {uniqueId}, {collectedUniqueId}");
+            if (itemData.IsStackable)
+            {
+                // スタック可能なアイテムはユニークIDが一致する場合のみ非表示
+                if (uniqueId == collectedUniqueId)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                // スタック不可のアイテムは同じ種類なら全て非表示
+                gameObject.SetActive(false);
+            }
         }
 
         public string GetIdentifier()
@@ -66,13 +61,12 @@ namespace AnoGame
             // ItemDataが新しく設定された、または変更された場合
             if (itemData != null && itemData != _previousItemData)
             {
-                if (itemData.IsStackable)
+                _previousItemData = itemData;  // 先に前回値を更新
+
+                if (itemData.IsStackable && string.IsNullOrEmpty(uniqueId))
                 {
-                    // 新しいIDを生成
+                    // ユニークIDが未設定の場合のみ新しいIDを生成
                     uniqueId = System.Guid.NewGuid().ToString();
-                    _previousItemData = itemData;
-                    
-                    // シーンを保存可能な状態に
                     UnityEditor.EditorUtility.SetDirty(this);
                 }
             }

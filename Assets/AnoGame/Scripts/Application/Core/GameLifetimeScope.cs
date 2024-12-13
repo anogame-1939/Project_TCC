@@ -18,13 +18,15 @@ namespace AnoGame.Application.Core
         protected override void Configure(IContainerBuilder builder)
         {
             // サービスの登録
-            builder.Register<IEventService, EventService>(Lifetime.Singleton);
-            builder.Register<IKeyItemService, KeyItemService>(Lifetime.Singleton);
+            builder.Register<EventService>(Lifetime.Singleton)
+                .AsImplementedInterfaces();
+
+            // KeyItemServiceの重複登録を削除
             builder.Register<IKeyItemService>(container => 
                 new KeyItemService(itemDatabase.Items.ToArray(), 
                 container.Resolve<IEventService>()), 
                 Lifetime.Singleton);
-            // builder.Register<IGameDataService, GameDataService>(Lifetime.Singleton);
+
 
             // シングルトンへの注入を有効にする
             builder.RegisterComponentInHierarchy<GameManager>();
