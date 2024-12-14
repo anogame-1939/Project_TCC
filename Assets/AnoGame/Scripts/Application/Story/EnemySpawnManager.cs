@@ -145,6 +145,12 @@ namespace AnoGame.Application.Story
             }
         }
 
+        public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation)
+        {
+            SpawnEnemyAt(position, rotation);
+            EnabaleEnamy();  // 既存の仕様に合わせてスポーン後に有効化
+        }
+
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)
         {
             if (_currentEnemyController != null)

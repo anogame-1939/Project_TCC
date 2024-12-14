@@ -33,9 +33,49 @@ namespace AnoGame.Application.Enemy
         }
 
         /// <summary>
+        /// 指定したGameObjectの位置と回転に敵をスポーンさせる
+        /// </summary>
+        /// <param name="target">位置と回転の参照とするGameObject</param>
+        public void SpawnAtObject(GameObject target)
+        {
+        if (_spawnManager != null)
+        {
+            if (target != null)
+            {
+                SpawnAt(target.transform.position, target.transform.rotation);
+            }
+            else
+            {
+                Debug.LogError("ターゲットのGameObjectがnullです。");
+            }
+        }
+        else
+        {
+            Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
+        }
+        }
+
+        /// <summary>
+        /// 指定した位置に直接敵をスポーンさせる
+        /// </summary>
+        /// <param name="position">スポーンさせる位置</param>
+        /// <param name="rotation">スポーンさせる際の回転</param>
+        public void SpawnAt(Vector3 position, Quaternion rotation)
+        {
+            if (_spawnManager != null)
+            {
+                _spawnManager.SpawnEnemyAtExactPosition(position, rotation);
+            }
+            else
+            {
+                Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
+            }
+        }
+
+        /// <summary>
         /// 指定した位置の近くに敵をスポーンさせる
         /// </summary>
-        public void TriggerEnemySpawnAtPosition(Vector3 position)
+        public void SpawnNear(Vector3 position)
         {
             if (_spawnManager != null)
             {
