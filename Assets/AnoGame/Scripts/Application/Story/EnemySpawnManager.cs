@@ -72,7 +72,7 @@ namespace AnoGame.Application.Story
             if (startPoint == null) return;
 
             SpawnEnemyAt(startPoint.position, startPoint.rotation);
-            EnabaleEnamy();
+            // EnabaleEnamy();
         }
 
         public void SpawnEnemyAtRetryPoint()
@@ -87,7 +87,7 @@ namespace AnoGame.Application.Story
             }
 
             SpawnEnemyAt(targetPoint.position, targetPoint.rotation);
-            EnabaleEnamy();
+            // EnabaleEnamy();
         }
 
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation)

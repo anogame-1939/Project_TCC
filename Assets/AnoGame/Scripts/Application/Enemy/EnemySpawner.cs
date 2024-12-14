@@ -38,21 +38,21 @@ namespace AnoGame.Application.Enemy
         /// <param name="target">位置と回転の参照とするGameObject</param>
         public void SpawnAtObject(GameObject target)
         {
-        if (_spawnManager != null)
-        {
-            if (target != null)
+            if (_spawnManager != null)
             {
-                SpawnAt(target.transform.position, target.transform.rotation);
+                if (target != null)
+                {
+                    SpawnAt(target.transform.position, target.transform.rotation);
+                }
+                else
+                {
+                    Debug.LogError("ターゲットのGameObjectがnullです。");
+                }
             }
             else
             {
-                Debug.LogError("ターゲットのGameObjectがnullです。");
+                Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
             }
-        }
-        else
-        {
-            Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
-        }
         }
 
         /// <summary>

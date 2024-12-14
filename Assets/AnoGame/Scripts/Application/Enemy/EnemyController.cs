@@ -30,7 +30,7 @@ namespace AnoGame.Application.Enemy
             }
 
             // キャラクターの動きを止める
-            StopMoving();
+            // StopMoving();
         }
 
         public void EnableBrain()
