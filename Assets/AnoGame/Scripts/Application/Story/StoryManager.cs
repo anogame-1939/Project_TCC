@@ -210,14 +210,20 @@ namespace AnoGame.Application.Story
         private IEnumerator UnloadCurrentScenesCoroutine()
         {
             var scenesToUnload = new List<Scene>(_loadedStoryScenes);
+            Debug.Log($"Starting to unload {scenesToUnload.Count} story scenes");
             
             foreach (var scene in scenesToUnload)
             {
-                if (!scene.isLoaded || !scene.IsValid()) continue;
+                if (!scene.isLoaded || !scene.IsValid())
+                {
+                    Debug.Log($"Skipping scene {scene.path}: not loaded or invalid");
+                    continue;
+                }
 
                 AsyncOperation unloadOperation = null;
                 try
                 {
+                    Debug.Log($"Unloading scene: {scene.path}");
                     unloadOperation = SceneManager.UnloadSceneAsync(scene);
                 }
                 catch (Exception ex)
@@ -229,6 +235,7 @@ namespace AnoGame.Application.Story
                 if (unloadOperation != null)
                 {
                     yield return unloadOperation;
+                    Debug.Log($"Successfully unloaded scene: {scene.path}");
                 }
             }
 
@@ -237,10 +244,10 @@ namespace AnoGame.Application.Story
 
             if (_mainScene.IsValid())
             {
+                Debug.Log($"Setting active scene back to main scene: {_mainScene.path}");
                 SceneManager.SetActiveScene(_mainScene);
             }
         }
-
         private IEnumerator SpawnSceneEventsCoroutine(StoryData.SceneData sceneData)
         {
             foreach (var eventData in sceneData.events)
