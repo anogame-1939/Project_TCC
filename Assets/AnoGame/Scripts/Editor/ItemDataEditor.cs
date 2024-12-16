@@ -96,7 +96,7 @@ public class ItemDataEditor : Editor
 
     private void CreateAsAncientDocument(SerializedObject serializedObject)
     {
-        var number = GetNextDocumentNumber();
+        var number = GetDocumentNumber();
         var nameProperty = serializedObject.FindProperty("itemName");
         var typeProperty = serializedObject.FindProperty("itemType");
         var stackableProperty = serializedObject.FindProperty("isStackable");
@@ -104,7 +104,7 @@ public class ItemDataEditor : Editor
         serializedObject.Update();
         
         nameProperty.stringValue = $"古い手記（{number}）";
-        typeProperty.enumValueIndex = (int)ItemType.Quest;
+        typeProperty.enumValueIndex = (int)ItemType.Consumable;
         stackableProperty.boolValue = false;
         
         serializedObject.ApplyModifiedProperties();
@@ -113,40 +113,35 @@ public class ItemDataEditor : Editor
         AssetDatabase.SaveAssets();
     }
 
-    private int GetNextDocumentNumber()
+    private int GetDocumentNumber()
     {
-        // プロジェクト内のすべてのItemDataアセットを検索
-        var guids = AssetDatabase.FindAssets("t:ItemData");
-        var existingNumbers = guids
-            .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-            .Select(path => AssetDatabase.LoadAssetAtPath<ItemData>(path))
-            .Where(item => item != null && item.ItemName.StartsWith("古い手記"))
-            .Select(item =>
+        // 完全な型名を指定してアセットを検索
+        var guids = AssetDatabase.FindAssets("t:AnoGame.Data.ItemData");
+        Debug.Log($"Found {guids.Length} ItemData assets"); // デバッグ出力を追加
+
+        var documentNumber = guids
+            .Select(guid =>
             {
-                // "古い手記（X）"から数字を抽出
-                var name = item.ItemName;
-                var startIndex = name.IndexOf('（') + 1;
-                var endIndex = name.IndexOf('）');
-                if (startIndex > 0 && endIndex > startIndex)
-                {
-                    if (int.TryParse(name.Substring(startIndex, endIndex - startIndex), out int number))
-                    {
-                        return number;
-                    }
-                }
-                return 0;
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                Debug.Log($"Found ItemData at path: {path}"); // パスの確認
+                return AssetDatabase.LoadAssetAtPath<ItemData>(path);
             })
-            .Where(num => num > 0)
-            .ToList();
+            .Where(item =>
+            {
+                if (item == null)
+                {
+                    Debug.LogWarning("Loaded ItemData is null");
+                    return false;
+                }
+                var isDocument = item.ItemName.StartsWith("古い手記");
+                Debug.Log($"ItemData: {item.ItemName}, IsDocument: {isDocument}"); // アイテム名とドキュメントかどうかを確認
+                return isDocument;
+            }).ToList().Count;
 
-        // 既存の番号が無ければ1を返す
-        if (!existingNumbers.Any())
-        {
-            return 1;
-        }
+        Debug.Log($"documentNumber:{documentNumber}  ");
 
-        // 最大の番号 + 1 を返す
-        return existingNumbers.Max() + 1;
+
+        return documentNumber;
     }
 
     private void ApplyTemplate(SerializedObject serializedObject, string templateText)
