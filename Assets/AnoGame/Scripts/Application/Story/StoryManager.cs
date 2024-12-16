@@ -173,7 +173,7 @@ namespace AnoGame.Application.Story
             try
             {
                 loadOperation = SceneManager.LoadSceneAsync(
-                    currentScene.sceneReference.scenePath, 
+                    currentScene.sceneReference.ScenePath, 
                     LoadSceneMode.Additive
                 );
             }
@@ -192,7 +192,7 @@ namespace AnoGame.Application.Story
             yield return loadOperation;
 
             Scene newScene = SceneManager.GetSceneByPath(
-                currentScene.sceneReference.scenePath
+                currentScene.sceneReference.ScenePath
             );
             
             if (newScene.IsValid())
@@ -203,7 +203,7 @@ namespace AnoGame.Application.Story
             }
             else
             {
-                Debug.LogError($"Failed to load scene: {currentScene.sceneReference.scenePath}");
+                Debug.LogError($"Failed to load scene: {currentScene.sceneReference.ScenePath}");
             }
         }
 
