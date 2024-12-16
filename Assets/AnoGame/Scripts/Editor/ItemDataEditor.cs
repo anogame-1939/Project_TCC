@@ -96,6 +96,7 @@ public class ItemDataEditor : Editor
 
     private void CreateAsAncientDocument(SerializedObject serializedObject)
     {
+        var itemData = serializedObject.targetObject as ItemData;
         var number = GetDocumentNumber();
         var nameProperty = serializedObject.FindProperty("itemName");
         var typeProperty = serializedObject.FindProperty("itemType");
@@ -109,21 +110,43 @@ public class ItemDataEditor : Editor
         
         serializedObject.ApplyModifiedProperties();
         
-        EditorUtility.SetDirty(target);
-        AssetDatabase.SaveAssets();
+        // アセットのパスを取得
+        string currentPath = AssetDatabase.GetAssetPath(itemData);
+        // 新しいファイル名を生成（formatを変更）
+        string newFileName = $"ItemData.501.Memo_{number}";
+        string directory = System.IO.Path.GetDirectoryName(currentPath);
+        string extension = System.IO.Path.GetExtension(currentPath);
+        string newPath = System.IO.Path.Combine(directory, newFileName + extension);
+
+        Debug.Log($"Renaming asset from {currentPath} to {newPath}");
+
+        // アセットの名前を変更
+        var result = AssetDatabase.MoveAsset(currentPath, newPath);
+        if (!string.IsNullOrEmpty(result))
+        {
+            Debug.LogError($"Error renaming asset: {result}");
+        }
+        else
+        {
+            EditorUtility.SetDirty(itemData);
+            AssetDatabase.SaveAssets();
+        }
     }
 
     private int GetDocumentNumber()
     {
+        var currentItem = target as ItemData;
+        
         // 完全な型名を指定してアセットを検索
         var guids = AssetDatabase.FindAssets("t:AnoGame.Data.ItemData");
-        Debug.Log($"Found {guids.Length} ItemData assets"); // デバッグ出力を追加
+        Debug.Log($"Found {guids.Length} ItemData assets");
 
-        var documentNumber = guids
+        // 古い手記のアイテムリストを取得
+        var documentItems = guids
             .Select(guid =>
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
-                Debug.Log($"Found ItemData at path: {path}"); // パスの確認
+                Debug.Log($"Found ItemData at path: {path}");
                 return AssetDatabase.LoadAssetAtPath<ItemData>(path);
             })
             .Where(item =>
@@ -134,12 +157,17 @@ public class ItemDataEditor : Editor
                     return false;
                 }
                 var isDocument = item.ItemName.StartsWith("古い手記");
-                Debug.Log($"ItemData: {item.ItemName}, IsDocument: {isDocument}"); // アイテム名とドキュメントかどうかを確認
+                Debug.Log($"ItemData: {item.ItemName}, IsDocument: {isDocument}");
                 return isDocument;
-            }).ToList().Count;
+            })
+            .OrderBy(item => AssetDatabase.GetAssetPath(item)) // パスでソート
+            .ToList();
 
-        Debug.Log($"documentNumber:{documentNumber}  ");
+        // 現在のアイテムのインデックスを検索
+        int index = documentItems.IndexOf(currentItem);
+        int documentNumber = index >= 0 ? index + 1 : documentItems.Count + 1;
 
+        Debug.Log($"Current index: {index}, documentNumber: {documentNumber}");
 
         return documentNumber;
     }
