@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using AnoGame.Domain.Item.Models;
-
 namespace AnoGame.Domain.Inventory.Services
 {
     public interface IItemCollectionEventService
