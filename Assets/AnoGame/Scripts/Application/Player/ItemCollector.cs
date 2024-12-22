@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VContainer;
 using AnoGame.Domain.Inventory.Services;
+using AnoGame.Domain.Event.Services;
 
 namespace AnoGame.Application.Player
 {

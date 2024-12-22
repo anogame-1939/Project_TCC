@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using VContainer;
-using AnoGame.Domain.Inventory.Services;
+using AnoGame.Domain.Event.Services;
 using AnoGame.Data;
 
 namespace AnoGame.Application.Interaction.Components

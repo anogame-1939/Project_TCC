@@ -3,6 +3,7 @@ using VContainer;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Domain.Item.Models;
 using AnoGame.Data;
+using AnoGame.Domain.Event.Services;
 
 namespace AnoGame.Application.Inventory.Components
 {

@@ -1,6 +1,7 @@
 using VContainer;
 using VContainer.Unity;
 using AnoGame.Domain.Inventory.Services;
+using AnoGame.Domain.Event.Services;
 using AnoGame.Infrastructure.Services.Inventory;
 using AnoGame.Application.Player;
 using AnoGame.Infrastructure.Services;
