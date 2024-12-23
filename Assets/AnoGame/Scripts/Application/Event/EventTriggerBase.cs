@@ -6,9 +6,10 @@ using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Event.Types;
 using AnoGame.Data;
 using System.Collections.Generic;
+using System.Linq;
 using AnoGame.Domain.Event.Conditions;
 
-namespace AnoGame.Application.Interaction.Components
+namespace AnoGame.Application.Event
 {
     public abstract class EventTriggerBase : MonoBehaviour
     {
@@ -16,10 +17,11 @@ namespace AnoGame.Application.Interaction.Components
         private IEventSettings EventSettings => eventData;
         [SerializeField] protected UnityEvent onEventStart;
         [SerializeField] protected UnityEvent onEventComplete;
+        [SerializeField] protected EventConditionComponent[] conditionComponents;
 
         [Inject] protected IEventProgressService _eventProgressService;
         
-        protected List<IEventCondition> _conditions = new List<IEventCondition>();
+        private List<IEventCondition> _conditions = new List<IEventCondition>();
 
         [Inject]
         public virtual void Construct(IEventProgressService eventProgressService)
@@ -32,11 +34,25 @@ namespace AnoGame.Application.Interaction.Components
             InitializeConditions();
         }
 
-        protected abstract void InitializeConditions();
+        protected virtual void InitializeConditions()
+        {
+            if (conditionComponents == null) return;
+            
+            foreach (var component in conditionComponents)
+            {
+                if (component != null)
+                {
+                    _conditions.Add(component.CreateCondition());
+                }
+            }
+        }
 
         protected bool CheckConditions()
         {
-            return _conditions.TrueForAll(condition => condition.IsSatisfied());
+            if (_conditions.Count == 0)
+                return true;
+
+            return _conditions.All(condition => condition.IsSatisfied());
         }
 
         protected virtual void TryTriggerEvent()

@@ -1,42 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events; // Add this line
 using AnoGame.Data;
 using VContainer;
+using AnoGame.Domain.Inventory.Services;
 using AnoGame.Domain.Event.Services;
 
-// イベントの基底クラス
-public abstract class EventTriggerBase : MonoBehaviour
+namespace AnoGame.Application.Event
 {
-    [SerializeField] protected EventData eventData;
-    [SerializeField] protected UnityEvent onEventTriggered;
-
-    [Inject] protected IEventStateService _eventStateService;
-
-    [Inject]
-    public virtual void Construct(IEventStateService eventStateService)
+    public class KeyItemEventTrigger : EventTriggerBase
     {
-        _eventStateService = eventStateService;
+        [SerializeField] private ItemData requiredKeyItem;
         
-        // イベントがクリア済みの場合は非アクティブにする
-        if (_eventStateService.IsEventCleared(eventData.EventId))
+        [Inject] private IInventoryService _inventoryService;
+
+        [Inject]
+        public void Construct(IEventProgressService eventProgressService, IInventoryService inventoryService)
         {
-            gameObject.SetActive(false);
+            base.Construct(eventProgressService);
+            _inventoryService = inventoryService;
         }
-    }
 
-    public void CompleteEvent()
-    {
-        _eventStateService.SetEventCleared(eventData.EventId);
-        gameObject.SetActive(false);
-    }
-
-    protected virtual void TriggerEvent()
-    {
-        if (!_eventStateService.IsEventCleared(eventData.EventId))
+        private void OnTriggerEnter(Collider other)
         {
-            onEventTriggered?.Invoke();
+            if (other.CompareTag("Player"))
+            {
+                TryTriggerEvent();
+            }
         }
     }
 }
