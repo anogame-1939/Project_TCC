@@ -1,4 +1,5 @@
 using UnityEngine;
+using AnoGame.Domain.Event.Types;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,7 +8,7 @@ using UnityEditor;
 namespace AnoGame.Data
 {
     [CreateAssetMenu(fileName = "EventData", menuName = "Game/EventData")]
-    public class EventData : ScriptableObject
+    public class EventData : ScriptableObject, IEventSettings
     {
         [SerializeField] private string eventId;
         [SerializeField] private string eventName;

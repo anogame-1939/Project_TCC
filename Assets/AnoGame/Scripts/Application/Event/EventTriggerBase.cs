@@ -1,56 +1,66 @@
 using UnityEngine;
-using AnoGame.Data;
+using UnityEngine.Events;
 using VContainer;
+using AnoGame.Domain.Event;
 using AnoGame.Domain.Event.Services;
+using AnoGame.Data;
+using System.Collections.Generic;
+using AnoGame.Domain.Event.Conditions;
 
-
-// キーアイテムによってトリガーされるイベント
-public class KeyItemEventTrigger : EventTriggerBase
+namespace AnoGame.Application.Interaction.Components
 {
-    [SerializeField] private ItemData requiredKeyItem;
-    
-    [Inject] private IEventService _eventService;
-
-    [Inject]
-    public override void Construct(IEventStateService eventStateService)
+    public abstract class EventTriggerBase : MonoBehaviour
     {
-        base.Construct(eventStateService);
+        [SerializeField] protected EventData eventData;
+        [SerializeField] protected UnityEvent onEventStart;
+        [SerializeField] protected UnityEvent onEventComplete;
+
+        [Inject] protected IEventProgressService _eventProgressService;
         
-        if (gameObject.activeSelf)
+        protected List<IEventCondition> _conditions = new List<IEventCondition>();
+
+        [Inject]
+        public virtual void Construct(IEventProgressService eventProgressService)
         {
-            _eventService.RegisterKeyItemHandler(requiredKeyItem.ItemName, OnKeyItemObtainedHandler);
+            _eventProgressService = eventProgressService;
         }
-    }
 
-    private void OnDestroy()
-    {
-        _eventService?.UnregisterKeyItemHandler(requiredKeyItem.ItemName, OnKeyItemObtainedHandler);
-    }
-
-    private void OnKeyItemObtainedHandler()
-    {
-        TriggerEvent();
-    }
-}
-
-// 単純な実行可能イベント（トリガーコライダーなどで発火）
-public class SimpleEventTrigger : EventTriggerBase
-{
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
+        protected virtual void Start()
         {
-            TriggerEvent();
+            InitializeConditions();
         }
-    }
-}
 
-// 敵の出現などに使用する一回限りのイベント
-public class OneTimeEventTrigger : EventTriggerBase
-{
-    public void ExecuteEvent()
-    {
-        TriggerEvent();
-        CompleteEvent(); // イベント実行後に自動的にクリア状態にする
+        protected abstract void InitializeConditions();
+
+        protected bool CheckConditions()
+        {
+            return _conditions.TrueForAll(condition => condition.IsSatisfied());
+        }
+
+        protected virtual void TryTriggerEvent()
+        {
+            if (!_eventProgressService.CanTriggerEvent(eventData.EventId))
+                return;
+
+            if (!CheckConditions())
+                return;
+
+            _eventProgressService.StartEvent(eventData.EventId);
+            onEventStart?.Invoke();
+        }
+
+        public virtual void CompleteEvent()
+        {
+            if (_eventProgressService.GetEventState(eventData.EventId) != EventState.InProgress)
+                return;
+
+            _eventProgressService.CompleteEvent(eventData.EventId);
+            onEventComplete?.Invoke();
+
+            if (!eventData.IsOneTime)
+            {
+                _eventProgressService.ResetEvent(eventData.EventId);
+            }
+        }
     }
 }
