@@ -34,6 +34,10 @@ namespace AnoGame.Application.Core
 
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();
+
+            // IEventProgressServiceの登録
+            builder.Register<IEventProgressService, EventProgressService>(Lifetime.Singleton);
+
         }
     }
 
