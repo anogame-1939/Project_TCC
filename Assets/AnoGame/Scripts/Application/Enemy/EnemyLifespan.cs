@@ -14,6 +14,8 @@ namespace AnoGame.Application.Enemy
         
         private SpriteRenderer[] _spriteRenderers;
         private ParticleSystem.MainModule _particleMainModule;
+        public event System.Action OnLifespanExpired;
+        
         
         private void Awake()
         {
@@ -55,7 +57,10 @@ namespace AnoGame.Application.Enemy
             float delay = Random.Range(minLifespan, maxLifespan);
             yield return new WaitForSeconds(delay);
 
-            // フェードアウトとパーティクル再生を同時に開始
+            // 寿命終了イベントを発火
+            OnLifespanExpired?.Invoke();
+
+            // 既存のフェードアウト処理
             StartCoroutine(FadeOut());
             
             if (disappearEffect != null)

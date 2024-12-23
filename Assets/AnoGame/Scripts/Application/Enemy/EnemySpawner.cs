@@ -1,11 +1,20 @@
 using UnityEngine;
 using AnoGame.Application.Story;
 using System.Collections;
+using AnoGame.Data;
 
 namespace AnoGame.Application.Enemy
 {
     public class EnemySpawner : MonoBehaviour
     {
+        [SerializeField]
+        EventData _eventaData;
+
+        public void SetEventData(EventData eventData)
+        {
+            _eventaData = eventData;
+        }
+
         private EnemySpawnManager _spawnManager;
 
         private void Awake()
@@ -55,6 +64,9 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+
+
+
         /// <summary>
         /// 指定した位置に直接敵をスポーンさせる
         /// </summary>
@@ -64,7 +76,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyAtExactPosition(position, rotation);
+                _spawnManager.SpawnEnemyAtExactPosition(position, rotation, _eventaData);
             }
             else
             {

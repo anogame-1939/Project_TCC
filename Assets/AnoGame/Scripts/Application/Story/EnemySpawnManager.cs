@@ -1,6 +1,8 @@
 using UnityEngine;
 using AnoGame.Infrastructure;
 using AnoGame.Application.Enemy;
+using AnoGame.Data;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,15 +11,15 @@ using UnityEditor;
 namespace AnoGame.Application.Story
 {
     public class EnemySpawnManager : SingletonMonoBehaviour<EnemySpawnManager>
-    {   
-    [SerializeField] private GameObject enemyPrefab;
-    private GameObject _currentEnemyInstance;
-    private EnemyController _currentEnemyController;  // EnemyControllerへの参照を保持
-    
-    private const string TAG_START_POINT_ENEMY = "StartPointEnemy";
-    private const string TAG_RETRY_POINT_ENEMY = "RetryPointEnemy";
-    
-    private Transform _currentRetryPoint;
+    {
+        [SerializeField] private GameObject enemyPrefab;
+        private GameObject _currentEnemyInstance;
+        private EnemyController _currentEnemyController;  // EnemyControllerへの参照を保持
+        
+        private const string TAG_START_POINT_ENEMY = "StartPointEnemy";
+        private const string TAG_RETRY_POINT_ENEMY = "RetryPointEnemy";
+        
+        private Transform _currentRetryPoint;
 
         private void Start()
         {
@@ -118,6 +120,12 @@ namespace AnoGame.Application.Story
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
 
+        private void SetEventData(EventData eventData)
+        {
+            var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
+            enemyEventController.Initialize(eventData);
+        }
+
         public void EnabaleEnamy()
         {
             _currentEnemyController.EnableBrain();
@@ -145,9 +153,10 @@ namespace AnoGame.Application.Story
             }
         }
 
-        public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation)
+        public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation, EventData eventData = null)
         {
             SpawnEnemyAt(position, rotation);
+            if (eventData) SetEventData(eventData);
             EnabaleEnamy();  // 既存の仕様に合わせてスポーン後に有効化
         }
 

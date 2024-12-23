@@ -14,6 +14,7 @@ namespace AnoGame.Application.Event
     public abstract class EventTriggerBase : MonoBehaviour
     {
         [SerializeField] protected EventData eventData;
+        public EventData EventData => eventData;
         private IEventSettings EventSettings => eventData;
         [SerializeField] protected UnityEvent onEventStart;
         [SerializeField] protected UnityEvent onEventComplete;

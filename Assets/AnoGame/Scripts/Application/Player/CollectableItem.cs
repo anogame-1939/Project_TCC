@@ -3,6 +3,8 @@ using UnityEngine;
 using AnoGame.Data;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
+using AnoGame.Application.Event;
+using AnoGame.Domain.Event;
 
 namespace AnoGame
 {
@@ -18,23 +20,29 @@ namespace AnoGame
         public int Quantity => quantity;
         public string UniqueId => uniqueId;
 
+
+        [SerializeField] private EventTriggerBase relatedEventTrigger;
+        [SerializeField] private EventTriggerBase[] relatedEventTriggers;
+        
+        // イベントの進捗状況を管理
         [Inject] private IEventProgressService _eventProgressService;
 
-        [Inject] private IInventoryService _itemCollectionService;
+        // インベントを管理
+        [Inject] private IInventoryService _inventoryService;
 
         [Inject]
         public void Construct(IEventProgressService eventProgressService, IInventoryService itemCollectionService)
         {
             _eventProgressService = eventProgressService;
-            _itemCollectionService = itemCollectionService;
+            _inventoryService = itemCollectionService;
 
             // アイテム収集イベントのハンドラを登録
-            _itemCollectionService.RegisterItemHandler(itemData.ItemName, OnItemCollected);
+            _inventoryService.RegisterItemHandler(itemData.ItemName, OnItemCollected);
         }
 
         private void OnDestroy()
         {
-            _itemCollectionService?.UnregisterItemHandler(itemData.ItemName, OnItemCollected);
+            _inventoryService?.UnregisterItemHandler(itemData.ItemName, OnItemCollected);
         }
 
         private void OnItemCollected(string collectedUniqueId)
@@ -59,6 +67,43 @@ namespace AnoGame
         {
             return itemData.IsStackable ? uniqueId : itemData.ItemName;
         }
+
+        public bool CanCollect()
+        {
+            // relatedEventTriggerが設定されている場合、イベントの状態をチェック
+            if (relatedEventTrigger != null)
+            {
+                var eventState = _eventProgressService.GetEventState(relatedEventTrigger.EventData.EventId);
+                // イベント完了済みの場合は取得不可
+                if (eventState == EventState.Completed)
+                {
+                    return false;
+                }
+            }
+
+            // 既に所持している場合は取得不可
+            if (_inventoryService.HasItem(itemData.ItemName))
+            {
+                return false;
+            }
+
+            return true;
+        }
+        
+        public void OnCollected()
+        {
+            if (!CanCollect()) return;
+            
+            // _inventoryService.AddItem(itemData.ItemName, quantity);
+            gameObject.SetActive(false);
+            
+            // 関連イベントが設定されている場合はイベントを開始
+            if (relatedEventTrigger != null)
+            {
+                _eventProgressService.StartEvent(relatedEventTrigger.EventData.EventId);
+            }
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
