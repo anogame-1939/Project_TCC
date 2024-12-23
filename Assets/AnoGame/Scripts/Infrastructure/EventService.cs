@@ -71,6 +71,11 @@ namespace AnoGame.Infrastructure.Services.Inventory
                 _itemCollectionHandlers[itemName].Remove(handler);
             }
         }
+
+        public bool HasItem(string itemName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
