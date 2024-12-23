@@ -22,7 +22,7 @@ namespace AnoGame.Application
         public GameData CurrentGameData => _currentGameData;
 
         [Inject] private IKeyItemService _keyItemService;
-        [Inject] private IItemCollectionEventService _itemCollectionService;
+        [Inject] private IInventoryService _itemCollectionService;
 
         public GameManager()
         {
@@ -32,7 +32,7 @@ namespace AnoGame.Application
         [Inject]
         public void Construct(
             IKeyItemService keyItemService,
-            IItemCollectionEventService itemCollectionService)
+            IInventoryService itemCollectionService)
         {
             _keyItemService = keyItemService;
             _itemCollectionService = itemCollectionService;

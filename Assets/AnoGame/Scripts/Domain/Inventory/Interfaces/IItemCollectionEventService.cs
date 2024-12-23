@@ -1,6 +1,6 @@
 namespace AnoGame.Domain.Inventory.Services
 {
-    public interface IItemCollectionEventService
+    public interface IInventoryService
     {
         void TriggerItemCollected(string itemName, string uniqueId = null);
         void RegisterItemHandler(string itemName, System.Action<string> handler);

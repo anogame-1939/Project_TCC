@@ -7,7 +7,7 @@ using AnoGame.Domain.Inventory.Services;
 // Infrastructure層の実装
 namespace AnoGame.Infrastructure.Services.Inventory
 {
-    public class EventService : IEventService, IItemCollectionEventService
+    public class EventService : IEventService, IInventoryService
     {
         // 既存のキーアイテムイベント用
         private readonly Dictionary<string, List<Action>> _keyItemHandlers = new();

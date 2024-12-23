@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using VContainer;
 using AnoGame.Domain.Event;
 using AnoGame.Domain.Event.Services;
+using AnoGame.Domain.Event.Types;
 using AnoGame.Data;
 using System.Collections.Generic;
 using AnoGame.Domain.Event.Conditions;
@@ -12,6 +13,7 @@ namespace AnoGame.Application.Interaction.Components
     public abstract class EventTriggerBase : MonoBehaviour
     {
         [SerializeField] protected EventData eventData;
+        private IEventSettings EventSettings => eventData;
         [SerializeField] protected UnityEvent onEventStart;
         [SerializeField] protected UnityEvent onEventComplete;
 

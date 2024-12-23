@@ -14,13 +14,13 @@ namespace AnoGame.Application.Player
     {
         [Inject] private IEventService _eventService;
         [Inject] private IKeyItemService _keyItemService;
-        [Inject] private IItemCollectionEventService _itemCollectionService;
+        [Inject] private IInventoryService _itemCollectionService;
 
         [Inject]
         public void Construct(
             IEventService eventService,
             IKeyItemService keyItemService,
-            IItemCollectionEventService itemCollectionService
+            IInventoryService itemCollectionService
             )
         {
             _eventService = eventService;

@@ -6,12 +6,12 @@ namespace AnoGame.Application.Core
     public class LevelInitializer : IStartable
     {
         private readonly IKeyItemService _keyItemService;
-        private readonly IItemCollectionEventService _itemCollectionService;
+        private readonly IInventoryService _itemCollectionService;
         private readonly GameManager _gameManager;
 
         public LevelInitializer(
             IKeyItemService keyItemService,
-            IItemCollectionEventService itemCollectionService,
+            IInventoryService itemCollectionService,
             GameManager gameManager)
         {
             _keyItemService = keyItemService;

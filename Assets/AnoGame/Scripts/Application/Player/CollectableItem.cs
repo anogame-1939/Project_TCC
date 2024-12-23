@@ -1,6 +1,7 @@
 using VContainer;
 using UnityEngine;
 using AnoGame.Data;
+using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame
@@ -17,13 +18,16 @@ namespace AnoGame
         public int Quantity => quantity;
         public string UniqueId => uniqueId;
 
-        [Inject] private IItemCollectionEventService _itemCollectionService;
+        [Inject] private IEventProgressService _eventProgressService;
+
+        [Inject] private IInventoryService _itemCollectionService;
 
         [Inject]
-        public void Construct(IItemCollectionEventService itemCollectionService)
+        public void Construct(IEventProgressService eventProgressService, IInventoryService itemCollectionService)
         {
+            _eventProgressService = eventProgressService;
             _itemCollectionService = itemCollectionService;
-            
+
             // アイテム収集イベントのハンドラを登録
             _itemCollectionService.RegisterItemHandler(itemData.ItemName, OnItemCollected);
         }
