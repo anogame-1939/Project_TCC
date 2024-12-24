@@ -19,7 +19,7 @@ namespace AnoGame.Application.Core
             }
 
             // EventTriggerBaseを継承したコンポーネントの検索と登録
-            var eventTriggers = FindObjectsByType<EventTriggerBase>(FindObjectsSortMode.None);
+            var eventTriggers = FindObjectsByType<EventTriggerBase2>(FindObjectsSortMode.None);
             foreach (var trigger in eventTriggers)
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(trigger));

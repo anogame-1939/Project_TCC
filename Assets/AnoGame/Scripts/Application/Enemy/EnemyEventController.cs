@@ -10,7 +10,9 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private EnemyHitDetector hitDetector;
         [SerializeField] private EnemyLifespan lifespan;
 
+        [SerializeField]
         private EventData _eventData;
+        public EventData EventData => _eventData;
         [Inject] private IEventService _eventService;
 
         [Inject]

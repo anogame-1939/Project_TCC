@@ -22,7 +22,6 @@ namespace AnoGame
 
 
         [SerializeField] private EventTriggerBase2 relatedEventTrigger;
-        [SerializeField] private EventTriggerBase[] relatedEventTriggers;
         
         private void OnItemCollected(string collectedUniqueId)
         {

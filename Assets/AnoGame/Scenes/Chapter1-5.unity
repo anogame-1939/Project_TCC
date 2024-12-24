@@ -5282,12 +5282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 955d1db46734b9f4da42f400a97ed822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredKeyItem: {fileID: 11400000, guid: 27233f10bf3f6d1479ed3766f2704530, type: 2}
-  onKeyItemObtained:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 5654877}, m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine, m_MethodName: SetActive, m_Mode: 6, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 1}, m_CallState: 2}
-    m_CallsDirty: 1
 --- !u!1001 &382371108
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15120,11 +15114,11 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1753672070}
           m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
-          m_MethodName: SpawnAtObject
+          m_MethodName: SetEventData
           m_Mode: 2
           m_Arguments:
-            m_ObjectArgument: {fileID: 1969251997}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_ObjectArgument: {fileID: 11400000, guid: cf96049929a1546d5a937b687f34dde7, type: 2}
+            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.EventData, AnoGame.Data
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -15132,11 +15126,11 @@ MonoBehaviour:
           m_CallState: 2
         - m_Target: {fileID: 1753672070}
           m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
-          m_MethodName: SetEventData
+          m_MethodName: SpawnAtObject
           m_Mode: 2
           m_Arguments:
-            m_ObjectArgument: {fileID: 11400000, guid: cf96049929a1546d5a937b687f34dde7, type: 2}
-            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.EventData, AnoGame.Data
+            m_ObjectArgument: {fileID: 1969251997}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -20142,7 +20136,19 @@ MonoBehaviour:
         m_CallState: 2
   onEventComplete:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1196875135}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   conditionComponents: []
 --- !u!1 &1201656812
 GameObject:

@@ -173,7 +173,7 @@ namespace AnoGame.Application.Enemy
         {
             SpawnEnemyAt(position, rotation);
             if (eventData) SetEventData(eventData);
-            EnabaleEnamy();  // 既存の仕様に合わせてスポーン後に有効化
+            EnabaleEnamy();
         }
 
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)

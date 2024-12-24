@@ -9,7 +9,7 @@ namespace AnoGame.Infrastructure.Services.Inventory
     /// イベントIDに対応するアクションを登録するサービス
     /// イベントの開始時、終了時のイベントを発火するだけ
     /// </summary>
-    public class EventService2 : IEventService
+    public class EventService : IEventService
     {
         private readonly Dictionary<string, List<Action>> _startEventHandlers = new();
         private readonly Dictionary<string, List<Action>> _cpmpleteEventHandlers = new();

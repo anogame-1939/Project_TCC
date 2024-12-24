@@ -22,14 +22,14 @@ namespace AnoGame.Application.Event
 
         private List<IEventCondition> _conditions = new List<IEventCondition>();
 
-        [Inject] protected IEventService _eventProgressService;
+        [Inject] protected IEventService _eventService;
 
         [Inject]
-        public virtual void Construct(IEventService eventProgressService)
+        public virtual void Construct(IEventService eventService)
         {
-            _eventProgressService = eventProgressService;
-            _eventProgressService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
-            _eventProgressService.RegisterCompleteEventHandler(eventData.EventId, OnCompleteEvent);
+            _eventService = eventService;
+            _eventService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
+            _eventService.RegisterCompleteEventHandler(eventData.EventId, OnCompleteEvent);
         }
 
         protected virtual void Start()

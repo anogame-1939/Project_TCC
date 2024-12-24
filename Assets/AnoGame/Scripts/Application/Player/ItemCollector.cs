@@ -12,16 +12,6 @@ namespace AnoGame.Application.Player
     [AddComponentMenu("Inventory/" + nameof(ItemCollector))]
     public class ItemCollector : MonoBehaviour
     {
-        [Inject] private IInventoryService _itemCollectionService;
-
-        [Inject]
-        public void Construct(
-            IInventoryService itemCollectionService
-            )
-        {
-            _itemCollectionService = itemCollectionService;
-        }
-
         [Header("Collection Settings")]
         [SerializeField] private float collectRadius = 2.0f;
         [SerializeField] private LayerMask itemLayer;
@@ -140,11 +130,6 @@ namespace AnoGame.Application.Player
                 if (itemData.IsStackable)
                 {
                     existingItem.uniqueIds.Add(collectableItem.UniqueId);
-                    // 個別にイベント発火
-                    _itemCollectionService.TriggerItemCollected(
-                        itemData.ItemName,
-                        collectableItem.UniqueId
-                    );
                 }
             }
             else

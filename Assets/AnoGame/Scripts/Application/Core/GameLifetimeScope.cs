@@ -20,11 +20,14 @@ namespace AnoGame.Application.Core
         protected override void Configure(IContainerBuilder builder)
         {
             // サービスの登録
-            builder.Register<EventService2>(Lifetime.Singleton)
-                .AsImplementedInterfaces();
+            // builder.Register<EventService>(Lifetime.Singleton)
+               // .AsImplementedInterfaces();
+            builder.Register<IEventService, EventService>(Lifetime.Singleton);
+
+
 
             // シングルトンへの注入を有効にする
-            builder.RegisterComponentInHierarchy<GameManager>();
+            // builder.RegisterComponentInHierarchy<GameManager>();
 
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();
