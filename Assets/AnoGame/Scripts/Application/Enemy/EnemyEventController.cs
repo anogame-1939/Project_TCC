@@ -48,6 +48,8 @@ namespace AnoGame.Application.Enemy
         // プレイヤーヒット = 逃走失敗
         private void HandleEscapeFail()
         {
+            lifespan.ImmediateDeactive();
+
             if (_eventData != null)
             {
                 _eventService.TriggerEventFailed(_eventData.EventId);

@@ -30,6 +30,7 @@ namespace AnoGame.Application.Event
             _eventService = eventService;
             _eventService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
             _eventService.RegisterCompleteEventHandler(eventData.EventId, OnCompleteEvent);
+            _eventService.RegisterFailedEventHandler(eventData.EventId, OnFailedEvent);
         }
 
         protected virtual void Start()

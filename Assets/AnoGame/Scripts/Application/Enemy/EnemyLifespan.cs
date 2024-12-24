@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using UnityEngine.LowLevelPhysics;
 
 namespace AnoGame.Application.Enemy
 {
@@ -16,6 +17,7 @@ namespace AnoGame.Application.Enemy
         private ParticleSystem.MainModule _particleMainModule;
         public event System.Action OnLifespanExpired;
         
+        private Coroutine _destroyCoroutine;
         
         private void Awake()
         {
@@ -35,6 +37,17 @@ namespace AnoGame.Application.Enemy
         
         private void OnEnable()
         {
+            ResetState();
+            StartDestroyTimer();
+        }
+
+        private void OnDisable()
+        {
+            StopDestroyTimer();
+        }
+
+        private void ResetState()
+        {
             foreach (var renderer in _spriteRenderers)
             {
                 Color color = renderer.color;
@@ -48,15 +61,47 @@ namespace AnoGame.Application.Enemy
                 disappearEffect.Stop();
                 _particleMainModule.startColor = new ParticleSystem.MinMaxGradient(Color.white);
             }
-            
-            StartCoroutine(DestroyAfterDelay());
+        }
+
+        // 外部から寿命タイマーを開始
+        public void StartDestroyTimer()
+        {
+            StopDestroyTimer();
+            _destroyCoroutine = StartCoroutine(DestroyAfterDelay());
+        }
+
+        // 外部から寿命タイマーを停止
+        public void StopDestroyTimer()
+        {
+            if (_destroyCoroutine != null)
+            {
+                StopCoroutine(_destroyCoroutine);
+                _destroyCoroutine = null;
+            }
+        }
+
+        // 外部からフェードアウトを即座に開始
+        public void StartFadeOut()
+        {
+            StopDestroyTimer();
+            StartCoroutine(FadeOutAndDestroy());
+        }
+
+        public void ImmediateDeactive()
+        {
+            gameObject.SetActive(false);
         }
         
         private IEnumerator DestroyAfterDelay()
         {
             float delay = Random.Range(minLifespan, maxLifespan);
             yield return new WaitForSeconds(delay);
+            
+            StartCoroutine(FadeOutAndDestroy());
+        }
 
+        private IEnumerator FadeOutAndDestroy()
+        {
             // 寿命終了イベントを発火
             OnLifespanExpired?.Invoke();
 
@@ -77,7 +122,6 @@ namespace AnoGame.Application.Enemy
             
             gameObject.SetActive(false);
         }
-        
         private IEnumerator FadeOut()
         {
             float elapsedTime = 0f;
