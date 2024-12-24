@@ -1,6 +1,7 @@
 using UnityEngine;
 using AnoGame.Application.Damage;
 using AnoGame.Application.Story;
+using AnoGame.Application.Enemy;
 
 namespace AnoGame.Application.Player
 {

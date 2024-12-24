@@ -1,17 +1,25 @@
 using UnityEngine;
 using AnoGame.Infrastructure;
-using AnoGame.Application.Enemy;
 using AnoGame.Data;
-
+using VContainer;
+using AnoGame.Domain.Event.Services;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace AnoGame.Application.Story
+namespace AnoGame.Application.Enemy
 {
     public class EnemySpawnManager : SingletonMonoBehaviour<EnemySpawnManager>
     {
+        [Inject] private IEventProgressService _eventProgressService;
+
+        [Inject]
+        public void Construct(IEventProgressService eventProgressService)
+        {
+            _eventProgressService = eventProgressService;
+        }
+
         [SerializeField] private GameObject enemyPrefab;
         private GameObject _currentEnemyInstance;
         private EnemyController _currentEnemyController;  // EnemyControllerへの参照を保持
@@ -36,6 +44,11 @@ namespace AnoGame.Application.Story
 
             // スタートポイントから初期スポーン
             SpawnEnemyAtStart();
+        }
+
+        public void SetEnemyPrefab(GameObject prefab)
+        {
+            enemyPrefab = prefab;
         }
 
         private Transform GetStartPoint()
@@ -109,6 +122,8 @@ namespace AnoGame.Application.Story
 
             // 新しい敵をスポーン
             _currentEnemyInstance = Instantiate(enemyPrefab, position, rotation);
+            // container.InjectGameObject(_currentEnemyInstance);
+
             // EnemyControllerの参照を保持
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
             
@@ -123,6 +138,7 @@ namespace AnoGame.Application.Story
         private void SetEventData(EventData eventData)
         {
             var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
+            enemyEventController.Construct(_eventProgressService);
             enemyEventController.Initialize(eventData);
         }
 

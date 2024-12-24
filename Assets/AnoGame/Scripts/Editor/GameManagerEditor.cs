@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using AnoGame.Application;
 using AnoGame.Application.Story;
+using AnoGame.Application.Enemy;
 using AnoGame.Data;
 using AnoGame.Infrastructure.Persistence;
 

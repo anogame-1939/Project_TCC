@@ -4,6 +4,7 @@ using AnoGame.Domain.Inventory.Services;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Infrastructure.Services.Inventory;
 using AnoGame.Application.Player;
+using AnoGame.Application.Enemy;
 using AnoGame.Infrastructure.Services;
 using UnityEngine;
 using AnoGame.Data;
@@ -34,6 +35,9 @@ namespace AnoGame.Application.Core
 
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();
+
+            builder.RegisterComponentInHierarchy<EnemySpawnManager>();
+            
 
             // IEventProgressServiceの登録
             builder.Register<IEventProgressService, EventProgressService>(Lifetime.Singleton);
