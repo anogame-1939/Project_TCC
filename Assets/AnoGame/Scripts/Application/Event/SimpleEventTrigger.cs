@@ -1,9 +1,8 @@
-using Unity.Plastic.Antlr3.Runtime;
 using UnityEngine;
 
 namespace AnoGame.Application.Event
 {
-    public class SimpleEventTrigger : EventTriggerBase2
+    public class SimpleEventTrigger : EventTriggerBase
     {
         protected override void OnStartEvent()
         {

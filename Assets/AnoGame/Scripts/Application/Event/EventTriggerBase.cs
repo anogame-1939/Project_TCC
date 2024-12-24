@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
 using VContainer;
-using AnoGame.Domain.Event;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Event.Types;
 using AnoGame.Data;
@@ -11,7 +10,7 @@ using AnoGame.Domain.Event.Conditions;
 
 namespace AnoGame.Application.Event
 {
-    public abstract class EventTriggerBase2 : MonoBehaviour
+    public abstract class EventTriggerBase : MonoBehaviour
     {
         [SerializeField] protected EventData eventData;
         public EventData EventData => eventData;

@@ -21,7 +21,7 @@ namespace AnoGame
         public string UniqueId => uniqueId;
 
 
-        [SerializeField] private EventTriggerBase2 relatedEventTrigger;
+        [SerializeField] private EventTriggerBase relatedEventTrigger;
         
         private void OnItemCollected(string collectedUniqueId)
         {
