@@ -17,6 +17,7 @@ namespace AnoGame.Application.Event
         private IEventSettings EventSettings => eventData;
         [SerializeField] protected UnityEvent onEventStart;
         [SerializeField] protected UnityEvent onEventComplete;
+        [SerializeField] protected UnityEvent onEventFailed;
         [SerializeField] protected EventConditionComponent[] conditionComponents;
 
         private List<IEventCondition> _conditions = new List<IEventCondition>();
@@ -83,6 +84,13 @@ namespace AnoGame.Application.Event
             {
                 // _eventProgressService.ResetEvent(eventData.EventId);
             }
+        }
+
+        public virtual void OnFailedEvent()
+        {
+            Debug.Log("OnFailedEvent");
+            onEventFailed?.Invoke();
+
         }
     }
 }

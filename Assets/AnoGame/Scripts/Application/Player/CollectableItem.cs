@@ -23,24 +23,6 @@ namespace AnoGame
 
         [SerializeField] private EventTriggerBase relatedEventTrigger;
         
-        private void OnItemCollected(string collectedUniqueId)
-        {
-            Debug.Log($"itemData:{itemData.ItemName}, {uniqueId}, {collectedUniqueId}");
-            if (itemData.IsStackable)
-            {
-                // スタック可能なアイテムはユニークIDが一致する場合のみ非表示
-                if (uniqueId == collectedUniqueId)
-                {
-                    gameObject.SetActive(false);
-                }
-            }
-            else
-            {
-                // スタック不可のアイテムは同じ種類なら全て非表示
-                gameObject.SetActive(false);
-            }
-        }
-
         public string GetIdentifier()
         {
             return itemData.IsStackable ? uniqueId : itemData.ItemName;
@@ -48,6 +30,8 @@ namespace AnoGame
 
         public bool CanCollect()
         {
+            // TODO:直す
+            Debug.LogWarning("CanCollect…とりあえずtrue返しちゃってるよ");
             return true;
         }
         

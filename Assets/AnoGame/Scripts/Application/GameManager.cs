@@ -1,18 +1,20 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
-using VContainer;
 using AnoGame.Infrastructure;
 using AnoGame.Data;
-using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.SaveData;
 
 namespace AnoGame.Application
 {
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
+#if UNITY_EDITOR
+        [SerializeField]
+        private bool _debugMode = false;
+        public bool DebugMode => _debugMode;
+#endif
         private readonly GameDataRepository _repository;
 
         public Action<GameData> SaveGameData;
@@ -41,14 +43,6 @@ namespace AnoGame.Application
                 {
                     _currentGameData = loadedData;
                     Debug.Log("Loaded existing save data");
-                    
-                    // セーブデータからキーアイテム状態を復元
-                    if (_currentGameData.inventory != null)
-                    {
-                        var collectedItems = _currentGameData.inventory
-                            .Select(item => item.itemName)
-                            .ToList();
-                    }
                 }
                 else
                 {
@@ -83,6 +77,15 @@ namespace AnoGame.Application
             };
         }
 
+        /// <summary>
+        /// データを再読み込み
+        /// 主にゲームオーバー時に使用
+        /// </summary>
+        public void ReloadData()
+        {
+            InitializeGameData().Forget();
+        }
+
         public void UpdateGameState(GameData newGameData)
         {
             _currentGameData = newGameData;
@@ -90,6 +93,11 @@ namespace AnoGame.Application
             {
                 SaveGameData?.Invoke(_currentGameData);
             }
+        }
+
+        public void SaveData()
+        {
+            SaveCurrentGameState().SuppressCancellationThrow().Forget();
         }
 
         public async UniTask SaveCurrentGameState()
@@ -109,19 +117,24 @@ namespace AnoGame.Application
 
         private void OnApplicationQuit()
         {
-            if (_currentGameData != null)
+#if UNITY_EDITOR
+            if (_debugMode)
             {
-                SaveGameData?.Invoke(_currentGameData);
-                try
+                if (_currentGameData != null)
                 {
-                    // アプリケーション終了時は同期的に保存を実行
-                    SaveCurrentGameState().SuppressCancellationThrow().Forget();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Failed to save game state on quit: {ex.Message}");
+                    SaveGameData?.Invoke(_currentGameData);
+                    try
+                    {
+                        // アプリケーション終了時は同期的に保存を実行
+                        SaveCurrentGameState().SuppressCancellationThrow().Forget();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Failed to save game state on quit: {ex.Message}");
+                    }
                 }
             }
+#endif
         }
 
         public async UniTask<bool> CreateSavePoint()

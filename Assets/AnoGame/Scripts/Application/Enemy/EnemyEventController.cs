@@ -32,14 +32,7 @@ namespace AnoGame.Application.Enemy
 
         private void OnDisable()
         {
-            if (lifespan != null)
-            {
-                lifespan.OnLifespanExpired -= HandleEscapeSuccess;
-            }
-            if (hitDetector != null)
-            {
-                hitDetector.OnPlayerHit -= HandleEscapeFail;
-            }
+            Dispose();
         }
 
         // 時間切れ = 逃走成功
@@ -49,6 +42,7 @@ namespace AnoGame.Application.Enemy
             {
                 _eventService.TriggerEventComplete(_eventData.EventId);
             }
+            Dispose();
         }
 
         // プレイヤーヒット = 逃走失敗
@@ -57,6 +51,19 @@ namespace AnoGame.Application.Enemy
             if (_eventData != null)
             {
                 _eventService.TriggerEventFailed(_eventData.EventId);
+            }
+            Dispose();
+        }
+
+        private void Dispose()
+        {
+            if (lifespan != null)
+            {
+                lifespan.OnLifespanExpired -= HandleEscapeSuccess;
+            }
+            if (hitDetector != null)
+            {
+                hitDetector.OnPlayerHit -= HandleEscapeFail;
             }
         }
     }
