@@ -21,30 +21,9 @@ namespace AnoGame
         public string UniqueId => uniqueId;
 
 
-        [SerializeField] private EventTriggerBase relatedEventTrigger;
+        [SerializeField] private EventTriggerBase2 relatedEventTrigger;
         [SerializeField] private EventTriggerBase[] relatedEventTriggers;
         
-        // イベントの進捗状況を管理
-        [Inject] private IEventProgressService _eventProgressService;
-
-        // インベントを管理
-        [Inject] private IInventoryService _inventoryService;
-
-        [Inject]
-        public void Construct(IEventProgressService eventProgressService, IInventoryService itemCollectionService)
-        {
-            _eventProgressService = eventProgressService;
-            _inventoryService = itemCollectionService;
-
-            // アイテム収集イベントのハンドラを登録
-            _inventoryService.RegisterItemHandler(itemData.ItemName, OnItemCollected);
-        }
-
-        private void OnDestroy()
-        {
-            _inventoryService?.UnregisterItemHandler(itemData.ItemName, OnItemCollected);
-        }
-
         private void OnItemCollected(string collectedUniqueId)
         {
             Debug.Log($"itemData:{itemData.ItemName}, {uniqueId}, {collectedUniqueId}");
@@ -70,23 +49,6 @@ namespace AnoGame
 
         public bool CanCollect()
         {
-            // relatedEventTriggerが設定されている場合、イベントの状態をチェック
-            if (relatedEventTrigger != null)
-            {
-                var eventState = _eventProgressService.GetEventState(relatedEventTrigger.EventData.EventId);
-                // イベント完了済みの場合は取得不可
-                if (eventState == EventState.Completed)
-                {
-                    return false;
-                }
-            }
-
-            // 既に所持している場合は取得不可
-            if (_inventoryService.HasItem(itemData.ItemName))
-            {
-                return false;
-            }
-
             return true;
         }
         
@@ -100,7 +62,7 @@ namespace AnoGame
             // 関連イベントが設定されている場合はイベントを開始
             if (relatedEventTrigger != null)
             {
-                _eventProgressService.StartEvent(relatedEventTrigger.EventData.EventId);
+                relatedEventTrigger.StartEvent();
             }
         }
 

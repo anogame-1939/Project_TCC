@@ -3,24 +3,20 @@ using UnityEngine;
 
 namespace AnoGame.Application.Event
 {
-    public class SimpleEventTrigger : EventTriggerBase
+    public class SimpleEventTrigger : EventTriggerBase2
     {
-        protected override void TryTriggerEvent()
+        protected override void OnStartEvent()
         {
-            base.TryTriggerEvent();
+            base.OnStartEvent();
+            Debug.Log("OnStartEvent-SimpleEventTrigger");
         }
 
-        public override void CompleteEvent()
+        public override void OnCompleteEvent()
         {
-            base.CompleteEvent();
+            base.OnCompleteEvent();
+            Debug.Log("OnCompleteEvent-SimpleEventTrigger");
         }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                TryTriggerEvent();
-            }
-        }
+
     }
 }

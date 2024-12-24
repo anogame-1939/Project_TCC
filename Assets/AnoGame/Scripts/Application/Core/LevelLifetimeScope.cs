@@ -45,7 +45,7 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(condition));
             }
 
-            builder.RegisterEntryPoint<LevelInitializer>();
+            // builder.RegisterEntryPoint<LevelInitializer>();
         }
     }
 

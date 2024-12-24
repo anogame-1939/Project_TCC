@@ -19,7 +19,7 @@ namespace AnoGame.Application.Core
         protected override void Configure(IContainerBuilder builder)
         {
             // サービスの登録
-            builder.Register<EventService>(Lifetime.Singleton)
+            builder.Register<EventService2>(Lifetime.Singleton)
                 .AsImplementedInterfaces();
 
             // KeyItemServiceの重複登録を削除

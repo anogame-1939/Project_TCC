@@ -100,6 +100,7 @@ namespace AnoGame.Application.Player
                 if (collectableItem != null)
                 {
                     AddItemToInventory(collectableItem);
+                    collectableItem.OnCollected();
                     closestItem.gameObject.SetActive(false);
                 }
             }
@@ -171,17 +172,6 @@ namespace AnoGame.Application.Player
 
                 Inventory.Add(newItem);
                 
-                // イベント発火
-                _itemCollectionService.TriggerItemCollected(
-                    itemData.ItemName,
-                    itemData.IsStackable ? collectableItem.UniqueId : null
-                );
-            }
-
-            // キーアイテムの場合のイベント
-            if (_keyItemService.IsKeyItem(itemData))
-            {
-                _eventService.TriggerKeyItemEvent(itemData.ItemName);
             }
 
             _gameManager.UpdateGameState(_gameManager.CurrentGameData);
