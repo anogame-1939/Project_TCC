@@ -12,19 +12,13 @@ namespace AnoGame.Application.Player
     [AddComponentMenu("Inventory/" + nameof(ItemCollector))]
     public class ItemCollector : MonoBehaviour
     {
-        [Inject] private IEventService _eventService;
-        [Inject] private IKeyItemService _keyItemService;
         [Inject] private IInventoryService _itemCollectionService;
 
         [Inject]
         public void Construct(
-            IEventService eventService,
-            IKeyItemService keyItemService,
             IInventoryService itemCollectionService
             )
         {
-            _eventService = eventService;
-            _keyItemService = keyItemService;
             _itemCollectionService = itemCollectionService;
         }
 

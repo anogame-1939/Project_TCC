@@ -12,12 +12,12 @@ namespace AnoGame.Application.Enemy
 {
     public class EnemySpawnManager : SingletonMonoBehaviour<EnemySpawnManager>
     {
-        [Inject] private IEventProgressService _eventProgressService;
+        [Inject] private IEventService _eventService;
 
         [Inject]
-        public void Construct(IEventProgressService eventProgressService)
+        public void Construct(IEventService eventService)
         {
-            _eventProgressService = eventProgressService;
+            _eventService = eventService;
         }
 
         [SerializeField] private GameObject enemyPrefab;
@@ -138,7 +138,7 @@ namespace AnoGame.Application.Enemy
         private void SetEventData(EventData eventData)
         {
             var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
-            enemyEventController.Construct(_eventProgressService);
+            enemyEventController.Construct(_eventService);
             enemyEventController.Initialize(eventData);
         }
 

@@ -21,18 +21,9 @@ namespace AnoGame.Application
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
 
-        [Inject] private IKeyItemService _keyItemService;
-
         public GameManager()
         {
             _repository = new GameDataRepository();
-        }
-
-        [Inject]
-        public void Construct(
-            IKeyItemService keyItemService)
-        {
-            _keyItemService = keyItemService;
         }
 
         private void Start()
@@ -57,10 +48,6 @@ namespace AnoGame.Application
                         var collectedItems = _currentGameData.inventory
                             .Select(item => item.itemName)
                             .ToList();
-                        
-                        // キーアイテム状態を復元（これにより関連するドアなどが開く）
-                        _keyItemService.RestoreKeyItemStates(collectedItems);
-
                     }
                 }
                 else

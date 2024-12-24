@@ -5,16 +5,13 @@ namespace AnoGame.Application.Core
 {
     public class LevelInitializer : IStartable
     {
-        private readonly IKeyItemService _keyItemService;
         private readonly IInventoryService _itemCollectionService;
         private readonly GameManager _gameManager;
 
         public LevelInitializer(
-            IKeyItemService keyItemService,
             IInventoryService itemCollectionService,
             GameManager gameManager)
         {
-            _keyItemService = keyItemService;
             _itemCollectionService = itemCollectionService;
             _gameManager = gameManager;
         }
@@ -26,8 +23,6 @@ namespace AnoGame.Application.Core
             {
                 foreach (var item in inventory)
                 {
-                    // キーアイテムの状態復元（これは変更なし）
-                    _keyItemService.RestoreKeyItemStates(new[] { item.itemName });
 
                     // スタック可能アイテムは各ユニークIDごとにイベント発火
                     if (item.uniqueIds != null && item.uniqueIds.Count > 0)

@@ -2,7 +2,6 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using AnoGame.Application.Event;
-using AnoGame.Application.Inventory.Components;
 using AnoGame.Application.Enemy;
 
 
@@ -12,11 +11,6 @@ namespace AnoGame.Application.Core
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            var keyDoors = FindObjectsByType<KeyDoor>(FindObjectsSortMode.None);
-            foreach (var door in keyDoors)
-            {
-                builder.RegisterBuildCallback(resolver => resolver.Inject(door));
-            }
 
             var collectables = FindObjectsByType<CollectableItem>(FindObjectsSortMode.None);
             foreach (var item in collectables)

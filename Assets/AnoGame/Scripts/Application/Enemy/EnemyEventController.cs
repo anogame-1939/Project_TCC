@@ -1,6 +1,5 @@
 using UnityEngine;
 using AnoGame.Data;
-using AnoGame.Domain.Event;
 using AnoGame.Domain.Event.Services;
 using VContainer;
 
@@ -12,12 +11,12 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private EnemyLifespan lifespan;
 
         private EventData _eventData;
-        [Inject] private IEventProgressService _eventProgressService;
+        [Inject] private IEventService _eventService;
 
         [Inject]
-        public void Construct(IEventProgressService eventProgressService)
+        public void Construct(IEventService eventService)
         {
-            _eventProgressService = eventProgressService;
+            _eventService = eventService;
         }
 
         public void Initialize(EventData eventData)
@@ -46,7 +45,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_eventData != null)
             {
-                _eventProgressService.CompleteEvent(_eventData.EventId);
+                _eventService.TriggerEventComplete(_eventData.EventId);
             }
         }
 
@@ -55,7 +54,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_eventData != null)
             {
-                _eventProgressService.ResetEvent(_eventData.EventId);
+                _eventService.TriggerEventFailed(_eventData.EventId);
             }
         }
     }

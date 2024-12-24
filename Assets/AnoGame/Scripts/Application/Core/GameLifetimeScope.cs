@@ -23,13 +23,6 @@ namespace AnoGame.Application.Core
             builder.Register<EventService2>(Lifetime.Singleton)
                 .AsImplementedInterfaces();
 
-            // KeyItemServiceの重複登録を削除
-            builder.Register<IKeyItemService>(container => 
-                new KeyItemService(itemDatabase.Items.ToArray(), 
-                container.Resolve<IEventService>()), 
-                Lifetime.Singleton);
-
-
             // シングルトンへの注入を有効にする
             builder.RegisterComponentInHierarchy<GameManager>();
 
