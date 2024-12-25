@@ -1,5 +1,5 @@
 using UnityEngine;
-using AnoGame.Infrastructure;
+using AnoGame.Application.Core;
 using AnoGame.Data;
 using Unity.TinyCharacterController.Brain;
 

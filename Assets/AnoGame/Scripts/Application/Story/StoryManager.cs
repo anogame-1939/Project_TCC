@@ -3,8 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-using AnoGame.Infrastructure;
 using AnoGame.Data;
+using AnoGame.Application.Core;
+using AnoGame.Application.Data;
 
 namespace AnoGame.Application.Story
 {

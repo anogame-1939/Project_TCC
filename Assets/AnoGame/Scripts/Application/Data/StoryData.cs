@@ -1,13 +1,13 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using AnoGame.Infrastructure.Scene;
+using AnoGame.Application.Core.Scene;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace AnoGame.Data
+namespace AnoGame.Application.Data
 {
     [CreateAssetMenu(fileName = "StoryStoryData", menuName = "Event System/Story StoryData")]
     public class StoryData : ScriptableObject

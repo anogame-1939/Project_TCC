@@ -1,4 +1,4 @@
-namespace AnoGame.Domain.Data.Types
+namespace AnoGame.Domain.Data.Models
 {
     public interface GameData
     {

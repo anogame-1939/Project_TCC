@@ -2,9 +2,10 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using AnoGame.Infrastructure;
+using AnoGame.Application.Core;
 using AnoGame.Data;
-using AnoGame.Application.SaveData;
+using AnoGame.Domain.Data.Services;
+using VContainer;
 
 namespace AnoGame.Application
 {
@@ -15,7 +16,6 @@ namespace AnoGame.Application
         private bool _debugMode = false;
         public bool DebugMode => _debugMode;
 #endif
-        private readonly GameDataRepository _repository;
 
         public Action<GameData> SaveGameData;
         public Action<GameData> LoadGameData;
@@ -23,9 +23,11 @@ namespace AnoGame.Application
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
 
-        public GameManager()
+        [Inject] private readonly IGameDataManager _repository;
+        [Inject]
+        public GameManager(IGameDataManager gameDataManager)
         {
-            _repository = new GameDataRepository();
+            _repository = gameDataManager;
         }
 
         private void Start()
@@ -37,7 +39,7 @@ namespace AnoGame.Application
         {
             try
             {
-                GameData loadedData = await _repository.LoadDataAsync();
+                GameData loadedData = await _repository.LoadDataAsync<GameData>();
 
                 if (loadedData != null)
                 {

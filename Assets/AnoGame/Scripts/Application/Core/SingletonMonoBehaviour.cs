@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AnoGame.Infrastructure
+namespace AnoGame.Application.Core
 {
 	public class SingletonMonoBehaviour<T> : MonoBehaviour where T : SingletonMonoBehaviour<T>
 	{

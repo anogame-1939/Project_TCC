@@ -41,7 +41,7 @@ namespace AnoGame.Application.Story
             {
                 Debug.Log("プレイヤーがトリガー内に入りました");
                 // ここにプレイヤーが入った時の処理を書きます
-                EventManager.Instance.InvokeEvent(_eventId);
+                // EventManager.Instance.InvokeEvent(_eventId);
             }
         }
 

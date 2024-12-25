@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AnoGame.Infrastructure
+namespace AnoGame.Application.Core
 {
     /// <summary>
     /// ゲーム中の設定情報を提供する

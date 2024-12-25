@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AnoGame.Infrastructure
+namespace AnoGame.Application.Core
 {
     /// <summary>
     /// 環境一覧

@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using System;
 using Cysharp.Threading.Tasks;
 
-namespace AnoGame.Infrastructure.Scene
+namespace AnoGame.Application.Core.Scene
 {
     [System.Serializable]
     public class SceneReference

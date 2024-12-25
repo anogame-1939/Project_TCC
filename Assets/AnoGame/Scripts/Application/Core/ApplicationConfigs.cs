@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace AnoGame.Infrastructure
+namespace AnoGame.Application.Core
 {
     [Serializable]
     public class ApplicationConfigs : ScriptableObject

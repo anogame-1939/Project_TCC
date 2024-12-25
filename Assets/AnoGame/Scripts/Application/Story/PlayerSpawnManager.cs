@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.TinyCharacterController.Brain;
 using AnoGame.Data;
-using AnoGame.Infrastructure;
+using AnoGame.Application.Core;
 
 #if UNITY_EDITOR
 using UnityEditor;

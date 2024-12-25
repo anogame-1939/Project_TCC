@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using AnoGame.Data;
 using AnoGame.Infrastructure.Persistence;
+using AnoGame.Domain.Data.Models;
 
-namespace AnoGame.Application.SaveData
+namespace AnoGame.Infrastructure.SaveData
 {
     public class GameDataRepository
     {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using AnoGame.Infrastructure.Scene;
+using AnoGame.Application.Core.Scene;
 using UnityEngine.SceneManagement;
 using System.Linq;
 

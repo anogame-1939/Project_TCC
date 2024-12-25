@@ -1,4 +1,5 @@
-using AnoGame.Infrastructure;
+using AnoGame.Application.Core;
+
 namespace AnoGame.Application.Event
 {
     public class GameOverManager : SingletonMonoBehaviour<GameOverManager>
