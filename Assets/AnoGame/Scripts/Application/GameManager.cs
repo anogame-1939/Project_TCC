@@ -97,6 +97,11 @@ namespace AnoGame.Application
             }
         }
 
+        public void AddItem()
+        {
+
+        }
+
         public void SaveData()
         {
             SaveCurrentGameState().SuppressCancellationThrow().Forget();

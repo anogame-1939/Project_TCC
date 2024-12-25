@@ -13,6 +13,11 @@ namespace AnoGame.Domain.Data.Models
         public PlayerPosition Position { get; private set; }
         public EventHistory ClearedEvents { get; private set; }
 
+        public GameData()
+        {
+            
+        }
+
         public GameData(
             int score,
             string playerName,
