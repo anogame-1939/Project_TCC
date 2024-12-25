@@ -1,14 +1,11 @@
 using VContainer;
 using VContainer.Unity;
-using AnoGame.Domain.Inventory.Services;
 using AnoGame.Domain.Event.Services;
-using AnoGame.Infrastructure.Services.Inventory;
 using AnoGame.Application.Player;
 using AnoGame.Application.Enemy;
 using AnoGame.Infrastructure.Services;
 using UnityEngine;
 using AnoGame.Data;
-using System.Linq;
 
 namespace AnoGame.Application.Core
 {
@@ -22,7 +19,12 @@ namespace AnoGame.Application.Core
             // サービスの登録
             // builder.Register<EventService>(Lifetime.Singleton)
                // .AsImplementedInterfaces();
+
             builder.Register<IEventService, EventService>(Lifetime.Singleton);
+            builder.Register<GameManager>(Lifetime.Singleton);
+
+
+
 
 
 

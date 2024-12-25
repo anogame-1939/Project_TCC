@@ -4,9 +4,9 @@ using VContainer;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Event.Types;
 using AnoGame.Data;
+using AnoGame.Domain.Event.Conditions;
 using System.Collections.Generic;
 using System.Linq;
-using AnoGame.Domain.Event.Conditions;
 
 namespace AnoGame.Application.Event
 {
@@ -16,7 +16,10 @@ namespace AnoGame.Application.Event
         public EventData EventData => eventData;
         private IEventSettings EventSettings => eventData;
         [SerializeField] protected UnityEvent onEventStart;
-        [SerializeField] protected UnityEvent onEventComplete;
+        // クリアしてすぐのイベント
+        [SerializeField] protected UnityEvent onEventFinish;
+        // クリア後のイベント
+        [SerializeField] protected UnityEvent onEventDone;
         [SerializeField] protected UnityEvent onEventFailed;
         [SerializeField] protected EventConditionComponent[] conditionComponents;
 
@@ -28,9 +31,18 @@ namespace AnoGame.Application.Event
         public virtual void Construct(IEventService eventService)
         {
             _eventService = eventService;
-            _eventService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
-            _eventService.RegisterCompleteEventHandler(eventData.EventId, OnCompleteEvent);
-            _eventService.RegisterFailedEventHandler(eventData.EventId, OnFailedEvent);
+            // クリア済みのイベント事項
+            if (_eventService.IsEventCleared(eventData.EventId))
+            {
+                OnDoneEvent();
+            }
+            // 未クリアならイベント登録
+            else
+            {
+                _eventService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
+                _eventService.RegisterCompleteEventHandler(eventData.EventId, OnFinishEvent);
+                _eventService.RegisterFailedEventHandler(eventData.EventId, OnFailedEvent);
+            }
         }
 
         protected virtual void Start()
@@ -73,13 +85,25 @@ namespace AnoGame.Application.Event
             onEventStart?.Invoke();
         }
 
-        public virtual void OnCompleteEvent()
+        public virtual void OnFinishEvent()
         {
             Debug.Log("OnCompleteEvent");
             // if (_eventProgressService.GetEventState(eventData.EventId) != EventState.InProgress)
                 // return;
 
-            onEventComplete?.Invoke();
+            onEventFinish?.Invoke();
+
+            if (!eventData.IsOneTime)
+            {
+                // _eventProgressService.ResetEvent(eventData.EventId);
+            }
+            OnDoneEvent();
+        }
+
+        public virtual void OnDoneEvent()
+        {
+            Debug.Log("OnDoneEvent");
+            onEventDone?.Invoke();
 
             if (!eventData.IsOneTime)
             {

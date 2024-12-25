@@ -11,7 +11,8 @@ namespace AnoGame.Data
         public string playerName;
         public StoryProgress storyProgress;
         public List<InventoryItem> inventory;
-        public PlayerPositionData playerPosition; // 位置情報を追加
+        public PlayerPositionData playerPosition;
+        public List<string> clearedEvents = new();
     }
 
     [Serializable]

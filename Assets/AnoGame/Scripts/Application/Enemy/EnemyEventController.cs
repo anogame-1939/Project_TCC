@@ -9,10 +9,13 @@ namespace AnoGame.Application.Enemy
     {
         [SerializeField] private EnemyHitDetector hitDetector;
         [SerializeField] private EnemyLifespan lifespan;
-
         [SerializeField]
         private EventData _eventData;
         public EventData EventData => _eventData;
+
+        private bool _isLocked = false;
+
+
         [Inject] private IEventService _eventService;
 
         [Inject]
@@ -24,6 +27,7 @@ namespace AnoGame.Application.Enemy
         public void Initialize(EventData eventData)
         {
             _eventData = eventData;
+            _isLocked = false;
             
             // EnemyLifespanのOnDestroyの前に判定を行うために
             lifespan.OnLifespanExpired += HandleEscapeSuccess;
@@ -38,6 +42,8 @@ namespace AnoGame.Application.Enemy
         // 時間切れ = 逃走成功
         private void HandleEscapeSuccess()
         {
+            if (_isLocked) return;
+            _isLocked = true;
             if (_eventData != null)
             {
                 _eventService.TriggerEventComplete(_eventData.EventId);
@@ -48,17 +54,20 @@ namespace AnoGame.Application.Enemy
         // プレイヤーヒット = 逃走失敗
         private void HandleEscapeFail()
         {
-            lifespan.ImmediateDeactive();
-
+            if (_isLocked) return;
+            _isLocked = true;
+            // lifespan.ImmediateDeactive();
             if (_eventData != null)
             {
                 _eventService.TriggerEventFailed(_eventData.EventId);
             }
+            
             Dispose();
         }
 
         private void Dispose()
         {
+
             if (lifespan != null)
             {
                 lifespan.OnLifespanExpired -= HandleEscapeSuccess;

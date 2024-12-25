@@ -1,32 +1,23 @@
 using VContainer.Unity;
 using AnoGame.Domain.Inventory.Services;
-using AnoGame.Domain.Event.Services;
-using System.Diagnostics;
 
 namespace AnoGame.Application.Core
 {
-    public class LevelInitializer : IStartable
+    public class GamelInitializer : IStartable
     {
-        // private readonly IInventoryService _itemCollectionService;
+        private readonly IInventoryService _itemCollectionService;
         private readonly GameManager _gameManager;
-        private readonly IEventService _eventService;
 
-        public LevelInitializer(
-            // IInventoryService itemCollectionService,
-            GameManager gameManager,
-            IEventService eventService
-            )
+        public GamelInitializer(
+            IInventoryService itemCollectionService,
+            GameManager gameManager)
         {
-            System.Console.WriteLine("LevelInitializer.Constructor()");
-            // _itemCollectionService = itemCollectionService;
+            _itemCollectionService = itemCollectionService;
             _gameManager = gameManager;
-            _eventService = eventService;
         }
 
         void IStartable.Start()
         {
-            System.Console.WriteLine("LevelInitializer.Start()");
-            /*
             var inventory = _gameManager.CurrentGameData?.inventory;
             if (inventory != null)
             {
@@ -50,9 +41,6 @@ namespace AnoGame.Application.Core
                     }
                 }
             }
-            */
-
-            _eventService.SetCleadEvents(_gameManager.CurrentGameData.clearedEvents);
         }
     }
 

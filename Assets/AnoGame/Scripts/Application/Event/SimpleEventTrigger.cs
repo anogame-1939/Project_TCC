@@ -10,9 +10,9 @@ namespace AnoGame.Application.Event
             Debug.Log("OnStartEvent-SimpleEventTrigger");
         }
 
-        public override void OnCompleteEvent()
+        public override void OnFinishEvent()
         {
-            base.OnCompleteEvent();
+            base.OnFinishEvent();
             Debug.Log("OnCompleteEvent-SimpleEventTrigger");
         }
 

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using AnoGame.Domain.Event.Services;
 
-namespace AnoGame.Infrastructure.Services.Inventory
+namespace AnoGame.Infrastructure.Services
 {
     /// <summary>
     /// イベントIDに対応するアクションを登録するサービス
@@ -11,9 +11,21 @@ namespace AnoGame.Infrastructure.Services.Inventory
     /// </summary>
     public class EventService : IEventService
     {
+        private readonly List<string> _clearedEvents = new();
         private readonly Dictionary<string, List<Action>> _startEventHandlers = new();
         private readonly Dictionary<string, List<Action>> _cpmpleteEventHandlers = new();
         private readonly Dictionary<string, List<Action>> _failedEventHandlers = new();
+
+
+        public void SetCleadEvents(List<string> clearedEventIDs)
+        {
+            _clearedEvents.AddRange(clearedEventIDs);
+        }
+
+        public bool IsEventCleared(string eventID)
+        {
+            return _clearedEvents.Contains(eventID);
+        }
         
         public void RegisterStartEventHandler(string eventID, Action handler)
         {
