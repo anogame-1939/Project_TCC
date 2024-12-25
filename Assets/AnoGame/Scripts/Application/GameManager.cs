@@ -23,9 +23,9 @@ namespace AnoGame.Application
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
 
-        [Inject] private readonly IGameDataManager _repository;
+        [Inject] private readonly IGameDataRepository _repository;
         [Inject]
-        public GameManager(IGameDataManager gameDataManager)
+        public GameManager(IGameDataRepository gameDataManager)
         {
             _repository = gameDataManager;
         }

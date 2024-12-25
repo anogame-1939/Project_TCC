@@ -1,10 +1,11 @@
 using System.Threading.Tasks;
 using AnoGame.Infrastructure.Persistence;
 using AnoGame.Domain.Data.Models;
+using AnoGame.Domain.Data.Services;
 
 namespace AnoGame.Infrastructure.SaveData
 {
-    public class GameDataRepository
+    public class GameDataRepository : IGameDataRepository
     {
         private readonly AsyncJsonDataManager _jsonManager;
         private const string SaveFileName = "savedata.json";
@@ -29,5 +30,16 @@ namespace AnoGame.Infrastructure.SaveData
         {
             return await _jsonManager.LoadDataAsync<GameData>(SaveFileName);
         }
+
+        public Task SaveDataAsync<T>(T data)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<T> LoadDataAsync<T>() where T : class
+        {
+            throw new System.NotImplementedException();
+        }
+
     }
 }
