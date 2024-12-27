@@ -32,7 +32,7 @@ namespace AnoGame.Application
 
         private void Start()
         {
-            InitializeGameData().Forget();
+            // InitializeGameData().Forget();
         }
 
         private async UniTaskVoid InitializeGameData()

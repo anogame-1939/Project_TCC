@@ -31,14 +31,14 @@ namespace AnoGame.Infrastructure.SaveData
             return await _jsonManager.LoadDataAsync<GameData>(SaveFileName);
         }
 
-        public Task SaveDataAsync<T>(T data)
+        public async Task SaveDataAsync<GameData>(GameData data)
         {
-            throw new System.NotImplementedException();
+            await _jsonManager.SaveDataAsync(SaveFileName, data);
         }
 
-        public Task<T> LoadDataAsync<T>() where T : class
+        public async Task<GameData> LoadDataAsync<GameData>() where GameData : class
         {
-            throw new System.NotImplementedException();
+            return await _jsonManager.LoadDataAsync<GameData>(SaveFileName);
         }
 
     }

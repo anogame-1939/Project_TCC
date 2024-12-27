@@ -161,6 +161,10 @@ namespace AnoGame.Domain.Data.Models
         private readonly List<InventoryItem> _items = new();
         public IReadOnlyList<InventoryItem> Items => _items.AsReadOnly();
 
+        public Inventory()
+        {
+        }
+
         public void AddItem(InventoryItem item)
         {
             _items.Add(item);

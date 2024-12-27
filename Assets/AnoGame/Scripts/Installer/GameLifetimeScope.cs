@@ -6,6 +6,8 @@ using AnoGame.Application.Enemy;
 using AnoGame.Infrastructure.Services;
 using UnityEngine;
 using AnoGame.Data;
+using AnoGame.Domain.Data.Services;
+using AnoGame.Infrastructure.SaveData;
 
 namespace AnoGame.Application.Core
 {
@@ -20,6 +22,8 @@ namespace AnoGame.Application.Core
             // builder.Register<EventService>(Lifetime.Singleton)
                // .AsImplementedInterfaces();
 
+            
+            builder.Register<IGameDataRepository, GameDataRepository>(Lifetime.Singleton);
             builder.Register<IEventService, EventService>(Lifetime.Singleton);
             builder.Register<GameManager>(Lifetime.Singleton);
 
@@ -34,6 +38,9 @@ namespace AnoGame.Application.Core
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();
 
+            // builder.Register<GameManager2>(Lifetime.Singleton);
+
+            builder.RegisterComponentInHierarchy<GameManager2>();
             builder.RegisterComponentInHierarchy<EnemySpawnManager>();
             
 

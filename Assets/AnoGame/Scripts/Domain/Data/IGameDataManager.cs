@@ -1,13 +1,13 @@
-using System;
+using AnoGame.Domain.Data.Models;
 using System.Threading.Tasks;
 
 namespace AnoGame.Domain.Data.Services
 {
     public interface IGameDataRepository
     {
-        Task SaveDataAsync<T>(T data);
+        Task SaveDataAsync<GameData>(GameData data);
 
-        Task<T> LoadDataAsync<T>() where T : class;
+        Task<GameData> LoadDataAsync<GameData>() where GameData : class;
 
         
     }

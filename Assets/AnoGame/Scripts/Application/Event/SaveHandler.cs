@@ -5,7 +5,7 @@ namespace AnoGame.Application.Event
     {
         public void Save()
         {
-            GameManager.Instance.SaveData();
+            GameManager2.Instance.SaveData();
 
         }
     }
