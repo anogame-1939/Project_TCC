@@ -1,4 +1,4 @@
-namespace AnoGame.Domain.Item.Models
+namespace AnoGame.Domain.Inventory.Models
 {
     public interface IItem
     {

@@ -43,10 +43,6 @@ namespace AnoGame.Application.Core
             builder.RegisterComponentInHierarchy<GameManager2>();
             builder.RegisterComponentInHierarchy<EnemySpawnManager>();
             
-
-            // IEventProgressServiceの登録
-            builder.Register<IEventProgressService, EventProgressService>(Lifetime.Singleton);
-
         }
     }
 

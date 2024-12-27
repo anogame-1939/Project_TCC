@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using AnoGame.Domain.Item.Models;
+using AnoGame.Domain.Inventory.Models;
 
 namespace AnoGame.Data
 {

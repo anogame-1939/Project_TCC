@@ -31,11 +31,6 @@ namespace AnoGame.Application
             InitializeGameData().Forget();
         }
 
-        private void Start()
-        {
-            
-        }
-
         private async UniTaskVoid InitializeGameData()
         {
             try
