@@ -1685,7 +1685,6 @@ namespace Unity.VisualScripting.Generated.Aot
 	// Unity.TinyCharacterController.Control.MoveControl.Move
 	// UnityEngine.Animator.SetBool
 	// StickBehavior.Attack
-	// AnoGame.ItemCollector.CollectItem
 	// UnityEngine.Animator.GetFloat
 	// UnityEngine.Rigidbody.AddForce
 	// Unity.TinyCharacterController.Utility.IndicatorRegister.HasInstance
@@ -8730,41 +8729,6 @@ namespace Unity.VisualScripting.Generated.Aot
 		// StickBehavior2.op_Inequality
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void StickBehavior2_op_Inequality()
-		{
-			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
-			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
-			bool @operator = (arg0 != arg1);
-			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
-			optimized.Invoke(null, arg0, arg1);
-			optimized.Invoke(default(object[]));
-		}
-		
-		// AnoGame.ItemCollector.op_Implicit
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void AnoGame_ItemCollector_op_Implicit()
-		{
-			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
-			bool conversion = ((bool)(arg0));
-			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
-			optimized.Invoke(null, arg0);
-			optimized.Invoke(default(object[]));
-		}
-		
-		// AnoGame.ItemCollector.op_Equality
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void AnoGame_ItemCollector_op_Equality()
-		{
-			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
-			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
-			bool @operator = (arg0 == arg1);
-			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
-			optimized.Invoke(null, arg0, arg1);
-			optimized.Invoke(default(object[]));
-		}
-		
-		// AnoGame.ItemCollector.op_Inequality
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void AnoGame_ItemCollector_op_Inequality()
 		{
 			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
 			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);

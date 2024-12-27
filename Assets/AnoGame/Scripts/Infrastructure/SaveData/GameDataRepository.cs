@@ -21,22 +21,12 @@ namespace AnoGame.Infrastructure.SaveData
             // _jsonManager.SetCustomPath(customPath);
         }
 
-        public async Task SaveDataAsync(GameData data)
-        {
-            await _jsonManager.SaveDataAsync(SaveFileName, data);
-        }
-
-        public async Task<GameData> LoadDataAsync()
-        {
-            return await _jsonManager.LoadDataAsync<GameData>(SaveFileName);
-        }
-
         public async Task SaveDataAsync<GameData>(GameData data)
         {
             await _jsonManager.SaveDataAsync(SaveFileName, data);
         }
 
-        public async Task<GameData> LoadDataAsync<GameData>() where GameData : class
+        public async Task<GameData> LoadDataAsync()
         {
             return await _jsonManager.LoadDataAsync<GameData>(SaveFileName);
         }

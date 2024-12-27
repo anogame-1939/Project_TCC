@@ -7,8 +7,6 @@ namespace AnoGame.Domain.Data.Services
     {
         Task SaveDataAsync<GameData>(GameData data);
 
-        Task<GameData> LoadDataAsync<GameData>() where GameData : class;
-
-        
+        Task<GameData> LoadDataAsync();
     }
 }
