@@ -39,7 +39,7 @@ namespace AnoGame.Application
         {
             try
             {
-                GameData loadedData = await _repository.LoadDataAsync<GameData>();
+                GameData loadedData = null;
 
                 if (loadedData != null)
                 {

@@ -18,7 +18,7 @@ namespace AnoGame.Application.Inventory
         List<InventoryItemUI> _inventoryItemUI;
 
         [SerializeField]
-        InventoryManager _inventoryManager;
+        InventoryViewer _inventoryViewer;
 
         private bool isInventoryMode = true;
         private CanvasGroup _canvasGroup;
@@ -34,7 +34,7 @@ namespace AnoGame.Application.Inventory
                 Debug.LogError("_inputActionAssetが設定されていません。");
                 return;
             }
-            if (_inventoryManager == null)
+            if (_inventoryViewer == null)
             {
                 Debug.LogError("_inventoryManagerが設定されていません。");
                 return;
@@ -56,7 +56,7 @@ namespace AnoGame.Application.Inventory
         private void UpdateInventoryItemUI(GameData data)
         {
             _inventoryItem = data.inventory;
-            _inventoryManager.UpdateInventory(_inventoryItem);
+            _inventoryViewer.UpdateInventory(_inventoryItem);
         }
 
         void ToggleCursorLock()
