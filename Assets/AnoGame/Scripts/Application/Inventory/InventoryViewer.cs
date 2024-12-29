@@ -5,31 +5,34 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using AnoGame.Data;
+using AnoGame.Domain.Data.Models;
+using VContainer;
 
 namespace AnoGame.Application.Inventory
 {
     public class InventoryViewer : MonoBehaviour
     {
-        [SerializeField] private ItemDatabase itemDatabase;
+        [SerializeField] private AnoGame.Data.ItemDatabase itemDatabase;
         private Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
         private Dictionary<string, AsyncOperationHandle<Sprite>> loadOperations = new Dictionary<string, AsyncOperationHandle<Sprite>>();
 
-        // InventorySlotをシンプルな表示用クラスに変更
-        public class InventorySlotData
-        {
-            public InventoryItem Item { get; set; }
-            public Sprite Sprite { get; set; }
-        }
         [SerializeField] private InventorySlot slotPrefab;
         [SerializeField] private Transform contentParent;
         [SerializeField] private int maxVisibleSlots = 16; // 4x4
         [SerializeField] private Button nextPageButton;
         [SerializeField] private Button prevPageButton;
 
-        private List<InventoryItem> _allItems = new List<InventoryItem>();
+        private IReadOnlyList<InventoryItem> _allItems = new List<InventoryItem>();
         private List<InventorySlot> visibleSlots = new List<InventorySlot>();
         private int currentPage = 0;
+
+        private InventoryManager _inventoryManager;
+
+        [Inject]
+        public void Construct(InventoryManager inventoryManager)
+        {
+            _inventoryManager = inventoryManager;
+        }
 
         private void Start()
         {
@@ -47,21 +50,21 @@ namespace AnoGame.Application.Inventory
             }
         }
 
-        public void UpdateInventory(List<InventoryItem> newItems)
+        public void UpdateInventory(Domain.Data.Models.Inventory inventory)
         {
-            foreach (var item in newItems)
+            foreach (var item in inventory.Items)
             {
-                if (!spriteCache.ContainsKey(item.itemName))
+                if (!spriteCache.ContainsKey(item.ItemName))
                 {
-                    LoadSprite(item.itemName);
+                    LoadSprite(item.ItemName);
                 }
             }
 
             // 差分更新の実装
-            var changes = CalculateInventoryChanges(_allItems, newItems);
+            var changes = CalculateInventoryChanges(_allItems, inventory.Items);
             ApplyInventoryChanges(changes);
 
-            _allItems = new List<InventoryItem>(newItems); // 新しいリストで更新
+            _allItems = inventory.Items; // これで型が一致する
             UpdateVisibleItems();
             UpdatePageButtonsVisibility();
         }
@@ -82,51 +85,54 @@ namespace AnoGame.Application.Inventory
             Move
         }
 
-        private List<InventoryChange> CalculateInventoryChanges(List<InventoryItem> oldItems, List<InventoryItem> newItems)
+
+        private List<InventoryChange> CalculateInventoryChanges(
+            IReadOnlyList<InventoryItem> oldInventory, 
+            IReadOnlyList<InventoryItem> newInventory)
         {
             var changes = new List<InventoryChange>();
 
             // アイテムの辞書を作成（名前をキーとして使用）
-            var oldItemDict = oldItems.Select((item, index) => new { Item = item, Index = index })
-                                    .ToDictionary(x => x.Item.itemName, x => x);
-            var newItemDict = newItems.Select((item, index) => new { Item = item, Index = index })
-                                    .ToDictionary(x => x.Item.itemName, x => x);
+            var oldItemDict = newInventory.Select((item, index) => new { Item = item, Index = index })
+                                    .ToDictionary(x => x.Item.ItemName, x => x);
+            var newItemDict = newInventory.Select((item, index) => new { Item = item, Index = index })
+                                    .ToDictionary(x => x.Item.ItemName, x => x);
 
             // 削除されたアイテムを検出
-            foreach (var oldItem in oldItems)
+            foreach (var oldItem in oldInventory)
             {
-                if (!newItemDict.ContainsKey(oldItem.itemName))
+                if (!newItemDict.ContainsKey(oldItem.ItemName))
                 {
                     changes.Add(new InventoryChange
                     {
                         Item = oldItem,
                         Type = ChangeType.Remove,
-                        OldIndex = oldItemDict[oldItem.itemName].Index
+                        OldIndex = oldItemDict[oldItem.ItemName].Index
                     });
                 }
             }
 
             // 追加・変更されたアイテムを検出
-            foreach (var newItem in newItems)
+            foreach (var newItem in newInventory)
             {
-                if (!oldItemDict.ContainsKey(newItem.itemName))
+                if (!oldItemDict.ContainsKey(newItem.ItemName))
                 {
                     // 新規追加
                     changes.Add(new InventoryChange
                     {
                         Item = newItem,
                         Type = ChangeType.Add,
-                        NewIndex = newItemDict[newItem.itemName].Index
+                        NewIndex = newItemDict[newItem.ItemName].Index
                     });
                 }
                 else
                 {
-                    var oldItem = oldItems[oldItemDict[newItem.itemName].Index];
-                    var oldIndex = oldItemDict[newItem.itemName].Index;
-                    var newIndex = newItemDict[newItem.itemName].Index;
+                    var oldItem = oldInventory[oldItemDict[newItem.ItemName].Index];
+                    var oldIndex = oldItemDict[newItem.ItemName].Index;
+                    var newIndex = newItemDict[newItem.ItemName].Index;
 
-                    if (newItem.quantity != oldItem.quantity || 
-                        newItem.description != oldItem.description)
+                    if (newItem.Quantity != oldItem.Quantity || 
+                        newItem.Description != oldItem.Description)
                     {
                         // 内容の変更
                         changes.Add(new InventoryChange
@@ -167,7 +173,7 @@ namespace AnoGame.Application.Inventory
                     {
                         case ChangeType.Add:
                         case ChangeType.Modify:
-                            if (spriteCache.TryGetValue(change.Item.itemName, out var sprite))
+                            if (spriteCache.TryGetValue(change.Item.ItemName, out var sprite))
                             {
                                 visibleSlots[slotIndex].SetItem(change.Item, sprite);
                             }
@@ -192,7 +198,7 @@ namespace AnoGame.Application.Inventory
                             {
                                 visibleSlots[change.OldIndex % maxVisibleSlots].Clear();
                             }
-                            if (spriteCache.TryGetValue(change.Item.itemName, out var moveSprite))
+                            if (spriteCache.TryGetValue(change.Item.ItemName, out var moveSprite))
                             {
                                 visibleSlots[slotIndex].SetItem(change.Item, moveSprite);
                             }
@@ -215,7 +221,7 @@ namespace AnoGame.Application.Inventory
                 if (itemIndex < _allItems.Count)
                 {
                     var item = _allItems[itemIndex];
-                    if (spriteCache.TryGetValue(item.itemName, out var sprite))
+                    if (spriteCache.TryGetValue(item.ItemName, out var sprite))
                     {
                         visibleSlots[i].SetItem(item, sprite);
                     }
@@ -277,7 +283,7 @@ namespace AnoGame.Application.Inventory
                 if (sprite != null)
                 {
                     spriteCache[itemName] = sprite;
-                    UpdateSlotsWithItem(itemName); // 関連するスロットを更新
+                    UpdateSlotsWithItem(itemName);
                 }
             }
             catch (Exception e)
@@ -292,10 +298,9 @@ namespace AnoGame.Application.Inventory
 
         private void UpdateSlotsWithItem(string itemName)
         {
-            // 表示中の該当アイテムのスロットを更新
             foreach (var slot in visibleSlots)
             {
-                if (slot.CurrentItem?.itemName == itemName && spriteCache.TryGetValue(itemName, out var sprite))
+                if (slot.CurrentItem?.ItemName == itemName && spriteCache.TryGetValue(itemName, out var sprite))
                 {
                     slot.UpdateSprite(sprite);
                 }

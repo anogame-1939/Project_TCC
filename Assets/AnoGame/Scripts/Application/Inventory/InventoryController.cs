@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using AnoGame.Data;
+using AnoGame.Domain.Data.Models;
 
 namespace AnoGame.Application.Inventory
 {
@@ -11,7 +11,7 @@ namespace AnoGame.Application.Inventory
         InputActionAsset _inputActionAsset;
 
         [SerializeField]
-        List<InventoryItem> _inventoryItem;
+        AnoGame.Domain.Data.Models.Inventory _inventoryItem;
 
         [SerializeField]
         InventoryViewer _inventoryViewer;
@@ -51,7 +51,7 @@ namespace AnoGame.Application.Inventory
 
         private void UpdateInventoryItemUI(GameData data)
         {
-            _inventoryItem = data.inventory;
+            _inventoryItem = data.Inventory;
             _inventoryViewer.UpdateInventory(_inventoryItem);
         }
 

@@ -231,10 +231,10 @@ namespace AnoGame.Editor
                         foreach (var item in currentGameData.inventory)
                         {
                             EditorGUILayout.BeginHorizontal();
-                            EditorGUILayout.LabelField($"- {item.itemName} x{item.quantity}");
-                            if (!string.IsNullOrEmpty(item.description))
+                            EditorGUILayout.LabelField($"- {item.ItemName} x{item.Quantity}");
+                            if (!string.IsNullOrEmpty(item.Description))
                             {
-                                EditorGUILayout.LabelField($"({item.description})", EditorStyles.miniLabel);
+                                EditorGUILayout.LabelField($"({item.Description})", EditorStyles.miniLabel);
                             }
                             EditorGUILayout.EndHorizontal();
                         }

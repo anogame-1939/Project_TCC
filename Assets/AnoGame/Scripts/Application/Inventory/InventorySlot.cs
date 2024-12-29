@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using AnoGame.Data;
+using AnoGame.Domain.Data.Models;
 
 namespace AnoGame.Application.Inventory
 {
@@ -18,9 +18,9 @@ namespace AnoGame.Application.Inventory
         {
             CurrentItem = item;
             
-            itemNameText.text = item.itemName;
-            descriptionText.text = item.description;
-            quantityText.text = item.quantity > 1 ? item.quantity.ToString() : string.Empty;
+            itemNameText.text = item.ItemName;
+            descriptionText.text = item.Description;
+            quantityText.text = item.Quantity > 1 ? item.Quantity.ToString() : string.Empty;
             
             UpdateSprite(sprite);
             gameObject.SetActive(true);

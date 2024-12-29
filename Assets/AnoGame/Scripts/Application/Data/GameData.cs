@@ -119,10 +119,10 @@ namespace AnoGame.Data
     [Serializable]
     public class InventoryItem
     {
-        public string itemName;
-        public int quantity;
-        public string description;
-        public string uniqueId;
-        public List<string> uniqueIds = new();  
+        public string ItemName;
+        public int Quantity;
+        public string Description;
+        public string UniqueId;
+        public List<string> UniqueIds = new();  
     }
 }
