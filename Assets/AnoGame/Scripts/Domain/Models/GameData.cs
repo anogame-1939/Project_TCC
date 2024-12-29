@@ -10,7 +10,7 @@ namespace AnoGame.Domain.Data.Models
         public string PlayerName { get; private set; }
         public StoryProgress StoryProgress { get; private set; }
         public Inventory Inventory { get; private set; }
-        public PlayerPosition Position { get; private set; }
+        public PlayerPosition PlayerPosition { get; private set; }
         public EventHistory ClearedEvents { get; private set; }
 
         public GameData()
@@ -30,13 +30,13 @@ namespace AnoGame.Domain.Data.Models
             PlayerName = playerName;
             StoryProgress = storyProgress;
             Inventory = inventory;
-            Position = position;
+            PlayerPosition = position;
             ClearedEvents = clearedEvents;
         }
 
         public void UpdatePosition(Position3D position, Rotation3D rotation, string mapId, string areaId)
         {
-            Position = Position.UpdatePosition(position, rotation, mapId, areaId);
+            PlayerPosition = PlayerPosition.UpdatePosition(position, rotation, mapId, areaId);
         }
 
         public void AddClearedEvent(string eventId)

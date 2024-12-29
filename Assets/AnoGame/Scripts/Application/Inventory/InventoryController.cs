@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using AnoGame.Domain.Data.Models;
+using VContainer;
 
 namespace AnoGame.Application.Inventory
 {
@@ -11,20 +10,21 @@ namespace AnoGame.Application.Inventory
         InputActionAsset _inputActionAsset;
 
         [SerializeField]
-        AnoGame.Domain.Data.Models.Inventory _inventoryItem;
-
-        [SerializeField]
         InventoryViewer _inventoryViewer;
 
         private bool isInventoryMode = true;
         private CanvasGroup _canvasGroup;
+        private InventoryManager _inventoryManager;
+
+        [Inject]
+        public void Construct(InventoryManager inventoryManager)
+        {
+            Debug.Log("_inputActionAssetが設定されていません。");
+            _inventoryManager = inventoryManager;
+        }
         
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            GameManager.Instance.SaveGameData += UpdateInventoryItemUI;
-            GameManager.Instance.LoadGameData += UpdateInventoryItemUI;
-
             if (_inputActionAsset == null)
             {
                 Debug.LogError("_inputActionAssetが設定されていません。");
@@ -49,12 +49,6 @@ namespace AnoGame.Application.Inventory
             Hide();
         }
 
-        private void UpdateInventoryItemUI(GameData data)
-        {
-            _inventoryItem = data.Inventory;
-            _inventoryViewer.UpdateInventory(_inventoryItem);
-        }
-
         void ToggleCursorLock()
         {
             isInventoryMode = !isInventoryMode;
@@ -68,8 +62,21 @@ namespace AnoGame.Application.Inventory
                 Hide();
             }
         }
+
         public void Show()
         {
+            // 最新のインベントリ情報を取得して表示を更新
+            var inventoryItems = _inventoryManager.GetInventory();
+            if (inventoryItems != null)
+            {
+                var inventory = new Domain.Data.Models.Inventory();
+                foreach (var item in inventoryItems)
+                {
+                    inventory.AddItem(item);
+                }
+                _inventoryViewer.UpdateInventory(inventory);
+            }
+
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             _canvasGroup.alpha = 1;

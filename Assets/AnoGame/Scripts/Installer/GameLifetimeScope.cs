@@ -17,8 +17,6 @@ namespace AnoGame.Application.Core
     {
         [SerializeField]
         ItemDatabase itemDatabase;
-        [SerializeField]
-        ItemCollector itemCollector;
 
         protected override void Configure(IContainerBuilder builder)
         {
