@@ -1,18 +1,18 @@
 using UnityEngine;
-using AnoGame.Data;
 using VContainer;
 using System.Collections.Generic;
 using System.Linq;
+using AnoGame.Domain.Data.Models;
 
 namespace AnoGame.Application.Inventory
 {
     public class InventoryManager
     {
-        private readonly GameManager _gameManager;
+        private readonly GameManager2 _gameManager;
         private readonly int _maxInventorySize = 20;
 
         [Inject]
-        public InventoryManager(GameManager gameManager)
+        public InventoryManager(GameManager2 gameManager)
         {
             Debug.Log("InventoryManager initialized");
             _gameManager = gameManager;
@@ -20,18 +20,18 @@ namespace AnoGame.Application.Inventory
 
         public bool IsInventoryFull()
         {
-            var inventory = _gameManager.CurrentGameData?.inventory;
-            return inventory != null && inventory.Count >= _maxInventorySize;
+            var inventory = _gameManager.CurrentGameData?.Inventory;
+            return inventory != null && inventory.Items.Count >= _maxInventorySize;
         }
 
         public IReadOnlyList<InventoryItem> GetInventory()
         {
-            return _gameManager.CurrentGameData?.inventory?.AsReadOnly();
+            return _gameManager.CurrentGameData?.Inventory?.Items;
         }
 
         public bool AddItem(CollectableItem collectableItem)
         {
-            var inventory = _gameManager.CurrentGameData?.inventory;
+            var inventory = _gameManager.CurrentGameData?.Inventory;
             if (inventory == null || IsInventoryFull())
             {
                 Debug.LogWarning("Inventory is full or not initialized!");
@@ -39,11 +39,11 @@ namespace AnoGame.Application.Inventory
             }
 
             var itemData = collectableItem.ItemData;
-            var existingItem = inventory.FirstOrDefault(item => item.itemName == itemData.ItemName);
+            var existingItem = inventory.Items.FirstOrDefault(item => item.ItemName == itemData.ItemName);
 
             if (existingItem != null)
             {
-                UpdateExistingItem(existingItem, collectableItem);
+                existingItem.AddQuantity(collectableItem.Quantity);
             }
             else
             {
@@ -54,54 +54,43 @@ namespace AnoGame.Application.Inventory
             return true;
         }
 
-        private void UpdateExistingItem(InventoryItem existingItem, CollectableItem collectableItem)
+        private void AddNewItem(Domain.Data.Models.Inventory inventory, CollectableItem collectableItem)
         {
-            existingItem.quantity += collectableItem.Quantity;
-            
-            if (collectableItem.ItemData.IsStackable)
-            {
-                existingItem.uniqueIds.Add(collectableItem.UniqueId);
-            }
-        }
+            var newItem = new InventoryItem(
+                itemName: collectableItem.ItemData.ItemName,
+                quantity: collectableItem.Quantity,
+                description: collectableItem.ItemData.Description,
+                uniqueId: collectableItem.UniqueId
+            );
 
-        private void AddNewItem(List<InventoryItem> inventory, CollectableItem collectableItem)
-        {
-            var newItem = new InventoryItem
-            {
-                itemName = collectableItem.ItemData.ItemName,
-                quantity = collectableItem.Quantity,
-                description = collectableItem.ItemData.Description,
-                uniqueIds = new List<string>()
-            };
-
-            if (collectableItem.ItemData.IsStackable)
-            {
-                newItem.uniqueIds.Add(collectableItem.UniqueId);
-            }
-
-            inventory.Add(newItem);
+            inventory.AddItem(newItem);
         }
 
         public bool RemoveItem(string itemName, int quantity = 1)
         {
-            var inventory = _gameManager.CurrentGameData?.inventory;
+            var inventory = _gameManager.CurrentGameData?.Inventory;
             if (inventory == null)
             {
                 Debug.LogWarning("Inventory is not initialized!");
                 return false;
             }
 
-            var existingItem = inventory.FirstOrDefault(item => item.itemName == itemName);
-            if (existingItem == null || existingItem.quantity < quantity)
+            var existingItem = inventory.Items.FirstOrDefault(item => item.ItemName == itemName);
+            if (existingItem == null || existingItem.Quantity < quantity)
             {
                 Debug.LogWarning($"Not enough {itemName} in inventory!");
                 return false;
             }
 
-            existingItem.quantity -= quantity;
-            if (existingItem.quantity <= 0)
+            // 完全に削除する場合
+            if (existingItem.Quantity <= quantity)
             {
-                inventory.Remove(existingItem);
+                inventory.RemoveItem(existingItem.UniqueId);
+            }
+            else
+            {
+                // 数量を減らす
+                existingItem.AddQuantity(-quantity);
             }
 
             _gameManager.UpdateGameState(_gameManager.CurrentGameData);
@@ -110,11 +99,11 @@ namespace AnoGame.Application.Inventory
 
         public int GetItemQuantity(string itemName)
         {
-            var inventory = _gameManager.CurrentGameData?.inventory;
+            var inventory = _gameManager.CurrentGameData?.Inventory;
             if (inventory == null) return 0;
 
-            var item = inventory.FirstOrDefault(i => i.itemName == itemName);
-            return item?.quantity ?? 0;
+            var item = inventory.Items.FirstOrDefault(i => i.ItemName == itemName);
+            return item?.Quantity ?? 0;
         }
     }
 }

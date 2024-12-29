@@ -104,7 +104,7 @@ namespace AnoGame.Application.Player
             return closestItem;
         }
 
-        public IReadOnlyList<InventoryItem> GetInventory()
+        public IReadOnlyList<Domain.Data.Models.InventoryItem> GetInventory()
         {
             return _inventoryManager.GetInventory();
         }
