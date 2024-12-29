@@ -15,9 +15,6 @@ namespace AnoGame.Application.Inventory
         List<InventoryItem> _inventoryItem;
 
         [SerializeField]
-        List<InventoryItemUI> _inventoryItemUI;
-
-        [SerializeField]
         InventoryViewer _inventoryViewer;
 
         private bool isInventoryMode = true;
