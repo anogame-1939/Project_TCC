@@ -19,7 +19,6 @@ namespace AnoGame.Application.Inventory
         [Inject]
         public void Construct(InventoryManager inventoryManager)
         {
-            Debug.Log("_inputActionAssetが設定されていません。");
             _inventoryManager = inventoryManager;
         }
         
