@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace AnoGame.Domain.Data.Models
 {
@@ -158,9 +159,13 @@ namespace AnoGame.Domain.Data.Models
 
     public class Inventory
     {
+        [JsonProperty("Items")]
         private readonly List<InventoryItem> _items = new();
+        
+        [JsonIgnore]
         public IReadOnlyList<InventoryItem> Items => _items.AsReadOnly();
 
+        [JsonConstructor]
         public Inventory()
         {
         }
@@ -180,14 +185,28 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public class InventoryItem
     {
-        public string ItemName { get; }
+        [JsonProperty]
+        public string ItemName { get; private set; }
+        [JsonProperty]
         public int Quantity { get; private set; }
-        public string Description { get; }
-        public string UniqueId { get; }
+        [JsonProperty]
+        public string Description { get; private set; }
+        [JsonProperty]
+        public string UniqueId { get; private set; }
+        
+        [JsonProperty("UniqueIds")]
         private readonly List<string> _uniqueIds = new();
+        
+        [JsonIgnore]
         public IReadOnlyList<string> UniqueIds => _uniqueIds.AsReadOnly();
+
+        [JsonConstructor]
+        public InventoryItem()
+        {
+        }
 
         public InventoryItem(string itemName, int quantity, string description, string uniqueId)
         {
