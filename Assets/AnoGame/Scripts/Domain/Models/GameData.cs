@@ -167,6 +167,7 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public class Inventory
     {
         [JsonProperty("Items")]
@@ -233,6 +234,7 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public class EventHistory
     {
         private readonly HashSet<string> _clearedEvents = new();
