@@ -5,20 +5,26 @@ using Newtonsoft.Json;
 
 namespace AnoGame.Domain.Data.Models
 {
+    [Serializable]
     public class GameData
     {
+        [JsonProperty]
         public int Score { get; private set; }
+        [JsonProperty]
         public string PlayerName { get; private set; }
+        [JsonProperty]
         public StoryProgress StoryProgress { get; private set; }
+        [JsonProperty]
         public Inventory Inventory { get; private set; }
+        [JsonProperty]
         public PlayerPosition PlayerPosition { get; private set; }
+        [JsonProperty]
         public EventHistory ClearedEvents { get; private set; }
 
+        [JsonConstructor]
         public GameData()
         {
-            
         }
-
         public GameData(
             int score,
             string playerName,
@@ -46,6 +52,7 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public class PlayerPosition
     {
         public Position3D Position { get; }
@@ -102,6 +109,7 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public readonly struct Position3D
     {
         public float X { get; }
@@ -116,6 +124,7 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public readonly struct Rotation3D
     {
         public float X { get; }
@@ -132,6 +141,7 @@ namespace AnoGame.Domain.Data.Models
         }
     }
 
+    [Serializable]
     public class StoryProgress
     {
         public int CurrentStoryIndex { get; private set; }
