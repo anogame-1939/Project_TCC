@@ -19,7 +19,7 @@ namespace AnoGame.Domain.Data.Models
         [JsonProperty]
         public PlayerPosition PlayerPosition { get; private set; }
         [JsonProperty]
-        public EventHistory ClearedEvents { get; private set; }
+        public EventHistory EventHistory { get; private set; }
 
         [JsonConstructor]
         public GameData()
@@ -31,14 +31,14 @@ namespace AnoGame.Domain.Data.Models
             StoryProgress storyProgress,
             Inventory inventory,
             PlayerPosition position,
-            EventHistory clearedEvents)
+            EventHistory eventHistory)
         {
             Score = score;
             PlayerName = playerName;
             StoryProgress = storyProgress;
             Inventory = inventory;
             PlayerPosition = position;
-            ClearedEvents = clearedEvents;
+            EventHistory = eventHistory;
         }
 
         public void UpdatePosition(Position3D position, Rotation3D rotation, string mapId, string areaId)
@@ -48,7 +48,7 @@ namespace AnoGame.Domain.Data.Models
 
         public void AddClearedEvent(string eventId)
         {
-            ClearedEvents.AddEvent(eventId);
+            EventHistory.AddEvent(eventId);
         }
     }
 
@@ -237,8 +237,16 @@ namespace AnoGame.Domain.Data.Models
     [Serializable]
     public class EventHistory
     {
+        [JsonProperty("ClearedEvents")]
         private readonly HashSet<string> _clearedEvents = new();
+        
+        [JsonIgnore]
         public IReadOnlyCollection<string> ClearedEvents => _clearedEvents;
+
+        [JsonConstructor]
+        public EventHistory()
+        {
+        }
 
         public void AddEvent(string eventId)
         {

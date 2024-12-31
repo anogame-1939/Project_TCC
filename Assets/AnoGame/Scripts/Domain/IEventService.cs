@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace AnoGame.Domain.Event.Services
 {
     public interface IEventService
     {
-        void SetCleadEvents(List<string> clearedEventIDs);
+        void SetCleadEvents(HashSet<string> clearedEventIDs);
         bool IsEventCleared(string eventID);
         void RegisterStartEventHandler(string eventID, System.Action handler);
         void RegisterCompleteEventHandler(string eventID, System.Action handler);

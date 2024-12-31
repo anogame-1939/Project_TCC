@@ -10,6 +10,7 @@ using AnoGame.Domain.Data.Services;
 using AnoGame.Infrastructure.SaveData;
 
 using AnoGame.Application.Inventory;
+using AnoGame.Application.Event;
 
 namespace AnoGame.Application.Core
 {
@@ -33,6 +34,7 @@ namespace AnoGame.Application.Core
 
             // インベントリマネージャの登録
             builder.Register<InventoryManager>(Lifetime.Singleton);
+            builder.Register<EventManager>(Lifetime.Singleton);
 
             // 
             // builder.RegisterComponent(inventoryManager);
@@ -49,6 +51,8 @@ namespace AnoGame.Application.Core
 
             builder.RegisterComponentInHierarchy<GameManager2>();
             builder.RegisterComponentInHierarchy<EnemySpawnManager>();
+
+            builder.RegisterEntryPoint<LevelInitializer>();
             
         }
     }

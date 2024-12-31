@@ -2,6 +2,7 @@ using UnityEngine;
 using AnoGame.Data;
 using VContainer;
 using AnoGame.Application.Core;
+using AnoGame.Application.Event;
 using AnoGame.Domain.Event.Services;
 
 #if UNITY_EDITOR
@@ -14,10 +15,16 @@ namespace AnoGame.Application.Enemy
     {
         [Inject] private IEventService _eventService;
 
+        [Inject] private EventManager _eventManager;
+
         [Inject]
-        public void Construct(IEventService eventService)
+        public void Construct(
+            IEventService eventService,
+            EventManager eventManager
+        )
         {
             _eventService = eventService;
+            _eventManager = eventManager;
         }
 
         [SerializeField] private GameObject enemyPrefab;
@@ -138,7 +145,7 @@ namespace AnoGame.Application.Enemy
         private void SetEventData(EventData eventData)
         {
             var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
-            enemyEventController.Construct(_eventService);
+            enemyEventController.Construct(_eventService, _eventManager);
             enemyEventController.Initialize(eventData);
         }
 

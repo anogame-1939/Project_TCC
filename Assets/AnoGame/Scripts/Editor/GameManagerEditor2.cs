@@ -220,11 +220,11 @@ namespace AnoGame.Editor
                     }
 
                     // クリア済みイベント情報
-                    if (currentGameData.ClearedEvents != null && currentGameData.ClearedEvents.ClearedEvents.Any())
+                    if (currentGameData.EventHistory != null && currentGameData.EventHistory.ClearedEvents.Any())
                     {
                         EditorGUILayout.Space(5);
                         EditorGUILayout.LabelField("Cleared Events:", EditorStyles.boldLabel);
-                        foreach (var eventId in currentGameData.ClearedEvents.ClearedEvents)
+                        foreach (var eventId in currentGameData.EventHistory.ClearedEvents)
                         {
                             EditorGUILayout.LabelField($"- {eventId}");
                         }

@@ -1,17 +1,18 @@
 using VContainer.Unity;
 using AnoGame.Domain.Event.Services;
+using System.Linq;
 
 namespace AnoGame.Application.Core
 {
     public class LevelInitializer : IStartable
     {
         // private readonly IInventoryService _itemCollectionService;
-        private readonly GameManager _gameManager;
+        private readonly GameManager2 _gameManager;
         private readonly IEventService _eventService;
 
         public LevelInitializer(
             // IInventoryService itemCollectionService,
-            GameManager gameManager,
+            GameManager2 gameManager,
             IEventService eventService
             )
         {
@@ -50,7 +51,7 @@ namespace AnoGame.Application.Core
             }
             */
 
-            _eventService.SetCleadEvents(_gameManager.CurrentGameData.clearedEvents);
+            _eventService.SetCleadEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
         }
     }
 

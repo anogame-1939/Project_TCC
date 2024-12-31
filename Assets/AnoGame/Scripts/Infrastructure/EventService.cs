@@ -17,7 +17,7 @@ namespace AnoGame.Infrastructure.Services
         private readonly Dictionary<string, List<Action>> _failedEventHandlers = new();
 
 
-        public void SetCleadEvents(List<string> clearedEventIDs)
+        public void SetCleadEvents(HashSet<string> clearedEventIDs)
         {
             _clearedEvents.AddRange(clearedEventIDs);
         }

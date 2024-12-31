@@ -1,6 +1,7 @@
 using UnityEngine;
 using AnoGame.Data;
 using AnoGame.Domain.Event.Services;
+using AnoGame.Application.Event;
 using VContainer;
 
 namespace AnoGame.Application.Enemy
@@ -17,11 +18,16 @@ namespace AnoGame.Application.Enemy
 
 
         [Inject] private IEventService _eventService;
+        [Inject] private EventManager _eventManager;
 
         [Inject]
-        public void Construct(IEventService eventService)
+        public void Construct(
+            IEventService eventService,
+            EventManager eventManager
+        )
         {
             _eventService = eventService;
+            _eventManager = eventManager;
         }
 
         public void Initialize(EventData eventData)
@@ -46,6 +52,9 @@ namespace AnoGame.Application.Enemy
             _isLocked = true;
             if (_eventData != null)
             {
+                // クリア済みのイベントIDを登録
+                _eventManager.AddClearedEvent(_eventData.EventId);
+                // イベントトリガーの実行
                 _eventService.TriggerEventComplete(_eventData.EventId);
             }
             Dispose();

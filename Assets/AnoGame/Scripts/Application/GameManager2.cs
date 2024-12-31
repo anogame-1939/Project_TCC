@@ -78,7 +78,7 @@ namespace AnoGame.Application
                 storyProgress: new StoryProgress(0, 0, 0),
                 inventory: new AnoGame.Domain.Data.Models.Inventory(), // 新しい空のインベントリを作成
                 position: playerPosition,
-                clearedEvents: new EventHistory() // 新しい空のイベント履歴を作成
+                eventHistory: new EventHistory() // 新しい空のイベント履歴を作成
             );
         }
 
