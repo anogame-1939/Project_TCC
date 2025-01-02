@@ -1,6 +1,10 @@
 using UnityEngine;
 using AnoGame.Domain.Event.Conditions;
-public abstract class EventConditionComponent : MonoBehaviour
+
+namespace AnoGame.Application.Event
 {
-    public abstract IEventCondition CreateCondition();
+    public abstract class EventConditionComponent : MonoBehaviour
+    {
+        public abstract IEventCondition CreateCondition();
+    }
 }
