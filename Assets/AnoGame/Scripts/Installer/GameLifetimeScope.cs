@@ -11,6 +11,7 @@ using AnoGame.Infrastructure.SaveData;
 
 using AnoGame.Application.Inventory;
 using AnoGame.Application.Event;
+using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Application.Core
 {
@@ -30,6 +31,7 @@ namespace AnoGame.Application.Core
             
             builder.Register<IGameDataRepository, GameDataRepository>(Lifetime.Singleton);
             builder.Register<IEventService, EventService>(Lifetime.Singleton);
+            builder.Register<IInventoryService, InventoryService>(Lifetime.Singleton);
             builder.Register<GameManager>(Lifetime.Singleton);
 
             // インベントリマネージャの登録
