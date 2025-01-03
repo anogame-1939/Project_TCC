@@ -3,7 +3,7 @@ using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Domain.Event.Conditions
 {
-    public class KeyItemCondition : IEventCondition
+    public class KeyItemCondition : IEventCondition, IObservableCondition, IDisposable
     {
         private readonly IInventoryService _inventoryService;
         private readonly string _requiredItemName;

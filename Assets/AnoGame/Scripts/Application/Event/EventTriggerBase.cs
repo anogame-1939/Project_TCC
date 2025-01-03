@@ -68,6 +68,9 @@ namespace AnoGame.Application.Event
                     }
                 }
             }
+
+            // 初期化のタイミングでチェック
+            CheckAndTriggerEvent();
         }
 
         private void CheckAndTriggerEvent()
@@ -84,6 +87,17 @@ namespace AnoGame.Application.Event
                 return true;
 
             return _conditions.All(condition => condition.IsSatisfied());
+        }
+
+        protected virtual void OnDestroy()
+        {
+            foreach (var condition in _conditions)
+            {
+                if (condition is IObservableCondition observableCondition)
+                {
+                    observableCondition.OnConditionChanged -= CheckAndTriggerEvent;
+                }
+            }
         }
 
         public void StartEvent()
