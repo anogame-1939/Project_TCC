@@ -47,7 +47,7 @@ namespace AnoGame.Application.Core
             // builder.RegisterComponentInHierarchy<GameManager>();
 
             // コンポーネントの登録
-            // builder.RegisterComponentInHierarchy<ItemCollector>();
+            builder.RegisterComponentInHierarchy<ItemCollector>();
 
             // builder.Register<GameManager2>(Lifetime.Singleton);
 

@@ -29,11 +29,16 @@ namespace AnoGame.Application.Core
         {
             UnityEngine.Debug.Log("LevelInitializer.Start()");
 
-            _eventService.SetCleadEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+            if (_gameManager.CurrentGameData.EventHistory != null)
+            {
+                _eventService.SetCleadEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+
+            }
+
             var itemNames = _gameManager.CurrentGameData.Inventory.Items
                             .Select(x => x.ItemName);
             _inventoryService.SetItems(itemNames.ToHashSet());
-
+            
             UnityEngine.Debug.Log("LevelInitializer.Start().END");
         }
     }

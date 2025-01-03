@@ -11,17 +11,16 @@ namespace AnoGame.Application.Inventory
     {
         private readonly GameManager2 _gameManager;
         private readonly IInventoryService _inventoryService;
-        private readonly int _maxInventorySize;
+        private readonly int _maxInventorySize = 20;
 
         [Inject]
         public InventoryManager(
             GameManager2 gameManager, 
-            IInventoryService inventoryService,
-            int maxInventorySize = 20)
+            IInventoryService inventoryService)
         {
             _gameManager = gameManager;
             _inventoryService = inventoryService;
-            _maxInventorySize = maxInventorySize;
+            // _maxInventorySize = maxInventorySize;
         }
 
         public bool IsInventoryFull()
