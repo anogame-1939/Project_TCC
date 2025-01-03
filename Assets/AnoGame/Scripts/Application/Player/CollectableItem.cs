@@ -45,6 +45,7 @@ namespace AnoGame
             // 関連イベントが設定されている場合はイベントを開始
             if (relatedEventTrigger != null)
             {
+                // NOTE:いらんかも(EventTriggerBaseでやってるので)
                 relatedEventTrigger.StartEvent();
             }
         }

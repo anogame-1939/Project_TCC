@@ -3,19 +3,25 @@ using VContainer;
 using System.Collections.Generic;
 using System.Linq;
 using AnoGame.Domain.Data.Models;
+using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Application.Inventory
 {
     public class InventoryManager
     {
         private readonly GameManager2 _gameManager;
-        private readonly int _maxInventorySize = 20;
+        private readonly IInventoryService _inventoryService;
+        private readonly int _maxInventorySize;
 
         [Inject]
-        public InventoryManager(GameManager2 gameManager)
+        public InventoryManager(
+            GameManager2 gameManager, 
+            IInventoryService inventoryService,
+            int maxInventorySize = 20)
         {
-            Debug.Log("InventoryManager initialized");
             _gameManager = gameManager;
+            _inventoryService = inventoryService;
+            _maxInventorySize = maxInventorySize;
         }
 
         public bool IsInventoryFull()
@@ -51,6 +57,7 @@ namespace AnoGame.Application.Inventory
             }
 
             _gameManager.UpdateGameState(_gameManager.CurrentGameData);
+            _inventoryService.NotifyItemAdded(itemData.ItemName);
             return true;
         }
 
@@ -86,6 +93,7 @@ namespace AnoGame.Application.Inventory
             if (existingItem.Quantity <= quantity)
             {
                 inventory.RemoveItem(existingItem.UniqueId);
+                _inventoryService.NotifyItemRemoved(existingItem.ItemName);
             }
             else
             {

@@ -16,8 +16,6 @@ namespace AnoGame.Application.Event
         }
         [SerializeField] private ItemData _item;
 
-        
-        
         public override IEventCondition CreateCondition()
         {
             return new KeyItemCondition(_inventoryService, _item.ItemName);

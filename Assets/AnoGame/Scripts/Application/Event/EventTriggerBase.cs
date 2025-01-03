@@ -58,8 +58,23 @@ namespace AnoGame.Application.Event
             {
                 if (component != null)
                 {
-                    _conditions.Add(component.CreateCondition());
+                    var condition = component.CreateCondition();
+                    _conditions.Add(condition);
+                    
+                    // コンディションの状態変化を監視
+                    if (condition is IObservableCondition observableCondition)
+                    {
+                        observableCondition.OnConditionChanged += CheckAndTriggerEvent;
+                    }
                 }
+            }
+        }
+
+        private void CheckAndTriggerEvent()
+        {
+            if (CheckConditions())
+            {
+                StartEvent();
             }
         }
 

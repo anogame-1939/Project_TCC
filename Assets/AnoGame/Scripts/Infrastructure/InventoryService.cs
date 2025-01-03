@@ -10,6 +10,8 @@ namespace AnoGame.Infrastructure.Services
     /// </summary>
     public class InventoryService : IInventoryService
     {
+        public event Action<string> OnItemAdded;
+        public event Action<string> OnItemRemoved;
         private HashSet<string> _itemNames = new();
 
         public void SetItems(HashSet<string> itemNames)
@@ -19,6 +21,18 @@ namespace AnoGame.Infrastructure.Services
         public bool HasItem(string itemName)
         {
             return _itemNames.Contains(itemName);
+        }
+
+        public void NotifyItemAdded(string itemName)
+        {
+            _itemNames.Add(itemName);
+            OnItemAdded?.Invoke(itemName);
+        }
+
+        public void NotifyItemRemoved(string itemName)
+        {
+            _itemNames.Remove(itemName);
+            OnItemRemoved?.Invoke(itemName);
         }
     }
 }
