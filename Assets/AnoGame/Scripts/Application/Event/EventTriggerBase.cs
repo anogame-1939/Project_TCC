@@ -15,6 +15,7 @@ namespace AnoGame.Application.Event
         [SerializeField] protected EventData eventData;
         public EventData EventData => eventData;
         private IEventSettings EventSettings => eventData;
+        [SerializeField] protected UnityEvent onPrepareEvent;
         [SerializeField] protected UnityEvent onEventStart;
         // クリアしてすぐのイベント
         [SerializeField] protected UnityEvent onEventFinish;
@@ -64,20 +65,23 @@ namespace AnoGame.Application.Event
                     // コンディションの状態変化を監視
                     if (condition is IObservableCondition observableCondition)
                     {
-                        observableCondition.OnConditionChanged += CheckAndTriggerEvent;
+                        observableCondition.OnConditionChanged += PrepareEvent;
                     }
                 }
             }
 
             // 初期化のタイミングでチェック
-            CheckAndTriggerEvent();
+            PrepareEvent();
         }
 
-        private void CheckAndTriggerEvent()
+        /// <summary>
+        /// TODO:未使用。どういう扱いにするのか後で考える。当初はアイテム持ってたらトリガーオブジェクトを有効にするとか考えてた。
+        /// </summary>
+        private void PrepareEvent()
         {
             if (CheckConditions())
             {
-                StartEvent();
+                onPrepareEvent?.Invoke();
             }
         }
 
@@ -95,7 +99,7 @@ namespace AnoGame.Application.Event
             {
                 if (condition is IObservableCondition observableCondition)
                 {
-                    observableCondition.OnConditionChanged -= CheckAndTriggerEvent;
+                    observableCondition.OnConditionChanged -= PrepareEvent;
                 }
             }
         }
