@@ -1,10 +1,8 @@
 using VContainer;
 using UnityEngine;
 using AnoGame.Data;
-using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Event;
-using AnoGame.Domain.Event;
 
 namespace AnoGame
 {
@@ -22,6 +20,22 @@ namespace AnoGame
 
 
         [SerializeField] private EventTriggerBase relatedEventTrigger;
+
+        [Inject] private IInventoryService _inventoryService;
+        [Inject]
+        public void Construct(IInventoryService inventoryService)
+        {
+            _inventoryService = inventoryService;
+        }
+
+        void Start()
+        {
+            // 既に持ってたら非表示
+            if (_inventoryService.HasItem(itemData.ItemName))
+            {
+                gameObject.SetActive(false);
+            }
+        }
         
         public string GetIdentifier()
         {
