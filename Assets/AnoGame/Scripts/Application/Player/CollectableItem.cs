@@ -3,6 +3,7 @@ using UnityEngine;
 using AnoGame.Data;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Event;
+using AnoGame.Application;
 
 namespace AnoGame
 {
