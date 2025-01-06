@@ -31,10 +31,11 @@ namespace AnoGame.Application
             InitializeGameData().Forget();
         }
 
-        private async UniTaskVoid InitializeGameData()
+        public async UniTask InitializeGameData()
         {
             try
             {
+                Debug.Log("InitializeGameData");
                 GameData loadedData = await _repository.LoadDataAsync();
 
                 if (loadedData != null)
@@ -47,6 +48,8 @@ namespace AnoGame.Application
                     _currentGameData = CreateNewGameData();
                     Debug.Log("Created new game data");
                 }
+
+                Debug.Log($"InitializeGameData:{_currentGameData}");
 
                 LoadGameData?.Invoke(_currentGameData);
             }
@@ -80,6 +83,12 @@ namespace AnoGame.Application
                 position: playerPosition,
                 eventHistory: new EventHistory() // 新しい空のイベント履歴を作成
             );
+        }
+
+
+        public async UniTask ReloadDataAsync()
+        {
+            await InitializeGameData();
         }
 
         /// <summary>

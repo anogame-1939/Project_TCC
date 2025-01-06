@@ -159,7 +159,19 @@ MonoBehaviour:
         m_Calls: []
     onDeselect:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 5654877}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     onUse:
       m_PersistentCalls:
         m_Calls: []
@@ -15250,7 +15262,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 833829913}
-  - component: {fileID: 833829915}
   - component: {fileID: 833829914}
   m_Layer: 0
   m_Name: SaveHandler
@@ -15284,18 +15295,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 560a9412b08dc3147b0c6fb8751115b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &833829915
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 833829912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70228ac3223cb484e8da3115bbb12a7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &854508862
@@ -25306,7 +25305,19 @@ MonoBehaviour:
         m_Calls: []
     onDeselect:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1453697596}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     onUse:
       m_PersistentCalls:
         m_Calls: []
@@ -30301,7 +30312,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1453697600}
-  - {fileID: 1849428103}
   m_Father: {fileID: 2083602256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1633008396
@@ -40386,7 +40396,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1633008395}
+  m_Father: {fileID: 2083602256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1969251997
 GameObject:
@@ -40450,6 +40460,7 @@ Transform:
   m_Children:
   - {fileID: 1723975891}
   - {fileID: 1633008395}
+  - {fileID: 1849428103}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807

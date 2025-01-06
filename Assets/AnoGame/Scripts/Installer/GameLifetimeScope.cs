@@ -52,6 +52,8 @@ namespace AnoGame.Application.Core
             // builder.Register<GameManager2>(Lifetime.Singleton);
 
             builder.RegisterComponentInHierarchy<GameManager2>();
+            builder.RegisterComponentInHierarchy<GameOverManager>();
+
             builder.RegisterComponentInHierarchy<EnemySpawnManager>();
 
             builder.RegisterEntryPoint<LevelInitializer>();

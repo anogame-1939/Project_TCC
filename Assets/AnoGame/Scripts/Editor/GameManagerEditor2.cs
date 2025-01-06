@@ -247,7 +247,7 @@ namespace AnoGame.Editor
             {
                 var jsonManager = new AsyncJsonDataManager();
                 currentGameData = await jsonManager.LoadDataAsync<GameData>(SAVE_FILE_NAME);
-                gameManager.ReloadData();
+                // gameManager.ReloadData();
                 Repaint();
             }
         }
