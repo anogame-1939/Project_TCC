@@ -20372,33 +20372,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2083602253}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
   onEventDone:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2083602253}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   onEventFailed:
     m_PersistentCalls:
       m_Calls:
@@ -25290,11 +25266,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1292063217 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
-  m_PrefabInstance: {fileID: 1804489848}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1453697596
 GameObject:
   m_ObjectHideFlags: 0
@@ -30361,19 +30332,7 @@ MonoBehaviour:
   eventData: {fileID: 11400000, guid: b690ee1e66a9648a788615f8c197b85c, type: 2}
   onPrepareEvent:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1292063217}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   onEventStart:
     m_PersistentCalls:
       m_Calls:
@@ -40369,6 +40328,14 @@ PrefabInstance:
       propertyPath: relatedEventTrigger
       value: 
       objectReference: {fileID: 1633008397}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: _relativeEvents.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: '_relativeEvents.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cf96049929a1546d5a937b687f34dde7, type: 2}
     - target: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: m_Name
       value: ItemObject-Note

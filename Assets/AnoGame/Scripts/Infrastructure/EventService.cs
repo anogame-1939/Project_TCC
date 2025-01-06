@@ -100,6 +100,7 @@ namespace AnoGame.Infrastructure.Services
 
         public void TriggerEventComplete(string eventID)
         {
+            _clearedEvents.Add(eventID);
             if (_cpmpleteEventHandlers.TryGetValue(eventID, out var handlers))
             {
                 foreach (var handler in handlers.ToList()) // ToList()で反復中の変更を防ぐ

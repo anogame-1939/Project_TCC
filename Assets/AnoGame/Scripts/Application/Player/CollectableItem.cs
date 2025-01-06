@@ -3,7 +3,7 @@ using UnityEngine;
 using AnoGame.Data;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Event;
-using AnoGame.Application;
+using AnoGame.Domain.Event.Services;
 
 namespace AnoGame
 {
@@ -11,6 +11,7 @@ namespace AnoGame
     public class CollectableItem : MonoBehaviour
     {
         [SerializeField] private ItemData itemData;
+        [SerializeField] private EventData[] _relativeEvents;
         [SerializeField] private int quantity = 1;
         [SerializeField] private string uniqueId;
         private ItemData _previousItemData;
@@ -23,18 +24,63 @@ namespace AnoGame
         [SerializeField] private EventTriggerBase relatedEventTrigger;
 
         [Inject] private IInventoryService _inventoryService;
+        [Inject] private IEventService _eventService;
         [Inject]
-        public void Construct(IInventoryService inventoryService)
+        public void Construct(
+            IInventoryService inventoryService,
+            IEventService eventService
+        )
         {
             _inventoryService = inventoryService;
+            _eventService = eventService;
+        }
+
+        private bool HasItem()
+        {
+            return _inventoryService.HasItem(itemData.ItemName);
+        }
+
+        private bool IsEventCleared()
+        {
+            foreach (var eventData in _relativeEvents)
+            {
+                if (!_eventService.IsEventCleared(eventData.EventId))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         void Start()
         {
-            // 既に持ってたら非表示
-            if (_inventoryService.HasItem(itemData.ItemName))
+            // アイテムを持っているか
+            if (HasItem())
             {
                 gameObject.SetActive(false);
+                return;
+            }
+
+            // 関連イベントが未クリアの場合、それぞれのイベントがクリアされるたびにステータスを更新
+            if (!IsEventCleared())
+            {
+                gameObject.SetActive(false);
+
+                foreach (var eventData in _relativeEvents)
+                {
+                    if (!_eventService.IsEventCleared(eventData.EventId))
+                    {
+                        _eventService.RegisterCompleteEventHandler(eventData.EventId, UpdateState);
+                    }
+                }
+            }
+        }
+
+        private void UpdateState()
+        {
+            if (IsEventCleared())
+            {
+                gameObject.SetActive(true);
             }
         }
         
