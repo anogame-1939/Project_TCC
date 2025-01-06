@@ -7,6 +7,7 @@ using AnoGame.Application.Story;
 using AnoGame.Application.Enemy;
 using AnoGame.Domain.Data.Models;
 using AnoGame.Infrastructure.Persistence;
+using Cysharp.Threading.Tasks;
 
 namespace AnoGame.Editor
 {
@@ -33,7 +34,7 @@ namespace AnoGame.Editor
         private void OnEnable()
         {
             storyManager = FindFirstObjectByType<StoryManager>();
-            LoadCurrentGameData();
+            // LoadCurrentGameData();
         }
 
         public override void OnInspectorGUI()
@@ -240,27 +241,24 @@ namespace AnoGame.Editor
         }
 
 
-        private async void LoadCurrentGameData()
+        private void LoadCurrentGameData()
         {
-            var gameManager = target as GameManager2;
+            var gameManager = GameManager2.Instance;
             if (gameManager != null)
             {
-                var jsonManager = new AsyncJsonDataManager();
-                currentGameData = await jsonManager.LoadDataAsync<GameData>(SAVE_FILE_NAME);
-                // gameManager.ReloadData();
+                currentGameData = gameManager.CurrentGameData;
                 Repaint();
             }
         }
 
         private async void ResetSaveData()
         {
-            var gameManager = target as GameManager2;
+            var gameManager = GameManager2.Instance;
             if (gameManager != null)
             {
-                var jsonManager = new AsyncJsonDataManager();
-                await jsonManager.SaveDataAsync(SAVE_FILE_NAME, (GameData)null);
-                currentGameData = null;
-                gameManager.ReloadData();
+                gameManager.ResetDataAsync();
+                await gameManager.SaveCurrentGameState();
+                currentGameData = gameManager.CurrentGameData;
                 Repaint();
             }
         }

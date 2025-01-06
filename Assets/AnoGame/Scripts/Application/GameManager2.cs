@@ -31,7 +31,7 @@ namespace AnoGame.Application
             InitializeGameData().Forget();
         }
 
-        public async UniTask InitializeGameData()
+        private async UniTask InitializeGameData()
         {
             try
             {
@@ -95,9 +95,10 @@ namespace AnoGame.Application
         /// データを再読み込み
         /// 主にゲームオーバー時に使用
         /// </summary>
-        public void ReloadData()
+        public void ResetDataAsync()
         {
-            InitializeGameData().Forget();
+            _currentGameData = CreateNewGameData();
+            LoadGameData?.Invoke(_currentGameData);
         }
 
         public void UpdateGameState(GameData newGameData)
