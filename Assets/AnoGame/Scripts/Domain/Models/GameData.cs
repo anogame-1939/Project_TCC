@@ -41,6 +41,11 @@ namespace AnoGame.Domain.Data.Models
             EventHistory = eventHistory;
         }
 
+        public void UpdateStoryProgress(StoryProgress storyProgress)
+        {
+            StoryProgress = storyProgress;
+        }
+
         public void UpdatePosition(Position3D position, Rotation3D rotation, string mapId, string areaId)
         {
             PlayerPosition = PlayerPosition.UpdatePosition(position, rotation, mapId, areaId);
@@ -148,11 +153,10 @@ namespace AnoGame.Domain.Data.Models
         public int CurrentChapterIndex { get; private set; }
         public int CurrentSceneIndex { get; private set; }
 
-        public StoryProgress(int storyIndex, int chapterIndex, int sceneIndex)
+        public StoryProgress(int storyIndex, int chapterIndex)
         {
             CurrentStoryIndex = storyIndex;
             CurrentChapterIndex = chapterIndex;
-            CurrentSceneIndex = sceneIndex;
         }
 
         public void AdvanceScene()

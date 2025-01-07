@@ -110,9 +110,9 @@ namespace AnoGame.Application.Story.Manager
                 currentGameData.storyProgress = new StoryProgress();
             }
 
-            currentGameData.storyProgress.currentStoryIndex = progress.currentStoryIndex;
-            currentGameData.storyProgress.currentChapterIndex = progress.currentChapterIndex;
-            currentGameData.storyProgress.currentSceneIndex = progress.currentSceneIndex;
+            currentGameData.storyProgress.currentStoryIndex = progress.CurrentStoryIndex;
+            currentGameData.storyProgress.currentChapterIndex = progress.CurrentChapterIndex;
+            // currentGameData.storyProgress.currentSceneIndex = progress.CurrentSceneIndex;
 
             // ここで位置情報を取得して保存
             if (currentGameData.playerPosition == null)

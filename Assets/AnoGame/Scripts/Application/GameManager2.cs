@@ -78,7 +78,7 @@ namespace AnoGame.Application
             return new GameData(
                 score: 0,
                 playerName: "Player1",
-                storyProgress: new StoryProgress(0, 0, 0),
+                storyProgress: new StoryProgress(0, 0),
                 inventory: new AnoGame.Domain.Data.Models.Inventory(), // 新しい空のインベントリを作成
                 position: playerPosition,
                 eventHistory: new EventHistory() // 新しい空のイベント履歴を作成

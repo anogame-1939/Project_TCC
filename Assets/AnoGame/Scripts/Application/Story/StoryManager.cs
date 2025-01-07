@@ -3,9 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-using AnoGame.Data;
 using AnoGame.Application.Core;
 using AnoGame.Application.Data;
+using AnoGame.Domain.Data.Models;
 
 namespace AnoGame.Application.Story
 {
@@ -18,6 +18,7 @@ namespace AnoGame.Application.Story
 
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
+        private int _currentChapterIndex = 0;
         private List<Scene> _loadedStoryScenes = new List<Scene>();
         private Scene _mainScene;
         private bool _isLoadingScene = false;
@@ -25,45 +26,37 @@ namespace AnoGame.Application.Story
         private void Awake()
         {
             _mainScene = SceneManager.GetActiveScene();
-            GameManager.Instance.LoadGameData += OnLoadGameData;
+            GameManager2.Instance.LoadGameData += OnLoadGameData;
         }
 
         private void OnDestroy()
         {
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.LoadGameData -= OnLoadGameData;
+                GameManager2.Instance.LoadGameData -= OnLoadGameData;
             }
         }
 
         private void OnLoadGameData(GameData gameData)
         {
-            if (gameData == null || gameData.storyProgress == null) return;
+            if (gameData == null || gameData.StoryProgress == null) return;
 
-            _currentStoryIndex = gameData.storyProgress.currentStoryIndex;
+            _currentStoryIndex = gameData.StoryProgress.CurrentStoryIndex;
             if (_currentStoryIndex < _storyDataList.Count)
             {
                 StoryData currentStory = _storyDataList[_currentStoryIndex];
-                currentStory.currentChapterIndex = gameData.storyProgress.currentChapterIndex;
-                currentStory.currentSceneIndex = gameData.storyProgress.currentSceneIndex;
+                currentStory.currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
+                currentStory.currentSceneIndex = gameData.StoryProgress.CurrentChapterIndex;
                 LoadCurrentScene();
             }
         }
 
         public void UpdateGameData()
         {
-            GameData gameData = GameManager.Instance.CurrentGameData;
-            if (gameData.storyProgress == null)
+            GameData gameData = GameManager2.Instance.CurrentGameData;
+            if (gameData.StoryProgress == null)
             {
-                gameData.storyProgress = new StoryProgress();
-            }
-
-            gameData.storyProgress.currentStoryIndex = _currentStoryIndex;
-            if (_currentStoryIndex < _storyDataList.Count)
-            {
-                StoryData currentStory = _storyDataList[_currentStoryIndex];
-                gameData.storyProgress.currentChapterIndex = currentStory.currentChapterIndex;
-                gameData.storyProgress.currentSceneIndex = currentStory.currentSceneIndex;
+                gameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
             }
         }
 
@@ -97,6 +90,7 @@ namespace AnoGame.Application.Story
 
         public void LoadChapter(int chapterIndex, bool useRetryPoint = false)
         {
+            _currentChapterIndex = chapterIndex;
             StoryData currentStory = _storyDataList[_currentStoryIndex];
             if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
             {
@@ -336,11 +330,10 @@ namespace AnoGame.Application.Story
         public StoryProgress GetCurrentProgress()
         {
             return new StoryProgress
-            {
-                currentStoryIndex = _currentStoryIndex,
-                currentChapterIndex = _storyDataList[_currentStoryIndex].currentChapterIndex,
-                currentSceneIndex = _storyDataList[_currentStoryIndex].currentSceneIndex
-            };
+            (
+                _currentStoryIndex,
+                _storyDataList[_currentStoryIndex].currentChapterIndex
+            );
         }
 
         public List<StoryData> GetStoryList()
