@@ -74,6 +74,12 @@ namespace AnoGame.Editor
                         LoadCurrentGameData();
                     }
 
+                    if (GUILayout.Button("Save Data"))
+                    {
+                        // 保存
+                        GameManager2.Instance.SaveData();
+                    }
+
                     DrawCurrentGameData();
                 }
 
@@ -113,13 +119,13 @@ namespace AnoGame.Editor
                                 {
                                     StartFromChapter(storyIndex, chapterIndex, false);
                                     PlayerSpawnManager.Instance.OnChapterLoaded(false);
-                                    EnemySpawnManager.Instance.OnChapterLoaded(false);
+                                    // EnemySpawnManager.Instance.OnChapterLoaded(false);
+                                    
                                 }
                                 if (GUILayout.Button("Retry Point", GUILayout.Width(100)))
                                 {
                                     StartFromChapter(storyIndex, chapterIndex, true);
                                     PlayerSpawnManager.Instance.OnChapterLoaded(true);
-                                    EnemySpawnManager.Instance.OnChapterLoaded(true);
                                 }
 
                                 EditorGUILayout.EndHorizontal();

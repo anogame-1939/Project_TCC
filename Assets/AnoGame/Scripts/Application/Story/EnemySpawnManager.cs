@@ -4,6 +4,12 @@ using VContainer;
 using AnoGame.Application.Core;
 using AnoGame.Application.Event;
 using AnoGame.Domain.Event.Services;
+using UnityEngine.SceneManagement;
+using AnoGame.Application.Story;
+
+
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -88,12 +94,12 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        public void SpawnEnemyAtStart()
+        public void SpawnEnemyAtStart(bool isPermanent = false)
         {
             var startPoint = GetStartPoint();
             if (startPoint == null) return;
 
-            SpawnEnemyAt(startPoint.position, startPoint.rotation);
+            SpawnEnemyAt(startPoint.position, startPoint.rotation, isPermanent);
             // EnabaleEnamy();
         }
 
@@ -112,7 +118,7 @@ namespace AnoGame.Application.Enemy
             // EnabaleEnamy();
         }
 
-        private void SpawnEnemyAt(Vector3 position, Quaternion rotation)
+        private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
             if (enemyPrefab == null)
             {
@@ -131,8 +137,20 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance = Instantiate(enemyPrefab, position, rotation);
             // container.InjectGameObject(_currentEnemyInstance);
 
+            // 明示的にメインシーンにスポーンさせる
+            var targetScene = StoryManager.Instance.MainScene;
+            SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
+
             // EnemyControllerの参照を保持
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+            if (isPermanent)
+            {
+                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = false;
+            }
+            else
+            {
+                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = true;
+            }
             
             if (_currentEnemyController == null)
             {

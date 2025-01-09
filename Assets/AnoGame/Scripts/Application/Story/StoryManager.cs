@@ -21,6 +21,7 @@ namespace AnoGame.Application.Story
         private int _currentChapterIndex = 0;
         private List<Scene> _loadedStoryScenes = new List<Scene>();
         private Scene _mainScene;
+        public Scene MainScene => _mainScene;
         private bool _isLoadingScene = false;
 
         private void Awake()
@@ -280,6 +281,8 @@ namespace AnoGame.Application.Story
 
             // シーンのロードを一度だけ実行
             LoadCurrentScene(useRetryPoint);
+
+            ChapterLoaded?.Invoke(useRetryPoint);
         }
 
         // 既存のパブリックメソッドをprivateに変更

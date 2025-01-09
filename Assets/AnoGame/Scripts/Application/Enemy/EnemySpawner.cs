@@ -8,6 +8,11 @@ namespace AnoGame.Application.Enemy
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField]
+        bool audoStart = false;
+        [SerializeField]
+        bool isPermanent = false;
+
+        [SerializeField]
         EventData _eventaData;
 
         public void SetEventData(EventData eventData)
@@ -26,6 +31,14 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+        private void Start()
+        {
+            if (audoStart)
+            {
+                TriggerEnemySpawn();
+            }
+        }
+
         /// <summary>
         /// エネミーのスタートポイントに出現させる
         /// </summary>
@@ -33,7 +46,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyAtStart();
+                _spawnManager.SpawnEnemyAtStart(isPermanent);
             }
             else
             {
