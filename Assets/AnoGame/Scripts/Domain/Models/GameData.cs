@@ -149,8 +149,13 @@ namespace AnoGame.Domain.Data.Models
     [Serializable]
     public class StoryProgress
     {
+        [JsonProperty]
         public int CurrentStoryIndex { get; private set; }
+        
+        [JsonProperty]
         public int CurrentChapterIndex { get; private set; }
+        
+        [JsonProperty]
         public int CurrentSceneIndex { get; private set; }
 
         public StoryProgress(int storyIndex, int chapterIndex)

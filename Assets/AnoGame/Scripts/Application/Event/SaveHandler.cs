@@ -18,6 +18,8 @@ namespace AnoGame.Application.Event
         {
             GameManager2.Instance.SaveData();
 
+            Debug.Log("保存");
+
         }
     }
 }

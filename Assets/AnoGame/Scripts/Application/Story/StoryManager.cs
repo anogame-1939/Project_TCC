@@ -31,7 +31,7 @@ namespace AnoGame.Application.Story
 
         private void OnDestroy()
         {
-            if (GameManager.Instance != null)
+            if (GameManager2.Instance != null)
             {
                 GameManager2.Instance.LoadGameData -= OnLoadGameData;
             }
@@ -42,13 +42,10 @@ namespace AnoGame.Application.Story
             if (gameData == null || gameData.StoryProgress == null) return;
 
             _currentStoryIndex = gameData.StoryProgress.CurrentStoryIndex;
-            if (_currentStoryIndex < _storyDataList.Count)
-            {
-                StoryData currentStory = _storyDataList[_currentStoryIndex];
-                currentStory.currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
-                currentStory.currentSceneIndex = gameData.StoryProgress.CurrentChapterIndex;
-                LoadCurrentScene();
-            }
+
+            _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
+
+            LoadCurrentScene();
         }
 
         public void UpdateGameData()
@@ -156,7 +153,7 @@ namespace AnoGame.Application.Story
         private IEnumerator LoadNewSceneCoroutine()
         {
             StoryData currentStory = _storyDataList[_currentStoryIndex];
-            StoryData.SceneData currentScene = currentStory.GetCurrentScene();
+            StoryData.SceneData currentScene = currentStory.chapters[_currentChapterIndex].scenes[0];
             
             if (currentScene == null)
             {
@@ -277,23 +274,9 @@ namespace AnoGame.Application.Story
 
         public void SwitchToChapterInStory(int storyIndex, int chapterIndex, bool useRetryPoint = false)
         {
-            if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
-            {
-                Debug.LogError($"Invalid story index: {storyIndex}");
-                return;
-            }
-
-            StoryData targetStory = _storyDataList[storyIndex];
-            if (chapterIndex < 0 || chapterIndex >= targetStory.chapters.Count)
-            {
-                Debug.LogError($"Invalid chapter index: {chapterIndex}");
-                return;
-            }
-
             // ストーリーとチャプターの状態を更新
             _currentStoryIndex = storyIndex;
-            targetStory.currentChapterIndex = chapterIndex;
-            targetStory.currentSceneIndex = 0;
+            _currentChapterIndex = chapterIndex;
 
             // シーンのロードを一度だけ実行
             LoadCurrentScene(useRetryPoint);

@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using AnoGame.Application.Core;
 using AnoGame.Domain.Data.Services;

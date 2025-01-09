@@ -1,18 +1,19 @@
 using UnityEngine;
 using AnoGame.Application.Core;
-using AnoGame.Data;
+using AnoGame.Domain.Data.Models;
+using AnoGame.Application.Utils;
 using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Application.Story.Manager
 {
     public class StoryStateManager : SingletonMonoBehaviour<StoryStateManager>
     {
-        private GameManager _gameManager;
+        private GameManager2 _gameManager;
         private StoryManager _storyManager;
         
         private void Awake()
         {
-            _gameManager = GameManager.Instance;
+            _gameManager = GameManager2.Instance;
             _storyManager = StoryManager.Instance;
             
             // StoryManagerのチャプターロードイベントを購読
@@ -44,15 +45,10 @@ namespace AnoGame.Application.Story.Manager
 
             if (useRetryPoint)
             {
-                var gameData = GameManager.Instance.CurrentGameData;
-                var playerPosition = gameData.playerPosition;
+                var gameData = GameManager2.Instance.CurrentGameData;
+                var playerPosition = gameData.PlayerPosition;
                 if (playerPosition != null)
                 {
-                    if (playerPosition.IsPositionValid)
-                    {
-                        // いらない？？
-                        // SpawnPlayer(playerPosition);
-                    }
                 }
             }
             else
@@ -77,24 +73,21 @@ namespace AnoGame.Application.Story.Manager
             // StoryManagerの進行状況を更新
             _storyManager.UpdateGameData();
 
-            var playerPosition = gameData.playerPosition;
+            var playerPosition = gameData.PlayerPosition;
             if (playerPosition != null)
             {
-                if (playerPosition.IsPositionValid)
-                {
-                    SpawnPlayer(playerPosition);
-                }
+                SpawnPlayer(playerPosition);
             }
         }
 
-        private void SpawnPlayer(PlayerPositionData playerPosition)
+        private void SpawnPlayer(PlayerPosition playerPosition)
         {
             // プレイヤーを前回終了位置に配置
-            var player = GameObject.FindGameObjectWithTag(SLFBRules.TAG_PLAYER);
+            var player = GameObject.FindGameObjectWithTag(AnoGame.Data.SLFBRules.TAG_PLAYER);
             if (player != null)
             {
                 var brain = player.GetComponent<CharacterBrain>();
-                brain.Warp(playerPosition.position.ToVector3(), playerPosition.rotation.ToQuaternion());
+                brain.Warp(playerPosition.Position.ToVector3(), playerPosition.Rotation.ToQuaternion());
             }
         }
 
@@ -105,30 +98,26 @@ namespace AnoGame.Application.Story.Manager
 
             // 現在のストーリー進行状況を取得してGameDataに反映
             var progress = _storyManager.GetCurrentProgress();
-            if (currentGameData.storyProgress == null)
-            {
-                currentGameData.storyProgress = new StoryProgress();
-            }
+            currentGameData.UpdateStoryProgress(new StoryProgress(progress.CurrentStoryIndex, progress.CurrentChapterIndex));
+            Debug.Log($"ストーリー進捗状況を保存:{currentGameData.StoryProgress.CurrentStoryIndex}, {currentGameData.StoryProgress.CurrentChapterIndex}");
 
-            currentGameData.storyProgress.currentStoryIndex = progress.CurrentStoryIndex;
-            currentGameData.storyProgress.currentChapterIndex = progress.CurrentChapterIndex;
-            // currentGameData.storyProgress.currentSceneIndex = progress.CurrentSceneIndex;
-
+            var player = GameObject.FindGameObjectWithTag(AnoGame.Data.SLFBRules.TAG_PLAYER);
             // ここで位置情報を取得して保存
-            if (currentGameData.playerPosition == null)
+            if (currentGameData.PlayerPosition == null)
             {
-                currentGameData.playerPosition = new PlayerPositionData();
+                
+                Position3D position = new Position3D(player.transform.position.x, player.transform.position.y, player.transform.position.z);
+                Rotation3D rotation = new Rotation3D(player.transform.rotation.x, player.transform.rotation.y, player.transform.rotation.z, player.transform.rotation.w);
+                currentGameData.UpdatePosition(position, rotation, "", "");
             }
 
-            var player = GameObject.FindGameObjectWithTag(SLFBRules.TAG_PLAYER);
-            if (player != null)
-            {
-                currentGameData.playerPosition.position = new Vector3SerializableData(player.transform.position);
-                currentGameData.playerPosition.rotation = new QuaternionSerializableData(player.transform.rotation);
-            }
+            Debug.Log($"位置情報を保存:{currentGameData.PlayerPosition.Position.X}, {currentGameData.PlayerPosition.Position.Y}, {currentGameData.PlayerPosition.Position.Z}");
 
             // GameManagerに更新を通知
             _gameManager.UpdateGameState(currentGameData);
+
+            // 保存
+            GameManager2.Instance.SaveData();
         }
 
         private async void CreateSavePoint()
