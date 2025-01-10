@@ -55,7 +55,11 @@ namespace AnoGame.Application.Enemy
             NavMeshHit hit;
             if (NavMesh.SamplePosition(spawnPosition, out hit, spawnDistance, NavMesh.AllAreas))
             {
-                transform.position = hit.position;
+                // transform.position = hit.position;
+                Instantiate(new GameObject("hit.position"), hit.position, new Quaternion());
+                Instantiate(new GameObject("spawnPosition"), spawnPosition, new Quaternion());
+
+                _characterBrain.Warp(hit.position, randomDirection);
                 StartMoving(); // スポーン後に動き出す
             }
             else

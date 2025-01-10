@@ -63,6 +63,7 @@ namespace AnoGame.Application.Enemy
 
             // 新しい敵をスポーン
             _currentEnemyInstance = Instantiate(enemyPrefab);
+            _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
             // container.InjectGameObject(_currentEnemyInstance);
 
             // 明示的にメインシーンにスポーンさせる
@@ -197,19 +198,9 @@ namespace AnoGame.Application.Enemy
 
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)
         {
-            // 既存の敵を破棄
-            if (_currentEnemyInstance != null)
-            {
-                Destroy(_currentEnemyInstance);
-                _currentEnemyController = null;
-            }
-
-            // 新しい敵をスポーン
-            _currentEnemyInstance = Instantiate(enemyPrefab);
-
-
             if (_currentEnemyController != null)
             {
+                EnabaleEnamy();
                 _currentEnemyController.SpawnNearPlayer(playerPosition);
             }
         }

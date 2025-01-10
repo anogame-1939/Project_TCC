@@ -42,6 +42,7 @@ namespace AnoGame.Application.Enemy
 
                 Debug.Log($"出たぁ！！:{waitTime}");
                 SpawnNearPlayer();
+                StartEnemyMovement();
 
                 Debug.Log("逃走中…");
 
