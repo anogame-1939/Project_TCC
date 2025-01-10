@@ -166,6 +166,7 @@ namespace AnoGame.Application.Inventory
 
         private void OnDestroy()
         {
+            Debug.Log("キャッシュのクリーンアップ");
             if (nextPageButton != null) nextPageButton.onClick.RemoveListener(NextPage);
             if (prevPageButton != null) prevPageButton.onClick.RemoveListener(PreviousPage);
 

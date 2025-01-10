@@ -29,10 +29,6 @@ namespace AnoGame.Application.Core
         {
             UnityEngine.Debug.Log("LevelInitializer.Start()");
 
-            var itemNames2 = _gameManager.CurrentGameData.Inventory.Items
-                            .Select(x => x.ItemName)
-                            .ToList();
-            
             if (_gameManager.CurrentGameData.EventHistory != null)
             {
                 _eventService.SetCleadEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());

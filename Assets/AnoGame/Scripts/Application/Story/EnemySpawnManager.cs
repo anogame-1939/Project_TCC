@@ -66,7 +66,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
             // container.InjectGameObject(_currentEnemyInstance);
 
-            // 明示的にメインシーンにスポーンさせる
+            // 明示的にメインシーンに配置する
             var targetScene = StoryManager.Instance.MainScene;
             SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
 
