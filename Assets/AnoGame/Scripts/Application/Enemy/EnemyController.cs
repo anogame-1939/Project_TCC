@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.AI;
-using TinyCharacterController;
 using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Application.Enemy

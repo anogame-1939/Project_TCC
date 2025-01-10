@@ -7,10 +7,6 @@ using AnoGame.Domain.Event.Services;
 using UnityEngine.SceneManagement;
 using AnoGame.Application.Story;
 
-
-
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -35,12 +31,13 @@ namespace AnoGame.Application.Enemy
 
         [SerializeField] private GameObject enemyPrefab;
         private GameObject _currentEnemyInstance;
-        private EnemyController _currentEnemyController;  // EnemyControllerへの参照を保持
+        private EnemyController _currentEnemyController;
         
         private const string TAG_START_POINT_ENEMY = "StartPointEnemy";
         private const string TAG_RETRY_POINT_ENEMY = "RetryPointEnemy";
         
         private Transform _currentRetryPoint;
+
 
         private void Start()
         {
@@ -170,6 +167,7 @@ namespace AnoGame.Application.Enemy
         public void EnabaleEnamy()
         {
             _currentEnemyController.EnableBrain();
+
         }
 
         public void DisabaleEnamy()
@@ -203,10 +201,26 @@ namespace AnoGame.Application.Enemy
 
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)
         {
+            // 既存の敵を破棄
+            if (_currentEnemyInstance != null)
+            {
+                Destroy(_currentEnemyInstance);
+                _currentEnemyController = null;
+            }
+
+            // 新しい敵をスポーン
+            _currentEnemyInstance = Instantiate(enemyPrefab);
+
+
             if (_currentEnemyController != null)
             {
                 _currentEnemyController.SpawnNearPlayer(playerPosition);
             }
+        }
+
+        public bool IsAlive()
+        {
+            return _currentEnemyInstance.GetComponent<EnemyLifespan>().IsAlive;
         }
 
         public void SetRetryPoint(Transform point)

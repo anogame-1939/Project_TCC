@@ -1,23 +1,19 @@
 using UnityEngine;
 using System.Collections;
 using AnoGame.Data;
+using System.Data;
 
 namespace AnoGame.Application.Enemy
 {
-    public class EnemySpawner : MonoBehaviour
+    public class EnemyRandomSpawner : MonoBehaviour
     {
+        [SerializeField] 
+        [Min(1f)]  // 最小値を0に制限
+        private float minSpawnTime = 15f;   // 最小生成間隔（秒）
+        
         [SerializeField]
-        bool audoStart = false;
-        [SerializeField]
-        bool isPermanent = false;
-
-        [SerializeField]
-        EventData _eventaData;
-
-        public void SetEventData(EventData eventData)
-        {
-            _eventaData = eventData;
-        }
+        [Min(10f)]  // 最小値を0に制限
+        private float maxSpawnTime = 30f;   // 最大生成間隔（秒）
 
         private EnemySpawnManager _spawnManager;
 
@@ -30,28 +26,46 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        private void Start()
+        public void StartSpawner()
         {
-            if (audoStart)
+            StartCoroutine(StartSpawnerCor());
+        }
+
+        private IEnumerator StartSpawnerCor()
+        {
+            while (true)
             {
-                TriggerEnemySpawn();
+                Debug.Log("来る…？");
+                // minSpawnTimeとmaxSpawnTimeの間でランダムな時間を生成
+                float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
+                yield return new WaitForSeconds(waitTime);
+
+                Debug.Log($"出たぁ！！:{waitTime}");
+                SpawnNearPlayer();
+
+                Debug.Log("逃走中…");
+
+                yield return WaitForEnemyDeath();
+
+                Debug.Log("怪異消滅");
+                
             }
         }
 
-        /// <summary>
-        /// エネミーのスタートポイントに出現させる
-        /// </summary>
-        public void TriggerEnemySpawn()
+        private void SpawnNearPlayer()
         {
-            if (_spawnManager != null)
+            var player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
+            SpawnNear(player.transform.position);
+        }
+
+        private IEnumerator WaitForEnemyDeath()
+        {
+            while (_spawnManager.IsAlive())
             {
-                _spawnManager.SpawnEnemyAtStart(isPermanent);
-            }
-            else
-            {
-                Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
+                yield return new WaitForSeconds(1f);
             }
         }
+
 
         /// <summary>
         /// 指定したGameObjectの位置と回転に敵をスポーンさせる
@@ -88,7 +102,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyAtExactPosition(position, rotation, _eventaData);
+                _spawnManager.SpawnEnemyAtExactPosition(position, rotation);
             }
             else
             {
@@ -166,6 +180,17 @@ namespace AnoGame.Application.Enemy
 
             yield return null;
         }
+
+#if UNITY_EDITOR
+        // エディタ上でmaxSpawnTimeがminSpawnTimeより小さくならないようにする
+        private void OnValidate()
+        {
+            if (maxSpawnTime < minSpawnTime)
+            {
+                maxSpawnTime = minSpawnTime;
+            }
+        }
+#endif
 
     }
 }

@@ -8,6 +8,8 @@ namespace AnoGame.Application.Enemy
     {
         [SerializeField] private float minLifespan = 5f;
         [SerializeField] private float maxLifespan = 30f;
+        [SerializeField] private bool _isAlive = false;
+        [SerializeField] public bool IsAlive => _isAlive;
         [SerializeField] private float fadeOutDuration = 1f;
         [SerializeField] private float particleFadeOutDuration = 0.5f;
         [SerializeField] private ParticleSystem disappearEffect;
@@ -67,6 +69,7 @@ namespace AnoGame.Application.Enemy
         {
             StopDestroyTimer();
             _destroyCoroutine = StartCoroutine(DestroyAfterDelay());
+            _isAlive = true;
         }
 
         // 外部から寿命タイマーを停止
@@ -95,7 +98,8 @@ namespace AnoGame.Application.Enemy
         {
             float delay = Random.Range(minLifespan, maxLifespan);
             yield return new WaitForSeconds(delay);
-            
+
+            _isAlive = false;
             StartCoroutine(FadeOutAndDestroy());
         }
 
