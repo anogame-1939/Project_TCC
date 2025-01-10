@@ -33,7 +33,7 @@ namespace AnoGame.Application.Story.Manager
             
             if (_gameManager != null)
             {
-                _gameManager.SaveGameData -= OnSaveGameData;
+                // _gameManager.SaveGameData -= OnSaveGameData;
                 _gameManager.LoadGameData -= OnLoadGameData;
             }
         }
@@ -56,23 +56,15 @@ namespace AnoGame.Application.Story.Manager
                 // 現在のストーリー進行状況をGameDataに反映
                 
             }
-            UpdateGameDataProgress();
-        }
-
-        private void OnSaveGameData(GameData gameData)
-        {
-            if (_storyManager == null) return;
-            
-            // セーブ時に最新のストーリー進行状況を反映
-            UpdateGameDataProgress();
+            // UpdateGameDataProgress();
         }
 
         private void OnLoadGameData(GameData gameData)
         {
-            if (_storyManager == null) return;
+            // if (_storyManager == null) return;
             
             // StoryManagerの進行状況を更新
-            _storyManager.UpdateGameData();
+            // _storyManager.UpdateGameData();
 
             var playerPosition = gameData.PlayerPosition;
             if (playerPosition != null)
@@ -92,19 +84,13 @@ namespace AnoGame.Application.Story.Manager
             }
         }
 
-        private void UpdateGameDataProgress()
+        public void UpdatePlayerPosition()
         {
             var currentGameData = _gameManager.CurrentGameData;
             if (currentGameData == null) return;
 
-            // 現在のストーリー進行状況を取得してGameDataに反映
-            var progress = _storyManager.GetCurrentProgress();
-            currentGameData.UpdateStoryProgress(new StoryProgress(progress.CurrentStoryIndex, progress.CurrentChapterIndex));
-            Debug.Log($"ストーリー進捗状況を保存:{currentGameData.StoryProgress.CurrentStoryIndex}, {currentGameData.StoryProgress.CurrentChapterIndex}");
-
+            // 位置情報を取得して保存
             var player = GameObject.FindGameObjectWithTag(AnoGame.Data.SLFBRules.TAG_PLAYER);
-
-            // ここで位置情報を取得して保存
             Position3D position = new Position3D(player.transform.position.x, player.transform.position.y, player.transform.position.z);
             Rotation3D rotation = new Rotation3D(player.transform.rotation.x, player.transform.rotation.y, player.transform.rotation.z, player.transform.rotation.w);
             currentGameData.UpdatePosition(position, rotation, "", "");
@@ -113,8 +99,6 @@ namespace AnoGame.Application.Story.Manager
 
             // GameManagerに更新を通知
             _gameManager.UpdateGameState(currentGameData);
-
-
         }
 
         private async void CreateSavePoint()
@@ -126,10 +110,5 @@ namespace AnoGame.Application.Story.Manager
             }
         }
 
-        // 外部からストーリー進行状況の更新を強制するためのメソッド
-        public void ForceUpdateProgress()
-        {
-            UpdateGameDataProgress();
-        }
     }
 }

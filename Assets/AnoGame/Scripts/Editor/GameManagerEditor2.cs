@@ -19,7 +19,7 @@ namespace AnoGame.Editor
         private bool showStartOptions = true;
         private bool showPositionData = true;
         private Vector2 scrollPosition;
-        private GameData currentGameData;
+        private GameData _currentGameData;
         private StoryManager storyManager;
         private const string SAVE_FILE_NAME = "savedata.json";
 
@@ -151,7 +151,7 @@ namespace AnoGame.Editor
 
         private void DrawCurrentGameData()
         {
-            if (currentGameData != null)
+            if (_currentGameData != null)
             {
                 using (var scrollView = new EditorGUILayout.ScrollViewScope(scrollPosition, GUILayout.Height(300)))
                 {
@@ -161,21 +161,21 @@ namespace AnoGame.Editor
                     EditorGUI.indentLevel++;
                     
                     // 基本情報
-                    EditorGUILayout.LabelField($"Player Name: {currentGameData.PlayerName}");
-                    EditorGUILayout.LabelField($"Score: {currentGameData.Score}");
+                    EditorGUILayout.LabelField($"Player Name: {_currentGameData.PlayerName}");
+                    EditorGUILayout.LabelField($"Score: {_currentGameData.Score}");
                     
                     // ストーリー進行状況
-                    if (currentGameData.StoryProgress != null)
+                    if (_currentGameData.StoryProgress != null)
                     {
                         EditorGUILayout.Space(5);
                         EditorGUILayout.LabelField("Story Progress:", EditorStyles.boldLabel);
-                        EditorGUILayout.LabelField($"Story Index: {currentGameData.StoryProgress.CurrentStoryIndex}");
-                        EditorGUILayout.LabelField($"Chapter Index: {currentGameData.StoryProgress.CurrentChapterIndex}");
-                        EditorGUILayout.LabelField($"Scene Index: {currentGameData.StoryProgress.CurrentSceneIndex}");
+                        EditorGUILayout.LabelField($"Story Index: {_currentGameData.StoryProgress.CurrentStoryIndex}");
+                        EditorGUILayout.LabelField($"Chapter Index: {_currentGameData.StoryProgress.CurrentChapterIndex}");
+                        EditorGUILayout.LabelField($"Scene Index: {_currentGameData.StoryProgress.CurrentSceneIndex}");
                     }
 
                     // 位置情報
-                    if (currentGameData.PlayerPosition != null)
+                    if (_currentGameData.PlayerPosition != null)
                     {
                         EditorGUILayout.Space(5);
                         showPositionData = EditorGUILayout.Foldout(showPositionData, "Position Data", true);
@@ -183,26 +183,26 @@ namespace AnoGame.Editor
                         {
                             EditorGUI.indentLevel++;
 
-                            var position = currentGameData.PlayerPosition.Position.ToVector3();
+                            var position = _currentGameData.PlayerPosition.Position.ToVector3();
                             EditorGUILayout.Vector3Field("Current Position", position);
 
-                            var rotation = currentGameData.PlayerPosition.Rotation;
+                            var rotation = _currentGameData.PlayerPosition.Rotation;
                             EditorGUILayout.Vector4Field("Current Rotation", 
                                 new Vector4(rotation.X, rotation.Y, rotation.Z, rotation.W));
 
-                            EditorGUILayout.LabelField($"Current Map ID: {currentGameData.PlayerPosition.CurrentMapId}");
-                            EditorGUILayout.LabelField($"Current Area ID: {currentGameData.PlayerPosition.CurrentAreaId}");
+                            EditorGUILayout.LabelField($"Current Map ID: {_currentGameData.PlayerPosition.CurrentMapId}");
+                            EditorGUILayout.LabelField($"Current Area ID: {_currentGameData.PlayerPosition.CurrentAreaId}");
 
-                            if (currentGameData.PlayerPosition.LastCheckpointPosition.HasValue)
+                            if (_currentGameData.PlayerPosition.LastCheckpointPosition.HasValue)
                             {
                                 EditorGUILayout.Vector3Field("Last Checkpoint Position", 
-                                    currentGameData.PlayerPosition.LastCheckpointPosition.Value.ToVector3());
+                                    _currentGameData.PlayerPosition.LastCheckpointPosition.Value.ToVector3());
                             }
 
-                            if (currentGameData.PlayerPosition.RespawnPosition.HasValue)
+                            if (_currentGameData.PlayerPosition.RespawnPosition.HasValue)
                             {
                                 EditorGUILayout.Vector3Field("Respawn Position", 
-                                    currentGameData.PlayerPosition.RespawnPosition.Value.ToVector3());
+                                    _currentGameData.PlayerPosition.RespawnPosition.Value.ToVector3());
                             }
 
                             EditorGUI.indentLevel--;
@@ -210,11 +210,11 @@ namespace AnoGame.Editor
                     }
 
                     // インベントリ情報
-                    if (currentGameData.Inventory != null && currentGameData.Inventory.Items.Any())
+                    if (_currentGameData.Inventory != null && _currentGameData.Inventory.Items.Any())
                     {
                         EditorGUILayout.Space(5);
                         EditorGUILayout.LabelField("Inventory:", EditorStyles.boldLabel);
-                        foreach (var item in currentGameData.Inventory.Items)
+                        foreach (var item in _currentGameData.Inventory.Items)
                         {
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField($"- {item.ItemName} x{item.Quantity}");
@@ -227,11 +227,11 @@ namespace AnoGame.Editor
                     }
 
                     // クリア済みイベント情報
-                    if (currentGameData.EventHistory != null && currentGameData.EventHistory.ClearedEvents.Any())
+                    if (_currentGameData.EventHistory != null && _currentGameData.EventHistory.ClearedEvents.Any())
                     {
                         EditorGUILayout.Space(5);
                         EditorGUILayout.LabelField("Cleared Events:", EditorStyles.boldLabel);
-                        foreach (var eventId in currentGameData.EventHistory.ClearedEvents)
+                        foreach (var eventId in _currentGameData.EventHistory.ClearedEvents)
                         {
                             EditorGUILayout.LabelField($"- {eventId}");
                         }
@@ -252,7 +252,7 @@ namespace AnoGame.Editor
             var gameManager = GameManager2.Instance;
             if (gameManager != null)
             {
-                currentGameData = gameManager.CurrentGameData;
+                _currentGameData = gameManager.CurrentGameData;
                 Repaint();
             }
         }
@@ -263,8 +263,8 @@ namespace AnoGame.Editor
             if (gameManager != null)
             {
                 gameManager.ResetDataAsync();
-                await gameManager.SaveCurrentGameState();
-                currentGameData = gameManager.CurrentGameData;
+                // await gameManager.SaveCurrentGameState();
+                // currentGameData = gameManager.CurrentGameData;
                 Repaint();
             }
         }
@@ -282,6 +282,7 @@ namespace AnoGame.Editor
             if (storyManager != null)
             {
                 storyManager.SwitchToChapterInStory(storyIndex, chapterIndex, useRetryPoint);
+                // storyManager.UpdateGameData();
             }
         }
 

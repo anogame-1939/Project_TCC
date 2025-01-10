@@ -42,8 +42,8 @@ namespace AnoGame.Application.Story
         {
             if (gameData == null || gameData.StoryProgress == null) return;
 
+            // ストーリ進捗状況をロード
             _currentStoryIndex = gameData.StoryProgress.CurrentStoryIndex;
-
             _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
 
             LoadCurrentScene();
@@ -54,8 +54,8 @@ namespace AnoGame.Application.Story
             GameData gameData = GameManager2.Instance.CurrentGameData;
             if (gameData.StoryProgress == null)
             {
-                gameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
             }
+            GameManager2.Instance.CurrentGameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
         }
 
         public void StartStory()
@@ -278,6 +278,7 @@ namespace AnoGame.Application.Story
             // ストーリーとチャプターの状態を更新
             _currentStoryIndex = storyIndex;
             _currentChapterIndex = chapterIndex;
+            UpdateGameData();
 
             // シーンのロードを一度だけ実行
             LoadCurrentScene(useRetryPoint);

@@ -1,3 +1,5 @@
+using AnoGame.Application.Story;
+using AnoGame.Application.Story.Manager;
 using UnityEngine;
 namespace AnoGame.Application.Event
 {
@@ -16,6 +18,7 @@ namespace AnoGame.Application.Event
 
         public void Save()
         {
+            StoryStateManager.Instance.UpdatePlayerPosition();
             GameManager2.Instance.SaveData();
 
             Debug.Log("保存");

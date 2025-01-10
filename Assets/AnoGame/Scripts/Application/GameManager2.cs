@@ -97,7 +97,7 @@ namespace AnoGame.Application
         public void ResetDataAsync()
         {
             _currentGameData = CreateNewGameData();
-            LoadGameData?.Invoke(_currentGameData);
+            // LoadGameData?.Invoke(_currentGameData);
         }
 
         public void UpdateGameState(GameData newGameData)
