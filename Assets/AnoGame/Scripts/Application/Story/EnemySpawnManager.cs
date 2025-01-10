@@ -44,6 +44,8 @@ namespace AnoGame.Application.Enemy
             InitializeEnemy();
         }
 
+
+        // TODO:チャプター毎に生成する怪異を付け替える
         private void InitializeEnemy()
         {
             if (enemyPrefab == null)
@@ -51,6 +53,21 @@ namespace AnoGame.Application.Enemy
                 Debug.LogError("Enemy Prefabが設定されていません。");
                 return;
             }
+
+            // 既存の敵を破棄
+            if (_currentEnemyInstance != null)
+            {
+                Destroy(_currentEnemyInstance);
+                _currentEnemyController = null;
+            }
+
+            // 新しい敵をスポーン
+            _currentEnemyInstance = Instantiate(enemyPrefab);
+            // container.InjectGameObject(_currentEnemyInstance);
+
+            // 明示的にメインシーンにスポーンさせる
+            var targetScene = StoryManager.Instance.MainScene;
+            SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
 
             // スタートポイントから初期スポーン
             SpawnEnemyAtStart();
@@ -117,27 +134,6 @@ namespace AnoGame.Application.Enemy
 
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
-            if (enemyPrefab == null)
-            {
-                Debug.LogError("Enemy Prefabが設定されていません。");
-                return;
-            }
-
-            // 既存の敵を破棄
-            if (_currentEnemyInstance != null)
-            {
-                Destroy(_currentEnemyInstance);
-                _currentEnemyController = null;
-            }
-
-            // 新しい敵をスポーン
-            _currentEnemyInstance = Instantiate(enemyPrefab, position, rotation);
-            // container.InjectGameObject(_currentEnemyInstance);
-
-            // 明示的にメインシーンにスポーンさせる
-            var targetScene = StoryManager.Instance.MainScene;
-            SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
-
             // EnemyControllerの参照を保持
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
             if (isPermanent)
