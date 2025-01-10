@@ -164,7 +164,6 @@ namespace AnoGame.Application.Enemy
         public void EnabaleEnamy()
         {
             _currentEnemyController.EnableBrain();
-
         }
 
         public void DisabaleEnamy()
