@@ -64,6 +64,9 @@ namespace AnoGame.Application.Enemy
             // 新しい敵をスポーン
             _currentEnemyInstance = Instantiate(enemyPrefab);
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+
+            var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
+            enemyEventController.Construct(_eventService, _eventManager);
             // container.InjectGameObject(_currentEnemyInstance);
 
             // 明示的にメインシーンに配置する
@@ -157,7 +160,6 @@ namespace AnoGame.Application.Enemy
         private void SetEventData(EventData eventData)
         {
             var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
-            enemyEventController.Construct(_eventService, _eventManager);
             enemyEventController.Initialize(eventData);
         }
 
@@ -200,13 +202,14 @@ namespace AnoGame.Application.Enemy
             if (_currentEnemyController != null)
             {
                 EnabaleEnamy();
+                SetEventData(null);
                 _currentEnemyController.SpawnNearPlayer(playerPosition);
             }
         }
 
-        public bool IsAlive()
+        public bool IsChasing()
         {
-            return _currentEnemyInstance.GetComponent<EnemyLifespan>().IsAlive;
+            return _currentEnemyInstance.GetComponent<EnemyEventController>().IsChasing;
         }
 
         public void SetRetryPoint(Transform point)

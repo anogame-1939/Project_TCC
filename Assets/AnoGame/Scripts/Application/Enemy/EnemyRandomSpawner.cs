@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using AnoGame.Data;
-using System.Data;
 
 namespace AnoGame.Application.Enemy
 {
@@ -43,6 +42,7 @@ namespace AnoGame.Application.Enemy
                 Debug.Log($"出たぁ！！:{waitTime}");
                 SpawnNearPlayer();
                 StartEnemyMovement();
+                
 
                 Debug.Log("逃走中…");
 
@@ -61,8 +61,9 @@ namespace AnoGame.Application.Enemy
 
         private IEnumerator WaitForEnemyDeath()
         {
-            while (_spawnManager.IsAlive())
+            while (_spawnManager.IsChasing())
             {
+                Debug.Log($"_spawnManager.IsChasing():{_spawnManager.IsChasing()}");
                 yield return new WaitForSeconds(1f);
             }
         }

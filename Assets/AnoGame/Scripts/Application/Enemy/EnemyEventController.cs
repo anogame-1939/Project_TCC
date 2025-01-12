@@ -14,6 +14,9 @@ namespace AnoGame.Application.Enemy
         private EventData _eventData;
         public EventData EventData => _eventData;
 
+        private bool isChasing = false;
+        public bool IsChasing => isChasing;
+
         private bool _isLocked = false;
 
 
@@ -38,6 +41,7 @@ namespace AnoGame.Application.Enemy
             // EnemyLifespanのOnDestroyの前に判定を行うために
             lifespan.OnLifespanExpired += HandleEscapeSuccess;
             hitDetector.OnPlayerHit += HandleEscapeFail;
+            isChasing = true;
         }
 
         private void OnDisable()
@@ -63,6 +67,7 @@ namespace AnoGame.Application.Enemy
         // プレイヤーヒット = 逃走失敗
         private void HandleEscapeFail()
         {
+            Debug.LogWarning("死");
             if (_isLocked) return;
             _isLocked = true;
             // lifespan.ImmediateDeactive();
@@ -85,6 +90,7 @@ namespace AnoGame.Application.Enemy
             {
                 hitDetector.OnPlayerHit -= HandleEscapeFail;
             }
+            isChasing = false;
         }
     }
 }

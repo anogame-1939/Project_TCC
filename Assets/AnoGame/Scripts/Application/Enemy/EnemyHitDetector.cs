@@ -12,11 +12,13 @@ namespace AnoGame.Application.Enemy
 
         private void OnTriggerEnter(Collider other)
         {
+            Debug.Log("hit");
             if (!other.CompareTag("Player")) return;
             
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
+                Debug.Log("Player");
                 damageable.TakeDamage(damage);
                 OnPlayerHit?.Invoke();  // イベント発火
             }
