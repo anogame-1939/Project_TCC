@@ -42,6 +42,7 @@ namespace AnoGame.Application.Enemy
             lifespan.OnLifespanExpired += HandleEscapeSuccess;
             hitDetector.OnPlayerHit += HandleEscapeFail;
             isChasing = true;
+            Debug.Log("セットアップ");
         }
 
         private void OnDisable()
