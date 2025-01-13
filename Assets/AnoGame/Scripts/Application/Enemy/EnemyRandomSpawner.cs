@@ -15,6 +15,7 @@ namespace AnoGame.Application.Enemy
         private float maxSpawnTime = 30f;   // 最大生成間隔（秒）
 
         private EnemySpawnManager _spawnManager;
+        private IEnumerator SpawnCoroutine;
 
         private void Awake()
         {
@@ -23,11 +24,21 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.LogError("EnemySpawnManagerが見つかりません。");
             }
+            GameManager2.Instance.GameOver += StopSpawner;
+            
         }
 
         public void StartSpawner()
         {
-            StartCoroutine(StartSpawnerCor());
+            Debug.Log("StartSpawner");
+            SpawnCoroutine = StartSpawnerCor();
+            StartCoroutine(SpawnCoroutine);
+        }
+
+        public void StopSpawner()
+        {
+            Debug.Log("GameOver -> StopSpawner");
+            StopCoroutine(SpawnCoroutine);
         }
 
         private IEnumerator StartSpawnerCor()
@@ -49,7 +60,6 @@ namespace AnoGame.Application.Enemy
                 yield return WaitForEnemyDeath();
 
                 Debug.Log("怪異消滅");
-                
             }
         }
 
