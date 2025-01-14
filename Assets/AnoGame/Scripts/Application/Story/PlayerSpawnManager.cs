@@ -2,6 +2,9 @@ using UnityEngine;
 using Unity.TinyCharacterController.Brain;
 using AnoGame.Data;
 using AnoGame.Application.Core;
+using AnoGame.Application.Utils;
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -96,21 +99,18 @@ namespace AnoGame.Application.Story
             Transform targetPoint = _currentRetryPoint ?? GetRetryPoint();
 
             // 前回セーブした位置を保存
-            var currentGameData = GameManager.instance.CurrentGameData;
+            var currentGameData = GameManager2.instance.CurrentGameData;
 
             // リトライポイントが存在しない場合は前回セーブした位置からスポーンする
             if (targetPoint == null)
             {
-                var gameData = GameManager.Instance.CurrentGameData;
-                var playerPosition = gameData.playerPosition;
+                var gameData = GameManager2.Instance.CurrentGameData;
+                var playerPosition = gameData.PlayerPosition;
                 if (playerPosition != null)
                 {
-                    if (playerPosition.IsPositionValid)
-                    {
-                        var position = currentGameData.playerPosition.position.ToVector3();
-                        var rotation = currentGameData.playerPosition.rotation.ToQuaternion();
-                        WarpPlayerTo(position, rotation);
-                    }
+                    var position = currentGameData.PlayerPosition.Position.ToVector3();
+                    var rotation = currentGameData.PlayerPosition.Rotation.ToQuaternion();
+                    WarpPlayerTo(position, rotation);
                 }
             }
             else

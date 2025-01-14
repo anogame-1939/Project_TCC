@@ -16,8 +16,9 @@ namespace AnoGame.Application
         public bool DebugMode => _debugMode;
 #endif
 
-        public Action<GameData> SaveGameData;
-        public Action<GameData> LoadGameData;
+        public event Action<GameData> SaveGameData;
+        public event Action<GameData> LoadGameData;
+        public event Action GameOver;
 
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
@@ -172,6 +173,12 @@ namespace AnoGame.Application
                 Debug.LogError($"Failed to create save point: {ex.Message}");
                 return false;
             }
+        }
+
+        public void InvokeGameOver()
+        {
+            Debug.Log("InvokeGameOver");
+            GameOver?.Invoke();
         }
     }
 }

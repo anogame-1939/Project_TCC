@@ -13,7 +13,7 @@ namespace AnoGame.Application
         private GameManager2 _gameManager;
         private StoryManager _storyManager;
         
-        private void Awake()
+        private new void Awake()
         {
             _gameManager = GameManager2.Instance;
             _storyManager = StoryManager.Instance;

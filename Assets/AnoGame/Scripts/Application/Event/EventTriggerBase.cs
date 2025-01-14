@@ -130,7 +130,7 @@ namespace AnoGame.Application.Event
             {
                 // _eventProgressService.ResetEvent(eventData.EventId);
             }
-            OnDoneEvent();
+            // OnDoneEvent();
         }
 
         public virtual void OnDoneEvent()
