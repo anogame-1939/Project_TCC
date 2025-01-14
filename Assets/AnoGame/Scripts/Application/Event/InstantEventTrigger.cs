@@ -1,0 +1,37 @@
+using AnoGame.Domain.Event.Services;
+using UnityEngine;
+using VContainer;
+
+namespace AnoGame.Application.Event
+{
+    /// <summary>
+    /// イベントがスタートしたら即時にクリアする
+    /// </summary>
+    public class InstantEventTrigger : EventTriggerBase
+    {
+        [Inject] private EventManager _eventManager;
+
+        [Inject]
+        public void Construct(
+            EventManager eventManager
+        )
+        {
+            _eventManager = eventManager;
+        }
+
+        protected override void OnStartEvent()
+        {
+            base.OnStartEvent();
+            Debug.Log("OnStartEvent-InstantEventTrigger");
+
+            _eventManager.AddClearedEvent(eventData.EventId);
+
+        }
+
+        public override void OnFinishEvent()
+        {
+            base.OnFinishEvent();
+            Debug.Log("OnCompleteEvent-InstantEventTrigger");
+        }
+    }
+}
