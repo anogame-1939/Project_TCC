@@ -6,6 +6,7 @@ using AnoGame.Application.Event;
 using AnoGame.Domain.Event.Services;
 using UnityEngine.SceneManagement;
 using AnoGame.Application.Story;
+using Unity.TinyCharacterController.Brain;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -153,6 +154,8 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
             }
+
+            _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
 
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }

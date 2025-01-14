@@ -26,6 +26,8 @@ namespace AnoGame.Application.Event
             UnityEngine.Debug.Log("OnGameOver");
             GameManager2.Instance.InvokeGameOver();
 
+            return;
+
             // データをリロード
             await GameManager2.Instance.ReloadDataAsync();
 
