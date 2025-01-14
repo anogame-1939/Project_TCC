@@ -7,6 +7,7 @@ namespace AnoGame.Application.Animation.Gmmicks
     public class TrapController : MonoBehaviour
     {
         [SerializeField] GameObject _trapObject;
+        [SerializeField] ParticleSystem _particleObject;
         [SerializeField] Vector3 _offsetPosition;
         [SerializeField] float _stopDuration = 1.0f;
 
@@ -18,6 +19,7 @@ namespace AnoGame.Application.Animation.Gmmicks
         {
             _initializePos = _trapObject.transform.position;
             _trapObject.SetActive(false);
+            if (_particleObject != null) _particleObject.Stop();
             _mainCamera = Camera.main; // メインカメラの参照を取得
         }
 
@@ -46,6 +48,8 @@ namespace AnoGame.Application.Animation.Gmmicks
                 {
                     Debug.Log("Animator found on trap object");
                 }
+
+                if (_particleObject != null) _particleObject.Play();
             }
 
             StartCoroutine(StopTrap());
@@ -53,8 +57,9 @@ namespace AnoGame.Application.Animation.Gmmicks
 
         private IEnumerator StopTrap()
         {
-            yield return new WaitForSeconds(_stopDuration);
             _trapObject.transform.position = _initializePos;
+            yield return new WaitForSeconds(_stopDuration);
+            if (_particleObject != null) _particleObject.Stop();
         }
 
     }
