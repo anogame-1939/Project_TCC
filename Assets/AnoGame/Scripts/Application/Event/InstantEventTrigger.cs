@@ -24,6 +24,8 @@ namespace AnoGame.Application.Event
             base.OnStartEvent();
             Debug.Log("OnStartEvent-InstantEventTrigger");
 
+            // スタートと同時にイベントをクリアする
+            _eventService.TriggerEventComplete(eventData.EventId);
             _eventManager.AddClearedEvent(eventData.EventId);
 
         }

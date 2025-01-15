@@ -56,8 +56,17 @@ namespace AnoGame.Application.Core
 
             builder.RegisterComponentInHierarchy<EnemySpawnManager>();
 
+            // EventTriggerBaseを継承したコンポーネントの検索と登録
+            var eventTriggers = FindObjectsByType<EventTriggerBase>(FindObjectsSortMode.None);
+            foreach (var trigger in eventTriggers)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(trigger));
+            }
+            
+
             builder.RegisterEntryPoint<LevelInitializer>();
             
+
         }
     }
 

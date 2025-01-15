@@ -61,5 +61,11 @@ namespace AnoGame.Application.Lighting
             _targetLight.color = _changedColor;
             _currentColorChange = null;
         }
+
+        public void ChangeColorImmediate()
+        {
+            _targetLight.color = _changedColor;
+            _currentColorChange = null;
+        }
     }
 }

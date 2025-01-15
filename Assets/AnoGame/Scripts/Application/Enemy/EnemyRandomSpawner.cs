@@ -60,6 +60,7 @@ namespace AnoGame.Application.Enemy
                 yield return WaitForEnemyDeath();
 
                 Debug.Log("怪異消滅");
+                break;
             }
         }
 

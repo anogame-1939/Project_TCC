@@ -7,6 +7,7 @@ using AnoGame.Data;
 using AnoGame.Domain.Event.Conditions;
 using System.Collections.Generic;
 using System.Linq;
+using PlasticGui;
 
 namespace AnoGame.Application.Event
 {
@@ -26,12 +27,27 @@ namespace AnoGame.Application.Event
 
         private List<IEventCondition> _conditions = new List<IEventCondition>();
 
+        // NOTE:重複登録防止。本来ならライフサイクルで制御したいところ
+        private bool _registeredEvent = false;
+
         [Inject] protected IEventService _eventService;
 
         [Inject]
         public virtual void Construct(IEventService eventService)
         {
             _eventService = eventService;
+            _eventService.LoadedClearEvent += InitializeEvents;
+
+        }
+
+        protected virtual void Start()
+        {
+            InitializeConditions();
+            InitializeEvents();
+        }
+
+        protected virtual void InitializeEvents()
+        {
             // クリア済みのイベント事項
             if (_eventService.IsEventCleared(eventData.EventId))
             {
@@ -40,16 +56,16 @@ namespace AnoGame.Application.Event
             // 未クリアならイベント登録
             else
             {
-                _eventService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
-                _eventService.RegisterCompleteEventHandler(eventData.EventId, OnFinishEvent);
-                _eventService.RegisterFailedEventHandler(eventData.EventId, OnFailedEvent);
+                if (!_registeredEvent)
+                {
+                    _eventService.RegisterStartEventHandler(eventData.EventId, OnStartEvent);
+                    _eventService.RegisterCompleteEventHandler(eventData.EventId, OnFinishEvent);
+                    _eventService.RegisterFailedEventHandler(eventData.EventId, OnFailedEvent);
+                    _registeredEvent = true;
+                }
             }
         }
 
-        protected virtual void Start()
-        {
-            InitializeConditions();
-        }
 
         protected virtual void InitializeConditions()
         {

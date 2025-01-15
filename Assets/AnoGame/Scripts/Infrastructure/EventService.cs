@@ -11,6 +11,7 @@ namespace AnoGame.Infrastructure.Services
     /// </summary>
     public class EventService : IEventService
     {
+        public event Action LoadedClearEvent;
         private readonly List<string> _clearedEvents = new();
         private readonly Dictionary<string, List<Action>> _startEventHandlers = new();
         private readonly Dictionary<string, List<Action>> _cpmpleteEventHandlers = new();
@@ -20,6 +21,7 @@ namespace AnoGame.Infrastructure.Services
         public void SetCleadEvents(HashSet<string> clearedEventIDs)
         {
             _clearedEvents.AddRange(clearedEventIDs);
+            LoadedClearEvent?.Invoke();
         }
 
         public bool IsEventCleared(string eventID)

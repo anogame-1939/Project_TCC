@@ -25,6 +25,12 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(trigger));
             }
 
+            var instantEventTriggers = FindObjectsByType<InstantEventTrigger>(FindObjectsSortMode.None);
+            foreach (var trigger in instantEventTriggers)
+            {
+                // builder.RegisterBuildCallback(resolver => resolver.Inject(trigger));
+            }
+
             // EnemyEventControllerの登録
             var enemyControllers = FindObjectsByType<EnemyEventController>(FindObjectsSortMode.None);
             foreach (var controller in enemyControllers)
