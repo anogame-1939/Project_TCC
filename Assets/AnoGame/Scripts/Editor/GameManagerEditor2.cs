@@ -8,6 +8,7 @@ using AnoGame.Application.Enemy;
 using AnoGame.Domain.Data.Models;
 using AnoGame.Infrastructure.Persistence;
 using Cysharp.Threading.Tasks;
+using AnoGame.Application.Story.Manager;
 
 namespace AnoGame.Editor
 {
@@ -77,6 +78,7 @@ namespace AnoGame.Editor
                     if (GUILayout.Button("Save Data"))
                     {
                         // 保存
+                        StoryStateManager.Instance.UpdatePlayerPosition();
                         GameManager2.Instance.SaveData();
                     }
 
