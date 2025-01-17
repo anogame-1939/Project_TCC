@@ -29,17 +29,10 @@ namespace AnoGame.Application.Lore
         {
             foreach (var scene in _persistentScenes)
             {
-                Debug.Log("読み込んだで");
                 if (string.IsNullOrEmpty(scene.ScenePath)) continue;
-                Debug.Log("読み込んだで1");
                 if (_loadedScenePaths.Contains(scene.ScenePath)) continue;
-
-                Debug.Log("読み込んだで2");
-
                 await _sceneLoader.LoadSceneAsync(scene, LoadSceneMode.Additive);
                 _loadedScenePaths.Add(scene.ScenePath);
-
-                Debug.Log("読み込んだで3");
             }
         }
 
