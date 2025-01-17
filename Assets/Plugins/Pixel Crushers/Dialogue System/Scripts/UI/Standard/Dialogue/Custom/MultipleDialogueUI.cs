@@ -28,6 +28,10 @@ namespace PixelCrushers.DialogueSystem
                         SetActorToDefaultPanel(conversation.dialogueEntries[i].ActorID);
                     }
                 }
+                if (conversation.LookupBool("Flashback"))
+                {
+                    SetActorToDefaultPanel(null);
+                }
             }
 
             base.Open();
