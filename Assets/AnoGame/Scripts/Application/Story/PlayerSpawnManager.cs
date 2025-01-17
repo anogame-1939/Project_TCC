@@ -39,15 +39,6 @@ namespace AnoGame.Application.Story
             return GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
         }
 
-        private void Awake()
-        {
-            // StoryManager.Instance.ChapterLoaded += OnChapterLoaded;
-        }
-
-        private void OnDestroy()
-        {
-        }
-
         // ChapterLoadedイベントハンドラを修正
         public void OnChapterLoaded(bool useRetryPoint)
         {

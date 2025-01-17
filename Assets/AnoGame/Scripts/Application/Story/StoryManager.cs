@@ -24,10 +24,19 @@ namespace AnoGame.Application.Story
         public Scene MainScene => _mainScene;
         private bool _isLoadingScene = false;
 
-        private void Awake()
+        private new void Awake()
         {
             _mainScene = SceneManager.GetActiveScene();
             GameManager2.Instance.LoadGameData += OnLoadGameData;
+        }
+
+        private void Start()
+        {
+            // ゲームデータがロード済みの場合、ロード済みのデータを使用してゲームを再開
+            if (GameManager2.Instance.DataLoaded)
+            {
+                OnLoadGameData(GameManager2.Instance.CurrentGameData);
+            }
         }
 
         private void OnDestroy()

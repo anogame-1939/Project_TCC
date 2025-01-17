@@ -15,6 +15,8 @@ namespace AnoGame.Application
         private bool _debugMode = false;
         public bool DebugMode => _debugMode;
 #endif
+        private bool _dataLoaded = false;
+        public bool DataLoaded => _dataLoaded;
 
         public event Action<GameData> SaveGameData;
         public event Action<GameData> LoadGameData;
@@ -59,6 +61,8 @@ namespace AnoGame.Application
                 _currentGameData = CreateNewGameData();
                 LoadGameData?.Invoke(_currentGameData);
             }
+
+            _dataLoaded = true;
         }
 
         private GameData CreateNewGameData()
