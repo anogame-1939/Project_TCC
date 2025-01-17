@@ -32,12 +32,6 @@ namespace PixelCrushers.DialogueSystem
                 if (conversation.LookupBool("Flashback"))
                 {
                     UnityEngine.Debug.Log("Flashback");
-                    SetActorToDefaultPanel(DialogueActor.GetDialogueActorComponent(DialogueManager.currentActor));
-                    SetActorToDefaultPanel(DialogueActor.GetDialogueActorComponent(DialogueManager.currentConversant));
-                    for (int i = 0; i < conversation.dialogueEntries.Count; i++)
-                    {
-                        SetActorToDefaultPanel(conversation.dialogueEntries[i].ActorID);
-                    }
                 }
             }
 
