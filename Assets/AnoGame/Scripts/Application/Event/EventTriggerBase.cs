@@ -7,7 +7,6 @@ using AnoGame.Data;
 using AnoGame.Domain.Event.Conditions;
 using System.Collections.Generic;
 using System.Linq;
-using PlasticGui;
 
 namespace AnoGame.Application.Event
 {
