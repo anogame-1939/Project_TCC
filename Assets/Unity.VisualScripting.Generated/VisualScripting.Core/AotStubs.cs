@@ -2472,6 +2472,9 @@ namespace Unity.VisualScripting.Generated.Aot
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_UI_Toggle_ToggleEvent.op_Implicit
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_UI_Toggle_ToggleEvent.op_Equality
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_UI_Toggle_ToggleEvent.op_Inequality
+	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.op_Implicit
+	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.op_Equality
+	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.op_Inequality
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_Mathematics_bool2.op_Implicit
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_Mathematics_bool2.op_Equality
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_Mathematics_bool2.op_Inequality
@@ -2484,6 +2487,9 @@ namespace Unity.VisualScripting.Generated.Aot
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_SceneManagement_AssetReferenceScene.op_Implicit
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_SceneManagement_AssetReferenceScene.op_Equality
 	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_SceneManagement_AssetReferenceScene.op_Inequality
+	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_VContainer_Unity_ParentReference.op_Implicit
+	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_VContainer_Unity_ParentReference.op_Equality
+	// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_VContainer_Unity_ParentReference.op_Inequality
 	// Unitychan.LockCursor.op_Implicit
 	// Unitychan.LockCursor.op_Equality
 	// Unitychan.LockCursor.op_Inequality
@@ -3189,13 +3195,13 @@ namespace Unity.VisualScripting.Generated.Aot
 	// UnityEngine.EventSystems.UIBehaviour.op_Inequality
 	// --------------- Plugin Stubs
 	// --------------- Asset Stubs
-	// Unity.TinyCharacterController.Interfaces.Components.IBrain.YawAngle
-	// UnityEngine.Mathf.DeltaAngle
-	// Unity.TinyCharacterController.CharacterSettings.CameraTransform
-	// UnityEngine.Animator.SetFloat
-	// UnityEngine.Transform.forward
-	// UnityEngine.Vector3.y
 	// UnityEngine.Transform.eulerAngles
+	// UnityEngine.Transform.forward
+	// Unity.TinyCharacterController.CharacterSettings.CameraTransform
+	// UnityEngine.Mathf.DeltaAngle
+	// Unity.TinyCharacterController.Interfaces.Components.IBrain.YawAngle
+	// UnityEngine.Animator.SetFloat
+	// UnityEngine.Vector3.y
 	// UnityEngine.Transform.Find
 	// Unity.TinyCharacterController.Control.MoveControl.CurrentSpeed
 	// UnityEngine.Animator.SetBool
@@ -31998,6 +32004,41 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
+		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_UnityEngine_VFX_Utility_ExposedProperty_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
 		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_Mathematics_bool2.op_Implicit
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_Unity_Mathematics_bool2_op_Implicit()
@@ -32129,6 +32170,41 @@ namespace Unity.VisualScripting.Generated.Aot
 		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_Unity_SceneManagement_AssetReferenceScene.op_Inequality
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_Unity_SceneManagement_AssetReferenceScene_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_VContainer_Unity_ParentReference.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_VContainer_Unity_ParentReference_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_VContainer_Unity_ParentReference.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_VContainer_Unity_ParentReference_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// Unity.VisualScripting.Generated.PropertyProviders.PropertyProvider_VContainer_Unity_ParentReference.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_VisualScripting_Generated_PropertyProviders_PropertyProvider_VContainer_Unity_ParentReference_op_Inequality()
 		{
 			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
 			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
@@ -40339,14 +40415,38 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// Unity.TinyCharacterController.Interfaces.Components.IBrain.YawAngle
+		// UnityEngine.Transform.eulerAngles
 		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void Unity_TinyCharacterController_Interfaces_Components_IBrain_YawAngle()
+		public static void UnityEngine_Transform_eulerAngles()
 		{
-			global::Unity.TinyCharacterController.Interfaces.Components.IBrain target = default(global::Unity.TinyCharacterController.Interfaces.Components.IBrain);
-			float accessor = target.YawAngle;
-			global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.Interfaces.Components.IBrain, float> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.Interfaces.Components.IBrain, float>(default(global::System.Reflection.PropertyInfo));
-			optimized.GetValue(default(global::Unity.TinyCharacterController.Interfaces.Components.IBrain));
+			global::UnityEngine.Transform target = default(global::UnityEngine.Transform);
+			global::UnityEngine.Vector3 accessor = target.eulerAngles;
+			target.eulerAngles = default(global::UnityEngine.Vector3);
+			global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3>(default(global::System.Reflection.PropertyInfo));
+			optimized.GetValue(default(global::UnityEngine.Transform));
+			optimized.SetValue(default(global::UnityEngine.Transform), default(global::UnityEngine.Vector3));
+		}
+		
+		// UnityEngine.Transform.forward
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void UnityEngine_Transform_forward()
+		{
+			global::UnityEngine.Transform target = default(global::UnityEngine.Transform);
+			global::UnityEngine.Vector3 accessor = target.forward;
+			target.forward = default(global::UnityEngine.Vector3);
+			global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3>(default(global::System.Reflection.PropertyInfo));
+			optimized.GetValue(default(global::UnityEngine.Transform));
+			optimized.SetValue(default(global::UnityEngine.Transform), default(global::UnityEngine.Vector3));
+		}
+		
+		// Unity.TinyCharacterController.CharacterSettings.CameraTransform
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void Unity_TinyCharacterController_CharacterSettings_CameraTransform()
+		{
+			global::Unity.TinyCharacterController.CharacterSettings target = default(global::Unity.TinyCharacterController.CharacterSettings);
+			global::UnityEngine.Transform accessor = target.CameraTransform;
+			global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.CharacterSettings, UnityEngine.Transform> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.CharacterSettings, UnityEngine.Transform>(default(global::System.Reflection.PropertyInfo));
+			optimized.GetValue(default(global::Unity.TinyCharacterController.CharacterSettings));
 		}
 		
 		// UnityEngine.Mathf.DeltaAngle
@@ -40361,14 +40461,14 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// Unity.TinyCharacterController.CharacterSettings.CameraTransform
+		// Unity.TinyCharacterController.Interfaces.Components.IBrain.YawAngle
 		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void Unity_TinyCharacterController_CharacterSettings_CameraTransform()
+		public static void Unity_TinyCharacterController_Interfaces_Components_IBrain_YawAngle()
 		{
-			global::Unity.TinyCharacterController.CharacterSettings target = default(global::Unity.TinyCharacterController.CharacterSettings);
-			global::UnityEngine.Transform accessor = target.CameraTransform;
-			global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.CharacterSettings, UnityEngine.Transform> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.CharacterSettings, UnityEngine.Transform>(default(global::System.Reflection.PropertyInfo));
-			optimized.GetValue(default(global::Unity.TinyCharacterController.CharacterSettings));
+			global::Unity.TinyCharacterController.Interfaces.Components.IBrain target = default(global::Unity.TinyCharacterController.Interfaces.Components.IBrain);
+			float accessor = target.YawAngle;
+			global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.Interfaces.Components.IBrain, float> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<Unity.TinyCharacterController.Interfaces.Components.IBrain, float>(default(global::System.Reflection.PropertyInfo));
+			optimized.GetValue(default(global::Unity.TinyCharacterController.Interfaces.Components.IBrain));
 		}
 		
 		// UnityEngine.Animator.SetFloat
@@ -40384,18 +40484,6 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// UnityEngine.Transform.forward
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void UnityEngine_Transform_forward()
-		{
-			global::UnityEngine.Transform target = default(global::UnityEngine.Transform);
-			global::UnityEngine.Vector3 accessor = target.forward;
-			target.forward = default(global::UnityEngine.Vector3);
-			global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3>(default(global::System.Reflection.PropertyInfo));
-			optimized.GetValue(default(global::UnityEngine.Transform));
-			optimized.SetValue(default(global::UnityEngine.Transform), default(global::UnityEngine.Vector3));
-		}
-		
 		// UnityEngine.Vector3.y
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void UnityEngine_Vector3_y()
@@ -40406,18 +40494,6 @@ namespace Unity.VisualScripting.Generated.Aot
 			global::Unity.VisualScripting.ReflectionFieldAccessor optimized = new global::Unity.VisualScripting.ReflectionFieldAccessor(default(global::System.Reflection.FieldInfo));
 			optimized.GetValue(default(global::UnityEngine.Vector3));
 			optimized.SetValue(default(global::UnityEngine.Vector3), default(float));
-		}
-		
-		// UnityEngine.Transform.eulerAngles
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void UnityEngine_Transform_eulerAngles()
-		{
-			global::UnityEngine.Transform target = default(global::UnityEngine.Transform);
-			global::UnityEngine.Vector3 accessor = target.eulerAngles;
-			target.eulerAngles = default(global::UnityEngine.Vector3);
-			global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3> optimized = new global::Unity.VisualScripting.InstancePropertyAccessor<UnityEngine.Transform, UnityEngine.Vector3>(default(global::System.Reflection.PropertyInfo));
-			optimized.GetValue(default(global::UnityEngine.Transform));
-			optimized.SetValue(default(global::UnityEngine.Transform), default(global::UnityEngine.Vector3));
 		}
 		
 		// UnityEngine.Transform.Find
