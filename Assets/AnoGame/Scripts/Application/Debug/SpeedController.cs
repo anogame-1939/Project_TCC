@@ -8,11 +8,6 @@ namespace AnoGame.Application.SLFBDebug
         [SerializeField]
         MoveControl moveControl;
 
-        void Start()
-        {
-
-        }
-
         public void SpeedUp()
         {
             moveControl.MoveSpeed += 1;
