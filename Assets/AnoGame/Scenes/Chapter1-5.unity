@@ -657,7 +657,20 @@ MonoBehaviour:
   conversationEvents:
     onConversationStart:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 4587226390067968350}
+          m_TargetAssemblyTypeName: AnoGame.Application.Inventory.InventoryHandler,
+            AnoGame.Application
+          m_MethodName: AddItem
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: 38133e83b7647bc4493d757c6994b65b, type: 2}
+            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.ItemData, AnoGame.Application
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     onConversationEnd:
       m_PersistentCalls:
         m_Calls:
@@ -42424,6 +42437,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+--- !u!114 &4587226390067968350 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2748043650713181031, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 4587226390067968349}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d737ecb2b4f54282b7894f2b6b2f11b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using VContainer;
 using VContainer.Unity;
 using AnoGame.Application.Event;
 using AnoGame.Application.Enemy;
+using AnoGame.Application.Inventory;
 
 
 namespace AnoGame.Application.Core
@@ -16,6 +17,12 @@ namespace AnoGame.Application.Core
             foreach (var item in collectables)
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(item));
+            }
+
+            var inventoryHandlers = FindObjectsByType<InventoryHandler>(FindObjectsSortMode.None);
+            foreach (var inventoryHandler in inventoryHandlers)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(inventoryHandler));
             }
 
             // EventTriggerBaseを継承したコンポーネントの検索と登録

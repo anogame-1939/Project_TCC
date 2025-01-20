@@ -186,6 +186,82 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &457343941
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2080231796069958229, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_Name
+      value: LevelModules
+      objectReference: {fileID: 0}
+    - target: {fileID: 6012029449518595477, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542715615986563986, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8086109162388240570, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+--- !u!114 &457343942 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2748043650713181031, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 457343941}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d737ecb2b4f54282b7894f2b6b2f11b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &592107418
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,6 +778,19 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 457343942}
+          m_TargetAssemblyTypeName: AnoGame.Application.Inventory.InventoryHandler,
+            AnoGame.Application
+          m_MethodName: AddItem
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: 2cb1dc94a733d664cac6c1a5dd7952dc, type: 2}
+            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.ItemData, AnoGame.Application
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
   - guid: 8144c4fe-083c-48cd-ba57-7e32d870f99c
     onExecute:
       m_PersistentCalls:
@@ -1040,6 +1129,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1435492655}
+  - {fileID: 457343941}
   - {fileID: 1022978318}
   - {fileID: 2577331246474313070}
   - {fileID: 6219244041640758205}
