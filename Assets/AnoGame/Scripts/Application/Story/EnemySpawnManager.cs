@@ -118,6 +118,7 @@ namespace AnoGame.Application.Enemy
             var startPoint = GetStartPoint();
             if (startPoint == null) return;
 
+            PlayeSpawnedSound();
             SpawnEnemyAt(startPoint.position, startPoint.rotation, isPermanent);
             // EnabaleEnamy();
         }
@@ -133,8 +134,14 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
+            PlayeSpawnedSound();
             SpawnEnemyAt(targetPoint.position, targetPoint.rotation);
             // EnabaleEnamy();
+        }
+
+        private void PlayeSpawnedSound()
+        {
+            GetComponent<AudioSource>().Play();
         }
 
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
@@ -197,6 +204,7 @@ namespace AnoGame.Application.Enemy
 
         public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation, EventData eventData = null)
         {
+            PlayeSpawnedSound();
             SpawnEnemyAt(position, rotation);
             if (eventData) SetEventData(eventData);
             EnabaleEnamy();
@@ -206,6 +214,8 @@ namespace AnoGame.Application.Enemy
         {
             if (_currentEnemyController != null)
             {
+                Debug.Log("くる！！");
+                PlayeSpawnedSound();
                 EnabaleEnamy();
                 SetEventData(null);
                 _currentEnemyController.SpawnNearPlayer(playerPosition);
