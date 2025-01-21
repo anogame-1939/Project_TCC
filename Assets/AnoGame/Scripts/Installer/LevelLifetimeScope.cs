@@ -19,12 +19,6 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(item));
             }
 
-            var inventoryHandlers = FindObjectsByType<InventoryHandler>(FindObjectsSortMode.None);
-            foreach (var inventoryHandler in inventoryHandlers)
-            {
-                builder.RegisterBuildCallback(resolver => resolver.Inject(inventoryHandler));
-            }
-
             // EventTriggerBaseを継承したコンポーネントの検索と登録
             var eventTriggers = FindObjectsByType<EventTriggerBase>(FindObjectsSortMode.None);
             foreach (var trigger in eventTriggers)

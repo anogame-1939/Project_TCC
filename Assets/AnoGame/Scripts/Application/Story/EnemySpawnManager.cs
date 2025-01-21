@@ -140,6 +140,8 @@ namespace AnoGame.Application.Enemy
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
             // EnemyControllerの参照を保持
+            _currentEnemyInstance.SetActive(true);
+            
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
             if (isPermanent)
             {

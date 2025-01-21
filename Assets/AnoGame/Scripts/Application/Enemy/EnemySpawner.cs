@@ -45,12 +45,21 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyAtStart(isPermanent);
+                StartCoroutine(TriggerEnemySpawnCor());
             }
             else
             {
                 Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
             }
+        }
+
+        private IEnumerator TriggerEnemySpawnCor()
+        {
+            _spawnManager.EnabaleEnamy();
+            yield return null;
+            _spawnManager.SpawnEnemyAtStart(isPermanent);
+            yield return null;
+            _spawnManager.DisabaleEnamy();
         }
 
         /// <summary>
