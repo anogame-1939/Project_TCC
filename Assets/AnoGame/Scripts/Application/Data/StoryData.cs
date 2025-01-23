@@ -36,8 +36,10 @@ namespace AnoGame.Application.Data
             public GameObject eventPrefab;
         }
 
-        // 以下、変更なし
         public string storyName;
+
+        [SerializeField]
+        public SceneReference mainMap;
         public List<ChapterData> chapters = new List<ChapterData>();
 
         [HideInInspector] public int currentChapterIndex = 0;
