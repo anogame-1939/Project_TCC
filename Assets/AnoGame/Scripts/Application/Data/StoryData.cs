@@ -38,7 +38,6 @@ namespace AnoGame.Application.Data
 
         public string storyName;
 
-        [SerializeField]
         public SceneReference mainMap;
         public List<ChapterData> chapters = new List<ChapterData>();
 
@@ -78,6 +77,7 @@ namespace AnoGame.Application.Data
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("storyName"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("mainMap"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("chapters"), true);
 
             if (GUILayout.Button("Update Scene Paths"))
@@ -95,6 +95,17 @@ namespace AnoGame.Application.Data
 
         private void UpdateScenePaths()
         {
+            // mainMapのシーンパスを更新
+            var mainMapProperty = serializedObject.FindProperty("mainMap");
+            var mainMapAssetProperty = mainMapProperty.FindPropertyRelative("sceneAsset");
+            var mainMapPathProperty = mainMapProperty.FindPropertyRelative("scenePath");
+            if (mainMapAssetProperty.objectReferenceValue != null)
+            {
+                var scenePath = AssetDatabase.GetAssetPath(mainMapAssetProperty.objectReferenceValue);
+                mainMapPathProperty.stringValue = scenePath;
+            }
+
+            // 既存のchapters更新処理
             var chaptersProperty = serializedObject.FindProperty("chapters");
             for (int i = 0; i < chaptersProperty.arraySize; i++)
             {
@@ -121,6 +132,14 @@ namespace AnoGame.Application.Data
             List<EditorBuildSettingsScene> buildScenes = new List<EditorBuildSettingsScene>();
             HashSet<string> addedScenePaths = new HashSet<string>();
 
+            // mainMapのシーンを追加
+            if (!string.IsNullOrEmpty(storyData.mainMap.ScenePath))
+            {
+                buildScenes.Add(new EditorBuildSettingsScene(storyData.mainMap.ScenePath, true));
+                addedScenePaths.Add(storyData.mainMap.ScenePath);
+            }
+
+            // 既存のchaptersのシーン追加処理
             foreach (var chapter in storyData.chapters)
             {
                 foreach (var scene in chapter.scenes)
