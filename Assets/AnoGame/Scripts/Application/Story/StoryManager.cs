@@ -109,18 +109,27 @@ namespace AnoGame.Application.Story
             LoadCurrentScene(false); // 次のシーンは常にスタートポイントから
         }
 
+        public void LoadStory(int storyIndex, bool useRetryPoint = false)
+        {
+            _currentStoryIndex = storyIndex;
+            StoryData currentStory = _storyDataList[storyIndex];
+            if (storyIndex < 0 || storyIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {storyIndex}");
+                return;
+            }
+            LoadCurrentScene(useRetryPoint);
+        }
+
         public void LoadChapter(int chapterIndex, bool useRetryPoint = false)
         {
             _currentChapterIndex = chapterIndex;
-            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            StoryData currentStory = _storyDataList[chapterIndex];
             if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
             {
                 Debug.LogError($"Invalid chapter index: {chapterIndex}");
                 return;
             }
-
-            currentStory.currentChapterIndex = chapterIndex;
-            currentStory.currentSceneIndex = 0;
             LoadCurrentScene(useRetryPoint);
         }
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace AnoGame.Application.Story
@@ -9,6 +7,8 @@ namespace AnoGame.Application.Story
         [SerializeField]
         bool _runAtStart = false;
         [SerializeField]
+        int _storyIndex = 0;
+        [SerializeField]
         int _chapterIndex = 0;
 
         void Start()
@@ -17,6 +17,12 @@ namespace AnoGame.Application.Story
             {
                 LoadChapter();
             }
+        }
+
+        public void LoadStory()
+        {
+            StoryManager.Instance.LoadStory(_storyIndex);
+            StoryManager.Instance.UpdateGameData();
         }
 
         public void LoadChapter()

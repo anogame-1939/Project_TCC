@@ -41,6 +41,7 @@ namespace AnoGame.Application.Data
         public SceneReference mainMap;
         public List<ChapterData> chapters = new List<ChapterData>();
 
+        [HideInInspector] public int currentStoryIndex = 0;
         [HideInInspector] public int currentChapterIndex = 0;
         [HideInInspector] public int currentSceneIndex = 0;
 
