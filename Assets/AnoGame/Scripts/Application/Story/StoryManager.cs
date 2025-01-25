@@ -20,6 +20,8 @@ namespace AnoGame.Application.Story
         private int _currentStoryIndex = 0;
         private int _currentChapterIndex = 0;
         private List<Scene> _loadedStoryScenes = new List<Scene>();
+
+        private Scene _mainMap;
         private Scene _mainScene;
         public Scene MainScene => _mainScene;
         private bool _isLoadingScene = false;
@@ -54,6 +56,18 @@ namespace AnoGame.Application.Story
             // ストーリ進捗状況をロード
             _currentStoryIndex = gameData.StoryProgress.CurrentStoryIndex;
             _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
+
+            StoryData storyData = _storyDataList[_currentStoryIndex];
+            if (_mainMap.path == null || _mainMap.path != storyData.mainMap.ScenePath)
+            {
+                _mainMap = SceneManager.GetSceneByPath(
+                    storyData.mainMap.ScenePath
+                );
+                SceneManager.LoadSceneAsync(
+                    storyData.mainMap.ScenePath, 
+                    LoadSceneMode.Additive
+                );
+            }
 
             LoadCurrentScene();
         }
