@@ -58,8 +58,13 @@ namespace AnoGame.Application.Story
             _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
 
             StoryData storyData = _storyDataList[_currentStoryIndex];
-            if (_mainMap.path == null || _mainMap.path != storyData.mainMap.ScenePath)
+            if (_mainMap.path != storyData.mainMap.ScenePath)
             {
+                if (_mainMap.path != null)
+                {
+                    SceneManager.UnloadSceneAsync(_mainMap.path);
+                }
+                
                 _mainMap = SceneManager.GetSceneByPath(
                     storyData.mainMap.ScenePath
                 );
@@ -109,15 +114,28 @@ namespace AnoGame.Application.Story
             LoadCurrentScene(false); // 次のシーンは常にスタートポイントから
         }
 
-        public void LoadStory(int storyIndex, bool useRetryPoint = false)
+        public async void LoadStory(int storyIndex, bool useRetryPoint = false)
         {
             _currentStoryIndex = storyIndex;
-            StoryData currentStory = _storyDataList[storyIndex];
-            if (storyIndex < 0 || storyIndex >= currentStory.chapters.Count)
+            _currentChapterIndex = 0;
+
+            StoryData storyData = _storyDataList[_currentStoryIndex];
+            if (_mainMap.path != storyData.mainMap.ScenePath)
             {
-                Debug.LogError($"Invalid chapter index: {storyIndex}");
-                return;
+                if (_mainMap.path != null)
+                {
+                    await SceneManager.UnloadSceneAsync(_mainMap);
+                }
+                
+                _mainMap = SceneManager.GetSceneByPath(
+                    storyData.mainMap.ScenePath
+                );
+                await SceneManager.LoadSceneAsync(
+                    storyData.mainMap.ScenePath, 
+                    LoadSceneMode.Additive
+                );
             }
+
             LoadCurrentScene(useRetryPoint);
         }
 
