@@ -38,7 +38,7 @@ namespace AnoGame.Application.Data
 
         public string storyName;
 
-        public SceneReference mainMap;
+        public SceneReference mainMapScene;
         public List<ChapterData> chapters = new List<ChapterData>();
 
         [HideInInspector] public int currentStoryIndex = 0;
@@ -78,7 +78,7 @@ namespace AnoGame.Application.Data
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("storyName"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("mainMap"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("mainMapScene"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("chapters"), true);
 
             if (GUILayout.Button("Update Scene Paths"))
@@ -97,7 +97,7 @@ namespace AnoGame.Application.Data
         private void UpdateScenePaths()
         {
             // mainMapのシーンパスを更新
-            var mainMapProperty = serializedObject.FindProperty("mainMap");
+            var mainMapProperty = serializedObject.FindProperty("mainMapScene");
             var mainMapAssetProperty = mainMapProperty.FindPropertyRelative("sceneAsset");
             var mainMapPathProperty = mainMapProperty.FindPropertyRelative("scenePath");
             if (mainMapAssetProperty.objectReferenceValue != null)
@@ -134,10 +134,10 @@ namespace AnoGame.Application.Data
             HashSet<string> addedScenePaths = new HashSet<string>();
 
             // mainMapのシーンを追加
-            if (!string.IsNullOrEmpty(storyData.mainMap.ScenePath))
+            if (!string.IsNullOrEmpty(storyData.mainMapScene.ScenePath))
             {
-                buildScenes.Add(new EditorBuildSettingsScene(storyData.mainMap.ScenePath, true));
-                addedScenePaths.Add(storyData.mainMap.ScenePath);
+                buildScenes.Add(new EditorBuildSettingsScene(storyData.mainMapScene.ScenePath, true));
+                addedScenePaths.Add(storyData.mainMapScene.ScenePath);
             }
 
             // 既存のchaptersのシーン追加処理

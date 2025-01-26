@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 using AnoGame.Application.Core;
 using AnoGame.Application.Data;
 using AnoGame.Domain.Data.Models;
+using AnoGame.Application.Core.Scene;
+using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 
 namespace AnoGame.Application.Story
 {
@@ -19,15 +22,17 @@ namespace AnoGame.Application.Story
         private List<GameObject> _spawnedObjects = new List<GameObject>();
         private int _currentStoryIndex = 0;
         private int _currentChapterIndex = 0;
-        private List<Scene> _loadedStoryScenes = new List<Scene>();
 
-        private Scene _mainMap;
+        private ISceneLoader _sceneLoader;
+        private List<Scene> _loadedStoryScenes = new List<Scene>();
+        private SceneReference _mainMapScene;
         private Scene _mainScene;
         public Scene MainScene => _mainScene;
         private bool _isLoadingScene = false;
 
         private new void Awake()
         {
+            _sceneLoader = new SceneLoader();
             _mainScene = SceneManager.GetActiveScene();
             GameManager2.Instance.LoadGameData += OnLoadGameData;
         }
@@ -49,7 +54,7 @@ namespace AnoGame.Application.Story
             }
         }
 
-        private void OnLoadGameData(GameData gameData)
+        private async void OnLoadGameData(GameData gameData)
         {
             if (gameData == null || gameData.StoryProgress == null) return;
 
@@ -58,23 +63,24 @@ namespace AnoGame.Application.Story
             _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
 
             StoryData storyData = _storyDataList[_currentStoryIndex];
-            if (_mainMap.path != storyData.mainMap.ScenePath)
+            if (_mainMapScene != storyData.mainMapScene)
             {
-                if (_mainMap.path != null)
+                if (_mainMapScene != null)
                 {
-                    SceneManager.UnloadSceneAsync(_mainMap.path);
+                    Debug.Log($"{_mainMapScene.ScenePath} をアンロード");
+                    await _sceneLoader.UnloadSceneAsync(_mainMapScene);
                 }
-                
-                _mainMap = SceneManager.GetSceneByPath(
-                    storyData.mainMap.ScenePath
-                );
-                SceneManager.LoadSceneAsync(
-                    storyData.mainMap.ScenePath, 
-                    LoadSceneMode.Additive
-                );
+                // StartCoroutine(LoadMapSceneAsync(storyData.mainMap.ScenePath));
+                _mainMapScene = storyData.mainMapScene;
+                await LoadScenesAsync(storyData.mainMapScene);
             }
 
             LoadCurrentScene();
+        }
+
+        private async UniTask LoadScenesAsync(SceneReference mainMapScene)
+        {
+            await _sceneLoader.LoadSceneAsync(mainMapScene, LoadSceneMode.Additive);
         }
 
         public void UpdateGameData()
@@ -120,20 +126,15 @@ namespace AnoGame.Application.Story
             _currentChapterIndex = 0;
 
             StoryData storyData = _storyDataList[_currentStoryIndex];
-            if (_mainMap.path != storyData.mainMap.ScenePath)
+            if (_mainMapScene != storyData.mainMapScene)
             {
-                if (_mainMap.path != null)
+                if (_mainMapScene != null)
                 {
-                    await SceneManager.UnloadSceneAsync(_mainMap);
+                    Debug.Log($"{_mainMapScene.ScenePath} をアンロード");
+                    await _sceneLoader.UnloadSceneAsync(_mainMapScene);
                 }
-                
-                _mainMap = SceneManager.GetSceneByPath(
-                    storyData.mainMap.ScenePath
-                );
-                await SceneManager.LoadSceneAsync(
-                    storyData.mainMap.ScenePath, 
-                    LoadSceneMode.Additive
-                );
+                _mainMapScene = storyData.mainMapScene;
+                await LoadScenesAsync(storyData.mainMapScene);
             }
 
             LoadCurrentScene(useRetryPoint);
