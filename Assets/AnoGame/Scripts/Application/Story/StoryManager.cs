@@ -8,7 +8,6 @@ using AnoGame.Application.Data;
 using AnoGame.Domain.Data.Models;
 using AnoGame.Application.Core.Scene;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 
 namespace AnoGame.Application.Story
 {
@@ -65,14 +64,23 @@ namespace AnoGame.Application.Story
             StoryData storyData = _storyDataList[_currentStoryIndex];
             if (_mainMapScene != storyData.mainMapScene)
             {
+                SceneReference tmpMainScene;
                 if (_mainMapScene != null)
                 {
+                    tmpMainScene = _mainMapScene;
                     Debug.Log($"{_mainMapScene.ScenePath} をアンロード");
-                    await _sceneLoader.UnloadSceneAsync(_mainMapScene);
+
+                    // _sceneLoader.HideAllGameObjects(tmpMainScene);
+                    
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                    await _sceneLoader.UnloadSceneAsync(tmpMainScene);
                 }
-                // StartCoroutine(LoadMapSceneAsync(storyData.mainMap.ScenePath));
-                _mainMapScene = storyData.mainMapScene;
-                await LoadScenesAsync(storyData.mainMapScene);
+                else
+                {
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                }
             }
 
             LoadCurrentScene();
@@ -128,13 +136,23 @@ namespace AnoGame.Application.Story
             StoryData storyData = _storyDataList[_currentStoryIndex];
             if (_mainMapScene != storyData.mainMapScene)
             {
+                SceneReference tmpMainScene;
                 if (_mainMapScene != null)
                 {
-                    Debug.Log($"{_mainMapScene.ScenePath} をアンロード");
-                    await _sceneLoader.UnloadSceneAsync(_mainMapScene);
+                    tmpMainScene = _mainMapScene;
+                    Debug.Log($"{_mainMapScene.ScenePath} をアンロード2");
+
+                    // _sceneLoader.HideAllGameObjects(tmpMainScene);
+                    
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                    await _sceneLoader.UnloadSceneAsync(tmpMainScene);
                 }
-                _mainMapScene = storyData.mainMapScene;
-                await LoadScenesAsync(storyData.mainMapScene);
+                else
+                {
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                }
             }
 
             LoadCurrentScene(useRetryPoint);

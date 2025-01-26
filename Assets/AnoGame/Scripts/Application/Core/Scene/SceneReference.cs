@@ -20,6 +20,7 @@ namespace AnoGame.Application.Core.Scene
     {
         UniTask LoadSceneAsync(SceneReference scene, LoadSceneMode mode = LoadSceneMode.Single);
         UniTask UnloadSceneAsync(SceneReference scene);
+        void HideGameObjectsInScene(SceneReference scene);
     }
 
     public class SceneLoader : ISceneLoader
@@ -57,6 +58,28 @@ namespace AnoGame.Application.Core.Scene
             catch (Exception e)
             {
                 Debug.LogError($"Failed to unload scene: {e.Message}");
+            }
+        }
+
+        public void HideGameObjectsInScene(SceneReference scene)
+        {
+            // シーン名からシーンを取得
+            UnityEngine.SceneManagement.Scene targetScene = SceneManager.GetSceneByName(scene.ScenePath);
+
+            // シーンが存在するかどうかを確認
+            if (!targetScene.IsValid())
+            {
+                Debug.LogError($"Scene not found: {scene.ScenePath}");
+                return;
+            }
+
+            // シーン内のすべてのルートゲームオブジェクトを取得
+            GameObject[] rootObjects = targetScene.GetRootGameObjects();
+
+            // 各ルートゲームオブジェクトを非アクティブにする
+            foreach (GameObject rootObject in rootObjects)
+            {
+                rootObject.SetActive(false);
             }
         }
     }
