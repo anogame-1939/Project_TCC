@@ -11,12 +11,13 @@ namespace AnoGame.Application.Story.Manager
         private GameManager2 _gameManager;
         private StoryManager _storyManager;
         
-        private new void Awake()
+        private void Awake()
         {
             _gameManager = GameManager2.Instance;
             _storyManager = StoryManager.Instance;
             
             // StoryManagerのチャプターロードイベントを購読
+            _storyManager.StoryLoaded += OnStoryLoaded;
             _storyManager.ChapterLoaded += OnChapterLoaded;
             
             // GameManagerのセーブ/ロードイベントを購読
@@ -28,6 +29,7 @@ namespace AnoGame.Application.Story.Manager
         {
             if (_storyManager != null)
             {
+                _storyManager.StoryLoaded -= OnStoryLoaded;
                 _storyManager.ChapterLoaded -= OnChapterLoaded;
             }
             
@@ -35,6 +37,22 @@ namespace AnoGame.Application.Story.Manager
             {
                 // _gameManager.SaveGameData -= OnSaveGameData;
                 _gameManager.LoadGameData -= OnLoadGameData;
+            }
+        }
+
+        private void OnStoryLoaded(bool useRetryPoint)
+        {
+            if (_gameManager == null || _storyManager == null) return;
+
+
+            if (useRetryPoint)
+            {
+
+            }
+            else
+            {
+                PlayerSpawnManager.Instance.SpawnPlayerAtStart();
+                
             }
         }
 

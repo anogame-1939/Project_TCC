@@ -13,6 +13,7 @@ namespace AnoGame.Application.Story
 {
     public class StoryManager : SingletonMonoBehaviour<StoryManager>
     {   
+        public event Action<bool> StoryLoaded;
         public event Action<bool> ChapterLoaded;
         
         [SerializeField]
@@ -154,6 +155,7 @@ namespace AnoGame.Application.Story
                     await LoadScenesAsync(storyData.mainMapScene);
                 }
             }
+            StoryLoaded?.Invoke(useRetryPoint);
 
             LoadCurrentScene(useRetryPoint);
         }
