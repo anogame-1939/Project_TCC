@@ -88,8 +88,8 @@ namespace AnoGame.Application.Lore
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            UpdateScenePaths();
-            UpdateBuildSettings();
+            // UpdateScenePaths();
+            // UpdateBuildSettings();
         }
 
         private void UpdateScenePaths()
