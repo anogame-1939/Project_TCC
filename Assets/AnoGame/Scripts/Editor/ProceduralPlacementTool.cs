@@ -74,12 +74,27 @@ namespace AnoGame.EditorExtensions
                 if (alignToSurface)
                 {
                     RaycastHit hit;
-                    if (Physics.Raycast(position + Vector3.up * 100f, Vector3.down, out hit, Mathf.Infinity, surfaceLayer))
+                    Vector3 rayStart = position + Vector3.up * 1000f;
+                    if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity, surfaceLayer))
                     {
                         position = hit.point;
+                        // デバッグ用の視覚化（エディタでのみ表示）
+                        Debug.DrawLine(rayStart, hit.point, Color.green, 2f);
+                    }
+                    else
+                    {
+                        // Raycastが失敗した場合はy=0に設定
+                        position.y = 0f;
+                        Debug.DrawLine(rayStart, position, Color.red, 2f);
+                        Debug.LogWarning($"Raycast failed at position {position}. Setting y to 0.");
                     }
                 }
+                else
+                {
+                    position.y = 0f;
+                }
 
+                // オフセットを適用
                 position.y += yOffset;
 
                 // Create object
