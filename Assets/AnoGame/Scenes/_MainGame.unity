@@ -25617,6 +25617,7 @@ GameObject:
   - component: {fileID: 1870598128}
   - component: {fileID: 1870598130}
   - component: {fileID: 1870598129}
+  - component: {fileID: 1870598131}
   m_Layer: 5
   m_Name: GameOverUI
   m_TagString: Untagged
@@ -25656,7 +25657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d10aa3ff415c745be146bd902f0549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOverPanel: {fileID: 1475488541}
+  gameOverPanel: {fileID: 1870598131}
 --- !u!222 &1870598130
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -25665,6 +25666,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1870598127}
   m_CullTransparentMesh: 1
+--- !u!225 &1870598131
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1870598127}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1883678461
 GameObject:
   m_ObjectHideFlags: 0
@@ -29754,7 +29767,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 426863186280237112}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0

@@ -6,6 +6,7 @@ namespace AnoGame.Application.Event
     /// <summary>
     /// イベントがスタートしたら即時にクリアする
     /// </summary>
+    [DefaultExecutionOrder(999)] 
     public class InstantEventTrigger : EventTriggerBase
     {
         [SerializeField]
@@ -24,6 +25,7 @@ namespace AnoGame.Application.Event
         {
             if (_onStart)
             {
+                base.Start();
                 base._eventService.TriggerEventStart(eventData.EventId);
             }
         }

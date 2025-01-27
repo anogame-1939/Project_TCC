@@ -10,7 +10,7 @@ namespace AnoGame.Application.GameOver
     public class GameOverUI : MonoBehaviour
     {
         [SerializeField]
-        private GameObject gameOverPanel;
+        private CanvasGroup gameOverPanel;
 
         private void Awake()
         {
@@ -20,12 +20,12 @@ namespace AnoGame.Application.GameOver
 
         private void ShowGameOverPanel()
         {
-            gameOverPanel.SetActive(true);
+            gameOverPanel.alpha = 1;
         }
 
         private void HideGameOverPanel()
         {
-            gameOverPanel.SetActive(false);
+            gameOverPanel.alpha = 0;
         }
         
         public void OnClickRetryButton()
