@@ -126,7 +126,7 @@ namespace AnoGame.Application.Event
 
         protected virtual void OnStartEvent()
         {
-            Debug.Log("OnStartEvent");
+            Debug.Log($"OnStartEvent:{name}");
             // if (!CheckConditions())
                 // return;
 

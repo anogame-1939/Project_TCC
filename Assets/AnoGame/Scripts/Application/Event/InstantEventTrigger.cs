@@ -1,4 +1,3 @@
-using AnoGame.Domain.Event.Services;
 using UnityEngine;
 using VContainer;
 
@@ -9,6 +8,8 @@ namespace AnoGame.Application.Event
     /// </summary>
     public class InstantEventTrigger : EventTriggerBase
     {
+        [SerializeField]
+        private bool _onStart = false;
         [Inject] private EventManager _eventManager;
 
         [Inject]
@@ -17,6 +18,14 @@ namespace AnoGame.Application.Event
         )
         {
             _eventManager = eventManager;
+        }
+
+        protected override void Start()
+        {
+            if (_onStart)
+            {
+                base._eventService.TriggerEventStart(eventData.EventId);
+            }
         }
 
         protected override void OnStartEvent()
