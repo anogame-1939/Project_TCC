@@ -20,7 +20,6 @@ namespace AnoGame.Application.Story
 
         private Transform GetStartPoint()
         {
-            var a = GameObject.FindGameObjectsWithTag(TAG_START_POINT);
             var startPoint = GameObject.FindWithTag(TAG_START_POINT);
             if (startPoint == null)
             {
