@@ -7,16 +7,20 @@ namespace AnoGame.EditorExtensions
     public class ProceduralPlacementTool : EditorWindow
     {
         private GameObject prefab;
+        
         private int count = 10;
         private float radius = 5f;
+        
+        private float densityMultiplier = 2f;
+        private float minDistance = 1f;
+        
         private float minScale = 0.8f;
         private float maxScale = 1.2f;
+        
         private float yOffset = 0f;
         private bool randomRotation = true;
         private bool alignToSurface = true;
         private LayerMask surfaceLayer = -1;
-        private float densityMultiplier = 2f; // 密度の調整係数
-        private float minDistance = 1f; // オブジェクト間の最小距離
 
         [MenuItem("Tools/Procedural Placement Tool")]
         public static void ShowWindow()
