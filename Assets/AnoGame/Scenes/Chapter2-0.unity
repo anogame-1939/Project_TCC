@@ -741,8 +741,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1602747504}
+  - component: {fileID: 1602747506}
+  - component: {fileID: 1602747505}
   m_Layer: 0
-  m_Name: "\u30B9\u30C8\u30FC\u30EA\u30FC2\u306E\u30B9\u30BF\u30FC\u30C8\u5730\u70B9_1"
+  m_Name: "\u30B9\u30C8\u30FC\u30EA\u30FC2\u958B\u59CB"
   m_TagString: StartPointEnemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -757,12 +759,70 @@ Transform:
   m_GameObject: {fileID: 1602747503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 88, z: -1.26}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1602747505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1602747503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: fd576feb8ec00aa40ac72db112e21d8a, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1602747506}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents: []
+--- !u!320 &1602747506
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1602747503}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: 477f5b35089654c4fb74a1dfdf5ba447, type: 2}
+  m_InitialState: 0
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings: []
+  m_ExposedReferences:
+    m_References: []
 --- !u!1 &1906241364
 GameObject:
   m_ObjectHideFlags: 0
@@ -1160,9 +1220,9 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 457343941}
   - {fileID: 1602747504}
   - {fileID: 1435492655}
-  - {fileID: 457343941}
   - {fileID: 1022978318}
   - {fileID: 2577331246474313070}
   - {fileID: 6219244041640758205}
