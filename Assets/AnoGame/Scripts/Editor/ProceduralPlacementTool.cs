@@ -7,20 +7,17 @@ namespace AnoGame.EditorExtensions
     public class ProceduralPlacementTool : EditorWindow
     {
         private GameObject prefab;
-        
         private int count = 10;
         private float radius = 5f;
-        
         private float densityMultiplier = 2f;
         private float minDistance = 1f;
-        
         private float minScale = 0.8f;
         private float maxScale = 1.2f;
-        
         private float yOffset = 0f;
         private bool randomRotation = true;
         private bool alignToSurface = true;
         private LayerMask surfaceLayer = -1;
+        private GameObject containerObject;
 
         [MenuItem("Tools/Procedural Placement Tool")]
         public static void ShowWindow()
@@ -121,8 +118,12 @@ namespace AnoGame.EditorExtensions
         {
             if (prefab == null) return;
 
-            GameObject container = new GameObject("Generated_Objects");
-            Undo.RegisterCreatedObjectUndo(container, "Generate Objects");
+            // 既存のコンテナがあれば削除
+            // ClearGenerated();
+
+            // 新しいコンテナを作成
+            containerObject = new GameObject("Generated_Objects");
+            Undo.RegisterCreatedObjectUndo(containerObject, "Generate Objects");
 
             List<Vector3> positions = GeneratePositions();
 
@@ -158,7 +159,7 @@ namespace AnoGame.EditorExtensions
                 // Create object
                 GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
                 obj.transform.position = finalPosition;
-                obj.transform.SetParent(container.transform);
+                obj.transform.SetParent(containerObject.transform);
 
                 // Random rotation
                 if (randomRotation)
@@ -176,10 +177,10 @@ namespace AnoGame.EditorExtensions
 
         private void ClearGenerated()
         {
-            GameObject[] generated = GameObject.FindGameObjectsWithTag("Generated_Objects");
-            foreach (GameObject obj in generated)
+            if (containerObject != null)
             {
-                Undo.DestroyObjectImmediate(obj);
+                Undo.DestroyObjectImmediate(containerObject);
+                containerObject = null;
             }
         }
     }
