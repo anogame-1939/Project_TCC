@@ -765,8 +765,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a15cc7471bbb274e9f9dcca4ea2c28c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveControl: {fileID: 8767099837496873908}
-  moveThreshold: 0.1
   _audioSource: {fileID: 6811365984052480311}
 --- !u!82 &6811365984052480311
 AudioSource:
@@ -787,11 +785,11 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
+  Priority: 0
+  DopplerLevel: 3.98
   MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
+  MaxDistance: 20
+  Pan2D: -0.052
   rolloffMode: 0
   BypassEffects: 0
   BypassListenerEffects: 0
@@ -825,7 +823,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.649
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -840,7 +838,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.30555555
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -855,7 +853,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 1.074
       inSlope: 0
       outSlope: 0
       tangentMode: 0
