@@ -158,7 +158,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3657523631435519758}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.4, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -635,7 +635,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 33554432
   viewAngle: 360
-  maxInventorySize: 20
 --- !u!114 &5581002343617322569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -720,7 +719,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6308477388476660970}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 1.45, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -729,7 +728,7 @@ Transform:
   - {fileID: 7278510429288468564}
   - {fileID: 5431559795609409333}
   m_Father: {fileID: 4582682551410209863}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!95 &924432481669290093
 Animator:
   serializedVersion: 7
@@ -1013,6 +1012,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9170fd179ea0e41adb7c2317c32a52a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audoStart: 0
+  isPermanent: 0
+  _eventaData: {fileID: 0}
 --- !u!1 &9151141888032704577
 GameObject:
   m_ObjectHideFlags: 0
