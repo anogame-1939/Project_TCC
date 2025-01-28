@@ -13,6 +13,8 @@ namespace AnoGame.Application.Inventory
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            Debug.Log("Pointer Enter");
+            Debug.Log(_inventorySlot.CurrentItem.ItemName);
             InventoryItemDetail.Instance.SetText(_inventorySlot.CurrentItem.ItemName, _inventorySlot.CurrentItem.Description);
         }
 
