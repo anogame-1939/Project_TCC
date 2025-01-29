@@ -7,6 +7,9 @@ namespace AnoGame.Application.Enemy
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField]
+        GameObject enemyPrefab;
+
+        [SerializeField]
         bool audoStart = false;
         [SerializeField]
         bool isPermanent = false;
@@ -32,6 +35,11 @@ namespace AnoGame.Application.Enemy
 
         private void Start()
         {
+            if (enemyPrefab != null)
+            {
+                _spawnManager.SetEnemyPrefab(enemyPrefab);
+            }
+            
             if (audoStart)
             {
                 TriggerEnemySpawn();

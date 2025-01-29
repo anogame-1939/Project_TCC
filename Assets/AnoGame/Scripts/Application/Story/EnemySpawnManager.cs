@@ -43,6 +43,9 @@ namespace AnoGame.Application.Enemy
         private void Start()
         {
             InitializeEnemy();
+
+            // スタートポイントから初期スポーン
+            SpawnEnemyAtStart();
         }
 
 
@@ -73,14 +76,12 @@ namespace AnoGame.Application.Enemy
             // 明示的にメインシーンに配置する
             var targetScene = StoryManager.Instance.MainScene;
             SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
-
-            // スタートポイントから初期スポーン
-            SpawnEnemyAtStart();
         }
 
         public void SetEnemyPrefab(GameObject prefab)
         {
             enemyPrefab = prefab;
+            InitializeEnemy();
         }
 
         private Transform GetStartPoint()
