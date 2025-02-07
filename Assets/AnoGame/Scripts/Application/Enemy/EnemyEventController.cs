@@ -71,7 +71,7 @@ namespace AnoGame.Application.Enemy
             Debug.LogWarning("死");
             if (_isLocked) return;
             _isLocked = true;
-            lifespan.ImmediateDeactive();
+            // lifespan.ImmediateDeactive();
             GameOverManager.Instance.OnGameOver();
 
             if (_eventData != null)
