@@ -20520,10 +20520,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64f2c319eab81724885f5a67f3437a53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  duration: 10
   detectionRadius: 10
-  forceMagnitude: 10
-  treeMass: 50
-  removeRigitBodyDelay: 1
+  fallDuration: 2
+  fallAngle: 90
+  pivotOffset: {x: 0, y: 0, z: 0}
+  fallCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!65 &978686828
 BoxCollider:
   m_ObjectHideFlags: 0
