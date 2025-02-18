@@ -10,6 +10,10 @@ namespace AnoGame.Application.Enemy
         public float detectionRadius = 10f;
         [Header("木に加える力の大きさ")]
         public float forceMagnitude = 10f;
+        [Header("木の重さ")]
+        public float treeMass = 50f;
+        [Header("重力除去までの時間")]
+        public float removeRigitBodyDelay = 1f;
 
         void Start()
         {
@@ -55,6 +59,8 @@ namespace AnoGame.Application.Enemy
                         // Rigidbodyを追加
                         Rigidbody rb = col.gameObject.AddComponent<Rigidbody>();
 
+                        rb.mass = treeMass;
+
                         // 自身と木オブジェクトの位置から、木が自身から離れる方向を計算
                         Vector3 direction = (col.transform.position - transform.position).normalized;
 
@@ -62,7 +68,7 @@ namespace AnoGame.Application.Enemy
                         rb.AddForce(direction * forceMagnitude, ForceMode.Impulse);
 
                         // 10秒後にRigidbodyを除去し、再び静的状態に戻す処理を開始
-                        StartCoroutine(RemoveRigidbodyAfterDelay(col.gameObject, 10f));
+                        StartCoroutine(RemoveRigidbodyAfterDelay(col.gameObject, removeRigitBodyDelay));
                     }
                 }
             }
