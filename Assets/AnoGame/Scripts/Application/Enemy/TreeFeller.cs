@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using MoreMountains.Feedbacks;
 
 namespace AnoGame.Application.Enemy
 {
@@ -14,12 +15,22 @@ namespace AnoGame.Application.Enemy
         [Header("倒すアニメーション設定")]
         [Tooltip("倒れるのにかかる時間(秒)")]
         public float fallDuration = 2f;
+
+        [Header("木が倒れる時間をランダム化する範囲")]
+        [Tooltip("fallDurationに乗算する乱数係数の最小値")]
+        public float minDurationMultiplier = 0.8f;
+        [Tooltip("fallDurationに乗算する乱数係数の最大値")]
+        public float maxDurationMultiplier = 2.0f;
+
         [Tooltip("何度倒すか(90度で横倒しイメージ)")]
         public float fallAngle = 90f;
         [Tooltip("回転軸のオフセット。根元を軸にしたい場合などに調整")]
         public Vector3 pivotOffset = Vector3.zero;
         [Tooltip("0→1の区間で角度をどれだけ倒すかを制御するカーブ")]
         public AnimationCurve fallCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+        public MMF_Player mMF_Player;
+        
 
         void Start()
         {
@@ -59,15 +70,37 @@ namespace AnoGame.Application.Enemy
                         fallScript = col.gameObject.AddComponent<CustomTreeRigidbody>();
                     }
 
+                    // イベント購読
+                    fallScript.OnTreeFallen += OnTreeFallenHandler;
+
+                    float randomDuration = fallDuration * Random.Range(minDurationMultiplier, maxDurationMultiplier);
+
                     // 「倒す」処理を実行 (本スクリプト側のパラメータを渡す)
                     fallScript.Fall(
                         fellerPosition : transform.position,
-                        fallDuration   : fallDuration,
+                        fallDuration   : randomDuration,
                         fallAngle      : fallAngle,
                         pivotOffset    : pivotOffset,
                         fallCurve      : fallCurve
                     );
                 }
+            }
+        }
+
+        // 木が倒れ終わった時に呼ばれるハンドラ
+        private void OnTreeFallenHandler(CustomTreeRigidbody fallenTree)
+        {
+            // 必要に応じて購読解除
+            fallenTree.OnTreeFallen -= OnTreeFallenHandler;
+
+            // Feelでカメラシェイクなどを実行
+            Debug.Log("木が倒れ終わりました！ カメラシェイクを実行します。");
+            // ここでFeelのFeedbackを呼ぶ etc...
+
+            if (!mMF_Player.IsPlaying)
+            {
+                Debug.Log("実行！");
+                mMF_Player.PlayFeedbacks();
             }
         }
 

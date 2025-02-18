@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace AnoGame.Application.Enemy
     /// </summary>
     public class CustomTreeRigidbody : MonoBehaviour
     {
+        // 木が倒れ終わったときに発火するイベント
+        public event Action<CustomTreeRigidbody> OnTreeFallen;
         private bool _isFalling = false;
 
         /// <summary>
@@ -61,7 +64,10 @@ namespace AnoGame.Application.Enemy
                 yield return null;
             }
 
+            Debug.Log("実行-たおれた");
+
             // 最終的に fallAngle 度まで倒れきった状態
+            OnTreeFallen?.Invoke(this);
         }
     }
 }

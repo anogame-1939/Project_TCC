@@ -20523,6 +20523,8 @@ MonoBehaviour:
   duration: 10
   detectionRadius: 10
   fallDuration: 2
+  minDurationMultiplier: 0.8
+  maxDurationMultiplier: 2
   fallAngle: 90
   pivotOffset: {x: 0, y: 0, z: 0}
   fallCurve:
@@ -20549,6 +20551,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  mMF_Player: {fileID: 0}
 --- !u!65 &978686828
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26940,7 +26943,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!82 &1893901967
 AudioSource:
   m_ObjectHideFlags: 0
