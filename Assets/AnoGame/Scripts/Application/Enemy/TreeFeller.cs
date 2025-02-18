@@ -24,38 +24,47 @@ namespace AnoGame.Application.Enemy
         {
             while (true)
             {
-                Debug.Log("TreeFellingRoutine: ");
-                // 自身の周囲（detectionRadius内）のColliderを取得
-                Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
-                foreach (Collider col in colliders)
+                FellTrees();
+                yield return new WaitForSeconds(10f);
+            }
+        }
+
+        /// <summary>
+        /// 周囲の木オブジェクトを検出して倒す処理
+        /// インスペクター上でコンテキストメニューから実行可能
+        /// </summary>
+        [ContextMenu("Fell Trees")]
+        public void FellTrees()
+        {
+            Debug.Log("FellTrees: 処理開始");
+            // 自身の周囲（detectionRadius内）のColliderを取得
+            Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
+            foreach (Collider col in colliders)
+            {
+                Debug.Log("TreeFeller: " + col.name);
+                // タグが "Tree" のオブジェクトに対して処理
+                if (col.CompareTag("Tree"))
                 {
-                    Debug.Log("TreeFeller: " + col.name);
-                    // タグが "Tree" のオブジェクトに対して処理
-                    if (col.CompareTag("Tree"))
+                    Debug.Log("TreeFeller-Tree: " + col.name);
+                    // 既にRigidbodyが追加されていないか確認
+                    if (col.GetComponent<Rigidbody>() == null)
                     {
-                        Debug.Log("TreeFeller-Tree: " + col.name);
-                        // 既にRigidbodyが追加されていないか確認
-                        if (col.GetComponent<Rigidbody>() == null)
-                        {
-                            // ※通常ランタイム中にisStaticは変更できませんが、ここでは処理として記述
-                            col.gameObject.isStatic = false;
+                        // ※通常ランタイム中にisStaticは変更できませんが、ここでは処理として記述
+                        col.gameObject.isStatic = false;
 
-                            // Rigidbodyを追加
-                            Rigidbody rb = col.gameObject.AddComponent<Rigidbody>();
+                        // Rigidbodyを追加
+                        Rigidbody rb = col.gameObject.AddComponent<Rigidbody>();
 
-                            // 自身と木オブジェクトの位置から、木が自身から離れる方向を計算
-                            Vector3 direction = (col.transform.position - transform.position).normalized;
+                        // 自身と木オブジェクトの位置から、木が自身から離れる方向を計算
+                        Vector3 direction = (col.transform.position - transform.position).normalized;
 
-                            // 算出した方向にImpulseモードで力を加える
-                            rb.AddForce(direction * forceMagnitude, ForceMode.Impulse);
+                        // 算出した方向にImpulseモードで力を加える
+                        rb.AddForce(direction * forceMagnitude, ForceMode.Impulse);
 
-                            // 10秒後にRigidbodyを除去し、再び静的状態に戻す処理を開始
-                            StartCoroutine(RemoveRigidbodyAfterDelay(col.gameObject, 10f));
-                        }
+                        // 10秒後にRigidbodyを除去し、再び静的状態に戻す処理を開始
+                        StartCoroutine(RemoveRigidbodyAfterDelay(col.gameObject, 10f));
                     }
                 }
-                // 10秒ごとにこの処理を実行
-                yield return new WaitForSeconds(10f);
             }
         }
 
