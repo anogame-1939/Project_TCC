@@ -4,78 +4,64 @@ using UnityEngine;
 namespace AnoGame.Application.Enemy
 {
     /// <summary>
-    /// Rigidbodyを使わず、コルーチンで「木が倒れる動き」を再現する
+    /// Rigidbodyを使わず、コルーチンのみで木が倒れる動きを再現する
     /// </summary>
     public class CustomTreeRigidbody : MonoBehaviour
     {
-        [Header("倒れるのにかかる時間 (秒)")]
-        public float fallDuration = 2f;
-        [Header("倒す角度 (度)")]
-        public float fallAngle = 90f;
-
-        // 木が倒れる軸をどこにするか(ローカルオフセット)
-        // 例：根元をPivotにしたいならYを少しマイナスにする、など
-        [Header("倒れる軸のPivotオフセット")]
-        public Vector3 pivotOffset = Vector3.zero;
-
         private bool _isFalling = false;
 
         /// <summary>
-        /// 外部から呼び出される「倒す」処理
+        /// 外部から呼び出される「木を倒す」メソッド
         /// </summary>
-        /// <param name="fellerPosition">倒す実行者の位置</param>
-        public void Fall(Vector3 fellerPosition)
+        /// <param name="fellerPosition">倒す実行者のワールド座標</param>
+        /// <param name="fallDuration">倒れるのにかける時間(秒)</param>
+        /// <param name="fallAngle">倒す角度(度)</param>
+        /// <param name="pivotOffset">回転軸のオフセット(根元を軸にしたい場合など)</param>
+        /// <param name="fallCurve">倒れる動き(0→1でどのくらい倒すか)を制御するアニメーションカーブ</param>
+        public void Fall(Vector3 fellerPosition, float fallDuration, float fallAngle, Vector3 pivotOffset, AnimationCurve fallCurve)
         {
             // すでに倒れている最中なら二重に開始しない
             if (_isFalling) { return; }
 
             _isFalling = true;
-            StartCoroutine(FallCoroutine(fellerPosition));
+            StartCoroutine(FallCoroutine(fellerPosition, fallDuration, fallAngle, pivotOffset, fallCurve));
         }
 
         /// <summary>
-        /// 実際にコルーチンで回転させる
+        /// コルーチンで段階的に木を回転させ、最終的に倒す
         /// </summary>
-        private IEnumerator FallCoroutine(Vector3 fellerPosition)
+        private IEnumerator FallCoroutine(Vector3 fellerPosition, float fallDuration, float fallAngle, Vector3 pivotOffset, AnimationCurve fallCurve)
         {
-            // 1) 倒す軸を決める
-            // 実行者(=feller)の位置から見て「反対側」に倒す場合
-            //   direction = (木の位置 - fellerの位置)
-            //   例：Vector3.up と direction の外積を使って回転軸を計算
+            // 木から見た実行者との相対方向を求める
             Vector3 direction = (transform.position - fellerPosition).normalized;
+            // 回転軸を計算 (上方向×direction)
             Vector3 rotationAxis = Vector3.Cross(Vector3.up, direction).normalized;
-
-            // 2) pivotのワールド座標を求める (transform.position + オフセット)
-            //    ここが“根元”になるように調整
+            // 回転の中心(pivot)を、木の位置 + オフセット で算出
             Vector3 pivot = transform.position + pivotOffset;
 
-            // 3) 実際にfallDuration秒かけて、fallAngle度 回転させる
             float elapsed = 0f;
             float currentAngle = 0f;
 
             while (elapsed < fallDuration)
             {
-                // このフレームで回転させる角度 (度)
-                float deltaAngle = (fallAngle / fallDuration) * Time.deltaTime;
+                elapsed += Time.deltaTime;
+                // 0→1に正規化
+                float t = Mathf.Clamp01(elapsed / fallDuration);
 
-                // RotateAround( pivot, 軸, 角度 ) で回転
+                // カーブから今の時点の「倒れ度合い」(0=未倒、1=全倒)を取得
+                float curveValue = fallCurve.Evaluate(t);
+                // 現在何度倒すかをLerpで算出
+                float targetAngle = Mathf.Lerp(0f, fallAngle, curveValue);
+
+                // 今フレームで回転させる差分角度
+                float deltaAngle = targetAngle - currentAngle;
                 transform.RotateAround(pivot, rotationAxis, deltaAngle);
 
-                // 進捗を更新
-                currentAngle += deltaAngle;
-                elapsed += Time.deltaTime;
-
-                yield return null; // 次のフレームまで待つ
+                currentAngle = targetAngle;
+                yield return null;
             }
 
-            // 計算上、最後に微妙に角度が足りないことがあるので補正
-            float remaining = fallAngle - currentAngle;
-            if (remaining > 0f)
-            {
-                transform.RotateAround(pivot, rotationAxis, remaining);
-            }
-
-            // コルーチン終了
+            // 最終的に fallAngle 度まで倒れきった状態
         }
     }
 }
