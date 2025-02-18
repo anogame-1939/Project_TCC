@@ -6,14 +6,25 @@ namespace AnoGame.Application.Enemy
 {
     public class TreeFeller : MonoBehaviour
     {
+        [Header("実行間隔")]
+        public float duration = 10f;
         [Header("周囲の木を検出するための半径")]
         public float detectionRadius = 10f;
         [Header("木に加える力の大きさ")]
         public float forceMagnitude = 10f;
         [Header("木の重さ")]
         public float treeMass = 50f;
+        [Header("木の重心オフセット")]
+        public Vector3 centerOfMass = new Vector3(0f, -2f, 0f);
+        
         [Header("重力除去までの時間")]
         public float removeRigitBodyDelay = 1f;
+
+        [Header("倒すアニメーション設定")]
+        // 倒れるのにかかる時間
+        public float fallDuration = 2f;
+        // 何度倒すか(90度で横倒しイメージ)
+        public float fallAngle = 90f;
 
         void Start()
         {
@@ -29,7 +40,7 @@ namespace AnoGame.Application.Enemy
             while (true)
             {
                 FellTrees();
-                yield return new WaitForSeconds(10f);
+                yield return new WaitForSeconds(duration);
             }
         }
 
@@ -41,35 +52,27 @@ namespace AnoGame.Application.Enemy
         public void FellTrees()
         {
             Debug.Log("FellTrees: 処理開始");
-            // 自身の周囲（detectionRadius内）のColliderを取得
+
+            // 自身の周囲(detectionRadius)のColliderを取得
             Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
             foreach (Collider col in colliders)
             {
-                Debug.Log("TreeFeller: " + col.name);
-                // タグが "Tree" のオブジェクトに対して処理
+                // タグが "Tree" のオブジェクトを対象
                 if (col.CompareTag("Tree"))
                 {
-                    Debug.Log("TreeFeller-Tree: " + col.name);
-                    // 既にRigidbodyが追加されていないか確認
-                    if (col.GetComponent<Rigidbody>() == null)
+                    // まだ TreeFallCoroutine が付いていないならアタッチする
+                    CustomTreeRigidbody fallScript = col.GetComponent<CustomTreeRigidbody>();
+                    if (fallScript == null)
                     {
-                        // ※通常ランタイム中にisStaticは変更できませんが、ここでは処理として記述
-                        col.gameObject.isStatic = false;
-
-                        // Rigidbodyを追加
-                        Rigidbody rb = col.gameObject.AddComponent<Rigidbody>();
-
-                        rb.mass = treeMass;
-
-                        // 自身と木オブジェクトの位置から、木が自身から離れる方向を計算
-                        Vector3 direction = (col.transform.position - transform.position).normalized;
-
-                        // 算出した方向にImpulseモードで力を加える
-                        rb.AddForce(direction * forceMagnitude, ForceMode.Impulse);
-
-                        // 10秒後にRigidbodyを除去し、再び静的状態に戻す処理を開始
-                        StartCoroutine(RemoveRigidbodyAfterDelay(col.gameObject, removeRigitBodyDelay));
+                        fallScript = col.gameObject.AddComponent<CustomTreeRigidbody>();
                     }
+
+                    // アニメーションのパラメータを設定
+                    fallScript.fallDuration = fallDuration;
+                    fallScript.fallAngle = fallAngle;
+
+                    // 倒す処理を開始 (引数に“倒す側”の位置を渡す)
+                    fallScript.Fall(transform.position);
                 }
             }
         }
