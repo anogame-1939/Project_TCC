@@ -29,7 +29,8 @@ namespace AnoGame.Application.Enemy
         [Tooltip("0→1の区間で角度をどれだけ倒すかを制御するカーブ")]
         public AnimationCurve fallCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
-        public MMF_Player mMF_Player;
+        public MMF_Player mMF_Player_Skill1;
+        public MMF_Player mMF_Player_Skill2;
         
 
         void Start()
@@ -63,6 +64,9 @@ namespace AnoGame.Application.Enemy
                 // "Tree" タグのオブジェクトを対象にする
                 if (col.CompareTag("Tree"))
                 {
+                    // 木が倒れる前の処理を実行
+                    PreTreeFallen();
+
                     // まだ CustomTreeRigidbody が付いていなければアタッチ
                     CustomTreeRigidbody fallScript = col.GetComponent<CustomTreeRigidbody>();
                     if (fallScript == null)
@@ -87,6 +91,14 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+        private void PreTreeFallen()
+        {
+            if (!mMF_Player_Skill1.IsPlaying)
+            {
+                mMF_Player_Skill1.PlayFeedbacks();
+            }
+        }
+
         // 木が倒れ終わった時に呼ばれるハンドラ
         private void OnTreeFallenHandler(CustomTreeRigidbody fallenTree)
         {
@@ -97,10 +109,9 @@ namespace AnoGame.Application.Enemy
             Debug.Log("木が倒れ終わりました！ カメラシェイクを実行します。");
             // ここでFeelのFeedbackを呼ぶ etc...
 
-            if (!mMF_Player.IsPlaying)
+            if (!mMF_Player_Skill2.IsPlaying)
             {
-                Debug.Log("実行！");
-                mMF_Player.PlayFeedbacks();
+                mMF_Player_Skill2.PlayFeedbacks();
             }
         }
 
