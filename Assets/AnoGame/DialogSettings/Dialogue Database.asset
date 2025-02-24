@@ -57,6 +57,28 @@ MonoBehaviour:
     spritePortrait: {fileID: 21300000, guid: 3e92acec7f6b64525b2d651e08c0317e, type: 3}
     alternatePortraits: []
     spritePortraits: []
+  - id: 6
+    fields:
+    - title: Name
+      value: "\u72EC\u308A\u8A00"
+      type: 0
+      typeString: CustomFieldType_Text
+    - title: Pictures
+      value: '[]'
+      type: 3
+      typeString: CustomFieldType_Files
+    - title: Description
+      value: 
+      type: 0
+      typeString: CustomFieldType_Text
+    - title: IsPlayer
+      value: False
+      type: 2
+      typeString: CustomFieldType_Boolean
+    portrait: {fileID: 0}
+    spritePortrait: {fileID: 0}
+    alternatePortraits: []
+    spritePortraits: []
   - id: 2
     fields:
     - title: Name
@@ -8215,7 +8237,7 @@ MonoBehaviour:
       type: 5
       typeString: CustomFieldType_Actor
     - title: Conversant
-      value: 2
+      value: 6
       type: 5
       typeString: CustomFieldType_Actor
     overrideSettings:
@@ -8265,7 +8287,7 @@ MonoBehaviour:
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
-        value: 2
+        value: 6
         type: 5
         typeString: CustomFieldType_Actor
       - title: Menu Text
@@ -8332,7 +8354,7 @@ MonoBehaviour:
         type: 0
         typeString: CustomFieldType_Text
       - title: Actor
-        value: 2
+        value: 6
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
@@ -8407,7 +8429,7 @@ MonoBehaviour:
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
-        value: 2
+        value: 6
         type: 5
         typeString: CustomFieldType_Actor
       - title: Menu Text
@@ -8415,7 +8437,7 @@ MonoBehaviour:
         type: 0
         typeString: CustomFieldType_Text
       - title: Dialogue Text
-        value: "\u3042"
+        value: "\u304F\u3057\u3083\u304F\u3057\u3083\u306E\u9EC4\u8272\u3044\u6298\u308A\u7D19\u306B\u8336\u8272\u306E\u30AF\u30EC\u30E8\u30F3\u3067\u6A21\u69D8\u304C\u63CF\u304B\u308C\u3066\u3044\u308B\n\u4F55\u3092\u8868\u3057\u3066\u3044\u308B\u3093\u3060\u308D\u3046\uFF1F"
         type: 0
         typeString: CustomFieldType_Text
       - title: Parenthetical
@@ -8455,8 +8477,8 @@ MonoBehaviour:
           m_Calls: []
       canvasRect:
         serializedVersion: 2
-        x: 166
-        y: 231
+        x: 169
+        y: 197
         width: 160
         height: 30
     - id: 3
@@ -8474,7 +8496,7 @@ MonoBehaviour:
         type: 0
         typeString: CustomFieldType_Text
       - title: Actor
-        value: 2
+        value: 6
         type: 5
         typeString: CustomFieldType_Actor
       - title: Conversant
@@ -8505,6 +8527,10 @@ MonoBehaviour:
         value: 
         type: 0
         typeString: CustomFieldType_Text
+      - title: EventGuid
+        value: 34b38b7c-7f39-4ac7-a8b7-e721eebb2c73
+        type: 0
+        typeString: 
       conversationID: 19
       isRoot: 0
       isGroup: 0
