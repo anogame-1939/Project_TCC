@@ -99,6 +99,7 @@ namespace AnoGame
         public void OnCollected()
         {
             if (!CanCollect()) return;
+            GetComponent<AudioSource>().Play();
             
             // _inventoryService.AddItem(itemData.ItemName, quantity);
             gameObject.SetActive(false);
