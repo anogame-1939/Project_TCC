@@ -27,10 +27,21 @@ namespace AnoGame.Direction
                 moveNavmeshControl.SetTargetPosition(movePositions[0].transform.position);
             }
 
-            // コルーチン開始
-            // StartCoroutine(FirstMove());
+            // 通常は自動で開始する場合
+            StartCoroutine(FirstMove());
         }
 
+        /// <summary>
+        /// エディタ拡張から呼び出す用のpublicメソッド
+        /// </summary>
+        public void StartFirstMove()
+        {
+            StartCoroutine(FirstMove());
+        }
+
+        /// <summary>
+        /// 最初の移動を実行するコルーチン
+        /// </summary>
         private IEnumerator FirstMove()
         {
             // 要素0から1へ、moveDuration秒かけて移動
@@ -59,8 +70,7 @@ namespace AnoGame.Direction
                 // Lerpで補間
                 Vector3 newPos = Vector3.Lerp(start, end, t);
 
-                // charactorBrain.Move(newPos) を呼ぶとフレーム毎にワープが走る可能性があるため、
-                // ここでは直接Transformを書き換える例を示す
+                // moveNavmeshControlのTransformを書き換え
                 moveNavmeshControl.transform.position = newPos;
 
                 yield return null; // 次のフレームまで待つ
