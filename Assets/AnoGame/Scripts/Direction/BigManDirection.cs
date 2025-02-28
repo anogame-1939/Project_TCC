@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Unity.TinyCharacterController.Brain;
 using Unity.TinyCharacterController.Control;
+using AnoGame.Application.Enemy;
 
 namespace AnoGame.Direction
 {
@@ -48,7 +49,13 @@ namespace AnoGame.Direction
             Vector3 startPos = movePositions[0].transform.position;
             Vector3 endPos   = movePositions[1].transform.position;
 
-            yield return StartCoroutine(MoveOverTime(startPos, endPos, moveDuration));
+            GetComponent<EnemyMoveController>().SetTargetObject(movePositions[0]);
+
+            yield return new WaitForSeconds(waitTime);
+
+            GetComponent<EnemyMoveController>().SetTargetObject(movePositions[1]);
+
+            
 
             // 移動後に waitTime 秒待機
             yield return new WaitForSeconds(waitTime);
