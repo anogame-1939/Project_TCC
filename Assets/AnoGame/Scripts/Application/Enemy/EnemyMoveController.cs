@@ -34,7 +34,7 @@ namespace AnoGame.Application.Enemy
             {
                 GetComponent<MoveNavmeshControl>().SetTargetPosition(_targetObject.transform.position);
             }
-            
+
             // 1) 現在の座標を小数点第3位で丸める
             Vector3 currentPosition = RoundVector3(transform.position, 3);
 
@@ -55,7 +55,7 @@ namespace AnoGame.Application.Enemy
             float speed = displacement.magnitude / Time.deltaTime;
 
             // 6) 速度が threshold を超えていれば移動中と判定
-            bool isMoving = speed > threshold;
+            bool isMoving = speed > 0;
 
             // --- 追加: 移動先にキャラクターを向かせる ---
             // displacement が 0 でなければ、その方向に回転させる

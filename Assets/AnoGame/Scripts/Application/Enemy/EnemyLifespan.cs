@@ -6,12 +6,13 @@ namespace AnoGame.Application.Enemy
 {
     public class EnemyLifespan : MonoBehaviour
     {
+        [SerializeField] private bool isPermanent = false;
         [SerializeField] private float minLifespan = 5f;
         [SerializeField] private float maxLifespan = 30f;
         [SerializeField] private bool _isAlive = false;
         [SerializeField] public bool IsAlive => _isAlive;
-        [SerializeField] private float fadeOutDuration = 1f;
-        [SerializeField] private float particleFadeOutDuration = 0.5f;
+        [SerializeField] private float _fadeOutDuration = 1f;
+        [SerializeField] private float _particleFadeOutDuration = 0.5f;
         [SerializeField] private ParticleSystem disappearEffect;
         
         private SpriteRenderer[] _spriteRenderers;
@@ -39,7 +40,10 @@ namespace AnoGame.Application.Enemy
         private void OnEnable()
         {
             ResetState();
-            StartDestroyTimer();
+            if (!isPermanent)
+            {
+                StartDestroyTimer();
+            }
         }
 
         private void OnDisable()
@@ -82,7 +86,19 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        // 外部からフェードアウトを即座に開始
+        public void StartFadeOut(float duration)
+        {
+            _particleFadeOutDuration = duration;
+            _fadeOutDuration = duration;
+            StartCoroutine(FadeOutAndDestroy());
+        }
+
+        private IEnumerator FadeOutCorourine(float duration)
+        {
+            yield return new WaitForSeconds(duration);
+
+        }
+
         public void StartFadeOut()
         {
             StopDestroyTimer();
@@ -119,7 +135,7 @@ namespace AnoGame.Application.Enemy
             }
 
             // 両方のフェードアウトの長い方の時間だけ待機
-            yield return new WaitForSeconds(Mathf.Max(fadeOutDuration, particleFadeOutDuration));
+            yield return new WaitForSeconds(Mathf.Max(_fadeOutDuration, _particleFadeOutDuration));
             // パーティクルが完全に消えるまでの余裕を持たせる
             yield return new WaitForSeconds(0.1f);
             
@@ -130,10 +146,10 @@ namespace AnoGame.Application.Enemy
             float elapsedTime = 0f;
             Color[] initialColors = _spriteRenderers.Select(r => r.color).ToArray();
             
-            while (elapsedTime < fadeOutDuration)
+            while (elapsedTime < _fadeOutDuration)
             {
                 elapsedTime += Time.deltaTime;
-                float normalizedTime = elapsedTime / fadeOutDuration;
+                float normalizedTime = elapsedTime / _fadeOutDuration;
                 
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
@@ -158,10 +174,10 @@ namespace AnoGame.Application.Enemy
             float elapsedTime = 0f;
             Color startColor = _particleMainModule.startColor.color;
             
-            while (elapsedTime < particleFadeOutDuration)
+            while (elapsedTime < _particleFadeOutDuration)
             {
                 elapsedTime += Time.deltaTime;
-                float normalizedTime = elapsedTime / particleFadeOutDuration;
+                float normalizedTime = elapsedTime / _particleFadeOutDuration;
                 
                 Color newColor = startColor;
                 newColor.a = Mathf.Lerp(1f, 0f, normalizedTime);
