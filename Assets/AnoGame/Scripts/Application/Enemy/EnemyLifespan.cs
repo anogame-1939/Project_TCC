@@ -88,6 +88,7 @@ namespace AnoGame.Application.Enemy
 
         public void StartFadeOut(float duration)
         {
+            Debug.Log("StartFadeOut");
             _particleFadeOutDuration = duration;
             _fadeOutDuration = duration;
             StartCoroutine(FadeOutAndDestroy());
