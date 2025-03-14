@@ -119,21 +119,51 @@ namespace AnoGame.Application.Player.Control
             Quaternion cameraYawRotation = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
 
             // MoveControl 内部では
-            // _moveDirection = cameraYawRotation * (leftStickInput.normalized)
-            // となっているため、desiredDirectionになるようにするには
-            // leftStickInput = Quaternion.Inverse(cameraYawRotation) * desiredDirection
+            //   _moveDirection = cameraYawRotation * (leftStickInput.normalized)
+            // となっているため、desiredDirection になるようにするには
+            //   leftStickInput = Quaternion.Inverse(cameraYawRotation) * desiredDirection
             Vector3 leftStickInput3D = Quaternion.Inverse(cameraYawRotation) * desiredDirection;
-            Vector2 leftStickInput = new Vector2(leftStickInput3D.x, leftStickInput3D.z); // わずかな入力値
+            Vector2 leftStickInput = new Vector2(leftStickInput3D.x, leftStickInput3D.z);
+
+            // --- ここで “WASD 相当” に丸める ---
+            Vector2 snappedInput = SnapToKeyboardDirections(leftStickInput, 0.5f);
 
             // 向き更新用に一時的に入力を送る
-            moveControl.Move(leftStickInput);
+            moveControl.Move(snappedInput);
 
             Debug.Log($"FaceTargetRoutine: targetPosition={targetPosition}");
-            Debug.Log($"FaceTargetRoutine: leftStickInput={leftStickInput}");
+            Debug.Log($"FaceTargetRoutine: leftStickInput(before snap)={leftStickInput}, snappedInput={snappedInput}");
 
-            // 数フレーム（ここでは2秒）入力を有効にして向きを更新し、その後入力をクリア
+            // 1フレーム待ってから入力をクリア（必要に応じて調整）
             yield return null;
             moveControl.Move(Vector2.zero);
+        }
+
+        /// <summary>
+        /// アナログ入力ベクトルを 8方向(上下左右＋斜め)にスナップ(0/1化)するヘルパーメソッド
+        /// </summary>
+        /// <param name="input">アナログ入力</param>
+        /// <param name="threshold">しきい値。例:0.5f</param>
+        /// <returns>上下左右斜めいずれかの(-1,0,1)成分を持つ Vector2</returns>
+        private Vector2 SnapToKeyboardDirections(Vector2 input, float threshold)
+        {
+            float x = 0f;
+            float y = 0f;
+
+            // X成分が threshold を超えたら ±1、それ以下なら 0
+            if (Mathf.Abs(input.x) >= threshold)
+            {
+                x = Mathf.Sign(input.x);
+            }
+
+            // Y成分が threshold を超えたら ±1、それ以下なら 0
+            if (Mathf.Abs(input.y) >= threshold)
+            {
+                y = Mathf.Sign(input.y);
+            }
+
+            // これで上下左右・斜めのいずれか(8方向)になる
+            return new Vector2(x, y);
         }
 
    }
