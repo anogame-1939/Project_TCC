@@ -70,7 +70,7 @@ namespace AnoGame.Application.Enemy
                 }
             }
 
-            Debug.Log($"displacement: {displacement}, distance: {distance}, Speed: {speed}, IsMoving: {isMoving}");
+            // Debug.Log($"displacement: {displacement}, distance: {distance}, Speed: {speed}, IsMoving: {isMoving}");
 
             // 7) Animator のパラメータを更新
             animator.SetBool("IsMove", isMoving);

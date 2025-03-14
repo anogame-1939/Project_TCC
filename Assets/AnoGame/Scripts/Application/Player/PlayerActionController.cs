@@ -131,11 +131,8 @@ namespace AnoGame.Application.Player.Control
             // 向き更新用に一時的に入力を送る
             moveControl.Move(snappedInput);
 
-            Debug.Log($"FaceTargetRoutine: targetPosition={targetPosition}");
-            Debug.Log($"FaceTargetRoutine: leftStickInput(before snap)={leftStickInput}, snappedInput={snappedInput}");
-
-            // 1フレーム待ってから入力をクリア（必要に応じて調整）
-            yield return null;
+            // 0.01秒待ってから入力をクリア（必要に応じて調整）
+            yield return new WaitForSeconds(0.1f);
             moveControl.Move(Vector2.zero);
         }
 
