@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.TinyCharacterController.Control;
+using System.Collections;
 
 namespace AnoGame.Application.Player.Control
 {
@@ -80,5 +81,60 @@ namespace AnoGame.Application.Player.Control
                moveControl.Move(Vector2.zero);
            }
        }
+
+        /// <summary>
+        /// ターゲットの方向を向く
+        /// </summary>
+        /// <param name="target"></param>
+        public void FaceTarget(GameObject target)
+        {
+            if (target == null)
+                return;
+            StartCoroutine(FaceTargetRoutine(target));
+        }
+
+        private IEnumerator FaceTargetRoutine(GameObject target)
+        {
+            // プレイヤーとターゲットの水平な位置を取得
+            Vector3 playerPosition = transform.position;
+            Vector3 targetPosition = target.transform.position;
+
+            // Y軸は無視して水平な方向ベクトルを計算
+            Vector3 desiredDirection = targetPosition - playerPosition;
+            desiredDirection.y = 0f;
+
+            if (desiredDirection.sqrMagnitude < 0.0001f)
+                yield break;
+            
+            desiredDirection.Normalize();
+
+            // カメラのY軸回転を取得（見下ろし視点でも、カメラのY軸は有効と仮定）
+            Transform cameraTransform = Camera.main?.transform;
+            if (cameraTransform == null)
+            {
+                Debug.LogWarning("Camera.mainが見つかりません。");
+                yield break;
+            }
+            // カメラのY軸回転（水平回転）のみを抽出
+            Quaternion cameraYawRotation = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
+
+            // MoveControl 内部では
+            // _moveDirection = cameraYawRotation * (leftStickInput.normalized)
+            // となっているため、desiredDirectionになるようにするには
+            // leftStickInput = Quaternion.Inverse(cameraYawRotation) * desiredDirection
+            Vector3 leftStickInput3D = Quaternion.Inverse(cameraYawRotation) * desiredDirection;
+            Vector2 leftStickInput = new Vector2(leftStickInput3D.x, leftStickInput3D.z); // わずかな入力値
+
+            // 向き更新用に一時的に入力を送る
+            moveControl.Move(leftStickInput);
+
+            Debug.Log($"FaceTargetRoutine: targetPosition={targetPosition}");
+            Debug.Log($"FaceTargetRoutine: leftStickInput={leftStickInput}");
+
+            // 数フレーム（ここでは2秒）入力を有効にして向きを更新し、その後入力をクリア
+            yield return null;
+            moveControl.Move(Vector2.zero);
+        }
+
    }
 }
