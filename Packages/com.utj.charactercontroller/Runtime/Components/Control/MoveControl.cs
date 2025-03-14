@@ -298,42 +298,79 @@ namespace Unity.TinyCharacterController.Control
         {
             using var profiler = new ProfilerScope(nameof(MoveControl));
 
-            if (_hasInput)
+
+            if (_isBackstepping)
             {
-                var preDirection = _moveDirection;
-                var cameraYawRotation = Quaternion.AngleAxis(_characterSettings.CameraTransform.rotation.eulerAngles.y, Vector3.up);
-                var direction = new Vector3(_inputValue.x, 0, _inputValue.y);
+                // 残り時間を減らす
+                _backstepTimer -= deltaTime;
 
-                // Determines direction of movement according to camera orientation
-                _moveDirection = cameraYawRotation * direction.normalized;
+                // キャラクターの正面（transform.forward）の反対向きへ後退
+                // MoveVelocity や _moveDirection を強制的に上書き
+                _moveDirection = -_transform.forward; // 後ろ向き
+                CurrentSpeed = _backstepSpeed;        // 一定速度で移動
+                IsMove = true; // 移動扱いにする
 
-                if (IsLockAxis)
+                // バックステップが終わったらフラグを戻す
+                if (_backstepTimer <= 0f)
                 {
-                    var dot = Vector3.Dot(_moveDirection, _lockAxis);
-                    _moveDirection = _lockAxis * Mathf.Round( Mathf.Clamp(dot * 100, -1, 1)) ;
+                    _isBackstepping = false;
+                    _currentSpeed = 0f;
+                }
+            }
+            else
+            {
+                if (_hasInput)
+                {
+                    var preDirection = _moveDirection;
+                    var cameraYawRotation = Quaternion.AngleAxis(_characterSettings.CameraTransform.rotation.eulerAngles.y, Vector3.up);
+                    var direction = new Vector3(_inputValue.x, 0, _inputValue.y);
+
+                    // Determines direction of movement according to camera orientation
+                    _moveDirection = cameraYawRotation * direction.normalized;
+
+                    if (IsLockAxis)
+                    {
+                        var dot = Vector3.Dot(_moveDirection, _lockAxis);
+                        _moveDirection = _lockAxis * Mathf.Round( Mathf.Clamp(dot * 100, -1, 1)) ;
+                    }
+
+                    _currentSpeed = Mathf.Lerp(_currentSpeed, _moveSpeed, _accelerator * deltaTime);
+                    DeltaTurnAngle = Vector3.SignedAngle(preDirection, _moveDirection, Vector3.up);
+                    
+                } else {
+                    
+                    DeltaTurnAngle = 0;
+                    _currentSpeed = Mathf.Lerp(_currentSpeed, 0, _brakePower * deltaTime);
+                    if (_currentSpeed < _moveStopThreshold)
+                        _currentSpeed = 0;
                 }
 
-                _currentSpeed = Mathf.Lerp(_currentSpeed, _moveSpeed, _accelerator * deltaTime);
-                DeltaTurnAngle = Vector3.SignedAngle(preDirection, _moveDirection, Vector3.up);
-                
-            } else {
-                
-                DeltaTurnAngle = 0;
-                _currentSpeed = Mathf.Lerp(_currentSpeed, 0, _brakePower * deltaTime);
-                if (_currentSpeed < _moveStopThreshold)
-                    _currentSpeed = 0;
+                // Determines direction of movement according to ground information
+                var normal = _hasGroundCheck && _groundCheck.IsOnGround ? _groundCheck.GroundSurfaceNormal : Vector3.up;
+                normal = Vector3.Angle(Vector3.up, normal) < _angle ? normal : Vector3.up;
+                Direction = Vector3.ProjectOnPlane(_moveDirection, normal);
+
+                MoveVelocity = Direction * _currentSpeed;
+                IsMove = _currentSpeed > _moveStopThreshold;
+                _isTurning = Vector3.Angle(_transform.forward, _moveDirection) > (1 - _turnStopThreshold) * 360;
             }
-
-            // Determines direction of movement according to ground information
-            var normal = _hasGroundCheck && _groundCheck.IsOnGround ? _groundCheck.GroundSurfaceNormal : Vector3.up;
-            normal = Vector3.Angle(Vector3.up, normal) < _angle ? normal : Vector3.up;
-            Direction = Vector3.ProjectOnPlane(_moveDirection, normal);
-
-            MoveVelocity = Direction * _currentSpeed;
-            IsMove = _currentSpeed > _moveStopThreshold;
-            _isTurning = Vector3.Angle(_transform.forward, _moveDirection) > (1 - _turnStopThreshold) * 360;
         }
 
         int IUpdateComponent.Order => Order.Control;
+
+        // バックステップ用のフラグや残り時間
+        private bool _isBackstepping;
+        private float _backstepTimer;
+        private float _backstepDuration;
+        private float _backstepSpeed;
+
+        // バックステップ開始メソッド
+        public void Backstep(float speed, float duration)
+        {
+            _isBackstepping = true;
+            _backstepTimer = duration;
+            _backstepDuration = duration;
+            _backstepSpeed = speed;
+        }
     }
 }
