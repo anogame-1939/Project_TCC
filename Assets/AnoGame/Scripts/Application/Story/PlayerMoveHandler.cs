@@ -7,16 +7,10 @@ namespace AnoGame.Application.Story
     {   
         private void MoveToTarget(GameObject target, bool doBackstep = false)
         {
-            // シーン内から PlayerActionController (PAC) を取得する
-            var pac = FindAnyObjectByType<PlayerActionController>();
-            if (pac != null)
-            {
-                pac.MoveToTarget(target, doBackstep);
-            }
-            else
-            {
-                Debug.LogWarning("PlayerActionController が見つかりません。");
-            }
+            PlayerForcedTransformMover playerForcedTransformMover = FindAnyObjectByType<PlayerForcedTransformMover>();
+            if (playerForcedTransformMover == null) return;
+
+            playerForcedTransformMover.ForceMove(target.transform);
         }
 
         public void MoveToTarget(GameObject target)

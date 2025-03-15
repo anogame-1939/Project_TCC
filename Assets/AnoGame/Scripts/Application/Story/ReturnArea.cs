@@ -18,7 +18,7 @@ namespace AnoGame.Application.Story
             PlayerActionController pac = other.GetComponent<PlayerActionController>();
             if (pac == null) return;
 
-            pac.MoveToTarget(returnPosition.gameObject);
+            // pac.MoveToTarget(returnPosition.gameObject);
         }
     }
 }
