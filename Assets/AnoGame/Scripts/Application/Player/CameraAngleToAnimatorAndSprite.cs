@@ -113,7 +113,7 @@ namespace AnoGame.Application.Player.Control
                     return; // カメラが見つからなければ処理中断
                 }
             }
-            spriteRenderer.transform.forward = cameraTransform.forward;
+            animator.transform.forward = cameraTransform.forward;
         }
     }
 }
