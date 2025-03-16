@@ -582,6 +582,11 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!212 &126846839 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2823213161542063461, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
+  m_PrefabInstance: {fileID: 4081853524390497649}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &130931281
 GameObject:
   m_ObjectHideFlags: 0
@@ -12761,6 +12766,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveDuration: 1
   moveEase: 7
+  applyTransformRotation: 0
+  debugTransformRotation: {x: 0, y: 0, z: 0}
+  applyAnimatorRotation: 0
+  debugAnimatorRotation: {x: 0, y: 0, z: 0}
+  applyAnimatorAngle: 0
+  debugAnimatorAngle: 0
+--- !u!114 &590326509 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4613847443511309718, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
+  m_PrefabInstance: {fileID: 4081853524390497649}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307215275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21501635e762343f1b16e2d5c7aed266, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &590326513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307215275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dc04127d71040648aa94c3883ba7730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 1323481402}
+  angleParamName: Angle
+  cameraTransform: {fileID: 0}
+  use2DFlip: 0
+  spriteRenderer: {fileID: 126846839}
+  characterSettings: {fileID: 590326509}
 --- !u!1 &596900672
 GameObject:
   m_ObjectHideFlags: 0
@@ -29731,6 +29771,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2604366155352085623, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4266821700169005377, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
       propertyPath: enemyController
       value: 
@@ -29869,6 +29913,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4536223424420877434, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 590326496}
+    - targetCorrespondingSourceObject: {fileID: 4536223424420877434, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 590326513}
   m_SourcePrefab: {fileID: 100100000, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
 --- !u!1 &4126487917237410922
 GameObject:

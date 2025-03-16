@@ -12,6 +12,17 @@ namespace AnoGame.Application.Player.Control
         private CharacterBrain characterBrain;
         private Animator animator;
 
+        // ==== デバッグ用フィールド ====
+        [Header("▼ デバッグ用：回転・アングル適用テスト")]
+        [SerializeField] private bool applyTransformRotation;       // transform.rotationを適用するか？
+        [SerializeField] private Vector3 debugTransformRotation;    // transform.rotation に適用するEuler角
+
+        [SerializeField] private bool applyAnimatorRotation;        // animator.transform.rotationを適用するか？
+        [SerializeField] private Vector3 debugAnimatorRotation;     // animator.transform.rotation に適用するEuler角
+
+        [SerializeField] private bool applyAnimatorAngle;           // animator.SetFloat("Angle", ...) を適用するか？
+        [SerializeField] private float debugAnimatorAngle;          // 上記で適用するfloat値
+
         private void Awake()
         {
             // CharacterBrainを取得（あれば）
@@ -29,15 +40,35 @@ namespace AnoGame.Application.Player.Control
             }
         }
 
+        private void Update()
+        {
+            // === デバッグ用に、シリアライズフィールドの値を適用する処理 ===
+            if (applyTransformRotation)
+            {
+                // debugTransformRotation (x, y, z) をEuler角として transform.rotation を更新
+                transform.rotation = Quaternion.Euler(debugTransformRotation);
+            }
+
+            if (applyAnimatorRotation && animator != null)
+            {
+                // debugAnimatorRotation (x, y, z) をEuler角として animator.transform.rotation を更新
+                animator.transform.rotation = Quaternion.Euler(debugAnimatorRotation);
+            }
+
+            if (applyAnimatorAngle && animator != null)
+            {
+                // debugAnimatorAngle を Angleパラメーターとして適用
+                animator.SetFloat("Angle", debugAnimatorAngle);
+            }
+        }
+
         /// <summary>
         /// 子階層をすべて探索して、最初に見つかったAnimatorを返すメソッド
         /// </summary>
         private Animator FindChildAnimator(Transform parent)
         {
-            // 直接の子階層をループ
             foreach (Transform child in parent)
             {
-                // まずは子オブジェクトにAnimatorがないかチェック
                 Animator anim = child.GetComponent<Animator>();
                 if (anim != null)
                 {
@@ -85,6 +116,7 @@ namespace AnoGame.Application.Player.Control
                 // ターゲットまでの水平ベクトルを求める
                 Vector3 directionAnim = targetTransform.position - transform.position;
                 directionAnim.y = 0f; // 垂直方向は無視
+                
 
                 // Angleパラメーターを8方向にスナップした角度として設定
                 if (directionAnim.sqrMagnitude > 0.001f)
@@ -102,7 +134,6 @@ namespace AnoGame.Application.Player.Control
                     animator.SetFloat("Angle", 0f);
                 }
 
-
                 Debug.Log($"Angle: {animator.GetFloat("Angle")}");
 
                 // IsMoveフラグをtrueにして移動アニメーションを再生させる
@@ -110,6 +141,7 @@ namespace AnoGame.Application.Player.Control
 
                 Debug.Log($"animator.GetFloat(IsMove): {animator.GetBool("IsMove")}");
 
+                // 実際に回転を適用
                 transform.rotation = Quaternion.LookRotation(directionAnim.normalized, Vector3.up);
             }
             // ▲ ここまでアニメーターのパラメーター制御 ▲
