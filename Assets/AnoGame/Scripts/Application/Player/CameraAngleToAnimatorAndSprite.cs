@@ -65,6 +65,9 @@ namespace AnoGame.Application.Player.Control
 
         private void Update()
         {
+            // スクリプトが有効なときのみ処理
+            if (!enabled) return;
+
             // CharacterBrain がアタッチされていなければ処理を中断
             if (!characterBrain)
             {
@@ -89,11 +92,10 @@ namespace AnoGame.Application.Player.Control
             }
 
             // 2) カメラから見たプレイヤーの角度を算出
-            //    ここでは "カメラのY軸" と "プレイヤーのY軸" を比較して DeltaAngle を取る例
             float camY = cameraTransform.eulerAngles.y;
-            float yawAngle = characterBrain.YawAngle;
+            float yawAngle = characterBrain.YawAngle;  // -180~180 で管理される想定
 
-            // Mathf.DeltaAngle は -180 ~ 180 の範囲で角度差を返す
+            // カメラのY軸とキャラのYawAngleの差分を取る (-180～180)
             float rawAngle = Mathf.DeltaAngle(camY, yawAngle);
 
             // 3) Animatorのパラメーターにセット
@@ -105,6 +107,9 @@ namespace AnoGame.Application.Player.Control
 
         private void LateUpdate()
         {
+            // スクリプトが有効なときのみ処理
+            if (!enabled) return;
+
             // 1) カメラTransformを再チェック
             if (!cameraTransform)
             {
@@ -121,7 +126,32 @@ namespace AnoGame.Application.Player.Control
                     return; // カメラが見つからなければ処理中断
                 }
             }
-            animator.transform.forward = cameraTransform.forward;
+
+            // スプライト(モデル)をカメラ方向へ向ける
+            if (animator != null)
+            {
+                animator.transform.forward = cameraTransform.forward;
+            }
+        }
+
+        //========================================================
+        // ↓↓↓ 強制移動用に OnForcedMoveBegin / OnForcedMoveEnd を追加 ↓↓↓
+        //========================================================
+
+        /// <summary>
+        /// 強制移動を始める前に呼び出して、このスクリプトを無効化する
+        /// </summary>
+        public void OnForcedMoveBegin()
+        {
+            enabled = false;
+        }
+
+        /// <summary>
+        /// 強制移動が完了したら呼び出して、このスクリプトを再有効化する
+        /// </summary>
+        public void OnForcedMoveEnd()
+        {
+            enabled = true;
         }
     }
 }

@@ -1,164 +1,165 @@
+using System.Collections;
 using UnityEngine;
-using DG.Tweening;
-using Unity.TinyCharacterController.Brain;
+using Unity.TinyCharacterController.Control; // MoveControl がある名前空間
 
 namespace AnoGame.Application.Player.Control
 {
     public class PlayerForcedTransformMover : MonoBehaviour
     {
-        [SerializeField] private float moveDuration = 1.0f;      // 移動にかかる時間
-        [SerializeField] private Ease moveEase = Ease.InOutQuad; // DOTweenのイージング
+        [Header("▼ MoveControlを介した強制移動設定")]
+        [SerializeField] private MoveControl moveControl;
 
-        private CharacterBrain characterBrain;
-        private Animator animator;
+        [Tooltip("目標位置に近づいたとみなす閾値（m）")]
+        [SerializeField] private float arrivalThreshold = 0.2f;
 
-        // ==== デバッグ用フィールド ====
-        [Header("▼ デバッグ用：回転・アングル適用テスト")]
-        [SerializeField] private bool applyTransformRotation;       // transform.rotationを適用するか？
-        [SerializeField] private Vector3 debugTransformRotation;    // transform.rotation に適用するEuler角
+        [Tooltip("アナログ入力を8方向にスナップするときのしきい値")]
+        [SerializeField] private float snapThreshold = 0.5f;
 
-        [SerializeField] private bool applyAnimatorRotation;        // animator.transform.rotationを適用するか？
-        [SerializeField] private Vector3 debugAnimatorRotation;     // animator.transform.rotation に適用するEuler角
-
-        [SerializeField] private bool applyAnimatorAngle;           // animator.SetFloat("Angle", ...) を適用するか？
-        [SerializeField] private float debugAnimatorAngle;          // 上記で適用するfloat値
+        private Coroutine forceMoveRoutine;
 
         private void Awake()
         {
-            // CharacterBrainを取得（あれば）
-            characterBrain = GetComponent<CharacterBrain>();
-            if (characterBrain == null)
+            if (moveControl == null)
             {
-                Debug.LogWarning("CharacterBrainが見つかりません。");
-            }
-
-            // 子オブジェクトを探索して最初に見つかったAnimatorを取得
-            animator = FindChildAnimator(transform);
-            if (animator == null)
-            {
-                Debug.LogWarning("子オブジェクトにAnimatorが見つかりません。");
-            }
-        }
-
-        private void Update()
-        {
-            // === デバッグ用に、シリアライズフィールドの値を適用する処理 ===
-            if (applyTransformRotation)
-            {
-                // debugTransformRotation (x, y, z) をEuler角として transform.rotation を更新
-                transform.rotation = Quaternion.Euler(debugTransformRotation);
-            }
-
-            if (applyAnimatorRotation && animator != null)
-            {
-                // debugAnimatorRotation (x, y, z) をEuler角として animator.transform.rotation を更新
-                animator.transform.rotation = Quaternion.Euler(debugAnimatorRotation);
-            }
-
-            if (applyAnimatorAngle && animator != null)
-            {
-                // debugAnimatorAngle を Angleパラメーターとして適用
-                animator.SetFloat("Angle", debugAnimatorAngle);
+                moveControl = GetComponent<MoveControl>();
             }
         }
 
         /// <summary>
-        /// 子階層をすべて探索して、最初に見つかったAnimatorを返すメソッド
+        /// 強制移動を開始する（がくがく回避版）
         /// </summary>
-        private Animator FindChildAnimator(Transform parent)
-        {
-            foreach (Transform child in parent)
-            {
-                Animator anim = child.GetComponent<Animator>();
-                if (anim != null)
-                {
-                    return anim;
-                }
-                // 孫以降の階層も再帰的に探索
-                Animator foundInSubChild = FindChildAnimator(child);
-                if (foundInSubChild != null)
-                {
-                    return foundInSubChild;
-                }
-            }
-            // どこにもAnimatorがなかった場合はnull
-            return null;
-        }
-
-        /// <summary>
-        /// 強制移動を実行するメソッド
-        /// </summary>
-        /// <param name="targetTransform">移動先のTransform</param>
+        /// <param name="targetTransform">移動先</param>
         public void ForceMove(Transform targetTransform)
         {
-            // Brainを無効化して、通常の入力や動作を止める
-            if (characterBrain != null)
-            {
-                characterBrain.enabled = false;
-            }
-
             if (targetTransform == null)
             {
                 Debug.LogError("targetTransformが設定されていません。");
                 return;
             }
 
-            PlayerActionController playerActionController = GetComponent<PlayerActionController>();
-            // PlayerActionControllerを無効化
-            if (playerActionController != null)
+            // すでに強制移動中なら一旦停止
+            if (forceMoveRoutine != null)
             {
-                playerActionController.OnForcedMoveBegin();
+                StopCoroutine(forceMoveRoutine);
             }
 
-            // ▼ ここからアニメーターのパラメーター制御 ▼
+            // PlayerActionController だけを無効化して、通常の入力を遮断
+            PlayerActionController pac = GetComponent<PlayerActionController>();
+            if (pac != null)
+            {
+                pac.OnForcedMoveBegin();
+            }
+
+            // コルーチン開始
+            forceMoveRoutine = StartCoroutine(ForceMoveRoutine(targetTransform, pac));
+        }
+
+        private IEnumerator ForceMoveRoutine(Transform targetTransform, PlayerActionController pac)
+        {
+            // 1) 最初に一度だけ方向ベクトルを計算 & スナップ
+            Vector2 forcedInput = CalculateSnappedInputOnce(targetTransform);
+
+            // もし見た目上も最初にターゲット方向を向きたい場合:
+            LookAtTargetOnce(targetTransform);
+
+            // アニメーション開始
+            Animator animator = GetComponentInChildren<Animator>();
             if (animator != null)
             {
-                // ターゲットまでの水平ベクトルを求める
-                Vector3 directionAnim = targetTransform.position - transform.position;
-                directionAnim.y = 0f; // 垂直方向は無視
-                
-
-                // Angleパラメーターを8方向にスナップした角度として設定
-                if (directionAnim.sqrMagnitude > 0.001f)
-                {
-                    float angle = Mathf.Atan2(directionAnim.x, directionAnim.z) * Mathf.Rad2Deg;
-                    float snappedAngle = Mathf.Round(angle / 45f) * 45f;
-                    animator.SetFloat("Angle", snappedAngle);
-
-                    Debug.Log($"Angle...angle: {angle}");
-                    Debug.Log($"Angle...snappedAngle: {snappedAngle}");
-                }
-                else
-                {
-                    // ターゲット位置がほぼ同じなら角度0とする
-                    animator.SetFloat("Angle", 0f);
-                }
-
-                Debug.Log($"Angle: {animator.GetFloat("Angle")}");
-
-                // IsMoveフラグをtrueにして移動アニメーションを再生させる
                 animator.SetBool("IsMove", true);
-
-                Debug.Log($"animator.GetFloat(IsMove): {animator.GetBool("IsMove")}");
-
-                // 実際に回転を適用
-                transform.rotation = Quaternion.LookRotation(directionAnim.normalized, Vector3.up);
             }
-            // ▲ ここまでアニメーターのパラメーター制御 ▲
 
-            Vector3 direction = targetTransform.position;
-            direction.y = transform.position.y;
-            // ▼ DOTweenでターゲット位置へ移動 ▼
-            transform.DOMove(direction, moveDuration)
-                .OnComplete(() =>
+            // 2) 毎フレーム、同じ入力ベクトルを与えつつ距離をチェック
+            while (true)
+            {
+                Vector3 toTarget = targetTransform.position - transform.position;
+                toTarget.y = 0f;
+                if (toTarget.sqrMagnitude <= arrivalThreshold * arrivalThreshold)
                 {
-                    // 移動完了後に再有効化
-                    if (playerActionController != null)
-                    {
-                        characterBrain.enabled = true;
-                        playerActionController.OnForcedMoveEnd();
-                    }
-                });
+                    // 到着
+                    break;
+                }
+
+                // 同じ入力ベクトルをMoveControlに渡す
+                moveControl.Move(forcedInput);
+
+                yield return null;
+            }
+
+            // 移動完了なので入力をゼロにして停止
+            moveControl.Move(Vector2.zero);
+
+            // PlayerActionControllerを再有効化
+            if (pac != null)
+            {
+                pac.OnForcedMoveEnd();
+            }
+
+            // アニメーション終了
+            if (animator != null)
+            {
+                animator.SetBool("IsMove", false);
+            }
+
+            forceMoveRoutine = null;
+        }
+
+        /// <summary>
+        /// 最初に一度だけ方向ベクトルを計算し、カメラインバース+8方向スナップして返す
+        /// </summary>
+        private Vector2 CalculateSnappedInputOnce(Transform targetTransform)
+        {
+            // ワールド座標での目標方向
+            Vector3 direction3D = targetTransform.position - transform.position;
+            direction3D.y = 0f;
+
+            // カメラ回転を取得して逆回転をかける
+            Transform cameraTransform = Camera.main?.transform;
+            if (cameraTransform != null)
+            {
+                Quaternion cameraYawRotation = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
+                direction3D = Quaternion.Inverse(cameraYawRotation) * direction3D;
+            }
+
+            // 正規化 & 8方向スナップ
+            Vector2 leftStickInput = new Vector2(direction3D.x, direction3D.z).normalized;
+            Vector2 snappedInput = SnapToKeyboardDirections(leftStickInput, snapThreshold);
+
+            return snappedInput;
+        }
+
+        /// <summary>
+        /// 一度だけ実際のオブジェクトをターゲット方向に向ける（必要に応じて）
+        /// </summary>
+        private void LookAtTargetOnce(Transform targetTransform)
+        {
+            // 水平方向だけLookAt
+            Vector3 dir = targetTransform.position - transform.position;
+            dir.y = 0f;
+            if (dir.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+            }
+        }
+
+        /// <summary>
+        /// アナログ入力ベクトルを 8方向(上下左右＋斜め)にスナップ(0/1化)するヘルパーメソッド
+        /// </summary>
+        private Vector2 SnapToKeyboardDirections(Vector2 input, float threshold)
+        {
+            float x = 0f;
+            float y = 0f;
+
+            if (Mathf.Abs(input.x) >= threshold)
+            {
+                x = Mathf.Sign(input.x);
+            }
+            if (Mathf.Abs(input.y) >= threshold)
+            {
+                y = Mathf.Sign(input.y);
+            }
+
+            return new Vector2(x, y);
         }
     }
 }

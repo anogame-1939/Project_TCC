@@ -7,10 +7,10 @@ namespace AnoGame.Application.Story
     {   
         private void MoveToTarget(GameObject target, bool doBackstep = false)
         {
-            PlayerForcedTransformMover playerForcedTransformMover = FindAnyObjectByType<PlayerForcedTransformMover>();
+            ForcedMovementController playerForcedTransformMover = FindAnyObjectByType<ForcedMovementController>();
             if (playerForcedTransformMover == null) return;
 
-            playerForcedTransformMover.ForceMove(target.transform);
+            playerForcedTransformMover.ForceMoveTo(target.transform.position);
         }
 
         public void MoveToTarget(GameObject target)

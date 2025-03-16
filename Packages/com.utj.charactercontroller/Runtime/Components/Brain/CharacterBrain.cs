@@ -290,5 +290,16 @@ namespace Unity.TinyCharacterController.Brain
                 CachedTransform.position = position;
             }
         }
+
+        public void ForceSetPosition(Vector3 position)
+        {
+            SetPositionDirectly(position);
+        }
+
+        public void ForceSetRotation(Quaternion rotation)
+        {
+            SetRotationDirectly(rotation);
+        }
+
     }
 }
