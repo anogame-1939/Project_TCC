@@ -43,6 +43,7 @@ public class ForcedMovementController : MonoBehaviour
         {
             float cameraY = Camera.main.transform.eulerAngles.y;
             float relativeAngle = Mathf.DeltaAngle(cameraY, forcedYawAngle);
+            relativeAngle = RoundAngleTo45(relativeAngle);
             animator.SetFloat("Angle", relativeAngle);
         }
 
@@ -72,5 +73,10 @@ public class ForcedMovementController : MonoBehaviour
             playerActionController.OnForcedMoveEnd();
         if (cameraAngleController != null)
             cameraAngleController.OnForcedMoveEnd();
+    }
+
+    private float RoundAngleTo45(float angle)
+    {
+        return Mathf.Round(angle / 45f) * 45f;
     }
 }
