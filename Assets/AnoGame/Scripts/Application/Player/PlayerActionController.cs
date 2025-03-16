@@ -32,7 +32,7 @@ namespace AnoGame.Application.Player.Control
             moveAction.started += OnMoveStarted;
             moveAction.canceled += OnMoveCanceled;
 
-            // Animatorが自分の子オブジェクトなどにある場合は、状況に応じてGetComponentInChildrenを使うなど
+            // Animatorが自分の子オブジェクトなどにある場合は、GetComponentInChildren等に変更する
             if (animator == null)
             {
                 animator = GetComponent<Animator>();
@@ -191,6 +191,33 @@ namespace AnoGame.Application.Player.Control
 
             // これで上下左右・斜めのいずれか(8方向)になる
             return new Vector2(x, y);
+        }
+
+        //========================================================
+        // ↓↓↓ 強制移動(ForecedTransformMover)用の有効/無効メソッドを追加 ↓↓↓
+        //========================================================
+
+        /// <summary>
+        /// 強制移動を始める前に呼び出して、PlayerActionControllerを無効化する
+        /// </summary>
+        public void OnForcedMoveBegin()
+        {
+            // ここではスクリプト自体を無効化
+            this.enabled = false;
+
+            // または、入力のみ無効化したい場合は以下
+            // SetInputEnabled(false);
+        }
+
+        /// <summary>
+        /// 強制移動が完了したら呼び出して、PlayerActionControllerを再有効化する
+        /// </summary>
+        public void OnForcedMoveEnd()
+        {
+            this.enabled = true;
+
+            // あるいは入力のみ再有効化
+            // SetInputEnabled(true);
         }
     }
 }

@@ -72,6 +72,13 @@ namespace AnoGame.Application.Player.Control
                 return;
             }
 
+            PlayerActionController playerActionController = GetComponent<PlayerActionController>();
+            // PlayerActionControllerを無効化
+            if (playerActionController != null)
+            {
+                playerActionController.OnForcedMoveBegin();
+            }
+
             // ▼ ここからアニメーターのパラメーター制御 ▼
             if (animator != null)
             {
@@ -101,7 +108,7 @@ namespace AnoGame.Application.Player.Control
                 // IsMoveフラグをtrueにして移動アニメーションを再生させる
                 animator.SetBool("IsMove", true);
 
-                Debug.Log($"animator.GetFloat(IsMove): {animator.GetFloat("IsMove")}");
+                Debug.Log($"animator.GetFloat(IsMove): {animator.GetBool("IsMove")}");
 
                 transform.rotation = Quaternion.LookRotation(directionAnim.normalized, Vector3.up);
             }
@@ -111,19 +118,13 @@ namespace AnoGame.Application.Player.Control
             direction.y = transform.position.y;
             // ▼ DOTweenでターゲット位置へ移動 ▼
             transform.DOMove(direction, moveDuration)
-                .SetEase(moveEase)
                 .OnComplete(() =>
                 {
-                    // 移動完了後にBrainを再有効化して通常操作に戻す
-                    if (characterBrain != null)
+                    // 移動完了後に再有効化
+                    if (playerActionController != null)
                     {
                         characterBrain.enabled = true;
-                    }
-
-                    // アニメーター側のIsMoveフラグをfalseに戻してIdle等へ遷移
-                    if (animator != null)
-                    {
-                        animator.SetBool("IsMove", false);
+                        playerActionController.OnForcedMoveEnd();
                     }
                 });
         }
