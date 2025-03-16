@@ -1,6 +1,6 @@
 using UnityEngine;
 using Unity.TinyCharacterController; // CharacterSettings が含まれる名前空間
-using UnityEngine.Serialization;
+using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Application.Player.Control
 {
@@ -32,12 +32,17 @@ namespace AnoGame.Application.Player.Control
         [SerializeField]
         private SpriteRenderer spriteRenderer;
 
+        [Header("▼ キャラクター設定 (Brain参照用)")]
+        [Tooltip("CharacterBrain / BrainBase を参照する")]
+        [SerializeField]
+        private CharacterBrain characterBrain;
+
         [Header("▼ キャラクター設定 (カメラ参照用)")]
         [Tooltip("CameraTransformを持っている CharacterSettings")]
         [SerializeField]
         private CharacterSettings characterSettings;
 
-        private void Reset()
+        private void Start()
         {
             // コンポーネント自動取得など必要なら
             if (!animator)
@@ -48,6 +53,10 @@ namespace AnoGame.Application.Player.Control
             {
                 spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             }
+            if (!characterBrain)
+            {
+                characterBrain = GetComponent<CharacterBrain>();
+            }
             if (!characterSettings)
             {
                 characterSettings = GetComponent<CharacterSettings>();
@@ -56,6 +65,12 @@ namespace AnoGame.Application.Player.Control
 
         private void Update()
         {
+            // CharacterBrain がアタッチされていなければ処理を中断
+            if (!characterBrain)
+            {
+                return;
+            }
+
             // 1) カメラTransformを取得（CharacterSettings → Camera.main の順で参照）
             if (!cameraTransform)
             {
@@ -76,17 +91,10 @@ namespace AnoGame.Application.Player.Control
             // 2) カメラから見たプレイヤーの角度を算出
             //    ここでは "カメラのY軸" と "プレイヤーのY軸" を比較して DeltaAngle を取る例
             float camY = cameraTransform.eulerAngles.y;
-            float plyY = transform.eulerAngles.y;
+            float yawAngle = characterBrain.YawAngle;
 
             // Mathf.DeltaAngle は -180 ~ 180 の範囲で角度差を返す
-            float rawAngle = Mathf.DeltaAngle(camY, plyY);
-
-            // -180~180 を 0~360 にマッピング
-            //  例: -90 -> 270, -179 -> 181, etc.
-            if (rawAngle < 0)
-            {
-                // rawAngle += 360f;
-            }
+            float rawAngle = Mathf.DeltaAngle(camY, yawAngle);
 
             // 3) Animatorのパラメーターにセット
             if (animator)
