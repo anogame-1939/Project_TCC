@@ -28,49 +28,43 @@ public class ForcedMovementController : MonoBehaviour
         if (playerActionController != null)
             playerActionController.OnForcedMoveBegin();
         if (cameraAngleController != null)
-            cameraAngleController.OnForcedMoveBegin();
+            cameraAngleController.OnForcedMoveBegin(); // ※この処理は、Animator の Angle 更新のみ停止する実装になっている前提です
 
-        // Animator の IsMove をオンに
+        // Animator の IsMove をオンにする
         if (animator != null)
             animator.SetBool("IsMove", true);
 
-        // 目的地に十分近づくまで移動する
-        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
+        // 強制移動開始時に一度だけ、移動方向から回転（YawAngle）を決定し、Animator の Angle を設定する
+        Vector3 initialDirection = (targetPosition - transform.position).normalized;
+        float forcedYawAngle = Mathf.Atan2(initialDirection.x, initialDirection.z) * Mathf.Rad2Deg;
+        Quaternion desiredRotation = Quaternion.Euler(0, forcedYawAngle, 0);
+        characterBrain.ForceSetRotation(desiredRotation);
+        if (animator != null && Camera.main != null)
         {
-            // 目的地に向かう方向を計算
-            Vector3 direction = (targetPosition - transform.position).normalized;
-            
-            // 移動方向から YawAngle を計算（※ Mathf.Atan2 はラジアンを返すので変換）
-            float forcedYawAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            Quaternion desiredRotation = Quaternion.Euler(0, forcedYawAngle, 0);
-            
-            // キャラクターの回転を更新
-            // ※ CharacterBrain の内部状態（YawAngle も含む）を更新するため、SetRotationDirectly を使う
-            characterBrain.ForceSetRotation(desiredRotation);
+            float cameraY = Camera.main.transform.eulerAngles.y;
+            float relativeAngle = Mathf.DeltaAngle(cameraY, forcedYawAngle);
+            animator.SetFloat("Angle", relativeAngle);
+        }
 
-            // 位置を補間で更新（CharacterBrain 経由で移動）
+        // 移動中は、回転は初期で決定したままとし、位置だけを更新する
+        while (Vector3.Distance(transform.position, targetPosition) > 1f)
+        {
+            Debug.Log($"Distance: {Vector3.Distance(transform.position, targetPosition)} | Current: {transform.position} | Target: {targetPosition}");
             Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            Debug.Log($"New Position: {newPosition}");
             characterBrain.ForceSetPosition(newPosition);
-
-            // Animator の Angle を更新（カメラとの相対角度を算出）
-            if (animator != null && Camera.main != null)
-            {
-                float cameraY = Camera.main.transform.eulerAngles.y;
-                float relativeAngle = Mathf.DeltaAngle(cameraY, forcedYawAngle);
-                animator.SetFloat("Angle", relativeAngle);
-            }
-
             yield return null;
         }
+
 
         // 最終位置に固定
         characterBrain.ForceSetPosition(targetPosition);
 
-        // Animator のパラメータをリセット
+        // 移動完了時に Animator のパラメータをリセットする
         if (animator != null)
         {
             animator.SetBool("IsMove", false);
-            animator.SetFloat("Angle", 0f);
+            // animator.SetFloat("Angle", 0f);
         }
 
         // 通常操作を再有効化

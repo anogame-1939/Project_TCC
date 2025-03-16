@@ -42,6 +42,8 @@ namespace AnoGame.Application.Player.Control
         [SerializeField]
         private CharacterSettings characterSettings;
 
+        private bool animatorEnabled = true;
+
         private void Start()
         {
             // コンポーネント自動取得など必要なら
@@ -66,7 +68,7 @@ namespace AnoGame.Application.Player.Control
         private void Update()
         {
             // スクリプトが有効なときのみ処理
-            if (!enabled) return;
+            if (!animatorEnabled) return;
 
             // CharacterBrain がアタッチされていなければ処理を中断
             if (!characterBrain)
@@ -107,9 +109,6 @@ namespace AnoGame.Application.Player.Control
 
         private void LateUpdate()
         {
-            // スクリプトが有効なときのみ処理
-            if (!enabled) return;
-
             // 1) カメラTransformを再チェック
             if (!cameraTransform)
             {
@@ -143,7 +142,7 @@ namespace AnoGame.Application.Player.Control
         /// </summary>
         public void OnForcedMoveBegin()
         {
-            enabled = false;
+            animatorEnabled = false;
         }
 
         /// <summary>
@@ -151,7 +150,7 @@ namespace AnoGame.Application.Player.Control
         /// </summary>
         public void OnForcedMoveEnd()
         {
-            enabled = true;
+            animatorEnabled = true;
         }
     }
 }
