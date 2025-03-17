@@ -1,12 +1,14 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using AnoGame.Application.Player.Control;
-using Codice.Client.BaseCommands.TubeClient; // NOTE:微妙...別のnamespaceがいい
+using Unity.TinyCharacterController.Control; // NOTE:微妙...別のnamespaceがいい
 
 namespace AnoGame.Application.Enmemy.Control
 {
     public class EnemyAIController : MonoBehaviour, IForcedMoveController
     {
+        [SerializeField] private MoveControl moveControl;
         // プレイヤーのタグ
         [SerializeField] private string playerTag = "Player";
         
@@ -26,6 +28,11 @@ namespace AnoGame.Application.Enmemy.Control
 
         void Start()
         {
+            if (moveControl == null)
+            {
+                moveControl = GetComponent<MoveControl>();
+            }
+            
             // NavMeshAgent の取得
             agent = GetComponentInChildren<NavMeshAgent>();
             
@@ -68,6 +75,83 @@ namespace AnoGame.Application.Enmemy.Control
             }
         }
 
+        public void FaceTarget(GameObject target)
+        {
+            if (target == null)
+                return;
+            StartCoroutine(FaceTargetRoutine(target));
+        }
+
+        private IEnumerator FaceTargetRoutine(GameObject target)
+        {
+            // プレイヤーとターゲットの水平な位置を取得
+            Vector3 playerPosition = transform.position;
+            Vector3 targetPosition = target.transform.position;
+
+            // Y軸は無視して水平な方向ベクトルを計算
+            Vector3 desiredDirection = targetPosition - playerPosition;
+            desiredDirection.y = 0f;
+
+            if (desiredDirection.sqrMagnitude < 0.0001f)
+                yield break;
+            
+            desiredDirection.Normalize();
+
+            // カメラのY軸回転を取得（見下ろし視点でも、カメラのY軸は有効と仮定）
+            Transform cameraTransform = Camera.main?.transform;
+            if (cameraTransform == null)
+            {
+                Debug.LogWarning("Camera.mainが見つかりません。");
+                yield break;
+            }
+            // カメラのY軸回転（水平回転）のみを抽出
+            Quaternion cameraYawRotation = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
+
+            // MoveControl 内部では
+            //   _moveDirection = cameraYawRotation * (leftStickInput.normalized)
+            // となっているため、desiredDirection になるようにするには
+            //   leftStickInput = Quaternion.Inverse(cameraYawRotation) * desiredDirection
+            Vector3 leftStickInput3D = Quaternion.Inverse(cameraYawRotation) * desiredDirection;
+            Vector2 leftStickInput = new Vector2(leftStickInput3D.x, leftStickInput3D.z);
+
+            // --- ここで “WASD 相当” に丸める ---
+            Vector2 snappedInput = SnapToKeyboardDirections(leftStickInput, 0.5f);
+
+            // 向き更新用に一時的に入力を送る
+            moveControl.Move(snappedInput);
+
+            // 0.01秒待ってから入力をクリア（必要に応じて調整）
+            yield return new WaitForSeconds(0.1f);
+            moveControl.Move(Vector2.zero);
+        }
+
+        /// <summary>
+        /// アナログ入力ベクトルを 8方向(上下左右＋斜め)にスナップ(0/1化)するヘルパーメソッド
+        /// </summary>
+        /// <param name="input">アナログ入力</param>
+        /// <param name="threshold">しきい値。例:0.5f</param>
+        /// <returns>上下左右斜めいずれかの(-1,0,1)成分を持つ Vector2</returns>
+        private Vector2 SnapToKeyboardDirections(Vector2 input, float threshold)
+        {
+            float x = 0f;
+            float y = 0f;
+
+            // X成分が threshold を超えたら ±1、それ以下なら 0
+            if (Mathf.Abs(input.x) >= threshold)
+            {
+                x = Mathf.Sign(input.x);
+            }
+
+            // Y成分が threshold を超えたら ±1、それ以下なら 0
+            if (Mathf.Abs(input.y) >= threshold)
+            {
+                y = Mathf.Sign(input.y);
+            }
+
+            // これで上下左右・斜めのいずれか(8方向)になる
+            return new Vector2(x, y);
+        }
+        
         public void OnForcedMoveBegin()
         {
             // ここではスクリプト自体を無効化
