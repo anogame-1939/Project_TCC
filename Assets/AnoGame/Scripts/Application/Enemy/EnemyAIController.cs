@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
-using AnoGame.Application.Player.Control; // NOTE:微妙...別のnamespaceがいい
+using AnoGame.Application.Player.Control;
+using Codice.Client.BaseCommands.TubeClient; // NOTE:微妙...別のnamespaceがいい
 
 namespace AnoGame.Application.Enmemy.Control
 {
@@ -16,7 +17,7 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField] private int animatorChildIndex = 0;
         
         // アニメーター内で設定している Bool パラメータ名
-        [SerializeField] private string animatorBoolParam = "IsMoving";
+        [SerializeField] private string animatorBoolParam = "IsMove";
 
         private NavMeshAgent agent;
         private Animator animator;
@@ -26,7 +27,7 @@ namespace AnoGame.Application.Enmemy.Control
         void Start()
         {
             // NavMeshAgent の取得
-            agent = GetComponent<NavMeshAgent>();
+            agent = GetComponentInChildren<NavMeshAgent>();
             
             // 指定した子オブジェクトから Animator を取得
             animator = transform.GetChild(animatorChildIndex).GetComponent<Animator>();
@@ -62,6 +63,8 @@ namespace AnoGame.Application.Enmemy.Control
             {
                 Vector3 targetPosition = player.transform.position;
                 agent.SetDestination(targetPosition);
+
+                Debug.Log($"Player position: {targetPosition}");
             }
         }
 
@@ -69,6 +72,7 @@ namespace AnoGame.Application.Enmemy.Control
         {
             // ここではスクリプト自体を無効化
             this.enabled = false;
+            agent.isStopped = true;
         }
 
         /// <summary>
@@ -77,6 +81,7 @@ namespace AnoGame.Application.Enmemy.Control
         public void OnForcedMoveEnd()
         {
             this.enabled = true;
+            agent.isStopped = false;
         }
     }
 }
