@@ -5582,8 +5582,8 @@ MonoBehaviour:
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1559397274}
-          m_TargetAssemblyTypeName: ForcedMovementController, AnoGame.Application
+        - m_Target: {fileID: 1078756860}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
           m_MethodName: EnableForceMode
           m_Mode: 1
           m_Arguments:
@@ -5596,8 +5596,8 @@ MonoBehaviour:
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1559397274}
-          m_TargetAssemblyTypeName: ForcedMovementController, AnoGame.Application
+        - m_Target: {fileID: 1078756860}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
           m_MethodName: DisableForceMode
           m_Mode: 1
           m_Arguments:
@@ -30601,66 +30601,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448623d86f85950479f00cc5367d0ca9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1538734610
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1538734613}
-  - component: {fileID: 1538734612}
-  - component: {fileID: 1538734611}
-  m_Layer: 0
-  m_Name: VisualScripting SceneVariables
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1538734611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1538734610}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 765181c9ef4b24d32a4f7cbd2ef370dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1538734612
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1538734610}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e741851cba3ad425c91ecf922cc6b379, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"declarations":{"Kind":"Scene","collection":{"$content":[],"$version":"A"},"$version":"A"}}'
-    _objectReferences: []
---- !u!4 &1538734613
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1538734610}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1559397257 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5931228778417601929, guid: f619f5d1a1b854e699d64fa9b2c4692a, type: 3}
@@ -30670,17 +30610,6 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85a16210db2e7514c897584522e43e4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1559397274 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5410025904601978029, guid: f619f5d1a1b854e699d64fa9b2c4692a, type: 3}
-  m_PrefabInstance: {fileID: 63886896}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2fbbabb79c9e614fa6806000ec01efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1619542011
@@ -41108,4 +41037,3 @@ SceneRoots:
   - {fileID: 1001792362}
   - {fileID: 808774681}
   - {fileID: 1188035238}
-  - {fileID: 1538734613}
