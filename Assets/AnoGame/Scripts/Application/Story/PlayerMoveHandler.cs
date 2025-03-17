@@ -5,7 +5,6 @@ namespace AnoGame.Application.Story
 {
     public class PlayerMoveHandler : MonoBehaviour
     {   
-
         public void EnableForceMode()
         {
             ForcedMovementController playerForcedTransformMover = FindAnyObjectByType<ForcedMovementController>();

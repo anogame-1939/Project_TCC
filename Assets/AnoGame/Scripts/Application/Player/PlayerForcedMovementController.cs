@@ -11,8 +11,19 @@ public class ForcedMovementController : MonoBehaviour
     [Header("参照コンポーネント")]
     [SerializeField] private Animator animator;
     [SerializeField] private CharacterBrain characterBrain;
-    [SerializeField] private PlayerActionController playerActionController;
+    [SerializeField] private IForcedMoveController actionController;
     [SerializeField] private CameraAngleToAnimatorAndSprite cameraAngleController;
+
+    void Start()
+    {
+        actionController = GetComponent<IForcedMoveController>();
+
+        if (actionController == null)
+        {
+            Debug.LogError($"[{nameof(actionController)}] " +
+                           $"IForcedMoveController を実装したコンポーネントが見つかりません。");
+        }
+    }
 
 
     /// <summary>
@@ -41,9 +52,7 @@ public class ForcedMovementController : MonoBehaviour
             // バックステップの場合は角度を反転
             if (doBackstep)
             {
-                Debug.Log($"Backstep: {relativeAngle}");
                 relativeAngle = relativeAngle - 180f ;
-                Debug.Log($"Backstep: {relativeAngle}");
             }
             relativeAngle = RoundAngleTo45(relativeAngle);
             animator.SetFloat("Angle", relativeAngle);
@@ -80,16 +89,16 @@ public class ForcedMovementController : MonoBehaviour
 
     public void EnableForceMode()
     {
-        if (playerActionController != null)
-            playerActionController.OnForcedMoveBegin();
+        if (actionController != null)
+            actionController.OnForcedMoveBegin();
         if (cameraAngleController != null)
             cameraAngleController.OnForcedMoveBegin();
     }
 
     public void DisableForceMode()
     {
-        if (playerActionController != null)
-            playerActionController.OnForcedMoveEnd();
+        if (actionController != null)
+            actionController.OnForcedMoveEnd();
         if (cameraAngleController != null)
             cameraAngleController.OnForcedMoveEnd();
     }

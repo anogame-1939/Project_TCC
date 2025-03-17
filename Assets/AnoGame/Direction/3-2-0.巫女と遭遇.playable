@@ -280,6 +280,7 @@ MonoBehaviour:
   m_Tracks:
   - {fileID: -1154207898825921152}
   - {fileID: 3677323517005348217}
+  - {fileID: 595735682206748439}
   - {fileID: -2514784978020299671}
   m_FixedDuration: 3.216666666667
   m_EditorSettings:
@@ -287,6 +288,31 @@ MonoBehaviour:
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: -1706933345987740325}
+--- !u!114 &595735682206748439
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b46e36075dd1c124a8422c228e75e1fb, type: 3}
+  m_Name: Signal Track (3)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects:
+    - {fileID: 5974709563048174045}
+    - {fileID: 1302954069273063682}
 --- !u!114 &1005692286046899185
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -303,6 +329,22 @@ MonoBehaviour:
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: 72b7c59427c543141b61b02a765f4d42, type: 2}
+--- !u!114 &1302954069273063682
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: 
+  m_Time: 5
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: 02ed639cd8594c34997735c4992ef0d3, type: 2}
 --- !u!114 &3310505922998967338
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -342,13 +384,11 @@ MonoBehaviour:
   m_Clips: []
   m_Markers:
     m_Objects:
-    - {fileID: 4958837881948894018}
-    - {fileID: 8507302161951212606}
     - {fileID: -3383406816532816206}
     - {fileID: -5488054964910976970}
     - {fileID: -7262180620854519895}
     - {fileID: -9118296614130171382}
---- !u!114 &4958837881948894018
+--- !u!114 &5974709563048174045
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -358,7 +398,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter(Clone)(Clone)
+  m_Name: Signal Emitter
   m_EditorClassIdentifier: 
   m_Time: 3.5
   m_Retroactive: 0

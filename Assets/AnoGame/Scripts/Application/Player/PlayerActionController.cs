@@ -5,8 +5,18 @@ using System.Collections;
 
 namespace AnoGame.Application.Player.Control
 {
+    
+    /// <summary>
+    /// 強制移動の開始・終了を受け取るためのインターフェース
+    /// </summary>
+    public interface IForcedMoveController
+    {
+        void OnForcedMoveBegin();
+        void OnForcedMoveEnd();
+    }
+
     [RequireComponent(typeof(PlayerInput))]
-    public class PlayerActionController : MonoBehaviour
+    public class PlayerActionController : MonoBehaviour, IForcedMoveController
     {
         [SerializeField] private MoveControl moveControl;
         [SerializeField] private Animator animator;
