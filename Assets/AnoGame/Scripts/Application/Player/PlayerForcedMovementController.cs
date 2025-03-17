@@ -14,22 +14,17 @@ public class ForcedMovementController : MonoBehaviour
     [SerializeField] private PlayerActionController playerActionController;
     [SerializeField] private CameraAngleToAnimatorAndSprite cameraAngleController;
 
+
     /// <summary>
     /// 指定した位置へ強制移動を開始する
     /// </summary>
-    public void ForceMoveTo(Vector3 targetPosition)
+    public void ForceMoveTo(Vector3 targetPosition, bool doBackstep)
     {
-        StartCoroutine(ForceMoveRoutine(targetPosition));
+        StartCoroutine(ForceMoveRoutine(targetPosition, doBackstep));
     }
 
-    private IEnumerator ForceMoveRoutine(Vector3 targetPosition)
+    private IEnumerator ForceMoveRoutine(Vector3 targetPosition, bool doBackstep)
     {
-        // 通常操作を無効化
-        if (playerActionController != null)
-            playerActionController.OnForcedMoveBegin();
-        if (cameraAngleController != null)
-            cameraAngleController.OnForcedMoveBegin(); // ※この処理は、Animator の Angle 更新のみ停止する実装になっている前提です
-
         // Animator の IsMove をオンにする
         if (animator != null)
             animator.SetBool("IsMove", true);
@@ -43,40 +38,59 @@ public class ForcedMovementController : MonoBehaviour
         {
             float cameraY = Camera.main.transform.eulerAngles.y;
             float relativeAngle = Mathf.DeltaAngle(cameraY, forcedYawAngle);
+            // バックステップの場合は角度を反転
+            if (doBackstep)
+            {
+                Debug.Log($"Backstep: {relativeAngle}");
+                relativeAngle = relativeAngle - 180f ;
+                Debug.Log($"Backstep: {relativeAngle}");
+            }
             relativeAngle = RoundAngleTo45(relativeAngle);
             animator.SetFloat("Angle", relativeAngle);
         }
 
-        // 移動中は、回転は初期で決定したままとし、位置だけを更新する
+        // 移動中は回転は固定し、位置だけ更新
         while (Vector3.Distance(transform.position, targetPosition) > 1f)
         {
-            Debug.Log($"Distance: {Vector3.Distance(transform.position, targetPosition)} | Current: {transform.position} | Target: {targetPosition}");
             Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            Debug.Log($"New Position: {newPosition}");
             characterBrain.ForceSetPosition(newPosition);
             yield return null;
         }
 
-
-        // 最終位置に固定
-        characterBrain.ForceSetPosition(targetPosition);
-
-        // 移動完了時に Animator のパラメータをリセットする
+        // 移動完了時に Animator のパラメータをリセット
         if (animator != null)
         {
             animator.SetBool("IsMove", false);
-            // animator.SetFloat("Angle", 0f);
         }
-
-        // 通常操作を再有効化
-        if (playerActionController != null)
-            playerActionController.OnForcedMoveEnd();
-        if (cameraAngleController != null)
-            cameraAngleController.OnForcedMoveEnd();
     }
+
 
     private float RoundAngleTo45(float angle)
     {
         return Mathf.Round(angle / 45f) * 45f;
+    }
+
+    public void SetAngle(float angle)
+    {
+        if (animator != null)
+        {
+            animator.SetFloat("Angle", angle);
+        }
+    }
+
+    public void EnableForceMode()
+    {
+        if (playerActionController != null)
+            playerActionController.OnForcedMoveBegin();
+        if (cameraAngleController != null)
+            cameraAngleController.OnForcedMoveBegin();
+    }
+
+    public void DisableForceMode()
+    {
+        if (playerActionController != null)
+            playerActionController.OnForcedMoveEnd();
+        if (cameraAngleController != null)
+            cameraAngleController.OnForcedMoveEnd();
     }
 }

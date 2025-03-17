@@ -219,5 +219,15 @@ namespace AnoGame.Application.Player.Control
             // あるいは入力のみ再有効化
             // SetInputEnabled(true);
         }
+
+        public IEnumerator InstantMoveUpdate(Vector2 moveInput)
+        {
+            // ダミー入力を送る
+            moveControl.Move(moveInput);
+            // 1フレーム待機することで、内部の入力処理を更新させる
+            yield return new WaitForSeconds(2f);
+            // 入力をクリア
+            moveControl.Move(Vector2.zero);
+        }
     }
 }
