@@ -2,147 +2,198 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
-namespace AnoGame.Application.UI
+[RequireComponent(typeof(PlayerInput))]
+public class SelectionCursorController : MonoBehaviour
 {
-    [RequireComponent(typeof(PlayerInput))]
-    public class SelectionCursorController : MonoBehaviour
+    [Header("UI上で選択可能なボタンなどのリスト")]
+    [SerializeField] private List<Selectable> selectableObjects;
+
+    [Header("選択中ボタンに重ねるカーソル用 Image")]
+    [SerializeField] private Image cursorImage;
+
+    [Header("カーソルの位置をずらすオフセット(ピクセル単位など)")]
+    [SerializeField] private Vector2 cursorOffset;
+
+    [Header("=== Events ===")]
+    // Selectアクション時のイベント
+    [SerializeField] private UnityEvent onSelect;
+    // Confirmアクション時のイベント
+    [SerializeField] private UnityEvent onConfirm;
+    // Cancelアクション時のイベント
+    [SerializeField] private UnityEvent onCancel;
+
+    private int currentIndex = 0;
+
+    private PlayerInput playerInput;
+
+    // “Select” “Confirm” “Cancel” アクションを参照
+    private InputAction selectAction;
+    private InputAction confirmAction;
+    private InputAction cancelAction;
+
+    private bool isKeyHeld = false;
+
+    [SerializeField] private float initialDelay = 0.5f;  // 最初のリピート開始までの待ち時間
+    [SerializeField] private float repeatInterval = 0.1f; // リピートの間隔
+
+    private float nextMoveTime = 0f;
+    private Vector2 currentInput = Vector2.zero;
+    private bool isHoldingDirection = false;
+
+    private void Awake()
     {
-        /// <summary>
-        /// 現在選択中のオブジェクトをハイライトしたり、フォーカス状態を管理するためのクラス/コンポーネント。
-        /// 自作の “Selectable” クラスや、UI の Selectable コンポーネント等を想定。
-        /// </summary>
-        [SerializeField] private List<Selectable> selectableObjects;
+        playerInput = GetComponent<PlayerInput>();
+        // UI アクションマップに切り替え
+        playerInput.SwitchCurrentActionMap("UI");
 
-        /// <summary>
-        /// 選択中のボタン上に配置するカーソル用のImage。
-        /// このImageが選択位置のインジケーターとして動作します。
-        /// </summary>
-        [SerializeField] private Image cursorImage;
+        // “Select” アクションを取得
+        selectAction = playerInput.actions.FindAction("Select", throwIfNotFound: true);
+        selectAction.started   += OnSelectStarted;
+         selectAction.performed += OnSelectPerformed;
+        selectAction.canceled  += OnSelectCanceled;
 
-        /// <summary>
-        /// 現在選択中のオブジェクトを示すインデックス。
-        /// </summary>
-        private int currentIndex = 0;
+        // “Confirm” アクションを取得
+        confirmAction = playerInput.actions.FindAction("Confirm", throwIfNotFound: true);
+        confirmAction.performed += OnConfirmPerformed;
 
-        private PlayerInput playerInput;
-        private InputAction moveAction;
-        private bool isKeyHeld = false;
+        // “Cancel” アクションを取得
+        cancelAction = playerInput.actions.FindAction("Cancel", throwIfNotFound: true);
+        cancelAction.performed += OnCancelPerformed;
+    }
 
-        private void Awake()
+    private void OnDestroy()
+    {
+        // イベント購読解除
+        if (selectAction != null)
         {
-            // PlayerInput を取得
-            playerInput = GetComponent<PlayerInput>();
-            // InputActionsアセットで設定した "Move" アクションを取り出す
-            moveAction = playerInput.actions["Move"];
-
-            // started / performed / canceled などのコールバックを登録
-            moveAction.started += OnMoveStarted;
-            moveAction.performed += OnMovePerformed;
-            moveAction.canceled += OnMoveCanceled;
+            selectAction.started   -= OnSelectStarted;
+            // selectAction.performed -= OnSelectPerformed;
+            selectAction.canceled  -= OnSelectCanceled;
         }
 
-        private void OnDestroy()
+        if (confirmAction != null)
         {
-            if (moveAction != null)
-            {
-                moveAction.started -= OnMoveStarted;
-                moveAction.performed -= OnMovePerformed;
-                moveAction.canceled -= OnMoveCanceled;
-            }
+            confirmAction.performed -= OnConfirmPerformed;
         }
 
-        /// <summary>
-        /// Moveアクションが開始されたタイミング (押し始めた瞬間) で呼ばれる。
-        /// </summary>
-        /// <param name="context"></param>
-        private void OnMoveStarted(InputAction.CallbackContext context)
+        if (cancelAction != null)
         {
-            // ボタンが押され始めたのでフラグを立てる
-            isKeyHeld = true;
+            cancelAction.performed -= OnCancelPerformed;
+        }
+    }
+
+    //========================
+    // Selectアクションの処理
+    //========================
+
+    private void OnSelectStarted(InputAction.CallbackContext context)
+    {
+        // ★ イベント呼び出し (Selectアクション時)
+        onSelect?.Invoke();
+
+        Vector2 inputValue = context.ReadValue<Vector2>();
+        Debug.Log("Select started! Input: " + inputValue);
+        if (inputValue.y > 0)
+        {
+            MoveSelectionUp();
+        }
+        else if (inputValue.y < 0)
+        {
+            MoveSelectionDown();
+        }
+    }
+
+    private void OnSelectPerformed(InputAction.CallbackContext context)
+    {
+        if (!isKeyHeld) return;
+
+        // ★ イベント呼び出し (Selectアクション時)
+        onSelect?.Invoke();
+
+        Vector2 inputValue = context.ReadValue<Vector2>();
+        if (inputValue.y > 0.5f)
+        {
+            MoveSelectionUp();
+        }
+        else if (inputValue.y < -0.5f)
+        {
+            MoveSelectionDown();
+        }
+        // 左右入力を使うなら inputValue.x も判定
+    }
+
+    private void OnSelectCanceled(InputAction.CallbackContext context)
+    {
+        isKeyHeld = false;
+    }
+
+    //========================
+    // Confirmアクションの処理
+    //========================
+
+    private void OnConfirmPerformed(InputAction.CallbackContext context)
+    {
+        Debug.Log("Confirm pressed! Selected: " + selectableObjects[currentIndex].gameObject.name);
+
+        // ★ イベント呼び出し (Confirmアクション時)
+        onConfirm?.Invoke();
+
+        var button = selectableObjects[currentIndex].GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.Invoke();
+        }
+    }
+
+    //========================
+    // Cancelアクションの処理
+    //========================
+
+    private void OnCancelPerformed(InputAction.CallbackContext context)
+    {
+        Debug.Log("Cancel pressed!");
+
+        // ★ イベント呼び出し (Cancelアクション時)
+        onCancel?.Invoke();
+
+        // 必要に応じて、UIを閉じる・前の画面に戻るなどの処理を行う
+        // gameObject.SetActive(false);
+    }
+
+    //========================
+    // 選択移動関連
+    //========================
+
+    private void MoveSelectionUp()
+    {
+        currentIndex--;
+        if (currentIndex < 0)
+        {
+            currentIndex = selectableObjects.Count - 1;
+        }
+        UpdateSelection();
+    }
+
+    private void MoveSelectionDown()
+    {
+        currentIndex++;
+        if (currentIndex >= selectableObjects.Count)
+        {
+            currentIndex = 0;
+        }
+        UpdateSelection();
+    }
+
+    private void UpdateSelection()
+    {
+        if (cursorImage != null && selectableObjects[currentIndex] != null)
+        {
+            cursorImage.transform.position 
+                = selectableObjects[currentIndex].transform.position + (Vector3)cursorOffset;
         }
 
-        /// <summary>
-        /// Moveアクションが実行されたタイミング。押し続けている間は連続で呼ばれる。
-        /// </summary>
-        /// <param name="context"></param>
-        private void OnMovePerformed(InputAction.CallbackContext context)
-        {
-            if (!isKeyHeld) return;
-
-            // 入力されたベクトル値を読み取る（WASD や 方向キー、左スティックなど）
-            Vector2 inputValue = context.ReadValue<Vector2>();
-
-            // 上下移動のみでセレクションを切り替える例
-            if (inputValue.y > 0.5f)
-            {
-                MoveSelectionUp();
-            }
-            else if (inputValue.y < -0.5f)
-            {
-                MoveSelectionDown();
-            }
-        }
-
-        /// <summary>
-        /// Moveアクションがキャンセルされたタイミング (キーやスティックを離した瞬間) で呼ばれる。
-        /// </summary>
-        /// <param name="context"></param>
-        private void OnMoveCanceled(InputAction.CallbackContext context)
-        {
-            // キーやスティックが離されたのでフラグを下ろす
-            isKeyHeld = false;
-        }
-
-        /// <summary>
-        /// 上方向へのセレクション移動処理
-        /// </summary>
-        private void MoveSelectionUp()
-        {
-            currentIndex--;
-            if (currentIndex < 0)
-            {
-                currentIndex = selectableObjects.Count - 1;  // リストの末尾へループ
-            }
-            UpdateSelection();
-        }
-
-        /// <summary>
-        /// 下方向へのセレクション移動処理
-        /// </summary>
-        private void MoveSelectionDown()
-        {
-            currentIndex++;
-            if (currentIndex >= selectableObjects.Count)
-            {
-                currentIndex = 0;  // リストの先頭へループ
-            }
-            UpdateSelection();
-        }
-
-        /// <summary>
-        /// 選択中のオブジェクトのハイライト、カーソルImageの位置更新、デバッグログの出力を行う処理
-        /// </summary>
-        private void UpdateSelection()
-        {
-            // すべてのSelectableのハイライトを解除する処理（例）
-            for (int i = 0; i < selectableObjects.Count; i++)
-            {
-                // selectableObjects[i].SetHighlighted(false);
-            }
-
-            // 現在選択中のSelectableをハイライトする処理（例）
-            // selectableObjects[currentIndex].SetHighlighted(true);
-
-            // カーソルImageを選択中のオブジェクトの上に移動
-            if (cursorImage != null && selectableObjects[currentIndex] != null)
-            {
-                // RectTransformがある場合はその位置に合わせる
-                cursorImage.transform.position = selectableObjects[currentIndex].transform.position;
-            }
-
-            // 現在選択中のオブジェクト名をデバッグログに出力
-            Debug.Log("Selected Button: " + selectableObjects[currentIndex].gameObject.name);
-        }
+        Debug.Log("Selected Button: " + selectableObjects[currentIndex].gameObject.name);
     }
 }
