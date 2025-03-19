@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 
 namespace AnoGame.Application.UI
@@ -8,43 +7,91 @@ namespace AnoGame.Application.UI
     {
         [SerializeField] private SelectionCursorController cursorController;
 
-        [SerializeField] private List<Selectable> mainMenuSelectables;
-        [SerializeField] private List<Selectable> settingsSelectables;
+        // 画面ごとにまとめた UISection をリストや配列で持つ
+        [SerializeField] private List<UISection> uiSections;
 
-        [SerializeField] private GameObject settingsPanel; // 設定画面パネル
-
-        private bool isSettingsOpen = false;
-
-        // ★ メイン画面の “前回の選択インデックス” を保存する変数
-        private int 
-         = 0;
+        // 現在アクティブなセクションを指す
+        private UISection currentSection;
 
         private void Start()
         {
-            // 起動時はメインメニューのリストを設定
-            cursorController.SetSelectableObjects(mainMenuSelectables, 0);
-            settingsPanel.SetActive(false);
+            // 例として、最初にメインメニュー(0番目)を開く
+            // リストの先頭をメインメニューと仮定
+            OpenSection(0);
         }
 
+        /// <summary>
+        /// 指定したインデックスの UISection を開く
+        /// </summary>
+        public void OpenSection(int sectionIndex)
+        {
+            if (sectionIndex < 0 || sectionIndex >= uiSections.Count)
+            {
+                Debug.LogWarning("Invalid section index: " + sectionIndex);
+                return;
+            }
+
+            // 今のセクションを閉じる
+            if (currentSection != null)
+            {
+                // 1) 現在のカーソル位置を記憶
+                currentSection.lastIndex = cursorController.GetCurrentIndex();
+
+                // 2) パネルを非表示
+                if (currentSection.panel != null)
+                {
+                    currentSection.panel.SetActive(false);
+                }
+            }
+
+            // 新たに開くセクションをセット
+            currentSection = uiSections[sectionIndex];
+
+            // 新セクションのパネルを表示
+            if (currentSection.panel != null)
+            {
+                currentSection.panel.SetActive(true);
+            }
+
+            // SelectionCursorController に対して、以前の lastIndex で表示する
+            cursorController.SetSelectableObjects(
+                currentSection.selectables,
+                currentSection.lastIndex
+            );
+        }
+
+        /// <summary>
+        /// セクション名で開く場合の例
+        /// </summary>
+        public void OpenSection(string sectionName)
+        {
+            // 名前で検索して OpenSection(index) を呼ぶなど
+            int index = uiSections.FindIndex(s => s.sectionName == sectionName);
+            if (index >= 0)
+            {
+                OpenSection(index);
+            }
+            else
+            {
+                Debug.LogWarning("Section not found: " + sectionName);
+            }
+        }
+
+        /// <summary>
+        /// 設定画面を開く
+        /// </summary>
         public void OpenSettings()
         {
-            isSettingsOpen = true;
-            settingsPanel.SetActive(true);
-
-            // 1) メインメニューの現在インデックスを退避
-            lastMainMenuIndex = cursorController.GetCurrentIndex();
-
-            // 2) 設定画面用リストを渡す（最初は0番目を選択しても良いし、別途記憶してもOK）
-            cursorController.SetSelectableObjects(settingsSelectables, 0);
+            // 例: "Settings" という名前のセクションを探して開く
+            OpenSection("Settings");
         }
 
-        public void CloseSettings()
+        /// <summary>
+        /// メインメニューに戻る
+        /// </summary>
+        public void OpenMainMenu()
         {
-            isSettingsOpen = false;
-            settingsPanel.SetActive(false);
-
-            // 3) メインメニューに戻すとき、前に記憶したインデックスでリストを復元
-            cursorController.SetSelectableObjects(mainMenuSelectables, lastMainMenuIndex);
+            OpenSection("MainMenu");
         }
     }
 }
