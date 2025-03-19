@@ -35,13 +35,6 @@ public class SelectionCursorController : MonoBehaviour
 
     private bool isKeyHeld = false;
 
-    [SerializeField] private float initialDelay = 0.5f;  // 最初のリピート開始までの待ち時間
-    [SerializeField] private float repeatInterval = 0.1f; // リピートの間隔
-
-    private float nextMoveTime = 0f;
-    private Vector2 currentInput = Vector2.zero;
-    private bool isHoldingDirection = false;
-
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -84,6 +77,14 @@ public class SelectionCursorController : MonoBehaviour
         }
     }
 
+    // SetSelectableObjectsを呼ぶことで、別の画面のリストを差し替え
+    public void SetSelectableObjects(List<Selectable> newList)
+    {
+        selectableObjects = newList;
+        currentIndex = 0; 
+        UpdateSelection();
+    }
+    
     //========================
     // Selectアクションの処理
     //========================
