@@ -9,27 +9,24 @@ namespace AnoGame.Application.UI
     [RequireComponent(typeof(PlayerInput))]
     public class SelectionCursorController : MonoBehaviour
     {
-        [Header("UI上で選択可能なボタンなどのリスト")]
-        [SerializeField] private List<Selectable> selectableObjects;
-
-        [Header("選択中ボタンに重ねるカーソル用 Image")]
-        [SerializeField] private Image cursorImage;
-
-        [Header("カーソルの位置をずらすオフセット(ピクセル単位など)")]
-        [SerializeField] private Vector2 cursorOffset;
-
         [Header("=== Events ===")]
         [SerializeField] private UnityEvent onSelect;
         [SerializeField] private UnityEvent onConfirm;
         [SerializeField] private UnityEvent onCancel;
-
-        private int currentIndex = 0;
 
         private PlayerInput playerInput;
         private InputAction selectAction;
         private InputAction confirmAction;
         private InputAction cancelAction;
 
+        // ★ 現在アクティブな UISection (UIManager からセットしてもらう)
+        private UISection currentSection;
+
+        // カーソルのイメージ (UISectionのオフセットを適用するため保持)
+        [SerializeField] private Image cursorImage;
+
+        // 現在のインデックス
+        private int currentIndex = 0;
 
         private void Awake()
         {
@@ -38,9 +35,7 @@ namespace AnoGame.Application.UI
 
             // “Select” アクションを取得
             selectAction = playerInput.actions.FindAction("Select", throwIfNotFound: true);
-            selectAction.started   += OnSelectStarted;
-            // selectAction.performed += OnSelectPerformed;
-            // selectAction.canceled  += OnSelectCanceled;
+            selectAction.started += OnSelectStarted;
 
             // “Confirm” アクションを取得
             confirmAction = playerInput.actions.FindAction("Confirm", throwIfNotFound: true);
@@ -55,14 +50,12 @@ namespace AnoGame.Application.UI
         {
             if (selectAction != null)
             {
-                selectAction.started   -= OnSelectStarted;
+                selectAction.started -= OnSelectStarted;
             }
-
             if (confirmAction != null)
             {
                 confirmAction.performed -= OnConfirmPerformed;
             }
-
             if (cancelAction != null)
             {
                 cancelAction.performed -= OnCancelPerformed;
@@ -70,22 +63,14 @@ namespace AnoGame.Application.UI
         }
 
         /// <summary>
-        /// 現在のリストを丸ごと差し替える（先頭要素を選択状態にする）
+        /// UIManager から現在の UISection を設定してもらう
         /// </summary>
-        public void SetSelectableObjects(List<Selectable> newList)
+        public void SetUISection(UISection section)
         {
-            selectableObjects = newList;
-            currentIndex = 0;
-            UpdateSelection();
-        }
+            currentSection = section;
+            // リストを反映
+            currentIndex = Mathf.Clamp(currentSection.lastIndex, 0, currentSection.selectables.Count - 1);
 
-        /// <summary>
-        /// インデックス指定つきでリストを差し替える（戻ったときに前のインデックスに復帰したい場合用）
-        /// </summary>
-        public void SetSelectableObjects(List<Selectable> newList, int startIndex)
-        {
-            selectableObjects = newList;
-            currentIndex = Mathf.Clamp(startIndex, 0, newList.Count - 1);
             UpdateSelection();
         }
 
@@ -104,6 +89,8 @@ namespace AnoGame.Application.UI
         private void OnSelectStarted(InputAction.CallbackContext context)
         {
             onSelect?.Invoke();
+
+            if (currentSection == null || currentSection.selectables.Count == 0) return;
 
             Vector2 inputValue = context.ReadValue<Vector2>();
             if (inputValue.y > 0)
@@ -124,8 +111,10 @@ namespace AnoGame.Application.UI
         {
             onConfirm?.Invoke();
 
-            Debug.Log("Confirm pressed! Selected: " + selectableObjects[currentIndex].gameObject.name);
-            var button = selectableObjects[currentIndex].GetComponent<Button>();
+            if (currentSection == null || currentSection.selectables.Count == 0) return;
+
+            Debug.Log("Confirm pressed! Selected: " + currentSection.selectables[currentIndex].gameObject.name);
+            var button = currentSection.selectables[currentIndex].GetComponent<Button>();
             if (button != null)
             {
                 button.onClick.Invoke();
@@ -141,7 +130,12 @@ namespace AnoGame.Application.UI
             onCancel?.Invoke();
 
             Debug.Log("Cancel pressed!");
-            // 必要に応じて閉じる処理など
+
+            // ★ 現在のセクションに onCancel イベントがあれば呼ぶ
+            if (currentSection != null && currentSection.onCancel != null)
+            {
+                currentSection.onCancel.Invoke();
+            }
         }
 
         //========================
@@ -153,7 +147,7 @@ namespace AnoGame.Application.UI
             currentIndex--;
             if (currentIndex < 0)
             {
-                currentIndex = selectableObjects.Count - 1;
+                currentIndex = currentSection.selectables.Count - 1;
             }
             UpdateSelection();
         }
@@ -161,7 +155,7 @@ namespace AnoGame.Application.UI
         private void MoveSelectionDown()
         {
             currentIndex++;
-            if (currentIndex >= selectableObjects.Count)
+            if (currentIndex >= currentSection.selectables.Count)
             {
                 currentIndex = 0;
             }
@@ -170,11 +164,13 @@ namespace AnoGame.Application.UI
 
         private void UpdateSelection()
         {
-            if (cursorImage != null && selectableObjects.Count > 0)
+            if (cursorImage != null && currentSection != null && currentSection.selectables.Count > 0)
             {
-                var target = selectableObjects[currentIndex];
+                var target = currentSection.selectables[currentIndex];
+                // UISection が持つカーソルオフセットを適用
+                Vector2 offset = currentSection.cursorOffset;
                 cursorImage.transform.position 
-                    = target.transform.position + (Vector3)cursorOffset;
+                    = target.transform.position + (Vector3)offset;
 
                 Debug.Log("Selected Button: " + target.gameObject.name);
             }

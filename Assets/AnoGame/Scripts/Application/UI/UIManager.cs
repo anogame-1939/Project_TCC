@@ -7,27 +7,26 @@ namespace AnoGame.Application.UI
     {
         [SerializeField] private SelectionCursorController cursorController;
 
-        // 画面ごとにまとめた UISection をリストや配列で持つ
+        // 複数のUI画面(メインメニュー, 設定画面など)をまとめて管理
         [SerializeField] private List<UISection> uiSections;
 
-        // 現在アクティブなセクションを指す
+        // 現在アクティブな画面
         private UISection currentSection;
 
         private void Start()
         {
-            // 例として、最初にメインメニュー(0番目)を開く
-            // リストの先頭をメインメニューと仮定
+            // 例: 起動時に 0 番目 (メインメニュー想定) を開く
             OpenSection(0);
         }
 
         /// <summary>
-        /// 指定したインデックスの UISection を開く
+        /// インデックス指定でUI画面を開く
         /// </summary>
         public void OpenSection(int sectionIndex)
         {
             if (sectionIndex < 0 || sectionIndex >= uiSections.Count)
             {
-                Debug.LogWarning("Invalid section index: " + sectionIndex);
+                Debug.LogWarning($"Invalid section index: {sectionIndex}");
                 return;
             }
 
@@ -36,7 +35,6 @@ namespace AnoGame.Application.UI
             {
                 // 1) 現在のカーソル位置を記憶
                 currentSection.lastIndex = cursorController.GetCurrentIndex();
-
                 // 2) パネルを非表示
                 if (currentSection.panel != null)
                 {
@@ -44,28 +42,24 @@ namespace AnoGame.Application.UI
                 }
             }
 
-            // 新たに開くセクションをセット
+            // 新しいセクションをアクティブに
             currentSection = uiSections[sectionIndex];
 
-            // 新セクションのパネルを表示
+            // パネルを表示
             if (currentSection.panel != null)
             {
                 currentSection.panel.SetActive(true);
             }
 
-            // SelectionCursorController に対して、以前の lastIndex で表示する
-            cursorController.SetSelectableObjects(
-                currentSection.selectables,
-                currentSection.lastIndex
-            );
+            // SelectionCursorController に “selectables” と “lastIndex”, “cursorOffset”, “UISection自体” を渡す
+            cursorController.SetUISection(currentSection);
         }
 
         /// <summary>
-        /// セクション名で開く場合の例
+        /// セクション名で画面を開くオーバーロード
         /// </summary>
         public void OpenSection(string sectionName)
         {
-            // 名前で検索して OpenSection(index) を呼ぶなど
             int index = uiSections.FindIndex(s => s.sectionName == sectionName);
             if (index >= 0)
             {
@@ -73,24 +67,23 @@ namespace AnoGame.Application.UI
             }
             else
             {
-                Debug.LogWarning("Section not found: " + sectionName);
+                Debug.LogWarning($"Section not found: {sectionName}");
             }
         }
 
         /// <summary>
-        /// 設定画面を開く
+        /// 現在開いている画面を閉じて、別の画面に戻る例
         /// </summary>
-        public void OpenSettings()
+        public void CloseCurrentSection()
         {
-            // 例: "Settings" という名前のセクションを探して開く
-            OpenSection("Settings");
-        }
+            if (currentSection != null && currentSection.panel != null)
+            {
+                // カーソル位置を記憶しておく
+                currentSection.lastIndex = cursorController.GetCurrentIndex();
+                currentSection.panel.SetActive(false);
+            }
 
-        /// <summary>
-        /// メインメニューに戻る
-        /// </summary>
-        public void OpenMainMenu()
-        {
+            // 例: 強制的に "MainMenu" という名前のセクションを開く
             OpenSection("MainMenu");
         }
     }

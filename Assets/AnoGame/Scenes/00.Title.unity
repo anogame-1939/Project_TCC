@@ -4720,12 +4720,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764a2d55b965b6d468a7405d328b534c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectableObjects:
-  - {fileID: 356357861}
-  - {fileID: 1338744937}
-  - {fileID: 1896921421}
-  cursorImage: {fileID: 1496556309}
-  cursorOffset: {x: -50, y: 0}
   onSelect:
     m_PersistentCalls:
       m_Calls:
@@ -4771,6 +4765,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  cursorImage: {fileID: 1496556309}
 --- !u!114 &950479765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4822,6 +4817,10 @@ MonoBehaviour:
     - {fileID: 1338744937}
     - {fileID: 1896921421}
     lastIndex: 0
+    cursorOffset: {x: -50, y: 0}
+    onCancel:
+      m_PersistentCalls:
+        m_Calls: []
   - sectionName: Settings
     panel: {fileID: 875791590}
     selectables:
@@ -4830,6 +4829,34 @@ MonoBehaviour:
     - {fileID: 1394846213}
     - {fileID: 594739986}
     lastIndex: 0
+    cursorOffset: {x: -100, y: 0}
+    onCancel:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 875791590}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 950479766}
+          m_TargetAssemblyTypeName: AnoGame.Application.UI.UIManager, AnoGame.Application
+          m_MethodName: OpenSection
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &972443941
 GameObject:
   m_ObjectHideFlags: 0
@@ -8470,12 +8497,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 950479766}
         m_TargetAssemblyTypeName: AnoGame.Application.UI.UIManager, AnoGame.Application
-        m_MethodName: OpenSettings
-        m_Mode: 1
+        m_MethodName: OpenSection
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0

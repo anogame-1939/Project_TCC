@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 namespace AnoGame.Application.UI
 {
@@ -10,9 +11,15 @@ namespace AnoGame.Application.UI
     [System.Serializable]
     public class UISection
     {
-        public string sectionName;              // 画面名(デバッグや識別用)
-        public GameObject panel;                // 該当画面のパネル (非表示にする等)
-        public List<Selectable> selectables;    // その画面内のボタンやスライダー等
+        public string sectionName;              // 画面名(メインメニュー, Settingsなど)
+        public GameObject panel;                // その画面全体のパネルオブジェクト
+        public List<Selectable> selectables;    // その画面内のボタン等
         [HideInInspector] public int lastIndex; // 前回選択していたインデックス
+
+        // 画面ごとのカーソルオフセット
+        public Vector2 cursorOffset;
+
+        // ★ キャンセル時に呼びたい処理を自由に設定できる
+        public UnityEvent onCancel;
     }
 }
