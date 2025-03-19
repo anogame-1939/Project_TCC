@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace AnoGame.Application.UI
 {
@@ -15,8 +17,37 @@ namespace AnoGame.Application.UI
 
         private void Start()
         {
+            StartCoroutine(StartCor());
+        }
+
+        /// <summary>
+        /// UIの初期化がバグるので1フレーム遅らせる
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator StartCor()
+        {
+            yield return null;
             // 例: 起動時に 0 番目 (メインメニュー想定) を開く
             OpenSection(0);
+
+            // 残りは非表示
+            for (int i = 0; i < uiSections.Count; i++)
+            {
+                if (i == 0)
+                {
+                    continue;
+                }
+
+                var section = uiSections[i];
+                if (section.panel != null)
+                {
+                    section.panel.SetActive(false);
+                }
+                
+            }
+
+            // 起動時は「選択モード」を有効, 「スクロールバー操作モード」は無効
+            cursorController.enabled = true;
         }
 
         /// <summary>
@@ -85,6 +116,36 @@ namespace AnoGame.Application.UI
 
             // 例: 強制的に "MainMenu" という名前のセクションを開く
             OpenSection("MainMenu");
+        }
+
+        public void OpenScrollbarMode(Scrollbar sb)
+        {
+            // 選択モードを無効化
+            cursorController.enabled = false;
+
+            // スクロールバー操作モードを有効化
+        }
+
+        public void CloseScrollbarMode()
+        {
+
+            // 選択モードを再度有効化
+            cursorController.enabled = true;
+        }
+
+        //========================
+        // Dropdownを別UISection扱いにする場合
+        //========================
+
+        public void OpenDropdownSection(/*...*/)
+        {
+            // 例: selectionCursorController.SetSelectableObjects(dropdownItems, 0, offset);
+            // またはUISectionを使ってOpenSection("DropdownMenu")等
+        }
+
+        public void CloseDropdownSection(/*...*/)
+        {
+            // メイン画面に戻る etc
         }
     }
 }

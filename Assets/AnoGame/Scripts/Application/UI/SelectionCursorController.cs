@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using TMPro;
 
 namespace AnoGame.Application.UI
 {
@@ -19,14 +20,17 @@ namespace AnoGame.Application.UI
         private InputAction confirmAction;
         private InputAction cancelAction;
 
-        // ★ 現在アクティブな UISection (UIManager からセットしてもらう)
+        // 現在アクティブな UISection
         private UISection currentSection;
 
-        // カーソルのイメージ (UISectionのオフセットを適用するため保持)
         [SerializeField] private Image cursorImage;
 
-        // 現在のインデックス
         private int currentIndex = 0;
+
+        // ★ スクロールバーを左右に動かす量（0～1の間で）
+        [SerializeField] private float scrollIncrement = 0.1f;
+        private float nextScrollTime = 0f;
+        private float coolTime = 0.1f;
 
         private void Awake()
         {
@@ -35,22 +39,63 @@ namespace AnoGame.Application.UI
 
             // “Select” アクションを取得
             selectAction = playerInput.actions.FindAction("Select", throwIfNotFound: true);
-            selectAction.started += OnSelectStarted;
+            // 押しっぱなし時に連続呼び出しされるように “performed” を使用
+            selectAction.started += OnSelectPerformed;
+            selectAction.performed += OnSelectPerformed;
 
-            // “Confirm” アクションを取得
+            // “Confirm” アクション
             confirmAction = playerInput.actions.FindAction("Confirm", throwIfNotFound: true);
             confirmAction.performed += OnConfirmPerformed;
 
-            // “Cancel” アクションを取得
+            // “Cancel” アクション
             cancelAction = playerInput.actions.FindAction("Cancel", throwIfNotFound: true);
             cancelAction.performed += OnCancelPerformed;
+        }
+
+        private void Update()
+        {
+            // 毎フレーム、現在の入力値を読み取る
+            Vector2 inputValue = selectAction.ReadValue<Vector2>();
+
+            if (Time.time < nextScrollTime)
+            {
+                // 他の処理（カーソル移動など）はやる場合はここで分岐
+                // 今回はスクロール部分だけ無視すると仮定
+                return;
+            }
+
+            // もし押しっぱなしであれば、ここで連続処理ができる
+            if (inputValue.x != 0)
+            {
+                // 左右入力の絶対値が大きい場合 → スクロールバーの値を更新
+                if (Mathf.Abs(inputValue.x) > 0.5f)
+                {
+                    var currentObj = currentSection.selectables[currentIndex].gameObject;
+                    var scrollbar = currentObj.GetComponent<Scrollbar>();
+                    if (scrollbar != null)
+                    {
+                        float sign = (inputValue.x > 0) ? 1f : -1f;
+                        float newValue = Mathf.Clamp01(scrollbar.value + sign * scrollIncrement);
+                        scrollbar.value = newValue;
+
+                        Debug.Log($"Scrollbar moved to {newValue}");
+
+                        // ★ ここでクールダウン開始
+                        // 次にスクロールが可能になる時刻を、現在時刻 + 1秒 とする
+                        nextScrollTime = Time.time + coolTime;
+
+                        return;
+                    }
+                }
+            }
         }
 
         private void OnDestroy()
         {
             if (selectAction != null)
             {
-                selectAction.started -= OnSelectStarted;
+                selectAction.started -= OnSelectPerformed;
+                selectAction.performed -= OnSelectPerformed;
             }
             if (confirmAction != null)
             {
@@ -62,21 +107,13 @@ namespace AnoGame.Application.UI
             }
         }
 
-        /// <summary>
-        /// UIManager から現在の UISection を設定してもらう
-        /// </summary>
         public void SetUISection(UISection section)
         {
             currentSection = section;
-            // リストを反映
             currentIndex = Mathf.Clamp(currentSection.lastIndex, 0, currentSection.selectables.Count - 1);
-
             UpdateSelection();
         }
 
-        /// <summary>
-        /// 現在のインデックスを取得（UIManagerなどが参照する）
-        /// </summary>
         public int GetCurrentIndex()
         {
             return currentIndex;
@@ -86,18 +123,20 @@ namespace AnoGame.Application.UI
         // Selectアクションの処理
         //========================
 
-        private void OnSelectStarted(InputAction.CallbackContext context)
+        private void OnSelectPerformed(InputAction.CallbackContext context)
         {
             onSelect?.Invoke();
 
             if (currentSection == null || currentSection.selectables.Count == 0) return;
 
             Vector2 inputValue = context.ReadValue<Vector2>();
-            if (inputValue.y > 0)
+
+            // 上下入力
+            if (inputValue.y > 0f)
             {
                 MoveSelectionUp();
             }
-            else if (inputValue.y < 0)
+            else if (inputValue.y < 0f)
             {
                 MoveSelectionDown();
             }
@@ -113,11 +152,32 @@ namespace AnoGame.Application.UI
 
             if (currentSection == null || currentSection.selectables.Count == 0) return;
 
-            Debug.Log("Confirm pressed! Selected: " + currentSection.selectables[currentIndex].gameObject.name);
-            var button = currentSection.selectables[currentIndex].GetComponent<Button>();
+            var currentObj = currentSection.selectables[currentIndex].gameObject;
+
+            // Dropdown や Scrollbar を個別に分岐したいならここで判定してもOK
+            // 今回は “左右入力でスクロールバー操作” するので
+            // Confirm押下時は Buttonなど他UIを想定
+
+            var button = currentObj.GetComponent<Button>();
             if (button != null)
             {
                 button.onClick.Invoke();
+                Debug.Log("Button clicked: " + button.name);
+            }
+            else
+            {
+                Debug.Log("Confirm pressed, but no Button found on " + currentObj.name);
+            }
+
+            var dropdown = currentObj.GetComponent<TMP_Dropdown>();
+            if (dropdown != null)
+            {
+                dropdown.Show();
+                Debug.Log("dropdown clicked: " + dropdown.name);
+            }
+            else
+            {
+                Debug.Log("Confirm pressed, but no dropdown found on " + currentObj.name);
             }
         }
 
@@ -130,8 +190,6 @@ namespace AnoGame.Application.UI
             onCancel?.Invoke();
 
             Debug.Log("Cancel pressed!");
-
-            // ★ 現在のセクションに onCancel イベントがあれば呼ぶ
             if (currentSection != null && currentSection.onCancel != null)
             {
                 currentSection.onCancel.Invoke();
@@ -167,12 +225,11 @@ namespace AnoGame.Application.UI
             if (cursorImage != null && currentSection != null && currentSection.selectables.Count > 0)
             {
                 var target = currentSection.selectables[currentIndex];
-                // UISection が持つカーソルオフセットを適用
                 Vector2 offset = currentSection.cursorOffset;
                 cursorImage.transform.position 
                     = target.transform.position + (Vector3)offset;
 
-                Debug.Log("Selected Button: " + target.gameObject.name);
+                Debug.Log("Selected: " + target.gameObject.name);
             }
         }
     }
