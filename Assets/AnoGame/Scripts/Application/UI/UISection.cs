@@ -21,5 +21,21 @@ namespace AnoGame.Application.UI
 
         // ★ キャンセル時に呼びたい処理を自由に設定できる
         public UnityEvent onCancel;
+
+        public void EnableAllSelectables()
+        {
+            foreach (var selectable in selectables)
+            {
+                selectable.interactable = true;
+            }
+        }
+        
+        public void DisableAllSelectables()
+        {
+            foreach (var selectable in selectables)
+            {
+                selectable.interactable = false;
+            }
+        }
     }
 }

@@ -2,73 +2,140 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
-public class UIManager : MonoBehaviour
+namespace AnoGame.Application.UI
 {
-    [SerializeField] private List<GameObject> panels; // 複数の画面をまとめたリスト
-    private int currentPanelIndex = 0;
-
-    private void Start()
+    public class UIManager : MonoBehaviour
     {
-        // 起動時にメイン画面(0番)を開く
-        ShowPanel(0);
-    }
+        // UISectionのリストをインスペクターから設定
+        [SerializeField] private List<UISection> sections;
+        private int currentSectionIndex = 0;
 
-    private GameObject lastSelected = null;
-
-    void Update()
-    {
-        // 現在 EventSystem が選択しているUIオブジェクト
-        var current = EventSystem.current.currentSelectedGameObject;
-
-        // もし前回と違うオブジェクトを選択していたらログを出す
-        if (current != lastSelected)
+        private void Start()
         {
-            lastSelected = current;
-            if (current != null)
+            // 起動時はメインメニュー（例：0番）を表示
+            ShowSection(0);
+        }
+
+        private void Initialize()
+        {
+            foreach(var selectable in sections)
             {
-                Debug.Log("Selected object: " + current.name);
+                if(selectable != null)
+                {
+                    // selectable.DisableAllSelectables();
+                }
+            }
+            
+        }
+
+        private GameObject lastSelected = null;
+        void Update()
+        {
+            // 現在 EventSystem が選択しているUIオブジェクト
+            var current = EventSystem.current.currentSelectedGameObject;
+
+            // もし前回と違うオブジェクトを選択していたらログを出す
+            if (current != lastSelected)
+            {
+                lastSelected = current;
+                if (current != null)
+                {
+                    Debug.Log("Selected object: " + current.name);
+                }
             }
         }
-    }
-    
-    public void ShowPanel(int index)
-    {
-        if (index < 0 || index >= panels.Count)
+
+        /// <summary>
+        /// セクション切り替え時に、前のセクションのSelectableを無効化し、新しいセクションのSelectableを有効化します。
+        /// また、新しいセクションでは前回の選択状態（lastIndex）を利用してフォーカスを設定します。
+        /// </summary>
+        /// <param name="index">表示したいセクションのインデックス</param>
+        public void ShowSection(int index)
         {
-            Debug.LogWarning($"Invalid panel index: {index}");
-            return;
+            if(index < 0 || index >= sections.Count)
+            {
+                Debug.LogWarning("Invalid section index: " + index);
+                return;
+            }
+
+            // 現在のセクションのSelectableを無効化し、パネルを非表示にする
+            UISection previousSection = sections[currentSectionIndex];
+            SetSelectablesInteractable(previousSection, false);
+            previousSection.panel.SetActive(false);
+
+            // 現在のセクションを更新
+            currentSectionIndex = index;
+            UISection currentSection = sections[currentSectionIndex];
+
+            // 新しいセクションのパネルを表示し、Selectableを有効化
+            currentSection.panel.SetActive(true);
+            SetSelectablesInteractable(currentSection, true);
+
+            // 前回選択していたSelectableがあればそのオブジェクトにフォーカス、
+            // なければリストの先頭を選択
+            int indexToSelect = currentSection.lastIndex;
+            if(indexToSelect < 0 || indexToSelect >= currentSection.selectables.Count)
+            {
+                indexToSelect = 0;
+            }
+            if(currentSection.selectables.Count > 0 && currentSection.selectables[indexToSelect] != null)
+            {
+                currentSection.selectables[indexToSelect].Select();
+                EventSystem.current.SetSelectedGameObject(currentSection.selectables[indexToSelect].gameObject);
+            }
         }
 
-        // 現在のパネルを非表示
-        if (currentPanelIndex >= 0 && currentPanelIndex < panels.Count)
+        /// <summary>
+        /// 指定されたUISection内のSelectable群のinteractable状態を切り替えます
+        /// </summary>
+        private void SetSelectablesInteractable(UISection section, bool interactable)
         {
-            panels[currentPanelIndex].SetActive(false);
+            foreach(var selectable in section.selectables)
+            {
+                if(selectable != null)
+                {
+                    selectable.interactable = interactable;
+                }
+            }
         }
 
-        currentPanelIndex = index;
-        panels[currentPanelIndex].SetActive(true);
-
-        // そのパネル内の「最初に選択しておきたいUI」(例: ボタン)を探す
-        var defaultButton = panels[currentPanelIndex].GetComponentInChildren<Button>();
-        if (defaultButton != null)
+        /// <summary>
+        /// 現在フォーカスされているSelectableのインデックスを保存します
+        /// （セクション切り替え前に呼び出して、後で戻る際に利用します）
+        /// </summary>
+        private void SaveCurrentSelectedIndex()
         {
-            // デフォルト選択を設定
-            defaultButton.Select();
-            // または
-            // EventSystem.current.SetSelectedGameObject(defaultButton.gameObject);
+            UISection currentSection = sections[currentSectionIndex];
+            GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+            if(currentSelected != null)
+            {
+                int index = currentSection.selectables.FindIndex(s => s.gameObject == currentSelected);
+                if(index >= 0)
+                {
+                    currentSection.lastIndex = index;
+                }
+            }
         }
-    }
 
-    // 例: 別のパネルを開くメソッド
-    public void OpenSettingsPanel()
-    {
-        ShowPanel(1); // 1番目が設定画面想定
-    }
+        /// <summary>
+        /// メインメニューから設定画面に移動する際の処理例
+        /// </summary>
+        public void OpenSettings()
+        {
+            // 現在のセクション（メインメニュー）の最後の選択状態を保存
+            SaveCurrentSelectedIndex();
+            // 設定画面（例：1番目）へ切り替え
+            ShowSection(1);
+        }
 
-    // 例: 現在のパネルを閉じてメインに戻る
-    public void CloseCurrentAndOpenMain()
-    {
-        ShowPanel(0); // 0番目がメインメニュー想定
+        /// <summary>
+        /// 設定画面などでキャンセルボタンが押されたときの処理例
+        /// </summary>
+        public void BackToMain()
+        {
+            ShowSection(0);
+        }
     }
 }
