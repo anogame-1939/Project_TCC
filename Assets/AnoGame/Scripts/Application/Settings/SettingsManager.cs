@@ -41,7 +41,7 @@ namespace AnoGame.Application.Settings
         public SettingsData CurrentSettingsData => _settingsData;
 
         /// <summary>
-        /// 既存の設定データを上書きします
+        /// 既存の設定データを上書きします（4項目一括更新）
         /// </summary>
         public void SetSettingsData(float masterVolume, float bgmVolume, float seSoundVolume, Language language)
         {
@@ -60,24 +60,80 @@ namespace AnoGame.Application.Settings
         }
 
         /// <summary>
-        /// マスター音量から言語までの各値を一括で更新します
+        /// マスター音量のみを更新するメソッド
         /// </summary>
-        public void UpdateSettings(float masterVolume, float bgmVolume, float seSoundVolume, Language language)
+        public void UpdateMasterVolume(float masterVolume)
         {
-            // _settingsData が null なら新規作成、既にある場合は各値を更新
             if (_settingsData == null)
             {
-                _settingsData = new SettingsData(masterVolume, bgmVolume, seSoundVolume, language);
+                // 他の値はデフォルト（1.0f, 1.0f）および言語はEnglishを仮設定
+                _settingsData = new SettingsData(masterVolume, 1.0f, 1.0f, Language.English);
             }
             else
             {
                 _settingsData.MasterVolume = masterVolume;
-                _settingsData.BGMVolume = bgmVolume;
-                _settingsData.SESoundVolume = seSoundVolume;
-                _settingsData.Language = language;
             }
-            // 設定データの変更を購読している側に通知
             OnSettingsDataChanged?.Invoke(_settingsData);
+        }
+
+        /// <summary>
+        /// BGM音量のみを更新するメソッド
+        /// </summary>
+        public void UpdateBgmVolume(float bgmVolume)
+        {
+            if (_settingsData == null)
+            {
+                _settingsData = new SettingsData(1.0f, bgmVolume, 1.0f, Language.English);
+            }
+            else
+            {
+                _settingsData.BGMVolume = bgmVolume;
+            }
+            OnSettingsDataChanged?.Invoke(_settingsData);
+        }
+
+        /// <summary>
+        /// SE音量のみを更新するメソッド
+        /// </summary>
+        public void UpdateSeSoundVolume(float seSoundVolume)
+        {
+            if (_settingsData == null)
+            {
+                _settingsData = new SettingsData(1.0f, 1.0f, seSoundVolume, Language.English);
+            }
+            else
+            {
+                _settingsData.SESoundVolume = seSoundVolume;
+            }
+            OnSettingsDataChanged?.Invoke(_settingsData);
+        }
+
+        /// <summary>
+        /// 1項目のstringを受け付け、Enum.TryParse を利用して Language を更新するメソッド
+        /// </summary>
+        public void UpdateLanguageFromString(string languageString)
+        {
+            if (Enum.TryParse<Language>(languageString, true, out Language languageEnum))
+            {
+                if (_settingsData == null)
+                {
+                    _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, languageEnum);
+                }
+                else
+                {
+                    _settingsData.Language = languageEnum;
+                }
+                OnSettingsDataChanged?.Invoke(_settingsData);
+            }
+            else
+            {
+                Debug.LogError($"UpdateLanguageFromString: 変換できない入力です -> {languageString}");
+            }
+        }
+
+        public void SaveSettings()
+        {
+            SaveSettingsAsync().Forget();
         }
 
         public async UniTask SaveSettingsAsync()

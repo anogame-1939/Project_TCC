@@ -24,6 +24,11 @@ namespace AnoGame.Application.UI
             teptText = GetComponent<TMP_Text>();
         }
 
+
+        public void UpdateText(string value)
+        {
+            teptText.text = value;
+        }
         // 引数のfloat値を文字列に変換して、テキストに反映するメソッド
         public void UpdatePercentageText(float value)
         {
