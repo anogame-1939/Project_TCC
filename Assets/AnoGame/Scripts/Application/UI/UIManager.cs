@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEngine.Events;
 
 namespace AnoGame.Application.UI
 {
@@ -16,6 +14,11 @@ namespace AnoGame.Application.UI
         {
             // 起動時はメインメニュー（例：0番）を表示
             ShowSection(0);
+            
+            foreach (var section in sections)
+            {
+                section.DisableAllSelectables();
+            }
         }
 
         private void Initialize()
