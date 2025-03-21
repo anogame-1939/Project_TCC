@@ -1,151 +1,74 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Collections;
 
-namespace AnoGame.Application.UI
+public class UIManager : MonoBehaviour
 {
-    public class UIManager : MonoBehaviour
+    [SerializeField] private List<GameObject> panels; // 複数の画面をまとめたリスト
+    private int currentPanelIndex = 0;
+
+    private void Start()
     {
-        [SerializeField] private SelectionCursorController cursorController;
+        // 起動時にメイン画面(0番)を開く
+        ShowPanel(0);
+    }
 
-        // 複数のUI画面(メインメニュー, 設定画面など)をまとめて管理
-        [SerializeField] private List<UISection> uiSections;
+    private GameObject lastSelected = null;
 
-        // 現在アクティブな画面
-        private UISection currentSection;
+    void Update()
+    {
+        // 現在 EventSystem が選択しているUIオブジェクト
+        var current = EventSystem.current.currentSelectedGameObject;
 
-        private void Start()
+        // もし前回と違うオブジェクトを選択していたらログを出す
+        if (current != lastSelected)
         {
-            StartCoroutine(StartCor());
-        }
-
-        /// <summary>
-        /// UIの初期化がバグるので1フレーム遅らせる
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator StartCor()
-        {
-            yield return null;
-            // 例: 起動時に 0 番目 (メインメニュー想定) を開く
-            OpenSection(0);
-
-            // 残りは非表示
-            for (int i = 0; i < uiSections.Count; i++)
+            lastSelected = current;
+            if (current != null)
             {
-                if (i == 0)
-                {
-                    continue;
-                }
-
-                var section = uiSections[i];
-                if (section.panel != null)
-                {
-                    section.panel.SetActive(false);
-                }
-                
-            }
-
-            // 起動時は「選択モード」を有効, 「スクロールバー操作モード」は無効
-            cursorController.enabled = true;
-        }
-
-        /// <summary>
-        /// インデックス指定でUI画面を開く
-        /// </summary>
-        public void OpenSection(int sectionIndex)
-        {
-            if (sectionIndex < 0 || sectionIndex >= uiSections.Count)
-            {
-                Debug.LogWarning($"Invalid section index: {sectionIndex}");
-                return;
-            }
-
-            // 今のセクションを閉じる
-            if (currentSection != null)
-            {
-                // 1) 現在のカーソル位置を記憶
-                currentSection.lastIndex = cursorController.GetCurrentIndex();
-                // 2) パネルを非表示
-                if (currentSection.panel != null)
-                {
-                    currentSection.panel.SetActive(false);
-                }
-            }
-
-            // 新しいセクションをアクティブに
-            currentSection = uiSections[sectionIndex];
-
-            // パネルを表示
-            if (currentSection.panel != null)
-            {
-                currentSection.panel.SetActive(true);
-            }
-
-            // SelectionCursorController に “selectables” と “lastIndex”, “cursorOffset”, “UISection自体” を渡す
-            cursorController.SetUISection(currentSection);
-        }
-
-        /// <summary>
-        /// セクション名で画面を開くオーバーロード
-        /// </summary>
-        public void OpenSection(string sectionName)
-        {
-            int index = uiSections.FindIndex(s => s.sectionName == sectionName);
-            if (index >= 0)
-            {
-                OpenSection(index);
-            }
-            else
-            {
-                Debug.LogWarning($"Section not found: {sectionName}");
+                Debug.Log("Selected object: " + current.name);
             }
         }
-
-        /// <summary>
-        /// 現在開いている画面を閉じて、別の画面に戻る例
-        /// </summary>
-        public void CloseCurrentSection()
+    }
+    
+    public void ShowPanel(int index)
+    {
+        if (index < 0 || index >= panels.Count)
         {
-            if (currentSection != null && currentSection.panel != null)
-            {
-                // カーソル位置を記憶しておく
-                currentSection.lastIndex = cursorController.GetCurrentIndex();
-                currentSection.panel.SetActive(false);
-            }
-
-            // 例: 強制的に "MainMenu" という名前のセクションを開く
-            OpenSection("MainMenu");
+            Debug.LogWarning($"Invalid panel index: {index}");
+            return;
         }
 
-        public void OpenScrollbarMode(Scrollbar sb)
+        // 現在のパネルを非表示
+        if (currentPanelIndex >= 0 && currentPanelIndex < panels.Count)
         {
-            // 選択モードを無効化
-            cursorController.enabled = false;
-
-            // スクロールバー操作モードを有効化
+            panels[currentPanelIndex].SetActive(false);
         }
 
-        public void CloseScrollbarMode()
+        currentPanelIndex = index;
+        panels[currentPanelIndex].SetActive(true);
+
+        // そのパネル内の「最初に選択しておきたいUI」(例: ボタン)を探す
+        var defaultButton = panels[currentPanelIndex].GetComponentInChildren<Button>();
+        if (defaultButton != null)
         {
-
-            // 選択モードを再度有効化
-            cursorController.enabled = true;
+            // デフォルト選択を設定
+            defaultButton.Select();
+            // または
+            // EventSystem.current.SetSelectedGameObject(defaultButton.gameObject);
         }
+    }
 
-        //========================
-        // Dropdownを別UISection扱いにする場合
-        //========================
+    // 例: 別のパネルを開くメソッド
+    public void OpenSettingsPanel()
+    {
+        ShowPanel(1); // 1番目が設定画面想定
+    }
 
-        public void OpenDropdownSection(/*...*/)
-        {
-            // 例: selectionCursorController.SetSelectableObjects(dropdownItems, 0, offset);
-            // またはUISectionを使ってOpenSection("DropdownMenu")等
-        }
-
-        public void CloseDropdownSection(/*...*/)
-        {
-            // メイン画面に戻る etc
-        }
+    // 例: 現在のパネルを閉じてメインに戻る
+    public void CloseCurrentAndOpenMain()
+    {
+        ShowPanel(0); // 0番目がメインメニュー想定
     }
 }
