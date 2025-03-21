@@ -27,13 +27,13 @@ namespace AnoGame.Application.Settings
             try
             {
                 Debug.Log("InitializeSettingsData");
-                _settingsData = await _repository.LoadDataAsync() ?? new SettingsData(1.0f, 1.0f, 1.0f, Language.English);
+                _settingsData = await _repository.LoadDataAsync() ?? new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
                 OnSettingsDataChanged?.Invoke(_settingsData);
             }
             catch (Exception ex)
             {
                 Debug.LogError($"Failed to initialize settings data: {ex.Message}");
-                _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, Language.English);
+                _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
                 OnSettingsDataChanged?.Invoke(_settingsData);
             }
         }
@@ -47,7 +47,7 @@ namespace AnoGame.Application.Settings
         {
             if (_settingsData == null)
             {
-                _settingsData = new SettingsData(masterVolume, bgmVolume, seSoundVolume, language);
+                _settingsData = GetDefaultSettingsData();
             }
             else
             {
@@ -66,8 +66,8 @@ namespace AnoGame.Application.Settings
         {
             if (_settingsData == null)
             {
-                // 他の値はデフォルト（1.0f, 1.0f）および言語はEnglishを仮設定
-                _settingsData = new SettingsData(masterVolume, 1.0f, 1.0f, Language.English);
+                _settingsData = GetDefaultSettingsData();
+                _settingsData.MasterVolume = masterVolume;
             }
             else
             {
@@ -83,7 +83,8 @@ namespace AnoGame.Application.Settings
         {
             if (_settingsData == null)
             {
-                _settingsData = new SettingsData(1.0f, bgmVolume, 1.0f, Language.English);
+                _settingsData = GetDefaultSettingsData();
+                _settingsData.BGMVolume = bgmVolume;
             }
             else
             {
@@ -99,7 +100,8 @@ namespace AnoGame.Application.Settings
         {
             if (_settingsData == null)
             {
-                _settingsData = new SettingsData(1.0f, 1.0f, seSoundVolume, Language.English);
+                _settingsData = GetDefaultSettingsData();
+                _settingsData.SESoundVolume = seSoundVolume;
             }
             else
             {
@@ -109,15 +111,17 @@ namespace AnoGame.Application.Settings
         }
 
         /// <summary>
-        /// 1項目のstringを受け付け、Enum.TryParse を利用して Language を更新するメソッド
+        /// int型を受け付け、受け取った値を Language enum に変換して更新するメソッド
         /// </summary>
-        public void UpdateLanguageFromString(string languageString)
+        public void UpdateLanguageFromInt(int languageValue)
         {
-            if (Enum.TryParse<Language>(languageString, true, out Language languageEnum))
+            if (Enum.IsDefined(typeof(Language), languageValue))
             {
+                Language languageEnum = (Language)languageValue;
                 if (_settingsData == null)
                 {
-                    _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, languageEnum);
+                    _settingsData = GetDefaultSettingsData();
+                    _settingsData.Language = languageEnum;
                 }
                 else
                 {
@@ -127,7 +131,7 @@ namespace AnoGame.Application.Settings
             }
             else
             {
-                Debug.LogError($"UpdateLanguageFromString: 変換できない入力です -> {languageString}");
+                Debug.LogError($"UpdateLanguageFromInt: 入力された値 {languageValue} は有効な Language ではありません。");
             }
         }
 
@@ -154,8 +158,27 @@ namespace AnoGame.Application.Settings
 
         public void ResetSettings()
         {
-            _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, Language.English);
+            _settingsData = GetDefaultSettingsData();
             OnSettingsDataChanged?.Invoke(_settingsData);
+        }
+
+        private SettingsData GetDefaultSettingsData()
+        {
+            return new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
+        }
+
+        private Language GetDefaultLanguageBasedOnSystem()
+        {
+            switch(UnityEngine.Application.systemLanguage)
+            {
+                case SystemLanguage.Japanese:
+                    return Language.Japanese;
+                case SystemLanguage.English:
+                    return Language.English;
+                // 必要に応じて他の言語も追加
+                default:
+                    return Language.English; // デフォルトは English に設定
+            }
         }
     }
 }

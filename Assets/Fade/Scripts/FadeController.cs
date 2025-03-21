@@ -8,6 +8,10 @@ public class FadeImageController : MonoBehaviour
     [SerializeField]
     private FadeImage _fadeImage;
 
+    [Header("オンなら画面を表示。オフなら暗転して非表示。")]
+    [SerializeField]
+    private bool defalutFeedIn = false;
+
     private Coroutine _fadeCoroutine;
 
 	private DialogueSystemTrigger _dialogueSystemTrigger;
@@ -15,7 +19,8 @@ public class FadeImageController : MonoBehaviour
     void Start()
     {
         Assert.IsNotNull(_fadeImage, "FadeImage component is not assigned");
-		FadeIn(0);
+		if (defalutFeedIn) FadeIn(0);
+        else FadeOut(0);
     }
 
 	public void SetDialogueSystemTrigger(DialogueSystemTrigger dialogueSystemTrigger)
