@@ -59,6 +59,7 @@ namespace AnoGame.Application.UI
                 Debug.LogWarning("Invalid section index: " + index);
                 return;
             }
+            SaveCurrentSelectedIndex();
 
             // 現在のセクションのSelectableを無効化し、パネルを非表示にする
             UISection previousSection = sections[currentSectionIndex];
