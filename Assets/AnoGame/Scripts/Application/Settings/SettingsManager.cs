@@ -1,5 +1,5 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 using Cysharp.Threading.Tasks;
 using AnoGame.Domain.Data.Models;
 using AnoGame.Domain.Data.Services;
@@ -11,6 +11,8 @@ namespace AnoGame.Application.Settings
     {
         private SettingsData _settingsData;
 
+        public event Action<SettingsData> OnSettingsDataChanged;
+
         [Inject] private ISettingsDataRepository _repository;
 
         [Inject]
@@ -20,36 +22,27 @@ namespace AnoGame.Application.Settings
             InitializeSettingsData().Forget();
         }
 
-        /// <summary>
-        /// 非同期で設定データをロードし、存在しない場合は初期値を設定する
-        /// </summary>
         private async UniTask InitializeSettingsData()
         {
             try
             {
                 Debug.Log("InitializeSettingsData");
                 _settingsData = await _repository.LoadDataAsync() ?? new SettingsData(1.0f, 1.0f, 1.0f, Language.English);
-                Debug.Log($"Settings data loaded: {_settingsData}");
+                OnSettingsDataChanged?.Invoke(_settingsData);
             }
             catch (Exception ex)
             {
                 Debug.LogError($"Failed to initialize settings data: {ex.Message}");
                 _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, Language.English);
+                OnSettingsDataChanged?.Invoke(_settingsData);
             }
         }
 
-        /// <summary>
-        /// 現在の設定データを取得します
-        /// </summary>
         public SettingsData CurrentSettingsData => _settingsData;
 
         /// <summary>
-        /// 設定データに各種設定値を反映します
+        /// 既存の設定データを上書きします
         /// </summary>
-        /// <param name="masterVolume">マスター音量</param>
-        /// <param name="bgmVolume">BGM音量</param>
-        /// <param name="seSoundVolume">SE音量</param>
-        /// <param name="language">言語設定</param>
         public void SetSettingsData(float masterVolume, float bgmVolume, float seSoundVolume, Language language)
         {
             if (_settingsData == null)
@@ -63,11 +56,30 @@ namespace AnoGame.Application.Settings
                 _settingsData.SESoundVolume = seSoundVolume;
                 _settingsData.Language = language;
             }
+            OnSettingsDataChanged?.Invoke(_settingsData);
         }
 
         /// <summary>
-        /// 現在の設定データを非同期で保存します
+        /// マスター音量から言語までの各値を一括で更新します
         /// </summary>
+        public void UpdateSettings(float masterVolume, float bgmVolume, float seSoundVolume, Language language)
+        {
+            // _settingsData が null なら新規作成、既にある場合は各値を更新
+            if (_settingsData == null)
+            {
+                _settingsData = new SettingsData(masterVolume, bgmVolume, seSoundVolume, language);
+            }
+            else
+            {
+                _settingsData.MasterVolume = masterVolume;
+                _settingsData.BGMVolume = bgmVolume;
+                _settingsData.SESoundVolume = seSoundVolume;
+                _settingsData.Language = language;
+            }
+            // 設定データの変更を購読している側に通知
+            OnSettingsDataChanged?.Invoke(_settingsData);
+        }
+
         public async UniTask SaveSettingsAsync()
         {
             if (_settingsData != null)
@@ -84,12 +96,10 @@ namespace AnoGame.Application.Settings
             }
         }
 
-        /// <summary>
-        /// 設定データを初期状態（マスター、BGM、SEともに1.0f、言語はEnglish）にリセットします
-        /// </summary>
         public void ResetSettings()
         {
             _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, Language.English);
+            OnSettingsDataChanged?.Invoke(_settingsData);
         }
     }
 }
