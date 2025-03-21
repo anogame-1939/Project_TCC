@@ -25,9 +25,10 @@ namespace AnoGame.Application.UI
         }
 
         // 引数のfloat値を文字列に変換して、テキストに反映するメソッド
-        public void SetTextFromFloat(float value)
+        public void UpdatePercentageText(float value)
         {
-            teptText.text = value.ToString();
+            int percentageValue = Mathf.FloorToInt(value * 100f);
+            teptText.text = percentageValue.ToString();
         }
     }
 }

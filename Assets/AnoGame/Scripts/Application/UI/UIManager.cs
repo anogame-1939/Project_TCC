@@ -12,13 +12,13 @@ namespace AnoGame.Application.UI
 
         private void Start()
         {
-            // 起動時はメインメニュー（例：0番）を表示
-            ShowSection(0);
-            
             foreach (var section in sections)
             {
                 section.DisableAllSelectables();
             }
+
+            // 起動時はメインメニュー（例：0番）を表示
+            ShowSection(0);
         }
 
         private void Initialize()
