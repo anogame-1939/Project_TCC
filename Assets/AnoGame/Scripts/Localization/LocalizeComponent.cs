@@ -7,6 +7,8 @@ namespace Localizer
     /// </summary>
     public class LocalizeComponent : MonoBehaviour
     {
+        [SerializeField] private bool ignore = false;
+        public bool Ignore => ignore;
         [SerializeField] private string _originText;
         public string OriginText => _originText;
 

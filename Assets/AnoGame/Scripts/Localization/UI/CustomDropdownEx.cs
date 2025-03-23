@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class CustomDropdownEx : TMP_Dropdown
 {
+    [SerializeField]
     public List<OptionDataEx> optionsEx = new List<OptionDataEx>();
 
     protected override DropdownItem CreateItem(DropdownItem itemTemplate)

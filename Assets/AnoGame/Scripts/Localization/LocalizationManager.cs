@@ -237,6 +237,10 @@ namespace Localizer
 
                 if(localizeComponent == null)
                 {
+                    if (localizeComponent.Ignore)
+                    {
+                        continue;
+                    }
                     tmpro.gameObject.AddComponent<LocalizeComponent>();
                     localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
 
