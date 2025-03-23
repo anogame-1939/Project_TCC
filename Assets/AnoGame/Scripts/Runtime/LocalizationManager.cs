@@ -9,6 +9,7 @@ using System.Threading;
 
 using UnityEngine.Localization.Tables;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Codice.CM.Common.Encryption;
 
 namespace Localizer
 {
@@ -80,14 +81,17 @@ namespace Localizer
             // _localizedStringTable.TableChanged += ChangeText;
 
             // フォント変更のイベントを発火
-            _fontTable.TableChanged += ChangeFont;
+            if  (_fontTable != null)
+            {
+                _fontTable.TableChanged += ChangeFont;
+            }
 
             // テキスト変更時のイベントを登録
             TextChangedEvent += OnTextChangedEvent;
 
             // フォント変更時のイベントを登録
             FontChangedEvent += OnFontChangedEvent;
-return;
+
             // TODO:いずれ消すこと
             // ビルド後、謎エラーで落ちてしまったため、リトライ処理を追加した
             for (int i = 0; i < retryCount; i++)
@@ -137,6 +141,16 @@ return;
         /// <param name="assetTable"></param>
         void ChangeFont(AssetTable assetTable)
         {
+            if (assetTable == null)
+            {
+                Debug.LogError("フォントフォントのアセットテーブルが設定されていません。");
+                return;
+            }
+            if (_localizedFontReference == null)
+            {
+                Debug.LogError("フォントテーブルが設定されていません。");
+                return;
+            }
             var operation = assetTable.GetAssetAsync<TMP_FontAsset>(_localizedFontReference.TableEntryReference);
             operation.Completed += handle => FontChangedEvent?.Invoke(handle.Result);
 
@@ -218,6 +232,7 @@ return;
             var tmpros = Resources.FindObjectsOfTypeAll(typeof(TMP_Text)) as TMP_Text[];
             foreach(var tmpro in tmpros)
             {
+                Debug.Log($"テキスト翻訳中:{tmpro.name}");
                 LocalizeComponent localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
 
                 if(localizeComponent == null)
@@ -232,13 +247,14 @@ return;
                     }
 
                     localizeComponent.SetOriginText(tmpro.text);
-                }
 
-                string tableName = _localizedStringTable.TableReference.TableCollectionName;
-                var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
-                if (entry != null)
-                {
-                    tmpro.text = entry.LocalizedValue;
+                    string tableName = _localizedStringTable.TableReference.TableCollectionName;
+                    var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
+                    if (entry != null)
+                    {
+                        Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
+                        tmpro.text = entry.LocalizedValue;
+                    }
                 }
             }
         }

@@ -553,6 +553,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 196301160}
   m_CullTransparentMesh: 1
+--- !u!1 &226658562
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 226658564}
+  - component: {fileID: 226658563}
+  m_Layer: 0
+  m_Name: LocalizationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &226658563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226658562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03676f4f87329c04b866f07b16d281c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _localizedStringTable:
+    m_TableReference:
+      m_TableCollectionName: GUID:177ffb5b9eaf64c4c89721c5ab2600e0
+  _fontTable:
+    m_TableReference:
+      m_TableCollectionName: GUID:9203e85dfdc13a5468a21ff62e4d20f9
+  _fontTableKey: Font
+  _localizedFontReference:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+--- !u!4 &226658564
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226658562}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &229136800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2052,7 +2111,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8A2D\u5B9A"
+  m_text: SETTINGS
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: faf65991db78a0a4098b955d6f24ce57, type: 2}
   m_sharedMaterial: {fileID: -3998071412672771672, guid: faf65991db78a0a4098b955d6f24ce57, type: 2}
@@ -9852,3 +9911,4 @@ SceneRoots:
   - {fileID: 1971326211}
   - {fileID: 1092461860}
   - {fileID: 1720465132}
+  - {fileID: 226658564}
