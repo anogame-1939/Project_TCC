@@ -21,7 +21,6 @@ namespace Localizer.UI
         void Start()
         {
             // Dropdownに言語名をセット
-            dropdown.ClearOptions();
             List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
             foreach (var langOpt in languageOptions)
             {
