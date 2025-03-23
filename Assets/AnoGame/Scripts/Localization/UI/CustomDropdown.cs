@@ -20,9 +20,6 @@ namespace Localizer.UI
 
         void Start()
         {
-            // 値変更時にフォントを切り替える
-            dropdown.onValueChanged.AddListener(OnLanguageChanged);
-            
             // Dropdownに言語名をセット
             List<TMP_Dropdown.OptionData> optionList = new List<TMP_Dropdown.OptionData>();
             foreach (var langOpt in languageOptions)
@@ -31,18 +28,6 @@ namespace Localizer.UI
             }
             dropdown.AddOptions(optionList);
             dropdown.RefreshShownValue();
-
-            
-        }
-
-        void OnLanguageChanged(int index)
-        {
-            // 選択された言語のフォントを適用
-            var selectedOption = languageOptions[index];
-            sampleText.font = selectedOption.font;
-
-            // 必要なら他のUIテキストにも適用
-            // ...
         }
     }
 }

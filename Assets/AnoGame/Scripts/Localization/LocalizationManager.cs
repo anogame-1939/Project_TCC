@@ -237,10 +237,6 @@ namespace Localizer
 
                 if(localizeComponent == null)
                 {
-                    if (localizeComponent.Ignore)
-                    {
-                        continue;
-                    }
                     tmpro.gameObject.AddComponent<LocalizeComponent>();
                     localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
 
@@ -252,13 +248,20 @@ namespace Localizer
 
                     localizeComponent.SetOriginText(tmpro.text);
 
-                    string tableName = _localizedStringTable.TableReference.TableCollectionName;
-                    var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
-                    if (entry != null)
-                    {
-                        Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
-                        tmpro.text = entry.LocalizedValue;
-                    }
+
+                }
+                else if (localizeComponent.Ignore)
+                {
+                    Debug.Log($"テキスト翻訳スキップ:{tmpro.text}");
+                    continue;
+                }
+
+                string tableName = _localizedStringTable.TableReference.TableCollectionName;
+                var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
+                if (entry != null)
+                {
+                    Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
+                    tmpro.text = entry.LocalizedValue;
                 }
             }
         }

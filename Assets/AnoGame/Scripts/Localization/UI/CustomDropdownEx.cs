@@ -6,16 +6,25 @@ using System.Collections.Generic;
 public class CustomDropdownEx : TMP_Dropdown
 {
     [SerializeField]
+    public List<string> aaa;
+    [SerializeField]
     public List<OptionDataEx> optionsEx = new List<OptionDataEx>();
 
     protected override DropdownItem CreateItem(DropdownItem itemTemplate)
     {
-        // 親クラスの処理でItemを生成
-        DropdownItem itemGO = base.CreateItem(itemTemplate);
-        // itemGO 上の TextMeshProUGUI を取得してフォントを適用
-        // ただし継承クラスでさらに細かい処理が必要になる
-
-        return itemGO;
+        var item = base.CreateItem(itemTemplate);
+        // item が親に追加された後に index を調べたい
+        Transform parent = item.transform.parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i) == item.transform)
+            {
+                int index = i - 1; // 先頭に何らかのテンプレートがある場合などで調整
+                Debug.Log($"CreateItem index = {index}");
+                break;
+            }
+        }
+        return item;
     }
 
     // あるいは RefreshShownValue() をオーバーライドして
