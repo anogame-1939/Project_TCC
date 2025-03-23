@@ -1,18 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
-public class TitleSceneLoader : MonoBehaviour
+namespace AnoGame.Application.Title
 {
-    // Start is called before the first frame update
-    void Start()
+    public class TitleSceneLoader : MonoBehaviour
     {
-        
-    }
+        // インスペクターで次のシーン名を指定できるようにします
+        [SerializeField] private string nextSceneName;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // Startが呼ばれる際に非同期処理を開始します
+        public void LoadNextScene()
+        {
+            StartCoroutine(LoadNextSceneCor());
+        }
+
+        // 非同期でシーンをロードし、完了後に現在のシーンをアンロードするコルーチン
+        private IEnumerator LoadNextSceneCor()
+        {
+            // 現在のシーンを取得
+            Scene currentScene = SceneManager.GetActiveScene();
+
+            // 指定されたシーンをAdditiveモードで非同期ロード
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
+
+            // ロードが完了するまで待機
+            while (!asyncLoad.isDone)
+            {
+                yield return null;
+            }
+
+            // ロード完了後、追加ロードしたシーンをアクティブに設定
+            Scene newScene = SceneManager.GetSceneByName(nextSceneName);
+            SceneManager.SetActiveScene(newScene);
+
+            // 現在のシーンをアンロード
+        }
     }
 }
