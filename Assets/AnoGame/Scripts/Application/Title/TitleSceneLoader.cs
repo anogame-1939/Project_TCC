@@ -35,6 +35,13 @@ namespace AnoGame.Application.Title
             SceneManager.SetActiveScene(newScene);
 
             // 現在のシーンをアンロード
+            AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(currentScene);
+
+            // アンロードが完了するまで待機
+            while (!asyncUnload.isDone)
+            {
+                yield return null;
+            }
         }
     }
 }
