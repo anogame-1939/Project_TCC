@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using Unity.TinyCharacterController.Brain;
-using AnoGame.Application.Player.Control;
 
 namespace AnoGame.Application.Player.Control
 {

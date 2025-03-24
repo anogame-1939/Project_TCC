@@ -43,14 +43,6 @@ namespace AnoGame.Application.Title
             {
                 yield return null;
             }
-
-            var playerInput = FindAnyObjectByType<PlayerInput>();
-            playerInput.enabled = false;
-
-            yield return null;
-
-            playerInput.enabled = true;
-
         }
     }
 }
