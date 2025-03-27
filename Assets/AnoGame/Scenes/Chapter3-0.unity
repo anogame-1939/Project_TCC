@@ -5429,7 +5429,7 @@ GameObject:
   m_Component:
   - component: {fileID: 592107421}
   - component: {fileID: 592107420}
-  - component: {fileID: 592107419}
+  - component: {fileID: 592107422}
   m_Layer: 0
   m_Name: "StoryArea->Chapter3-1\u3078"
   m_TagString: Untagged
@@ -5437,19 +5437,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &592107419
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 592107418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3adeee68bc9a47149a81d189d42c578c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _chapterIndex: 1
 --- !u!65 &592107420
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5486,6 +5473,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &592107422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 592107418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f36ccb048637294dbe3f6ac46591564, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _chapterIndex: 1
 --- !u!1 &621707323
 GameObject:
   m_ObjectHideFlags: 0
