@@ -172,6 +172,24 @@ namespace AnoGame.Application.Story
             LoadCurrentScene(useRetryPoint);
         }
 
+        /// <summary>
+        /// LoadChapterの処理が間違っているが、既存のシーンに影響があるので修正しない
+        /// 以降のストーリー作成ではこっちを使う
+        /// </summary>
+        /// <param name="chapterIndex"></param>
+        /// <param name="useRetryPoint"></param>
+        public void LoadChapter2(int chapterIndex, bool useRetryPoint = false)
+        {
+            _currentChapterIndex = chapterIndex;
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+            LoadCurrentScene(useRetryPoint);
+        }
+
         public void LoadChapterScene(int chapterIndex, int sceneIndex)
         {
             StoryData currentStory = _storyDataList[_currentStoryIndex];
