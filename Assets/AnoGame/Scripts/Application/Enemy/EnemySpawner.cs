@@ -10,9 +10,13 @@ namespace AnoGame.Application.Enemy
         GameObject enemyPrefab;
 
         [SerializeField]
+        bool destoryCurrentEnemy = false;
+        [SerializeField]
         bool audoStart = false;
         [SerializeField]
         bool isPermanent = false;
+        [SerializeField]
+        bool isStoryMode = false;
 
         [SerializeField]
         EventData _eventaData;
@@ -35,6 +39,11 @@ namespace AnoGame.Application.Enemy
 
         private void Start()
         {
+            if (destoryCurrentEnemy)
+            {
+                _spawnManager.DestroyCurrentEnemyInstance();
+            }
+
             if (enemyPrefab != null)
             {
                 _spawnManager.SetEnemyPrefab(enemyPrefab);
@@ -53,7 +62,14 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                StartCoroutine(TriggerEnemySpawnCor());
+                if (isStoryMode)
+                {
+                    StartCoroutine(TriggerEnemySpawnToStoryModeCor());
+                }
+                else
+                {
+                    StartCoroutine(TriggerEnemySpawnCor());
+                }
             }
             else
             {
@@ -68,6 +84,15 @@ namespace AnoGame.Application.Enemy
             _spawnManager.SpawnEnemyAtStart(isPermanent);
             yield return null;
             _spawnManager.DisabaleEnamy();
+        }
+
+        private IEnumerator TriggerEnemySpawnToStoryModeCor()
+        {
+            // _spawnManager.EnabaleEnamy();
+            yield return null;
+            _spawnManager.SpawnEnemyAtStart(isPermanent);
+            yield return null;
+            // _spawnManager.DisabaleEnamy();
         }
 
         /// <summary>

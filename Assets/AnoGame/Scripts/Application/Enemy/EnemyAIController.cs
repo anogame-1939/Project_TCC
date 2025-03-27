@@ -71,7 +71,7 @@ namespace AnoGame.Application.Enmemy.Control
                 Vector3 targetPosition = player.transform.position;
                 agent.SetDestination(targetPosition);
 
-                Debug.Log($"Player position: {targetPosition}");
+                // Debug.Log($"Player position: {targetPosition}");
             }
         }
 

@@ -6087,8 +6087,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -66.21, y: 0, z: -103}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -19.08, y: 0, z: -97.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6099,7 +6099,7 @@ Transform:
   - {fileID: 9165933249076382163}
   - {fileID: 6217056203680006169}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!143 &8486724571373039048
 CharacterController:
   m_ObjectHideFlags: 0
@@ -6273,7 +6273,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 070c9411b272c4e03bdba48b4561adbf, type: 3}
   m_Name: 
@@ -6282,8 +6282,8 @@ MonoBehaviour:
   minLifespan: 5
   maxLifespan: 15
   _isAlive: 0
-  _fadeOutDuration: 1
-  _particleFadeOutDuration: 0.5
+  _fadeOutDuration: 2
+  _particleFadeOutDuration: 1.5
   disappearEffect: {fileID: 2145959727201834453}
 --- !u!114 &-2493535432171837609
 MonoBehaviour:
@@ -6441,10 +6441,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d021daeb50ad3c4581d6e25b0d55562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveControl: {fileID: 0}
   playerTag: Player
   speedThreshold: 0.1
   animatorChildIndex: 0
-  animatorBoolParam: IsMoving
+  animatorBoolParam: IsMove
 --- !u!114 &5410025904601978029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11404,8 +11405,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8831504548343106181}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.15, z: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 2.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11413,7 +11414,7 @@ Transform:
   - {fileID: 8458701727734905018}
   - {fileID: 302076044325301072}
   m_Father: {fileID: 2365655322038012229}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!95 &7665162067455944546
 Animator:
   serializedVersion: 7

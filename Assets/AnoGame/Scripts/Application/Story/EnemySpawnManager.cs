@@ -7,6 +7,9 @@ using AnoGame.Domain.Event.Services;
 using UnityEngine.SceneManagement;
 using AnoGame.Application.Story;
 using Unity.TinyCharacterController.Brain;
+using System.Collections;
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -31,6 +34,7 @@ namespace AnoGame.Application.Enemy
         }
 
         [SerializeField] private GameObject enemyPrefab;
+        [SerializeField] private float destroyDelay = 5.0f;
         private GameObject _currentEnemyInstance;
         private EnemyController _currentEnemyController;
         
@@ -61,7 +65,7 @@ namespace AnoGame.Application.Enemy
             // 既存の敵を破棄
             if (_currentEnemyInstance != null)
             {
-                Destroy(_currentEnemyInstance);
+                StartCoroutine(DestroyCor(_currentEnemyInstance));
                 _currentEnemyController = null;
             }
 
@@ -76,6 +80,21 @@ namespace AnoGame.Application.Enemy
             // 明示的にメインシーンに配置する
             var targetScene = StoryManager.Instance.MainScene;
             SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
+        }
+
+        public void DestroyCurrentEnemyInstance()
+        {
+            StartCoroutine(DestroyCor(_currentEnemyInstance));
+        }
+
+        private IEnumerator DestroyCor(GameObject enemyObject)
+        {
+            enemyObject.GetComponent<EnemyHitDetector>().enabled = false;
+            enemyObject.GetComponent<EnemyLifespan>().enabled = true;
+            enemyObject.GetComponent<EnemyLifespan>().TriggerFadeOutAndDestroy();
+
+            yield return new WaitForSeconds(destroyDelay);
+            Destroy(enemyObject);
         }
 
         public void SetEnemyPrefab(GameObject prefab)

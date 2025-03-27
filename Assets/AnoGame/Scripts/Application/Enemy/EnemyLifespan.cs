@@ -120,6 +120,13 @@ namespace AnoGame.Application.Enemy
             StartCoroutine(FadeOutAndDestroy());
         }
 
+        public void TriggerFadeOutAndDestroy()
+        {
+            StopDestroyTimer();
+            StartCoroutine(FadeOutAndDestroy());
+        }
+
+
         private IEnumerator FadeOutAndDestroy()
         {
             // 寿命終了イベントを発火
