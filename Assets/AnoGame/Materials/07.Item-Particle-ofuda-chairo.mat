@@ -20,15 +20,16 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Item
+  m_Name: 07.Item-Particle-ofuda-chairo
   m_Shader: {fileID: 4800000, guid: 1bc5c6a70411243779ce486a98012125, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _ALPHA_TRANSITION_MAP_MODE_2D
   - _BASE_MAP_MODE_2D
+  - _DISSOLVE_TRANSITION_ENABLED
   - _EMISSION_AREA_ALL
-  - _EMISSION_COLOR_BASECOLOR
+  - _EMISSION_COLOR_COLOR
   - _EMISSION_MAP_MODE_2D
   - _PARALLAX_MAP_MODE_2D
   - _TINT_COLOR_ENABLED
@@ -48,7 +49,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlphaTransitionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: ada4f485c3269984caf76b0df309b838, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AlphaTransitionMap2DArray:
@@ -72,8 +73,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 928f9495b4377544daa4cdcd8d5f22ed, type: 3}
+        m_Scale: {x: 1, y: 2}
         m_Offset: {x: 0, y: 0}
     - _BaseMap2DArray:
         m_Texture: {fileID: 0}
@@ -193,23 +194,23 @@ Material:
     - _AlphaTransitionMapSecondTextureProgressCoord: 0
     - _AlphaTransitionMapSecondTextureSliceCount: 4
     - _AlphaTransitionMapSliceCount: 4
-    - _AlphaTransitionMode: 0
-    - _AlphaTransitionProgress: 0
+    - _AlphaTransitionMode: 2
+    - _AlphaTransitionProgress: 0.44
     - _AlphaTransitionProgressCoord: 0
     - _AlphaTransitionProgressCoordSecondTexture: 0
     - _AlphaTransitionProgressSecondTexture: 0
     - _AlphaTransitionSecondTextureBlendMode: 0
     - _BaseMapMirrorSampling: 0
     - _BaseMapMode: 0
-    - _BaseMapOffsetXCoord: 0
-    - _BaseMapOffsetYCoord: 0
+    - _BaseMapOffsetXCoord: 1
+    - _BaseMapOffsetYCoord: 11
     - _BaseMapProgress: 0
     - _BaseMapProgressCoord: 0
     - _BaseMapRotation: 0
     - _BaseMapRotationCoord: 0
     - _BaseMapSliceCount: 4
     - _Blend: 0
-    - _BlendDst: 10
+    - _BlendDst: 1
     - _BlendModePreserveSpecular: 1
     - _BlendSrc: 5
     - _BumpScale: 1
@@ -229,8 +230,8 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EmissionAreaType: 1
-    - _EmissionColorType: 1
-    - _EmissionIntensity: 1
+    - _EmissionColorType: 0
+    - _EmissionIntensity: 2.56
     - _EmissionIntensityCoord: 0
     - _EmissionMapChannelsX: 0
     - _EmissionMapMode: 0
@@ -251,13 +252,13 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _InverseLuminanceTransparency: 0
-    - _InverseRimTransparency: 1
+    - _InverseRimTransparency: 0
     - _InverseTintRim: 0
     - _KeepEdgeTransparency: 1
     - _LuminanceTransparencyEnabled: 0
-    - _LuminanceTransparencyProgress: 0.5
+    - _LuminanceTransparencyProgress: 0.327
     - _LuminanceTransparencyProgressCoord: 0
-    - _LuminanceTransparencySharpness: 0.5
+    - _LuminanceTransparencySharpness: 0.462
     - _LuminanceTransparencySharpnessCoord: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
@@ -275,10 +276,10 @@ Material:
     - _ReceiveShadows: 1
     - _RenderType: 2
     - _RimTransparencyEnabled: 1
-    - _RimTransparencyProgress: 0.948
-    - _RimTransparencyProgressCoord: 1
-    - _RimTransparencySharpness: 0
-    - _RimTransparencySharpnessCoord: 11
+    - _RimTransparencyProgress: 0.39
+    - _RimTransparencyProgressCoord: 0
+    - _RimTransparencySharpness: 0.5
+    - _RimTransparencySharpnessCoord: 0
     - _ShadowCasterAlphaAffectedByAlphaTransitionMap: 0
     - _ShadowCasterAlphaAffectedByFlowMap: 0
     - _ShadowCasterAlphaAffectedByTintColor: 0
@@ -308,7 +309,7 @@ Material:
     - _TintRimProgressCoord: 0
     - _TintRimSharpness: 0.5
     - _TintRimSharpnessCoord: 0
-    - _TransparentBlendMode: 0
+    - _TransparentBlendMode: 1
     - _VertexAlphaMode: 0
     - _VertexDeformationEnabled: 0
     - _VertexDeformationIntensity: 0.1
@@ -324,7 +325,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0.18039216, g: 0.026837518, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _TintColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
