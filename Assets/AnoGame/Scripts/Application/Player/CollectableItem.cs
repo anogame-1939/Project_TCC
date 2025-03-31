@@ -4,6 +4,7 @@ using AnoGame.Data;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Event;
 using AnoGame.Domain.Event.Services;
+using UnityEngine.Events;
 
 namespace AnoGame
 {
@@ -22,6 +23,7 @@ namespace AnoGame
 
 
         [SerializeField] private EventTriggerBase relatedEventTrigger;
+        [SerializeField] private UnityEvent relatedUnityEvent;
 
         [Inject] private IInventoryService _inventoryService;
         [Inject] private IEventService _eventService;
@@ -109,6 +111,12 @@ namespace AnoGame
             {
                 // NOTE:いらんかも(EventTriggerBaseでやってるので)
                 relatedEventTrigger.StartEvent();
+            }
+
+            // 上記とは別に汎用的なUnityEventを呼び出す
+            if (relatedUnityEvent != null)
+            {
+                relatedUnityEvent.Invoke();
             }
         }
 
