@@ -125,7 +125,9 @@ namespace AnoGame.Application.Inventory
 
         private async void LoadSprite(string itemName)
         {
+            // すでにキャッシュにある場合は何もしない
             if (spriteCache.ContainsKey(itemName)) return;
+            // 既にロード中の場合も処理しない
             if (loadOperations.ContainsKey(itemName)) return;
 
             var itemData = itemDatabase.GetItemById(itemName);
@@ -133,9 +135,22 @@ namespace AnoGame.Application.Inventory
 
             try
             {
+                // 既にAssetReferenceがロード済みなら、そのハンドルを利用する
+                if (itemData.AssetReference.OperationHandle.IsValid())
+                {
+                    var loadedSprite = (Sprite)itemData.AssetReference.OperationHandle.Result;
+                    if (loadedSprite != null)
+                    {
+                        spriteCache[itemName] = loadedSprite;
+                        UpdateSlotsWithItem(itemName);
+                        return;
+                    }
+                }
+
+                // ロード中でなければ、新たにロードする
                 var operation = itemData.AssetReference.LoadAssetAsync<Sprite>();
                 loadOperations[itemName] = operation;
-                
+                        
                 var sprite = await operation.Task;
                 if (sprite != null)
                 {
@@ -152,6 +167,7 @@ namespace AnoGame.Application.Inventory
                 loadOperations.Remove(itemName);
             }
         }
+
 
         private void UpdateSlotsWithItem(string itemName)
         {
