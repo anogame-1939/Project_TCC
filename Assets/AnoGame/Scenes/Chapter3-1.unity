@@ -21535,6 +21535,30 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 1992210893}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
+        m_MethodName: TriggerEnemySpawn
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 599132071}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onEventStart:
     m_PersistentCalls:
       m_Calls:
@@ -21601,7 +21625,7 @@ GameObject:
   - component: {fileID: 599132072}
   - component: {fileID: 599132071}
   m_Layer: 0
-  m_Name: "\u6F14\u51FA-3-2-0.\u5DEB\u5973\u3068\u906D\u9047"
+  m_Name: "\u6F14\u51FA-3-1-3.\u4E8C\u5EA6\u76EE\u306E\u5DEB\u5973\u3068\u906D\u9047_\u30BB\u30C3\u30C8\u30A2\u30C3\u30D7"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21616,7 +21640,7 @@ PlayableDirector:
   m_GameObject: {fileID: 599132070}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
+  m_PlayableAsset: {fileID: 11400000, guid: 43972aa6249a94d289f69f27d36be6d8, type: 2}
   m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
@@ -21630,6 +21654,8 @@ PlayableDirector:
     value: {fileID: 0}
   - key: {fileID: 595735682206748439, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
     value: {fileID: 0}
+  - key: {fileID: -2420690652327050217, guid: 43972aa6249a94d289f69f27d36be6d8, type: 2}
+    value: {fileID: 735179719}
   m_ExposedReferences:
     m_References: []
 --- !u!4 &599132072
@@ -37227,7 +37253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventData: {fileID: 11400000, guid: 318d3b20ac561d74fb9c87eb71692dee, type: 2}
+  eventData: {fileID: 11400000, guid: d665d688ed4c24abfa003f3bbdb15451, type: 2}
   onPrepareEvent:
     m_PersistentCalls:
       m_Calls: []
