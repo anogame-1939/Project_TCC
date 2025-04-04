@@ -6,8 +6,12 @@ namespace AnoGame.Application.Enemy
     {
         [Range(0f, 1f)]
         public float targetAlpha = 0.5f;
-        
+
+        // 溶解にかける時間
         public float duration = 1f;
+
+        // アウトラインカラーを設定
+        public Color outlineColor = Color.red;
     }
 
 }
