@@ -199,14 +199,25 @@ namespace AnoGame.Application.Enemy
             _particleMainModule.startColor = new ParticleSystem.MinMaxGradient(finalColor);
         }
 
-        public void FadeToPartialState(float targetAlpha, float duration)
+        public void FadeToPartialState(PartialFadeSettings settings)
         {
-            // targetAlphaが0～1の範囲に収まるように制限
-            targetAlpha = Mathf.Clamp01(targetAlpha);
+            if (settings == null)
+            {
+                Debug.LogWarning("PartialFadeSettingsがnullです。");
+                return;
+            }
+            
             // 既存の破壊タイマーを停止
             StopDestroyTimer();
-            // 部分フェードアウト用のコルーチンを開始
-            StartCoroutine(FadeOutPartialCoroutine(targetAlpha, duration));
+            // 部分フェードアウト用のコルーチンを開始（ScriptableObjectから値を取得）
+            StartCoroutine(FadeOutPartialCoroutine(settings.targetAlpha, settings.duration));
+
+            if (disappearEffect != null)
+            {
+                disappearEffect.gameObject.SetActive(true);
+                disappearEffect.Play();
+                StartCoroutine(FadeOutParticle());
+            }
         }
 
         private IEnumerator FadeOutPartialCoroutine(float targetAlpha, float duration)

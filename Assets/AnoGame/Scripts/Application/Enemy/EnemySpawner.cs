@@ -209,5 +209,18 @@ namespace AnoGame.Application.Enemy
             yield return null;
         }
 
+        /// <summary>
+        /// 雑だけど怪異を
+        /// </summary>
+        /// <param name="settings"></param>
+        public void ApFadeToPartialStatepear(PartialFadeSettings settings)
+        {
+            if (settings != null)
+            {
+                var enemyLifespan =  _spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
+                // enemyLifespan.enabled = true;
+                enemyLifespan.FadeToPartialState(settings);
+            }
+        }
     }
 }

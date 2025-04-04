@@ -36,6 +36,7 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private GameObject enemyPrefab;
         [SerializeField] private float destroyDelay = 5.0f;
         private GameObject _currentEnemyInstance;
+        public GameObject CurrentEnemyInstance => _currentEnemyInstance;
         private EnemyController _currentEnemyController;
         
         private const string TAG_START_POINT_ENEMY = "StartPointEnemy";
@@ -316,7 +317,7 @@ namespace AnoGame.Application.Enemy
                     manager.SetCurrentPositionAsRetryPoint();
                 }
             }
-        }
 #endif
+        }
     }
 }
