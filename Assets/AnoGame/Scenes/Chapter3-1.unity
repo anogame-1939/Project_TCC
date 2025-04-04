@@ -128,7 +128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 11026613}
-  - component: {fileID: 11026612}
   - component: {fileID: 11026611}
   - component: {fileID: 11026610}
   m_Layer: 0
@@ -266,7 +265,7 @@ MonoBehaviour:
   allowBarksDuringConversations: 0
   skipBarkIfNoValidEntries: 0
   cacheBarkLines: 0
-  conversation: "3.1.19_\u3042\u306A\u305F\u3082\u4F55\u304B\u62B1\u3048\u3066\u3044\u308B\u306E\uFF1F"
+  conversation: "3.1.20_\u305A\u3063\u3068\u63A2\u3057\u3066\u3044\u305F"
   conversationConversant: {fileID: 0}
   conversationActor: {fileID: 0}
   startConversationEntryID: -1
@@ -294,37 +293,6 @@ MonoBehaviour:
   useBarkTitlePicker: 1
   useQuestNamePicker: 1
   selectedDatabase: {fileID: 11400000, guid: 6d71bf6774ada0c4395d954ae35774b1, type: 2}
---- !u!320 &11026612
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 11026609}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 5db700f395340934a8b49c6829911020, type: 2}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings:
-  - key: {fileID: 3677323517005348217, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -1154207898825921152, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -2514784978020299671, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: 595735682206748439, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: 0}
-    value: {fileID: 213973501}
-  - key: {fileID: 0}
-    value: {fileID: 735179719}
-  - key: {fileID: 595735682206748439, guid: 5db700f395340934a8b49c6829911020, type: 2}
-    value: {fileID: 1434073256}
-  m_ExposedReferences:
-    m_References: []
 --- !u!4 &11026613
 Transform:
   m_ObjectHideFlags: 0
@@ -23584,7 +23552,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 808533888}
-  - component: {fileID: 808533887}
   - component: {fileID: 808533886}
   - component: {fileID: 808533885}
   m_Layer: 0
@@ -23762,37 +23729,6 @@ MonoBehaviour:
   useBarkTitlePicker: 1
   useQuestNamePicker: 1
   selectedDatabase: {fileID: 11400000, guid: 6d71bf6774ada0c4395d954ae35774b1, type: 2}
---- !u!320 &808533887
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 808533884}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 5db700f395340934a8b49c6829911020, type: 2}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings:
-  - key: {fileID: 3677323517005348217, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -1154207898825921152, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -2514784978020299671, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: 595735682206748439, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: 0}
-    value: {fileID: 213973501}
-  - key: {fileID: 0}
-    value: {fileID: 735179719}
-  - key: {fileID: 595735682206748439, guid: 5db700f395340934a8b49c6829911020, type: 2}
-    value: {fileID: 1434073256}
-  m_ExposedReferences:
-    m_References: []
 --- !u!4 &808533888
 Transform:
   m_ObjectHideFlags: 0
@@ -31823,7 +31759,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 0.1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -32445,7 +32381,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 0c7d2f88eed1a6d429492fa5add687ce, type: 2}
     - {fileID: 11400000, guid: cc48aa5ee27657b4ea162b66b238901a, type: 2}
     - {fileID: 11400000, guid: 4a1e5a5e7bb1ae74994f3051f7b4c635, type: 2}
-    - {fileID: 11400000, guid: adc7565d1174e7f4f9355ea9e1419e50, type: 2}
+    - {fileID: 11400000, guid: 18ca1737d54774bb2b4d49360049ce91, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -32506,6 +32442,20 @@ MonoBehaviour:
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
+        - m_Target: {fileID: 1992210894}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: SetAngle
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 45
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
         - m_Target: {fileID: 11026611}
           m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
             Assembly-CSharp-firstpass
@@ -32519,8 +32469,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls: []
 --- !u!4 &1434073257
 Transform:
   m_ObjectHideFlags: 0
@@ -33460,7 +33408,7 @@ PlayableDirector:
   m_GameObject: {fileID: 1731260532}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 4b8500c2b0127fd40aab755416b5b3b1, type: 2}
+  m_PlayableAsset: {fileID: 11400000, guid: 9f0119d3bfa02d54f9186e2fbf4b1fb7, type: 2}
   m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
@@ -33485,6 +33433,8 @@ PlayableDirector:
   - key: {fileID: 595735682206748439, guid: d8f156f6ecc645241aaf913e868cbe0e, type: 2}
     value: {fileID: 1434073256}
   - key: {fileID: 595735682206748439, guid: 4b8500c2b0127fd40aab755416b5b3b1, type: 2}
+    value: {fileID: 1434073256}
+  - key: {fileID: 595735682206748439, guid: 9f0119d3bfa02d54f9186e2fbf4b1fb7, type: 2}
     value: {fileID: 1434073256}
   m_ExposedReferences:
     m_References: []
@@ -50074,7 +50024,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2081084036}
-  - component: {fileID: 2081084035}
   - component: {fileID: 2081084034}
   - component: {fileID: 2081084037}
   m_Layer: 0
@@ -50162,37 +50111,6 @@ MonoBehaviour:
   useBarkTitlePicker: 1
   useQuestNamePicker: 1
   selectedDatabase: {fileID: 11400000, guid: 6d71bf6774ada0c4395d954ae35774b1, type: 2}
---- !u!320 &2081084035
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2081084033}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 5db700f395340934a8b49c6829911020, type: 2}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings:
-  - key: {fileID: 3677323517005348217, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -1154207898825921152, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -2514784978020299671, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: 595735682206748439, guid: e738d2a8030ba544cb8063d004283b15, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: 0}
-    value: {fileID: 213973501}
-  - key: {fileID: 0}
-    value: {fileID: 735179719}
-  - key: {fileID: 595735682206748439, guid: 5db700f395340934a8b49c6829911020, type: 2}
-    value: {fileID: 1434073256}
-  m_ExposedReferences:
-    m_References: []
 --- !u!4 &2081084036
 Transform:
   m_ObjectHideFlags: 0
