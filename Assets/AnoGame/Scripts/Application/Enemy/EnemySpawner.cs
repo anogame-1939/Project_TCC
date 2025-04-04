@@ -217,10 +217,33 @@ namespace AnoGame.Application.Enemy
         {
             if (settings != null)
             {
+                // HACK:雑だけどここでヒットディテクタを無効化しておく
+                var enemyHitDetector =  _spawnManager.CurrentEnemyInstance.GetComponent<EnemyHitDetector>();
+                enemyHitDetector.SetEnabled(false);
+
                 var enemyLifespan =  _spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
                 // enemyLifespan.enabled = true;
                 enemyLifespan.FadeToPartialState(settings);
+                
             }
         }
+
+        /// <summary>
+        /// 部分フェードアウト状態になっている敵を、完全にフェードアウトさせる（消失させる）メソッド
+        /// </summary>
+        /// <param name="duration">完全フェードアウトにかかる時間</param>
+        public void ApCompletePartialFadeOut(float duration)
+        {
+            var enemyLifespan = _spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
+            if(enemyLifespan != null)
+            {
+                enemyLifespan.CompletePartialFadeOut(duration);
+            }
+            else
+            {
+                Debug.LogError("CurrentEnemyInstance に EnemyLifespan コンポーネントが見つかりません。");
+            }
+        }
+
     }
 }

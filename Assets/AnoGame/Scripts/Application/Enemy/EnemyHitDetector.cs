@@ -5,6 +5,7 @@ namespace AnoGame.Application.Enemy
 {
     public class EnemyHitDetector : MonoBehaviour
     {
+        [SerializeField] bool on = true;
         [SerializeField] private int damage = 1;
         
         // イベント追加
@@ -12,6 +13,7 @@ namespace AnoGame.Application.Enemy
 
         private void OnTriggerEnter(Collider other)
         {
+            if (!on) return;
             Debug.Log("hit");
             if (!other.CompareTag("Player")) return;
             
@@ -22,6 +24,11 @@ namespace AnoGame.Application.Enemy
                 damageable.TakeDamage(damage);
                 OnPlayerHit?.Invoke();  // イベント発火
             }
+        }
+
+        public void SetEnabled(bool enabled)
+        {
+            on = enabled;
         }
     }
 }

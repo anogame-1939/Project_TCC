@@ -253,7 +253,7 @@ namespace AnoGame.Application.Enemy
                 }
             }
 
-            // DissolveAmount のコルーチンを開始
+            // DissolveAmount のコルーチンを開始（部分的なフェードアウト）
             StartCoroutine(FadeOutPartialCoroutine(settings.targetAlpha, settings.duration));
         }
 
@@ -307,6 +307,69 @@ namespace AnoGame.Application.Enemy
                 {
                     mat.SetFloat("_DissolveAmount", targetDissolve);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 部分的なフェードアウト状態から残りを完全にフェードアウトさせる処理
+        /// 現在の _DissolveAmount の値から 1（完全溶解）になるまで補間します。
+        /// </summary>
+        public void CompletePartialFadeOut(float duration)
+        {
+            StopDestroyTimer();
+            StartCoroutine(CompletePartialFadeOutCoroutine(duration));
+        }
+
+        private IEnumerator CompletePartialFadeOutCoroutine(float duration)
+        {
+            // 現在の DissolveAmount の値を各レンダラーから取得
+            float[] currentDissolveValues = new float[_spriteRenderers.Length];
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                Material mat = _spriteRenderers[i].material;
+                if (mat.HasProperty("_DissolveAmount"))
+                {
+                    currentDissolveValues[i] = mat.GetFloat("_DissolveAmount");
+                }
+                else
+                {
+                    currentDissolveValues[i] = 0f;
+                }
+            }
+
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float normalizedTime = elapsedTime / duration;
+                for (int i = 0; i < _spriteRenderers.Length; i++)
+                {
+                    Material mat = _spriteRenderers[i].material;
+                    if (mat.HasProperty("_DissolveAmount"))
+                    {
+                        // 現在の値から 1（完全に溶解）までを補間
+                        float newVal = Mathf.Lerp(currentDissolveValues[i], 1f, normalizedTime);
+                        mat.SetFloat("_DissolveAmount", newVal);
+                    }
+                }
+                yield return null;
+            }
+
+            // 最終的に各レンダラーの DissolveAmount を 1 に固定
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                Material mat = _spriteRenderers[i].material;
+                if (mat.HasProperty("_DissolveAmount"))
+                {
+                    mat.SetFloat("_DissolveAmount", 1f);
+                }
+            }
+
+            // 部分フェードアウト開始時にパーティクルを再生
+            if (disappearEffect2 != null)
+            {
+                disappearEffect2.Stop();
+                // disappearEffect2.gameObject.SetActive(false);
             }
         }
     }
