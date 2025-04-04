@@ -198,5 +198,47 @@ namespace AnoGame.Application.Enemy
             finalColor.a = 0f;
             _particleMainModule.startColor = new ParticleSystem.MinMaxGradient(finalColor);
         }
+
+        public void FadeToPartialState(float targetAlpha, float duration)
+        {
+            // targetAlphaが0～1の範囲に収まるように制限
+            targetAlpha = Mathf.Clamp01(targetAlpha);
+            // 既存の破壊タイマーを停止
+            StopDestroyTimer();
+            // 部分フェードアウト用のコルーチンを開始
+            StartCoroutine(FadeOutPartialCoroutine(targetAlpha, duration));
+        }
+
+        private IEnumerator FadeOutPartialCoroutine(float targetAlpha, float duration)
+        {
+            float elapsedTime = 0f;
+            // 各SpriteRendererの現在の色を取得
+            Color[] initialColors = _spriteRenderers.Select(r => r.color).ToArray();
+            
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float normalizedTime = elapsedTime / duration;
+                // 1（初期状態）からtargetAlphaまで線形補間
+                float currentAlpha = Mathf.Lerp(1f, targetAlpha, normalizedTime);
+                
+                for (int i = 0; i < _spriteRenderers.Length; i++)
+                {
+                    Color color = initialColors[i];
+                    color.a = currentAlpha;
+                    _spriteRenderers[i].color = color;
+                }
+                
+                yield return null;
+            }
+            
+            // 最終的にtargetAlphaに固定
+            foreach (var renderer in _spriteRenderers)
+            {
+                Color color = renderer.color;
+                color.a = targetAlpha;
+                renderer.color = color;
+            }
+        }
     }
 }
