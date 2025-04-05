@@ -26,15 +26,20 @@ namespace AnoGame.Application.Story
         private ISceneLoader _sceneLoader;
         private List<Scene> _loadedStoryScenes = new List<Scene>();
         private SceneReference _mainMapScene;
+        
+        // インスペクターでメインシーン名を設定
         [SerializeField]
+        private string mainSceneName;
         private Scene _mainScene;
         public Scene MainScene => _mainScene;
+        
         private bool _isLoadingScene = false;
 
-        private new void Awake()
+        private void Awake()
         {
             _sceneLoader = new SceneLoader();
-            _mainScene = SceneManager.GetActiveScene();
+            // GetActiveScene() は使わず、mainSceneName からシーンを取得する
+            _mainScene = SceneManager.GetSceneByName(mainSceneName);
             GameManager2.Instance.LoadGameData += OnLoadGameData;
         }
 
@@ -173,12 +178,6 @@ namespace AnoGame.Application.Story
             LoadCurrentScene(useRetryPoint);
         }
 
-        /// <summary>
-        /// LoadChapterの処理が間違っているが、既存のシーンに影響があるので修正しない
-        /// 以降のストーリー作成ではこっちを使う
-        /// </summary>
-        /// <param name="chapterIndex"></param>
-        /// <param name="useRetryPoint"></param>
         public void LoadChapter2(int chapterIndex, bool useRetryPoint = false)
         {
             _currentChapterIndex = chapterIndex;
@@ -224,12 +223,16 @@ namespace AnoGame.Application.Story
 
         private IEnumerator LoadSceneCoroutine(bool useRetryPoint)
         {
-            // 追加: メインシーンの読み込みが完了しているか確認する処理
-            while (!_mainScene.isLoaded)
+            // 変更後：インスペクターで設定した mainSceneName からシーンを取得して待機
+            Scene scene = SceneManager.GetSceneByName(mainSceneName);
+            while (!scene.isLoaded)
             {
-                Debug.Log($"メインシーンの読み込みが完了するまで待機中...:{_mainScene.path}");
+                Debug.Log($"メインシーン {mainSceneName} の読み込みが完了するまで待機中...");
                 yield return null;
+                scene = SceneManager.GetSceneByName(mainSceneName);
             }
+            // 正常に読み込まれたら _mainScene を更新
+            _mainScene = scene;
 
             if (_isLoadingScene)
             {
@@ -383,7 +386,6 @@ namespace AnoGame.Application.Story
             ChapterLoaded?.Invoke(useRetryPoint);
         }
 
-        // 既存のパブリックメソッドをprivateに変更
         private void SwitchToStory(int storyIndex)
         {
             if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
