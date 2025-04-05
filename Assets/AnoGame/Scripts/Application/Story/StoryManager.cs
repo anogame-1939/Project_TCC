@@ -26,6 +26,7 @@ namespace AnoGame.Application.Story
         private ISceneLoader _sceneLoader;
         private List<Scene> _loadedStoryScenes = new List<Scene>();
         private SceneReference _mainMapScene;
+        [SerializeField]
         private Scene _mainScene;
         public Scene MainScene => _mainScene;
         private bool _isLoadingScene = false;
@@ -223,6 +224,13 @@ namespace AnoGame.Application.Story
 
         private IEnumerator LoadSceneCoroutine(bool useRetryPoint)
         {
+            // 追加: メインシーンの読み込みが完了しているか確認する処理
+            while (!_mainScene.isLoaded)
+            {
+                Debug.Log($"メインシーンの読み込みが完了するまで待機中...:{_mainScene.path}");
+                yield return null;
+            }
+
             if (_isLoadingScene)
             {
                 Debug.LogWarning("Scene loading is already in progress");
@@ -236,7 +244,7 @@ namespace AnoGame.Application.Story
 
             _isLoadingScene = false;
             
-            // 単一のイベントでスポーン方法も通知
+            // チャプターのロード完了イベントを通知
             ChapterLoaded?.Invoke(useRetryPoint);
         }
 
