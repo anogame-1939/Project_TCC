@@ -161,24 +161,6 @@ namespace AnoGame.Application
 #endif
         }
 
-        public async UniTask<bool> CreateSavePoint()
-        {
-            if (_currentGameData == null) return false;
-
-            try
-            {
-                SaveGameData?.Invoke(_currentGameData);
-                await _repository.SaveDataAsync(_currentGameData);
-                Debug.Log("Save point created successfully");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to create save point: {ex.Message}");
-                return false;
-            }
-        }
-
         public void InvokeGameOver()
         {
             Debug.Log("InvokeGameOver");

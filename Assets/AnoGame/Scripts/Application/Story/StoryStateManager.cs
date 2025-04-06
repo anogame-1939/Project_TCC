@@ -119,14 +119,5 @@ namespace AnoGame.Application.Story.Manager
             _gameManager.UpdateGameState(currentGameData);
         }
 
-        private async void CreateSavePoint()
-        {
-            bool success = await _gameManager.CreateSavePoint();
-            if (!success)
-            {
-                Debug.LogWarning("Failed to create save point after chapter load");
-            }
-        }
-
     }
 }

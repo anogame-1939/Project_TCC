@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.TinyCharacterController.Control;
 
-namespace AnoGame.Application.SLFBDebug
+namespace AnoGame.SLFBDebug
 {
     public class SpeedController : MonoBehaviour
     {

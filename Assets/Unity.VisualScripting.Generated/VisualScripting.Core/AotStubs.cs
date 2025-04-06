@@ -1974,6 +1974,9 @@ namespace Unity.VisualScripting.Generated.Aot
 	// JoystickPlayerExample.op_Implicit
 	// JoystickPlayerExample.op_Equality
 	// JoystickPlayerExample.op_Inequality
+	// AnimatedImage.op_Implicit
+	// AnimatedImage.op_Equality
+	// AnimatedImage.op_Inequality
 	// ExplotionDemoController.op_Implicit
 	// ExplotionDemoController.op_Equality
 	// ExplotionDemoController.op_Inequality
@@ -2634,6 +2637,9 @@ namespace Unity.VisualScripting.Generated.Aot
 	// DanielLochner.Assets.SimpleScrollSnap.ExpandInformation.op_Implicit
 	// DanielLochner.Assets.SimpleScrollSnap.ExpandInformation.op_Equality
 	// DanielLochner.Assets.SimpleScrollSnap.ExpandInformation.op_Inequality
+	// PixelCrushers.DialogueSystem.LocalizationPackageSupport.DialogueSystemLocalizationPackageBridge.op_Implicit
+	// PixelCrushers.DialogueSystem.LocalizationPackageSupport.DialogueSystemLocalizationPackageBridge.op_Equality
+	// PixelCrushers.DialogueSystem.LocalizationPackageSupport.DialogueSystemLocalizationPackageBridge.op_Inequality
 	// JoystickPack.JoystickSetterExample.op_Implicit
 	// JoystickPack.JoystickSetterExample.op_Equality
 	// JoystickPack.JoystickSetterExample.op_Inequality
@@ -2691,6 +2697,9 @@ namespace Unity.VisualScripting.Generated.Aot
 	// AnoGame.VolumetricFogEffect.op_Implicit
 	// AnoGame.VolumetricFogEffect.op_Equality
 	// AnoGame.VolumetricFogEffect.op_Inequality
+	// AnoGame.Direction.BigManDirection.op_Implicit
+	// AnoGame.Direction.BigManDirection.op_Equality
+	// AnoGame.Direction.BigManDirection.op_Inequality
 	// AnoGame.DialogueFeatures.LocationDialogueTrigger.op_Implicit
 	// AnoGame.DialogueFeatures.LocationDialogueTrigger.op_Equality
 	// AnoGame.DialogueFeatures.LocationDialogueTrigger.op_Inequality
@@ -2700,9 +2709,18 @@ namespace Unity.VisualScripting.Generated.Aot
 	// AnoGame.DialogueFeatures.LocationViewManager.op_Implicit
 	// AnoGame.DialogueFeatures.LocationViewManager.op_Equality
 	// AnoGame.DialogueFeatures.LocationViewManager.op_Inequality
-	// AnoGame.Application.Audio.AudioController.op_Implicit
-	// AnoGame.Application.Audio.AudioController.op_Equality
-	// AnoGame.Application.Audio.AudioController.op_Inequality
+	// AnoGame.SLFBDebug.ChapterDebugTool.op_Implicit
+	// AnoGame.SLFBDebug.ChapterDebugTool.op_Equality
+	// AnoGame.SLFBDebug.ChapterDebugTool.op_Inequality
+	// AnoGame.SLFBDebug.DebugTool.op_Implicit
+	// AnoGame.SLFBDebug.DebugTool.op_Equality
+	// AnoGame.SLFBDebug.DebugTool.op_Inequality
+	// AnoGame.SLFBDebug.SimpleOutputLog.op_Implicit
+	// AnoGame.SLFBDebug.SimpleOutputLog.op_Equality
+	// AnoGame.SLFBDebug.SimpleOutputLog.op_Inequality
+	// AnoGame.SLFBDebug.SpeedController.op_Implicit
+	// AnoGame.SLFBDebug.SpeedController.op_Equality
+	// AnoGame.SLFBDebug.SpeedController.op_Inequality
 	// CinemachineCameraOffset.op_Implicit
 	// CinemachineCameraOffset.op_Equality
 	// CinemachineCameraOffset.op_Inequality
@@ -3296,8 +3314,8 @@ namespace Unity.VisualScripting.Generated.Aot
 	// Unity.TinyCharacterController.Control.MoveNavmeshControl.SetTargetPosition
 	// UnityEngine.Vector3.magnitude
 	// Unity.TinyCharacterController.Control.MoveNavmeshControl.IsArrived
-	// UnityEngine.Mathf.Abs
 	// UnityEngine.Transform.Rotate
+	// UnityEngine.Mathf.Abs
 	// UnityEngine.LineRenderer.SetPosition
 	// UnityEngine.Vector3.Lerp
 	// Unity.TinyCharacterController.Utility.PooledGameObject.Release
@@ -3313,6 +3331,10 @@ namespace Unity.VisualScripting.Generated.Aot
 	// UnityEngine.InputSystem.Mouse.rightButton
 	// UnityEngine.InputSystem.Controls.KeyControl.wasPressedThisFrame
 	// UnityEngine.InputSystem.Keyboard.allKeys
+	// --------------- Scene Stubs
+	// --------------- Scene Stubs
+	// --------------- Scene Stubs
+	// --------------- Scene Stubs
 	// --------------- Scene Stubs
 	// --------------- Scene Stubs
 	// --------------- Scene Stubs
@@ -26200,6 +26222,41 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
+		// AnimatedImage.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnimatedImage_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnimatedImage.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnimatedImage_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnimatedImage.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnimatedImage_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
 		// ExplotionDemoController.op_Implicit
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void ExplotionDemoController_op_Implicit()
@@ -33900,6 +33957,41 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
+		// PixelCrushers.DialogueSystem.LocalizationPackageSupport.DialogueSystemLocalizationPackageBridge.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void PixelCrushers_DialogueSystem_LocalizationPackageSupport_DialogueSystemLocalizationPackageBridge_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// PixelCrushers.DialogueSystem.LocalizationPackageSupport.DialogueSystemLocalizationPackageBridge.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void PixelCrushers_DialogueSystem_LocalizationPackageSupport_DialogueSystemLocalizationPackageBridge_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// PixelCrushers.DialogueSystem.LocalizationPackageSupport.DialogueSystemLocalizationPackageBridge.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void PixelCrushers_DialogueSystem_LocalizationPackageSupport_DialogueSystemLocalizationPackageBridge_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
 		// JoystickPack.JoystickSetterExample.op_Implicit
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void JoystickPack_JoystickSetterExample_op_Implicit()
@@ -34565,6 +34657,41 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
+		// AnoGame.Direction.BigManDirection.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_Direction_BigManDirection_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.Direction.BigManDirection.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_Direction_BigManDirection_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.Direction.BigManDirection.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_Direction_BigManDirection_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
 		// AnoGame.DialogueFeatures.LocationDialogueTrigger.op_Implicit
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void AnoGame_DialogueFeatures_LocationDialogueTrigger_op_Implicit()
@@ -34670,9 +34797,9 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// AnoGame.Application.Audio.AudioController.op_Implicit
+		// AnoGame.SLFBDebug.ChapterDebugTool.op_Implicit
 		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void AnoGame_Application_Audio_AudioController_op_Implicit()
+		public static void AnoGame_SLFBDebug_ChapterDebugTool_op_Implicit()
 		{
 			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
 			bool conversion = ((bool)(arg0));
@@ -34681,9 +34808,9 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// AnoGame.Application.Audio.AudioController.op_Equality
+		// AnoGame.SLFBDebug.ChapterDebugTool.op_Equality
 		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void AnoGame_Application_Audio_AudioController_op_Equality()
+		public static void AnoGame_SLFBDebug_ChapterDebugTool_op_Equality()
 		{
 			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
 			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
@@ -34693,9 +34820,114 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.Invoke(default(object[]));
 		}
 		
-		// AnoGame.Application.Audio.AudioController.op_Inequality
+		// AnoGame.SLFBDebug.ChapterDebugTool.op_Inequality
 		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void AnoGame_Application_Audio_AudioController_op_Inequality()
+		public static void AnoGame_SLFBDebug_ChapterDebugTool_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.DebugTool.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_DebugTool_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.DebugTool.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_DebugTool_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.DebugTool.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_DebugTool_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.SimpleOutputLog.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_SimpleOutputLog_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.SimpleOutputLog.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_SimpleOutputLog_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.SimpleOutputLog.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_SimpleOutputLog_op_Inequality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 != arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.SpeedController.op_Implicit
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_SpeedController_op_Implicit()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			bool conversion = ((bool)(arg0));
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.SpeedController.op_Equality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_SpeedController_op_Equality()
+		{
+			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
+			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
+			bool @operator = (arg0 == arg1);
+			global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<UnityEngine.Object, UnityEngine.Object, bool>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0, arg1);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// AnoGame.SLFBDebug.SpeedController.op_Inequality
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void AnoGame_SLFBDebug_SpeedController_op_Inequality()
 		{
 			global::UnityEngine.Object arg0 = default(global::UnityEngine.Object);
 			global::UnityEngine.Object arg1 = default(global::UnityEngine.Object);
@@ -41589,17 +41821,6 @@ namespace Unity.VisualScripting.Generated.Aot
 			optimized.SetValue(default(global::Unity.TinyCharacterController.Control.MoveNavmeshControl), default(bool));
 		}
 		
-		// UnityEngine.Mathf.Abs
-		[global::UnityEngine.Scripting.PreserveAttribute()]
-		public static void UnityEngine_Mathf_Abs()
-		{
-			float arg0 = default(float);
-			global::UnityEngine.Mathf.Abs(arg0);
-			global::Unity.VisualScripting.StaticFunctionInvoker<float, float> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<float, float>(default(global::System.Reflection.MethodInfo));
-			optimized.Invoke(null, arg0);
-			optimized.Invoke(default(object[]));
-		}
-		
 		// UnityEngine.Transform.Rotate
 		[global::UnityEngine.Scripting.PreserveAttribute()]
 		public static void UnityEngine_Transform_Rotate()
@@ -41611,6 +41832,17 @@ namespace Unity.VisualScripting.Generated.Aot
 			target.Rotate(arg0, arg1, arg2);
 			global::Unity.VisualScripting.InstanceActionInvoker<UnityEngine.Transform, float, float, float> optimized = new global::Unity.VisualScripting.InstanceActionInvoker<UnityEngine.Transform, float, float, float>(default(global::System.Reflection.MethodInfo));
 			optimized.Invoke(default(global::UnityEngine.Transform), arg0, arg1, arg2);
+			optimized.Invoke(default(object[]));
+		}
+		
+		// UnityEngine.Mathf.Abs
+		[global::UnityEngine.Scripting.PreserveAttribute()]
+		public static void UnityEngine_Mathf_Abs()
+		{
+			float arg0 = default(float);
+			global::UnityEngine.Mathf.Abs(arg0);
+			global::Unity.VisualScripting.StaticFunctionInvoker<float, float> optimized = new global::Unity.VisualScripting.StaticFunctionInvoker<float, float>(default(global::System.Reflection.MethodInfo));
+			optimized.Invoke(null, arg0);
 			optimized.Invoke(default(object[]));
 		}
 		

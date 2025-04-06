@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AnoGame.Application.SLFBDebug
+namespace AnoGame.SLFBDebug
 {
     public class DebugTool : MonoBehaviour
     {
