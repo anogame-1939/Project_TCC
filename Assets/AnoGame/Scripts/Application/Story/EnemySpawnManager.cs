@@ -317,7 +317,7 @@ namespace AnoGame.Application.Enemy
                     manager.SetCurrentPositionAsRetryPoint();
                 }
             }
-#endif
         }
+#endif
     }
 }

@@ -2,14 +2,8 @@
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-
 using Cysharp.Threading.Tasks;
-using System.Threading;
-
-
 using UnityEngine.Localization.Tables;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using Codice.CM.Common.Encryption;
 
 namespace Localizer
 {
