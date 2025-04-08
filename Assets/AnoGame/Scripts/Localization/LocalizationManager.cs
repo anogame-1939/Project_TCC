@@ -75,7 +75,29 @@ namespace Localizer
                 Debug.Log($"DebugCor Loop _fontTable:{_fontTable}");
                 Debug.Log($"DebugCor Loop _localizedFontReference:{_localizedFontReference}");
                 yield return new WaitForSeconds(1f);
+
+
+                if (_localizedStringTable != null
+                    && _localizedStringTable.TableReference != null
+                    && _localizedStringTable.TableReference.TableCollectionName != null)
+                {
+                    Debug.Log($"DebugCor Loop _localizedStringTable.TableReference.TableCollectionName:{_localizedStringTable.TableReference.TableCollectionName}");
+                    break;
+                }
+                else
+                {
+                    Debug.LogError("DebugCor Loop: _localizedStringTableがnullまたはTableReferenceがnullです。");
+                }
             }
+
+            Debug.Log("DebugCor End");
+
+            Debug.Log("DebugCor End ローカライズ呼び出し開始");
+
+            ApplyLoclizedText().Forget();
+            ApplyFont().Forget();
+
+            Debug.Log("DebugCor End ローカライズ呼び出し完了");
 
         }
 
@@ -103,7 +125,7 @@ namespace Localizer
             // ロケール変更時の処理を追加
             LocalizationSettings.SelectedLocaleChanged += SelectedLocaleChanged;
             
-            // _localizedStringTable.TableChanged += ChangeText;
+            _localizedStringTable.TableChanged += ChangeText;
             if (_fontTable != null)
             {
                 _fontTable.TableChanged += ChangeFont;
@@ -225,7 +247,9 @@ namespace Localizer
                     Debug.Log($"テキスト翻訳スキップ:{tmpro.text}");
                     continue;
                 }
-
+                Debug.Log($"おそらくここでエラー:{_localizedStringTable}");
+                Debug.Log($"おそらくここでエラー:{_localizedStringTable.TableReference}");
+                Debug.Log($"おそらくここでエラー:{_localizedStringTable.TableReference.TableCollectionName}");
                 string tableName = _localizedStringTable.TableReference.TableCollectionName;
                 var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
                 if (entry != null)

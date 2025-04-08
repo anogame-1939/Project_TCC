@@ -26,8 +26,19 @@ namespace AnoGame.Application.Settings
         {
             try
             {
-                Debug.Log("InitializeSettingsData");
-                _settingsData = await _repository.LoadDataAsync() ?? new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
+                Debug.Log($"InitializeSettingsData");
+                var tmpsettingsData = await _repository.LoadDataAsync();
+                if (tmpsettingsData != null)
+                {
+                    Debug.Log($"InitializeSettingsData:tmpsettingsData:{tmpsettingsData}");
+                    Debug.Log($"InitializeSettingsData:tmpsettingsData.Language:{tmpsettingsData.Language}");
+                }
+                else
+                {
+                    Debug.Log($"InitializeSettingsData:tmpsettingsData is null");
+                }
+                _settingsData = tmpsettingsData ?? new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
+                Debug.Log($"InitializeSettingsData-_settingsData.Language:{_settingsData.Language}");
                 OnSettingsDataChanged?.Invoke(_settingsData);
             }
             catch (Exception ex)

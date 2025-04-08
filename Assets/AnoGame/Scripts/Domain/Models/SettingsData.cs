@@ -5,10 +5,21 @@ namespace AnoGame.Domain.Data.Models
 {
     public enum Language
     {
-        Japanese,
-        English,
-        // 他の言語を追加する場合はここに記述
+        ChineseCN,    // Chinese (CN)
+        ChineseHK,    // Chinese (HK)
+        English,      // English
+        Suomi,        // Suomi (Finnish)
+        French,       // Français
+        Hindi,        // Hindi
+        Indonesian,   // Indonesian
+        Italian,      // Italian
+        Japanese,     // Japanese
+        Korean,       // Korean
+        Portuguese,   // Portuguese
+        Russian,      // Russian
+        Spanish       // Spanish
     }
+
 
     [Serializable]
     public class SettingsData
