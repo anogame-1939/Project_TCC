@@ -36,7 +36,7 @@ namespace AnoGame.Application.Inventory
         {
             CurrentItem = null;
             itemImage.sprite = null;
-            itemImage.enabled = false;
+            if (itemImage != null) itemImage.enabled = false;
             itemNameText.text = string.Empty;
             descriptionText.text = string.Empty;
             quantityText.text = string.Empty;
