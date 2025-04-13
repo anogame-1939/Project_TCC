@@ -9,8 +9,6 @@ namespace AnoGame.Application.UI
         [SerializeField] private SettingsDisplay _settingsDisplay; // SettingsDisplayがアタッチされたUIパネル
 
         private CanvasGroup _canvasGroup;
-        private bool _isSettingsOpen = false;
-
         void Start()
         {
             if (_inputActionAsset == null)
@@ -46,49 +44,51 @@ namespace AnoGame.Application.UI
 
         void ToggleSettings()
         {
-            if (_isSettingsOpen)
+
+            var currentState = GameStateManager.Instance.CurrentState;
+
+            if (currentState == GameState.Gameplay)
             {
-                Debug.Log("Settingsを閉じます");
-                HideSettings();
-            }
-            else
-            {
-                Debug.Log("Settingsを開きます");
+                GameStateManager.Instance.SetState(GameState.Settings);
                 ShowSettings();
+            }
+            else if (currentState == GameState.Settings)
+            {
+                GameStateManager.Instance.SetState(GameState.Gameplay);
+                HideSettings();
             }
         }
 
         public void ShowSettings()
         {
-            _isSettingsOpen = true;
             // SettingsDisplayが有効になるとOnEnableで表示更新が行われる想定
             _settingsDisplay.gameObject.SetActive(true);
             if (_canvasGroup != null)
                 _canvasGroup.alpha = 1;
 
             // Settings表示中はカーソルを開放
-            // Cursor.lockState = CursorLockMode.None;
-            // Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         public void HideSettings()
         {
-            _isSettingsOpen = false;
             _settingsDisplay.gameObject.SetActive(false);
             if (_canvasGroup != null)
                 _canvasGroup.alpha = 0;
 
             // Settings非表示時はカーソルをロック
-            // Cursor.lockState = CursorLockMode.Locked;
-            // Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         private void OnApplicationFocus(bool hasFocus)
         {
+            return;
             /*
             if (hasFocus)
             {
-                if (_isSettingsOpen)
+                // if (_isSettingsOpen)
                 {
                     Cursor.lockState = CursorLockMode.None;
                     Cursor.visible = true;
