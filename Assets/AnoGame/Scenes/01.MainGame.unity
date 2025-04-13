@@ -33282,6 +33282,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 11424616, guid: 58ac37417e60e534f91138088a3e6f70, type: 3}
+      propertyPath: controlCursorState
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 11426072, guid: 58ac37417e60e534f91138088a3e6f70, type: 3}
       propertyPath: initialDatabase
       value: 
@@ -33603,6 +33607,7 @@ GameObject:
   - component: {fileID: 1859354956}
   - component: {fileID: 1859354960}
   - component: {fileID: 1859354961}
+  - component: {fileID: 1859354962}
   m_Layer: 5
   m_Name: Canvas-UI
   m_TagString: Untagged
@@ -33722,6 +33727,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sections: []
+--- !u!114 &1859354962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859354955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eb65c805d8fc4105b0043492488817e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1863088473
 GameObject:
   m_ObjectHideFlags: 0
