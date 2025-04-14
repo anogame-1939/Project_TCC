@@ -91,7 +91,6 @@ namespace AnoGame.Application.Enemy
         {
             // 必要に応じ、初期化や状態リセットをここで実施可能
 
-            // 敵の生成前の準備（※脳の有効化処理などは呼ばず、生成のみ実施）
             yield return null;
 
             // isPermanentや eventData を渡して開始位置に敵を生成
@@ -104,38 +103,45 @@ namespace AnoGame.Application.Enemy
 
         /// <summary>
         /// ランダムモード用の生成コルーチン
-        /// ランダムな待機時間後、プレイヤーの近くに敵を生成し、通常の追跡やタイムアウト消滅の処理を実行
+        /// トリガーされたら、ランダムな間隔で継続的に敵を生成し、通常の追跡・タイムアウト消滅処理を実行
         /// </summary>
         private IEnumerator RandomSpawnCoroutine()
         {
-            // ランダムな待機時間を設定
-            float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
-            yield return new WaitForSeconds(waitTime);
-
-            // プレイヤーをタグから検索し、近くに敵をスポーン
-            GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
-            if (player != null)
+            // 終了条件がある場合はそれに合わせてループ条件を変更してください。
+            while (true)
             {
-                spawnManager.SpawnEnemyNearPlayer(player.transform.position);
-            }
-            else
-            {
-                Debug.LogError("プレイヤーオブジェクトが見つかりません。");
-            }
+                // ランダムな待機時間を設定
+                float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
 
-            // ランダムモードでは、敵の追跡やタイムアウト消滅など、通常の機能を有効にする
-            // 脳の有効化や移動開始処理を実施
-            spawnManager.EnabaleEnamy();
-            spawnManager.StartEnemyMovement();
+                Debug.Log("RandomSpawnCoroutine - wait" + waitTime);
+                yield return new WaitForSeconds(waitTime);
+                Debug.Log("RandomSpawnCoroutine - start" + waitTime);
 
-            // 敵が追跡状態にある間、待機（敵の状態を管理する IsChasing() を利用している前提）
-            while (spawnManager.IsChasing())
-            {
-                yield return new WaitForSeconds(1f);
+                // プレイヤーをタグから検索し、近くに敵をスポーン
+                GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
+                if (player != null)
+                {
+                    spawnManager.SpawnEnemyNearPlayer(player.transform.position);
+                }
+                else
+                {
+                    Debug.LogError("プレイヤーオブジェクトが見つかりません。");
+                }
+
+                // ランダムモードでは、敵の追跡やタイムアウト消滅など、通常の機能を有効にする
+                // 脳の有効化や移動開始処理を実施
+                spawnManager.EnabaleEnamy();
+                spawnManager.StartEnemyMovement();
+
+                // 敵が追跡状態にある間、待機（IsChasing() が false になれば次のループへ）
+                while (spawnManager.IsChasing())
+                {
+                    yield return new WaitForSeconds(1f);
+                }
+
+                // 状態が変わった場合に移動停止などの後処理を実施
+                spawnManager.StopEnemyMovement();
             }
-
-            // 状態が変わった場合に移動停止などの後処理を実施
-            spawnManager.StopEnemyMovement();
         }
     }
 }
