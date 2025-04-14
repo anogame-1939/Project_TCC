@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 using AnoGame.Application.Story;
 using Unity.TinyCharacterController.Brain;
 using System.Collections;
+using AnoGame.Application.Player.Control;
+
 
 
 
@@ -190,7 +192,7 @@ namespace AnoGame.Application.Enemy
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
 
-        private void SetEventData(EventData eventData)
+        public void SetEventData(EventData eventData)
         {
             var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
             enemyEventController.Initialize(eventData);
@@ -199,11 +201,13 @@ namespace AnoGame.Application.Enemy
         public void EnabaleEnamy()
         {
             _currentEnemyController.EnableBrain();
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
         }
 
         public void DisabaleEnamy()
         {
             _currentEnemyController.DisableBrain();
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
         }
 
         // 敵の状態を制御するためのメソッド群
