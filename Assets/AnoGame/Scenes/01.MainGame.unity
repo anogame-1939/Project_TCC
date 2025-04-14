@@ -206,6 +206,65 @@ MonoBehaviour:
   onCancel:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &5178731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5178733}
+  - component: {fileID: 5178732}
+  m_Layer: 0
+  m_Name: LocalizationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &5178732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5178731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03676f4f87329c04b866f07b16d281c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _localizedStringTable:
+    m_TableReference:
+      m_TableCollectionName: GUID:177ffb5b9eaf64c4c89721c5ab2600e0
+  _fontTable:
+    m_TableReference:
+      m_TableCollectionName: GUID:9203e85dfdc13a5468a21ff62e4d20f9
+  _fontTableKey: Font
+  _localizedFontReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:9203e85dfdc13a5468a21ff62e4d20f9
+    m_TableEntryReference:
+      m_KeyId: 100337782784
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+--- !u!4 &5178733
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5178731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8220712
 GameObject:
   m_ObjectHideFlags: 0
@@ -1858,7 +1917,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1859354962}
         m_TargetAssemblyTypeName: AnoGame.Application.Settings.SettingsManager, AnoGame.Application
         m_MethodName: UpdateLanguageFromInt
         m_Mode: 0
@@ -1870,7 +1929,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 5178732}
         m_TargetAssemblyTypeName: Localizer.LocalizationManager, anogame.localizer.runtime
         m_MethodName: ChangeLocale
         m_Mode: 0
@@ -14183,7 +14242,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1859354962}
         m_TargetAssemblyTypeName: AnoGame.Application.Settings.SettingsManager, AnoGame.Application
         m_MethodName: UpdateMasterVolume
         m_Mode: 0
@@ -17250,7 +17309,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1859354962}
         m_TargetAssemblyTypeName: AnoGame.Application.Settings.SettingsManager, AnoGame.Application
         m_MethodName: UpdateBgmVolume
         m_Mode: 0
@@ -29179,7 +29238,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1859354962}
         m_TargetAssemblyTypeName: AnoGame.Application.Settings.SettingsManager, AnoGame.Application
         m_MethodName: UpdateSeSoundVolume
         m_Mode: 0
@@ -33093,7 +33152,7 @@ GameObject:
   - component: {fileID: 1767301455}
   - component: {fileID: 1767301454}
   - component: {fileID: 1767301453}
-  - component: {fileID: 1767301452}
+  - component: {fileID: 1767301456}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -33101,67 +33160,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1767301452
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1767301451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d38d5ce2d2a1e4742ae6b7f0d761be8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputModule: {fileID: 1767301453}
-  onMove:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8220714}
-        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onSubmit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 633009272}
-        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onCancel:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1938829410}
-        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onLeftClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1767301453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33222,6 +33220,67 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1767301456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767301451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6304a6d75bb1e1e4195a7f6e093a15ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputModule: {fileID: 1767301453}
+  onMove:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8220714}
+        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onSubmit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 633009272}
+        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onCancel:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1938829410}
+        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onLeftClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1792717962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39373,6 +39432,7 @@ SceneRoots:
   - {fileID: 1668909554}
   - {fileID: 1159805804}
   - {fileID: 74569089}
+  - {fileID: 5178733}
   - {fileID: 1303263892}
   - {fileID: 1767301455}
   - {fileID: 346012592}
