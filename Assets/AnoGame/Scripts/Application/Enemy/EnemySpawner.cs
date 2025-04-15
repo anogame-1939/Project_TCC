@@ -79,7 +79,7 @@ namespace AnoGame.Application.Enemy
 
         private IEnumerator TriggerEnemySpawnCor()
         {
-            _spawnManager.EnabaleEnamy();
+            _spawnManager.EnabaleEnemy();
             yield return null;
             _spawnManager.SpawnEnemyAtStart(isPermanent);
             yield return null;
@@ -177,7 +177,7 @@ namespace AnoGame.Application.Enemy
 
         public void EnableBrain()
         {
-            _spawnManager.EnabaleEnamy();
+            _spawnManager.EnabaleEnemy();
         }
 
         public void DisableBrain()

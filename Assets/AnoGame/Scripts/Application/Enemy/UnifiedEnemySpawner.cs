@@ -56,6 +56,8 @@ namespace AnoGame.Application.Enemy
             if (enemyPrefab != null)
             {
                 spawnManager.SetEnemyPrefab(enemyPrefab);
+                spawnManager.InitializeEnemy();
+                TriggerEnemySpawn();
             }
         }
 
@@ -64,6 +66,8 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         public void TriggerEnemySpawn()
         {
+            // NOTE:ストーリー、ランダム用のセットアップが必要
+
             // もし既にコルーチンが動いていれば停止
             if (spawnCoroutine != null)
             {
@@ -73,14 +77,26 @@ namespace AnoGame.Application.Enemy
             // 選択モードに応じて処理を切り替え
             if (spawnMode == SpawnerMode.Story)
             {
+                spawnManager.SetupToStoryMode();
                 spawnCoroutine = StorySpawnCoroutine();
             }
             else if (spawnMode == SpawnerMode.Random)
             {
+                spawnManager.SetupToRamdomMode();
                 spawnCoroutine = RandomSpawnCoroutine();
             }
 
             StartCoroutine(spawnCoroutine);
+        }
+
+        /// <summary>
+        /// 外部から呼び出す敵生成開始メソッド
+        /// </summary>
+        public void TriggerEnemySpawnToStory()
+        {
+            spawnMode = SpawnerMode.Story;
+            
+            TriggerEnemySpawn();
         }
 
         /// <summary>
@@ -95,7 +111,8 @@ namespace AnoGame.Application.Enemy
 
             // isPermanentや eventData を渡して開始位置に敵を生成
             spawnManager.SetEventData(eventData);
-            spawnManager.SpawnEnemyAtStart(isPermanent);
+
+            spawnManager.SpawnEnemyAtStart(true);
             yield return null;
 
             // Storyモードでは、敵の追跡や自動消滅処理は実施しないので、追加の処理は不要
@@ -130,7 +147,7 @@ namespace AnoGame.Application.Enemy
 
                 // ランダムモードでは、敵の追跡やタイムアウト消滅など、通常の機能を有効にする
                 // 脳の有効化や移動開始処理を実施
-                spawnManager.EnabaleEnamy();
+                spawnManager.EnabaleEnemy();
                 spawnManager.StartEnemyMovement();
 
                 // 敵が追跡状態にある間、待機（IsChasing() が false になれば次のループへ）
@@ -141,6 +158,44 @@ namespace AnoGame.Application.Enemy
 
                 // 状態が変わった場合に移動停止などの後処理を実施
                 spawnManager.StopEnemyMovement();
+            }
+        }
+
+
+
+        /// <summary>
+        /// 雑だけど怪異を
+        /// </summary>
+        /// <param name="settings"></param>
+        public void ApFadeToPartialStatepear(PartialFadeSettings settings)
+        {
+            if (settings != null)
+            {
+                // HACK:雑だけどここでヒットディテクタを無効化しておく
+                var enemyHitDetector =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyHitDetector>();
+                enemyHitDetector.SetEnabled(false);
+
+                var enemyLifespan =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
+                // enemyLifespan.enabled = true;
+                enemyLifespan.FadeToPartialState(settings);
+                
+            }
+        }
+
+        /// <summary>
+        /// 部分フェードアウト状態になっている敵を、完全にフェードアウトさせる（消失させる）メソッド
+        /// </summary>
+        /// <param name="duration">完全フェードアウトにかかる時間</param>
+        public void ApCompletePartialFadeOut(float duration)
+        {
+            var enemyLifespan = spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
+            if(enemyLifespan != null)
+            {
+                enemyLifespan.CompletePartialFadeOut(duration);
+            }
+            else
+            {
+                Debug.LogError("CurrentEnemyInstance に EnemyLifespan コンポーネントが見つかりません。");
             }
         }
     }

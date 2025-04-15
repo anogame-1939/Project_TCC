@@ -162,7 +162,7 @@ namespace AnoGame.Application.Enemy
 
         public void EnableBrain()
         {
-            _spawnManager.EnabaleEnamy();
+            _spawnManager.EnabaleEnemy();
         }
 
         public void DisableBrain()

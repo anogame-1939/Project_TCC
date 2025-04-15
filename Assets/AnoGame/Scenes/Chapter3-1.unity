@@ -1380,8 +1380,9 @@ MonoBehaviour:
     onConversationEnd:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1992210893}
-          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
+        - m_Target: {fileID: 1524738180}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
           m_MethodName: ApCompletePartialFadeOut
           m_Mode: 4
           m_Arguments:
@@ -22771,9 +22772,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1992210893}
-        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
-        m_MethodName: TriggerEnemySpawn
+      - m_Target: {fileID: 1524738180}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: TriggerEnemySpawnToStory
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -33857,23 +33859,11 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 1992210893}
-          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
-          m_MethodName: ApFadeToPartialStatepear
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 11400000, guid: abb3a68cc0bdd9845bbacefcc3a75030, type: 2}
-            m_ObjectArgumentAssemblyTypeName: AnoGame.Application.Enemy.PartialFadeSettings,
-              AnoGame.Application
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1992210893}
-          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
+        - m_Target: {fileID: 1524738180}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
           m_MethodName: ApFadeToPartialStatepear
           m_Mode: 2
           m_Arguments:
@@ -35213,6 +35203,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1524738180 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1383781561140396094, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 1992210892}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb18e11236404cc690294c3fdf59dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1548078180
 GameObject:
   m_ObjectHideFlags: 0

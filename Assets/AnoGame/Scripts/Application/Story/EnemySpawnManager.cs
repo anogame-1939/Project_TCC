@@ -49,15 +49,13 @@ namespace AnoGame.Application.Enemy
 
         private void Start()
         {
-            InitializeEnemy();
-
             // スタートポイントから初期スポーン
             SpawnEnemyAtStart();
         }
 
 
         // TODO:チャプター毎に生成する怪異を付け替える
-        private void InitializeEnemy()
+        public void InitializeEnemy()
         {
             if (enemyPrefab == null)
             {
@@ -85,6 +83,20 @@ namespace AnoGame.Application.Enemy
             SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
         }
 
+        public void SetupToStoryMode()
+        {
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
+        }
+
+        public void SetupToRamdomMode()
+        {
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
+        }
+
         public void DestroyCurrentEnemyInstance()
         {
             StartCoroutine(DestroyCor(_currentEnemyInstance));
@@ -103,7 +115,6 @@ namespace AnoGame.Application.Enemy
         public void SetEnemyPrefab(GameObject prefab)
         {
             enemyPrefab = prefab;
-            InitializeEnemy();
         }
 
         private Transform GetStartPoint()
@@ -141,7 +152,7 @@ namespace AnoGame.Application.Enemy
             var startPoint = GetStartPoint();
             if (startPoint == null) return;
 
-            PlayeSpawnedSound();
+            PlaySpawnedSound();
             SpawnEnemyAt(startPoint.position, startPoint.rotation, isPermanent);
             // EnabaleEnamy();
         }
@@ -157,12 +168,12 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
-            PlayeSpawnedSound();
+            PlaySpawnedSound();
             SpawnEnemyAt(targetPoint.position, targetPoint.rotation);
             // EnabaleEnamy();
         }
 
-        private void PlayeSpawnedSound()
+        private void PlaySpawnedSound()
         {
             GetComponent<AudioSource>().Play();
         }
@@ -173,6 +184,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.SetActive(true);
             
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+
             if (isPermanent)
             {
                 _currentEnemyController.GetComponent<EnemyLifespan>().enabled = false;
@@ -198,7 +210,7 @@ namespace AnoGame.Application.Enemy
             enemyEventController.Initialize(eventData);
         }
 
-        public void EnabaleEnamy()
+        public void EnabaleEnemy()
         {
             _currentEnemyController.EnableBrain();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
@@ -229,10 +241,10 @@ namespace AnoGame.Application.Enemy
 
         public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation, EventData eventData = null)
         {
-            PlayeSpawnedSound();
+            PlaySpawnedSound();
             SpawnEnemyAt(position, rotation);
             if (eventData) SetEventData(eventData);
-            EnabaleEnamy();
+            EnabaleEnemy();
         }
 
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)
@@ -240,8 +252,8 @@ namespace AnoGame.Application.Enemy
             if (_currentEnemyController != null)
             {
                 Debug.Log("くる！！");
-                PlayeSpawnedSound();
-                EnabaleEnamy();
+                PlaySpawnedSound();
+                EnabaleEnemy();
                 SetEventData(null);
                 _currentEnemyController.SpawnNearPlayer(playerPosition);
             }
