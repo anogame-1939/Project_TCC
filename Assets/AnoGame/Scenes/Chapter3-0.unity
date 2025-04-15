@@ -4963,6 +4963,17 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!114 &227194830 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1383781561140396094, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 1078756855}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb18e11236404cc690294c3fdf59dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &354629483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5427,6 +5438,19 @@ MonoBehaviour:
   onEventStart:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 227194830}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: TriggerEnemySpawnToStory
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1509391777}
         m_TargetAssemblyTypeName: FadeImageController, Assembly-CSharp
         m_MethodName: FadeOut
@@ -15565,15 +15589,23 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1383781561140396094, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: enemyPrefab
+      value: 
+      objectReference: {fileID: 7092537996067713669, guid: f619f5d1a1b854e699d64fa9b2c4692a, type: 3}
     - target: {fileID: 2080231796069958229, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: m_Name
       value: LevelModules
       objectReference: {fileID: 0}
     - target: {fileID: 6012029449518595477, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6542715615986563986, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6936544386161812939, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
