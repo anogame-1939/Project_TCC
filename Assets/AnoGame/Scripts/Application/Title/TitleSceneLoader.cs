@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using UnityEngine.InputSystem;
 
 namespace AnoGame.Application.Title
 {

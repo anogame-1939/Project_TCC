@@ -8172,7 +8172,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1859354962}
         m_TargetAssemblyTypeName: AnoGame.Application.Settings.SettingsManager, AnoGame.Application
         m_MethodName: SaveSettings
         m_Mode: 1
@@ -13323,7 +13323,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 451406791}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1859354962}
+        m_TargetAssemblyTypeName: AnoGame.Application.Settings.SettingsManager, AnoGame.Application
+        m_MethodName: ResetSettings
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &451406791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26908,10 +26920,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: AnoGame.Application.UI.UIManager, AnoGame.Application
-        m_MethodName: ShowSection
-        m_Mode: 3
+      - m_Target: {fileID: 1859354963}
+        m_TargetAssemblyTypeName: AnoGame.Application.Title.TitleSceneLoader, AnoGame.Application
+        m_MethodName: LoadNextScene
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -33667,6 +33679,7 @@ GameObject:
   - component: {fileID: 1859354960}
   - component: {fileID: 1859354961}
   - component: {fileID: 1859354962}
+  - component: {fileID: 1859354963}
   m_Layer: 5
   m_Name: Canvas-UI
   m_TagString: Untagged
@@ -33798,6 +33811,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eb65c805d8fc4105b0043492488817e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1859354963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859354955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb26136c9275f45e0b962714280ec068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextSceneName: 00.Title
 --- !u!1 &1863088473
 GameObject:
   m_ObjectHideFlags: 0

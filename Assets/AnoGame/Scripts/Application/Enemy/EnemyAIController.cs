@@ -60,6 +60,12 @@ namespace AnoGame.Application.Enmemy.Control
         /// </summary>
         void FixedUpdate()
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
+            {
+                // ゲームがプレイ中でない場合は、入力を無視
+                return;
+            }
+            
             // 2. タグからプレイヤーを探して、その位置を目標地点に設定
             if (player == null)
             {

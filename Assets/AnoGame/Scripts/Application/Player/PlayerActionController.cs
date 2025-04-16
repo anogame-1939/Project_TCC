@@ -75,6 +75,12 @@ namespace AnoGame.Application.Player.Control
 
         private void FixedUpdate()
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
+            {
+                // ゲームがプレイ中でない場合は、入力を無視
+                return;
+            }
+            
             // キーが押されている場合のみ入力値を取得して反映
             if (isKeyHeld && isInputEnabled)
             {
