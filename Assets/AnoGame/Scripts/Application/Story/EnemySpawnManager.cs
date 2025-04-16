@@ -93,6 +93,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().EnableForceMode();
         }
 
         public void SetupToRamdomMode()
@@ -102,6 +103,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
         }
 
         public void DestroyCurrentEnemyInstance()
