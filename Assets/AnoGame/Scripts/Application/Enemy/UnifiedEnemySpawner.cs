@@ -57,7 +57,7 @@ namespace AnoGame.Application.Enemy
             {
                 spawnManager.SetEnemyPrefab(enemyPrefab);
                 // spawnManager.InitializeEnemy();
-                // TriggerEnemySpawn();
+                TriggerEnemySpawn();
             }
         }
 
@@ -66,6 +66,7 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         public void TriggerEnemySpawn()
         {
+            Debug.Log("TriggerEnemySpawn - " + spawnMode);
             // NOTE:ストーリー、ランダム用のセットアップが必要
             spawnManager.InitializeEnemy();
 
@@ -125,6 +126,7 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         private IEnumerator RandomSpawnCoroutine()
         {
+            Debug.Log("RandomSpawnCoroutine - ");
             // 終了条件がある場合はそれに合わせてループ条件を変更してください。
             while (true)
             {
@@ -148,24 +150,29 @@ namespace AnoGame.Application.Enemy
 
                 // ランダムモードでは、敵の追跡やタイムアウト消滅など、通常の機能を有効にする
                 // 脳の有効化や移動開始処理を実施
-                spawnManager.EnabaleEnemy();
-                spawnManager.StartEnemyMovement();
+                // spawnManager.EnabaleEnemy();
+                // spawnManager.StartEnemyMovement();
 
                 // 敵が追跡状態にある間、待機（IsChasing() が false になれば次のループへ）
                 while (spawnManager.IsChasing())
                 {
+                    Debug.Log("Enemy is chasing...");
                     yield return new WaitForSeconds(1f);
                 }
 
+                Debug.Log("Enemy has stopped chasing.");
+
                 // 状態が変わった場合に移動停止などの後処理を実施
-                spawnManager.StopEnemyMovement();
+                // spawnManager.StopEnemyMovement();
+
+                yield return new WaitForSeconds(10f);
             }
         }
 
 
 
         /// <summary>
-        /// 雑だけど怪異を
+        /// 雑だけど怪異を部分的にフェードインさせるメソッド
         /// </summary>
         /// <param name="settings"></param>
         public void ApFadeToPartialStatepear(PartialFadeSettings settings)

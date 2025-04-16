@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace AnoGame.Application.Enemy
 {
+    // NOTE:実質アニメーションコントローラー
     public class EnemyMoveController : MonoBehaviour
     {
         /// <summary>
@@ -30,7 +31,7 @@ namespace AnoGame.Application.Enemy
 
         private void Update()
         {
-            if (_targetObject != null) 
+            if (_targetObject != null)
             {
                 GetComponent<MoveNavmeshControl>().SetTargetPosition(_targetObject.transform.position);
             }
@@ -59,7 +60,7 @@ namespace AnoGame.Application.Enemy
 
             // --- 追加: 移動先にキャラクターを向かせる ---
             // displacement が 0 でなければ、その方向に回転させる
-            if (displacement.sqrMagnitude > 0.000001f) 
+            if (displacement.sqrMagnitude > 0.000001f)
             {
                 // XZ 平面のみで回転させる場合、y 成分を 0 に
                 Vector3 direction = new Vector3(displacement.x, 0f, displacement.z);

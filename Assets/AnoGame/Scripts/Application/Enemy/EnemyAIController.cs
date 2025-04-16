@@ -2,7 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using AnoGame.Application.Player.Control;
-using Unity.TinyCharacterController.Control; // NOTE:微妙...別のnamespaceがいい
+using Unity.TinyCharacterController.Control;
+using Unity.TinyCharacterController.Core; // NOTE:微妙...別のnamespaceがいい
+using Unity.TinyCharacterController.Brain;
 
 namespace AnoGame.Application.Enmemy.Control
 {
@@ -11,19 +13,23 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField] private MoveControl moveControl;
         // プレイヤーのタグ
         [SerializeField] private string playerTag = "Player";
-        
+
         // 移動アニメーションを切り替える速度のしきい値
         [SerializeField] private float speedThreshold = 0.1f;
-        
+
         // 子オブジェクトにあるアニメーターを取得する場合のインデックス
         [SerializeField] private int animatorChildIndex = 0;
-        
+
         // アニメーター内で設定している Bool パラメータ名
         [SerializeField] private string animatorBoolParam = "IsMove";
 
+        [SerializeField] private bool isChasing = false;
+        public bool IsChasing => isChasing;
+
+
+
         private NavMeshAgent agent;
         private Animator animator;
-
         private GameObject player;
 
         void Start()
@@ -32,10 +38,10 @@ namespace AnoGame.Application.Enmemy.Control
             {
                 moveControl = GetComponent<MoveControl>();
             }
-            
+
             // NavMeshAgent の取得
             agent = GetComponentInChildren<NavMeshAgent>();
-            
+
             // 指定した子オブジェクトから Animator を取得
             animator = transform.GetChild(animatorChildIndex).GetComponent<Animator>();
         }
@@ -46,10 +52,13 @@ namespace AnoGame.Application.Enmemy.Control
         /// </summary>
         void Update()
         {
+            Debug.Log($"EnemyAIController Update - IsChasing: {isChasing}");
+
+
             // 1. オブジェクトの速度（NavMeshAgent の速度）を取得し、アニメーターの Bool を設定
             float speed = agent.velocity.magnitude;
             bool isMoving = speed > speedThreshold;
-            
+
             // アニメーション用パラメータをセット
             animator.SetBool(animatorBoolParam, isMoving);
         }
@@ -65,13 +74,13 @@ namespace AnoGame.Application.Enmemy.Control
                 // ゲームがプレイ中でない場合は、入力を無視
                 return;
             }
-            
+
             // 2. タグからプレイヤーを探して、その位置を目標地点に設定
             if (player == null)
             {
                 player = GameObject.FindWithTag(playerTag);
             }
-            
+
             if (player != null)
             {
                 Vector3 targetPosition = player.transform.position;
@@ -100,7 +109,7 @@ namespace AnoGame.Application.Enmemy.Control
 
             if (desiredDirection.sqrMagnitude < 0.0001f)
                 yield break;
-            
+
             desiredDirection.Normalize();
 
             // カメラのY軸回転を取得（見下ろし視点でも、カメラのY軸は有効と仮定）
@@ -157,7 +166,7 @@ namespace AnoGame.Application.Enmemy.Control
             // これで上下左右・斜めのいずれか(8方向)になる
             return new Vector2(x, y);
         }
-        
+
         public void OnForcedMoveBegin()
         {
             // ここではスクリプト自体を無効化
@@ -172,6 +181,39 @@ namespace AnoGame.Application.Enmemy.Control
         {
             this.enabled = true;
             agent.isStopped = false;
+        }
+
+        public void SpawnNearPlayer(Vector3 playerPosition, float spawnDistance = 5f)
+        {
+            Vector3 randomDirection = Random.insideUnitSphere * spawnDistance;
+            randomDirection.y = 0;
+            Vector3 spawnPosition = playerPosition + randomDirection;
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(spawnPosition, out hit, spawnDistance, NavMesh.AllAreas))
+            {
+                GetComponent<BrainBase>().Warp(hit.position, randomDirection);
+                // StartMoving(); // スポーン後に動き出す
+            }
+            else
+            {
+                Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
+            }
+        }
+
+
+
+        public void SetChasing(bool chasing)
+        {
+            isChasing = chasing;
+            if (isChasing)
+            {
+                // ChasePlayer(); // プレイヤーを追いかける処理を実行
+            }
+            else
+            {
+                // StopChasing(); // プレイヤーの追跡を停止する処理を実行
+            }
         }
     }
 }

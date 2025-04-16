@@ -9,6 +9,9 @@ using AnoGame.Application.Story;
 using Unity.TinyCharacterController.Brain;
 using System.Collections;
 using AnoGame.Application.Player.Control;
+using AnoGame.Application.Enmemy.Control;
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -32,7 +35,7 @@ namespace AnoGame.Application.Enemy
         }
 
         [SerializeField] private GameObject enemyPrefab;
-        [SerializeField] private float moveDelay = 5.0f;  // 出現前の待機時間（移動猶予）
+        [SerializeField] private float moveDelay = 3.0f;  // 出現前の待機時間（移動猶予）
         [SerializeField] private float destroyDelay = 5.0f;
         private GameObject _currentEnemyInstance;
         public GameObject CurrentEnemyInstance => _currentEnemyInstance;
@@ -76,6 +79,8 @@ namespace AnoGame.Application.Enemy
             // 明示的にメインシーンに配置する
             var targetScene = StoryManager.Instance.MainScene;
             SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
+
+            _currentEnemyInstance.SetActive(false); // 初期状態では非アクティブにする
         }
 
         public void SetupToStoryMode()
@@ -237,6 +242,11 @@ namespace AnoGame.Application.Enemy
 
         private IEnumerator SpawnEnemyNearPlayerCoroutine(Vector3 playerPosition)
         {
+            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
+            con.SetChasing(true);
+            con.SpawnNearPlayer(playerPosition);
+
+
             Debug.Log("SpawnEnemyCoroutine-SpawnEnemyNearPlayerCoroutine");
             // 出現前エフェクト・効果音の再生
             PlaySpawnedSound();
@@ -245,12 +255,12 @@ namespace AnoGame.Application.Enemy
 
             // 敵をアクティブ化
             _currentEnemyInstance.SetActive(true);
-            _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
-
+            // _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+            
             // プレイヤー付近での出現処理を行う
             EnabaleEnemy();
             SetEventData(null);
-            _currentEnemyController.SpawnNearPlayer(playerPosition);
+            // _currentEnemyController.SpawnNearPlayer(playerPosition);
             Debug.Log("プレイヤー付近に敵を出現させました。");
         }
 
@@ -291,13 +301,15 @@ namespace AnoGame.Application.Enemy
 
         public void EnabaleEnemy()
         {
-            _currentEnemyController.EnableBrain();
+            // _currentEnemyController.EnableBrain();
+            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
         }
 
         public void DisabaleEnamy()
         {
-            _currentEnemyController.DisableBrain();
+            // _currentEnemyController.DisableBrain();
+            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
         }
 
@@ -320,7 +332,7 @@ namespace AnoGame.Application.Enemy
 
         public bool IsChasing()
         {
-            return _currentEnemyInstance.GetComponent<EnemyEventController>().IsChasing;
+            return _currentEnemyInstance.GetComponent<EnemyAIController>().IsChasing;
         }
 
         public void SetRetryPoint(Transform point)
