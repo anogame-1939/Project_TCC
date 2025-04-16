@@ -10,9 +10,6 @@ using Unity.TinyCharacterController.Brain;
 using System.Collections;
 using AnoGame.Application.Player.Control;
 
-
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -22,7 +19,6 @@ namespace AnoGame.Application.Enemy
     public class EnemySpawnManager : SingletonMonoBehaviour<EnemySpawnManager>
     {
         [Inject] private IEventService _eventService;
-
         [Inject] private EventManager _eventManager;
 
         [Inject]
@@ -36,6 +32,7 @@ namespace AnoGame.Application.Enemy
         }
 
         [SerializeField] private GameObject enemyPrefab;
+        [SerializeField] private float moveDelay = 5.0f;
         [SerializeField] private float destroyDelay = 5.0f;
         private GameObject _currentEnemyInstance;
         public GameObject CurrentEnemyInstance => _currentEnemyInstance;
@@ -45,7 +42,6 @@ namespace AnoGame.Application.Enemy
         private const string TAG_RETRY_POINT_ENEMY = "RetryPointEnemy";
         
         private Transform _currentRetryPoint;
-
 
         private void Start()
         {
@@ -70,7 +66,7 @@ namespace AnoGame.Application.Enemy
                 _currentEnemyController = null;
             }
 
-            // 新しい敵をスポーン
+            // 新しい敵をスポーン（※初期状態では非アクティブにしておくなど、事前設定が必要な場合はこちらで対応）
             _currentEnemyInstance = Instantiate(enemyPrefab);
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
 
@@ -147,16 +143,21 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+        /// <summary>
+        /// スタート地点に敵を出現させる。
+        /// </summary>
         public void SpawnEnemyAtStart(bool isPermanent = false)
         {
             var startPoint = GetStartPoint();
             if (startPoint == null) return;
 
-            PlaySpawnedSound();
-            SpawnEnemyAt(startPoint.position, startPoint.rotation, isPermanent);
-            // EnabaleEnamy();
+            // 出現前効果再生後に敵を出現させるコルーチンを呼び出す
+            StartCoroutine(SpawnEnemyCoroutine(startPoint.position, startPoint.rotation, isPermanent));
         }
 
+        /// <summary>
+        /// リトライ地点に敵を出現させる。
+        /// </summary>
         public void SpawnEnemyAtRetryPoint()
         {
             Transform targetPoint = _currentRetryPoint ?? GetRetryPoint();
@@ -168,21 +169,73 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
-            PlaySpawnedSound();
-            SpawnEnemyAt(targetPoint.position, targetPoint.rotation);
-            // EnabaleEnamy();
+            StartCoroutine(SpawnEnemyCoroutine(targetPoint.position, targetPoint.rotation));
         }
 
-        private void PlaySpawnedSound()
+        /// <summary>
+        /// 出現前のエフェクト・効果音再生後、一定時間待機してから敵を出現させるコルーチン
+        /// </summary>
+        private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation, bool isPermanent = false)
+        {
+            // 出現前エフェクト・効果音の再生
+            PlaySpawnedSound();
+            // ※ エフェクトとしてパーティクル等を再生する処理を追加可能
+            // 例: Instantiate(spawnEffectPrefab, position, rotation);
+
+            // プレイヤーに回避の猶予を与えるため、一定時間待機（例: 1秒）
+            yield return new WaitForSeconds(moveDelay);
+
+            // 敵をアクティブ化して位置・回転を設定
+            _currentEnemyInstance.SetActive(true);
+            _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+
+            if (_currentEnemyController == null)
+            {
+                Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
+            }
+            
+            if (isPermanent)
+            {
+                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = false;
+            }
+            else
+            {
+                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = true;
+            }
+            
+            _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
+            Debug.Log($"敵を ({position}) の位置にスポーンしました。");
+        }
+
+        /// <summary>
+        /// 特定の位置に敵を出現させる（エフェクト再生後に実施）。
+        /// イベントデータが設定されている場合は、出現後に反映する。
+        /// </summary>
+        public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation, EventData eventData = null)
+        {
+            StartCoroutine(SpawnEnemyAtExactPositionCoroutine(position, rotation, eventData));
+        }
+
+        private IEnumerator SpawnEnemyAtExactPositionCoroutine(Vector3 position, Quaternion rotation, EventData eventData)
+        {
+            yield return SpawnEnemyCoroutine(position, rotation);
+            if (eventData != null)
+            {
+                SetEventData(eventData);
+            }
+            EnabaleEnemy();
+        }
+
+        public void PlaySpawnedSound()
         {
             GetComponent<AudioSource>().Play();
         }
 
+        // ※ 既存の SpawnEnemyAt メソッドは、SpawnEnemyCoroutine に処理を移しているため、使用しなくてもOKです。
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
-            // EnemyControllerの参照を保持
+            // このメソッドは参考用。コルーチン化した SpawnEnemyCoroutine に処理を分散しています。
             _currentEnemyInstance.SetActive(true);
-            
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
 
             if (isPermanent)
@@ -200,7 +253,6 @@ namespace AnoGame.Application.Enemy
             }
 
             _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
-
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
 
@@ -237,14 +289,6 @@ namespace AnoGame.Application.Enemy
             {
                 _currentEnemyController.StopMoving();
             }
-        }
-
-        public void SpawnEnemyAtExactPosition(Vector3 position, Quaternion rotation, EventData eventData = null)
-        {
-            PlaySpawnedSound();
-            SpawnEnemyAt(position, rotation);
-            if (eventData) SetEventData(eventData);
-            EnabaleEnemy();
         }
 
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)
