@@ -30,6 +30,7 @@ namespace AnoGame.Application.GameOver
         
         public void OnClickRetryButton()
         {
+            Debug.Log("Retry Button Clicked!");
             HideGameOverPanel();
             // 現在のシーンをやり直す
             StoryManager.Instance.RetyrCurrentScene();

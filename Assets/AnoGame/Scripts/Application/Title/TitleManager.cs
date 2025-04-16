@@ -6,6 +6,8 @@ namespace AnoGame.Application.Title
 {
     public class TitleManager : MonoBehaviour
     {
+        [SerializeField] private string titleSceneName;
+
         /// <summary>
         /// DontDestroyOnLoad で保持されたオブジェクトが配置される内部シーンを取得する。
         /// ※ この方法は、一時的にDontDestroyOnLoad対象のオブジェクトを作成して、その属するシーンを参照するテクニックです。
@@ -45,7 +47,7 @@ namespace AnoGame.Application.Title
             }
 
             // タイトルシーン (シーン名："TitleScene") をロードする
-            SceneManager.LoadScene("TitleScene");
+            SceneManager.LoadScene(titleSceneName);
         }
     }
 }
