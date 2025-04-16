@@ -56,8 +56,8 @@ namespace AnoGame.Application.Enemy
             if (enemyPrefab != null)
             {
                 spawnManager.SetEnemyPrefab(enemyPrefab);
-                spawnManager.InitializeEnemy();
-                TriggerEnemySpawn();
+                // spawnManager.InitializeEnemy();
+                // TriggerEnemySpawn();
             }
         }
 
@@ -67,6 +67,7 @@ namespace AnoGame.Application.Enemy
         public void TriggerEnemySpawn()
         {
             // NOTE:ストーリー、ランダム用のセットアップが必要
+            spawnManager.InitializeEnemy();
 
             // もし既にコルーチンが動いていれば停止
             if (spawnCoroutine != null)

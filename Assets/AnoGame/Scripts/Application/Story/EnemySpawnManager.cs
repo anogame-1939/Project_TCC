@@ -32,7 +32,7 @@ namespace AnoGame.Application.Enemy
         }
 
         [SerializeField] private GameObject enemyPrefab;
-        [SerializeField] private float moveDelay = 5.0f;
+        [SerializeField] private float moveDelay = 5.0f;  // 出現前の待機時間（移動猶予）
         [SerializeField] private float destroyDelay = 5.0f;
         private GameObject _currentEnemyInstance;
         public GameObject CurrentEnemyInstance => _currentEnemyInstance;
@@ -46,9 +46,8 @@ namespace AnoGame.Application.Enemy
         private void Start()
         {
             // スタートポイントから初期スポーン
-            SpawnEnemyAtStart();
+            // SpawnEnemyAtStart();
         }
-
 
         // TODO:チャプター毎に生成する怪異を付け替える
         public void InitializeEnemy()
@@ -177,12 +176,13 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
+            Debug.Log("SpawnEnemyCoroutine-SpawnEnemyCoroutine");
             // 出現前エフェクト・効果音の再生
             PlaySpawnedSound();
             // ※ エフェクトとしてパーティクル等を再生する処理を追加可能
             // 例: Instantiate(spawnEffectPrefab, position, rotation);
 
-            // プレイヤーに回避の猶予を与えるため、一定時間待機（例: 1秒）
+            // プレイヤーに回避の猶予を与えるため、一定時間待機（例: moveDelay秒）
             yield return new WaitForSeconds(moveDelay);
 
             // 敵をアクティブ化して位置・回転を設定
@@ -226,15 +226,42 @@ namespace AnoGame.Application.Enemy
             EnabaleEnemy();
         }
 
+        /// <summary>
+        /// プレイヤー付近に敵を出現させる。
+        /// 出現前効果再生後、一定時間待機してからEnemyControllerのSpawnNearPlayerを呼び出すコルーチンを実行する。
+        /// </summary>
+        public void SpawnEnemyNearPlayer(Vector3 playerPosition)
+        {
+            StartCoroutine(SpawnEnemyNearPlayerCoroutine(playerPosition));
+        }
+
+        private IEnumerator SpawnEnemyNearPlayerCoroutine(Vector3 playerPosition)
+        {
+            Debug.Log("SpawnEnemyCoroutine-SpawnEnemyNearPlayerCoroutine");
+            // 出現前エフェクト・効果音の再生
+            PlaySpawnedSound();
+            // 出現前のエフェクトの待機（moveDelay秒）
+            yield return new WaitForSeconds(moveDelay);
+
+            // 敵をアクティブ化
+            _currentEnemyInstance.SetActive(true);
+            _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+
+            // プレイヤー付近での出現処理を行う
+            EnabaleEnemy();
+            SetEventData(null);
+            _currentEnemyController.SpawnNearPlayer(playerPosition);
+            Debug.Log("プレイヤー付近に敵を出現させました。");
+        }
+
         public void PlaySpawnedSound()
         {
             GetComponent<AudioSource>().Play();
         }
 
-        // ※ 既存の SpawnEnemyAt メソッドは、SpawnEnemyCoroutine に処理を移しているため、使用しなくてもOKです。
+        // ※ 既存の SpawnEnemyAt メソッドは、SpawnEnemyCoroutine に処理を分散しています。
         private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
-            // このメソッドは参考用。コルーチン化した SpawnEnemyCoroutine に処理を分散しています。
             _currentEnemyInstance.SetActive(true);
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
 
@@ -288,18 +315,6 @@ namespace AnoGame.Application.Enemy
             if (_currentEnemyController != null)
             {
                 _currentEnemyController.StopMoving();
-            }
-        }
-
-        public void SpawnEnemyNearPlayer(Vector3 playerPosition)
-        {
-            if (_currentEnemyController != null)
-            {
-                Debug.Log("くる！！");
-                PlaySpawnedSound();
-                EnabaleEnemy();
-                SetEventData(null);
-                _currentEnemyController.SpawnNearPlayer(playerPosition);
             }
         }
 
