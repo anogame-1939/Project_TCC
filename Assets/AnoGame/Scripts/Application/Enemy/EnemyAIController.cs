@@ -5,6 +5,7 @@ using AnoGame.Application.Player.Control;
 using Unity.TinyCharacterController.Control;
 using Unity.TinyCharacterController.Core; // NOTE:微妙...別のnamespaceがいい
 using Unity.TinyCharacterController.Brain;
+using AnoGame.Application.Enemy;
 
 namespace AnoGame.Application.Enmemy.Control
 {
@@ -26,6 +27,9 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField] private bool isChasing = false;
         public bool IsChasing => isChasing;
 
+        [SerializeField] private bool isStoryMode = false;
+        public bool IsStoryMode => isStoryMode;
+
 
 
         private NavMeshAgent agent;
@@ -44,7 +48,28 @@ namespace AnoGame.Application.Enmemy.Control
 
             // 指定した子オブジェクトから Animator を取得
             animator = transform.GetChild(animatorChildIndex).GetComponent<Animator>();
+
+            GetComponent<EnemyLifespan>().OnLifespanExpired += OnLifespanExpired;
+            GetComponent<EnemyHitDetector>().OnPlayerHit += OnPlayerHit;
         }
+
+        private void OnLifespanExpired()
+        {
+            isChasing = false;
+            agent.isStopped = true;
+        }
+
+        private void OnPlayerHit()
+        {
+            isChasing = false;
+            agent.isStopped = true;
+        }
+
+        public void SetStoryMode(bool isStoryMode)
+        {
+            this.isStoryMode = isStoryMode;
+        }
+
 
         /// <summary>
         /// Bolt の「On Update」相当
@@ -69,6 +94,11 @@ namespace AnoGame.Application.Enmemy.Control
         /// </summary>
         void FixedUpdate()
         {
+            if (this.IsStoryMode)
+            {
+                // ストーリーモードの場合は、プレイヤーを追いかけない
+                return;
+            }
             if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
             {
                 // ゲームがプレイ中でない場合は、入力を無視

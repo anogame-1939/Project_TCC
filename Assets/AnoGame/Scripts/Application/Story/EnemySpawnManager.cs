@@ -10,6 +10,9 @@ using Unity.TinyCharacterController.Brain;
 using System.Collections;
 using AnoGame.Application.Player.Control;
 using AnoGame.Application.Enmemy.Control;
+using Unity.TinyCharacterController.Core;
+
+
 
 
 
@@ -85,6 +88,8 @@ namespace AnoGame.Application.Enemy
 
         public void SetupToStoryMode()
         {
+            _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(true);
+            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
@@ -92,6 +97,8 @@ namespace AnoGame.Application.Enemy
 
         public void SetupToRamdomMode()
         {
+            _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
+            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
@@ -181,14 +188,15 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
+            yield return null;
             Debug.Log("SpawnEnemyCoroutine-SpawnEnemyCoroutine");
             // 出現前エフェクト・効果音の再生
-            PlaySpawnedSound();
+            // PlaySpawnedSound();
             // ※ エフェクトとしてパーティクル等を再生する処理を追加可能
             // 例: Instantiate(spawnEffectPrefab, position, rotation);
 
             // プレイヤーに回避の猶予を与えるため、一定時間待機（例: moveDelay秒）
-            yield return new WaitForSeconds(moveDelay);
+            // yield return new WaitForSeconds(moveDelay);
 
             // 敵をアクティブ化して位置・回転を設定
             _currentEnemyInstance.SetActive(true);
@@ -256,7 +264,7 @@ namespace AnoGame.Application.Enemy
             // 敵をアクティブ化
             _currentEnemyInstance.SetActive(true);
             // _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
-            
+
             // プレイヤー付近での出現処理を行う
             EnabaleEnemy();
             SetEventData(null);
