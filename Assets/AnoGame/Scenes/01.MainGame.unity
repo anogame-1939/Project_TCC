@@ -206,65 +206,6 @@ MonoBehaviour:
   onCancel:
     m_PersistentCalls:
       m_Calls: []
---- !u!1 &5178731
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5178733}
-  - component: {fileID: 5178732}
-  m_Layer: 0
-  m_Name: LocalizationManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &5178732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5178731}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03676f4f87329c04b866f07b16d281c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _localizedStringTable:
-    m_TableReference:
-      m_TableCollectionName: GUID:177ffb5b9eaf64c4c89721c5ab2600e0
-  _fontTable:
-    m_TableReference:
-      m_TableCollectionName: GUID:9203e85dfdc13a5468a21ff62e4d20f9
-  _fontTableKey: Font
-  _localizedFontReference:
-    m_TableReference:
-      m_TableCollectionName: GUID:9203e85dfdc13a5468a21ff62e4d20f9
-    m_TableEntryReference:
-      m_KeyId: 100337782784
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
---- !u!4 &5178733
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5178731}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &35768356
 GameObject:
   m_ObjectHideFlags: 0
@@ -1800,7 +1741,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 5178732}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Localizer.LocalizationManager, anogame.localizer.runtime
         m_MethodName: ChangeLocale
         m_Mode: 0
@@ -23360,7 +23301,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u3042\u304D\u3089\u3081\u308B"
+  m_text: Give Up
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1a314a7113bd9ad46ba626b0524b148b, type: 2}
   m_sharedMaterial: {fileID: -9056126674977827841, guid: 1a314a7113bd9ad46ba626b0524b148b, type: 2}
@@ -27805,6 +27746,7 @@ Transform:
   - {fileID: 70559782}
   - {fileID: 1961940473}
   - {fileID: 35768357}
+  - {fileID: 1430901697}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1303263890
@@ -29349,6 +29291,50 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &1430901696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1430901697}
+  - component: {fileID: 1430901698}
+  m_Layer: 0
+  m_Name: LocalizeHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1430901697
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430901696}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1291390061}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1430901698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430901696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0e169e9c73383a45ae38a6d1a3f81da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1438964082
 GameObject:
   m_ObjectHideFlags: 0
@@ -34922,7 +34908,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u3084\u308A\u306A\u304A\u3059"
+  m_text: Retry
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1a314a7113bd9ad46ba626b0524b148b, type: 2}
   m_sharedMaterial: {fileID: -9056126674977827841, guid: 1a314a7113bd9ad46ba626b0524b148b, type: 2}
@@ -39413,5 +39399,4 @@ SceneRoots:
   - {fileID: 1668909554}
   - {fileID: 1159805804}
   - {fileID: 74569089}
-  - {fileID: 5178733}
   - {fileID: 1303263892}

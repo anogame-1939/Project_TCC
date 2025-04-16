@@ -152,6 +152,26 @@ namespace Localizer
             }
         }
 
+        public async void ApplyLocalize()
+        {
+            // リトライ処理
+            for (int i = 0; i < retryCount; i++)
+            {
+                try
+                {
+                    ApplyLoclizedText().Forget();
+                    ApplyFont().Forget();
+                    break;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.Log($"エラーが発生したため、リトライします。:{e.Message}");
+                    await UniTask.Delay(retryDuration);
+                    continue;
+                }
+            }
+        }
+
         private void OnTextChangedEvent(string text)
         {
             Debug.Log($"テキストが変更されました。{text}");
@@ -228,7 +248,7 @@ namespace Localizer
             var tmpros = Resources.FindObjectsOfTypeAll(typeof(TMP_Text)) as TMP_Text[];
             foreach(var tmpro in tmpros)
             {
-                Debug.Log($"テキスト翻訳中:{tmpro.name}");
+                Debug.Log($"テキスト翻訳中:{tmpro.name}-{tmpro.text}");
                 LocalizeComponent localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
 
                 if(localizeComponent == null)

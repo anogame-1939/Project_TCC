@@ -223,6 +223,7 @@ Transform:
   - {fileID: 2632653598486671384}
   - {fileID: 5323249719527550746}
   - {fileID: 6612553358768104520}
+  - {fileID: 1785502051559919943}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2781315311268038114
@@ -311,6 +312,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a5a43bd28f6a48a423636d43d8316, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &5865586510833873711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1785502051559919943}
+  - component: {fileID: 6871539816348813892}
+  m_Layer: 0
+  m_Name: GameStateHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1785502051559919943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5865586510833873711}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8086109162388240570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6871539816348813892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5865586510833873711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d205f025553f9f447a5ff9d0f64ec7cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6012029449518595477
@@ -541,6 +586,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb18e11236404cc690294c3fdf59dce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyPrefab: {fileID: 0}
+  spawnMode: 0
+  isPermanent: 0
+  eventData: {fileID: 0}
+  minSpawnTime: 15
+  maxSpawnTime: 30
 --- !u!1 &8998815975645784490
 GameObject:
   m_ObjectHideFlags: 0
