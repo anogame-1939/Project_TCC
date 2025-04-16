@@ -277,6 +277,7 @@ namespace Localizer
                     Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
                     tmpro.text = entry.LocalizedValue;
                 }
+                
             }
         }
 
