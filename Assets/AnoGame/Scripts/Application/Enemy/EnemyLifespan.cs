@@ -54,6 +54,8 @@ namespace AnoGame.Application.Enemy
 
         private void ResetState()
         {
+            SwitchSpiriteRenderers(true);
+
             // 通常のアルファ値を1にリセット
             foreach (var renderer in _spriteRenderers)
             {
@@ -160,8 +162,22 @@ namespace AnoGame.Application.Enemy
             // パーティクルが完全に消えるまでの余裕を持たせる
             yield return new WaitForSeconds(0.1f);
 
+            disappearEffect.Stop();
+
+            yield return new WaitForSeconds(1f);
+
+            SwitchSpiriteRenderers(false);
+
             // 最終的に非アクティブ化
             gameObject.SetActive(false);
+        }
+
+        private void SwitchSpiriteRenderers(bool isActive)
+        {
+            foreach (var spriteRenderer in _spriteRenderers)
+            {
+                spriteRenderer.gameObject.SetActive(isActive);
+            }
         }
 
         /// <summary>
