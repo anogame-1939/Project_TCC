@@ -96,6 +96,16 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<ForcedMovementController>().EnableForceMode();
         }
 
+        public void SetupToNormalMode()
+        {
+            _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
+            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
+            _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
+        }
+
         public void SetupToRamdomMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);

@@ -1,3 +1,4 @@
+using AnoGame.Application.Enemy;
 using AnoGame.Application.Player.Control;
 using UnityEngine;
 
@@ -49,6 +50,10 @@ namespace AnoGame.Application.Story
             if (enemyForcedMover == null) return;
 
             enemyForcedMover.DisableForceMode();
+
+            // 敵の移動を通常モードに戻す
+            // NOTE:雑にいれたけど問題があれば見直す
+            EnemySpawnManager.Instance.SetupToNormalMode();
         }
 
         private void MoveToTarget(GameObject target, bool doBackstep = false)
