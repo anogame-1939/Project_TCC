@@ -169,7 +169,7 @@ namespace AnoGame.Application.Story
         public void LoadChapter(int chapterIndex, bool useRetryPoint = false)
         {
             _currentChapterIndex = chapterIndex;
-            StoryData currentStory = _storyDataList[chapterIndex];
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
             if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
             {
                 Debug.LogError($"Invalid chapter index: {chapterIndex}");
