@@ -100,6 +100,11 @@ namespace AnoGame.Application.Player.Control
             // カメラのY軸とキャラのYawAngleの差分を取る (-180～180)
             float rawAngle = Mathf.DeltaAngle(camY, yawAngle);
 
+            if (transform.name != "Player")
+            {
+                Debug.Log($"rawAngle:{rawAngle}");
+            }
+
             // 3) Animatorのパラメーターにセット
             if (animator)
             {
