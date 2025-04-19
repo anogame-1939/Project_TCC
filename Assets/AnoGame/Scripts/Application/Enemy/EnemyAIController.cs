@@ -11,7 +11,7 @@ namespace AnoGame.Application.Enmemy.Control
 {
     public class EnemyAIController : MonoBehaviour, IForcedMoveController
     {
-        [SerializeField] private MoveControl moveControl;
+        [SerializeField] private MoveNavmeshControl moveControl;
         // プレイヤーのタグ
         [SerializeField] private string playerTag = "Player";
 
@@ -40,7 +40,7 @@ namespace AnoGame.Application.Enmemy.Control
         {
             if (moveControl == null)
             {
-                moveControl = GetComponent<MoveControl>();
+                moveControl = GetComponent<MoveNavmeshControl>();
             }
 
             // NavMeshAgent の取得
@@ -113,8 +113,7 @@ namespace AnoGame.Application.Enmemy.Control
 
             if (player != null)
             {
-                Vector3 targetPosition = player.transform.position;
-                agent.SetDestination(targetPosition);
+                moveControl.SetTargetPosition(player.transform.position);
 
                 // Debug.Log($"Player position: {targetPosition}");
             }
@@ -163,11 +162,11 @@ namespace AnoGame.Application.Enmemy.Control
             Vector2 snappedInput = SnapToKeyboardDirections(leftStickInput, 0.5f);
 
             // 向き更新用に一時的に入力を送る
-            moveControl.Move(snappedInput);
+            // moveControl.Move(snappedInput);
 
             // 0.01秒待ってから入力をクリア（必要に応じて調整）
             yield return new WaitForSeconds(0.1f);
-            moveControl.Move(Vector2.zero);
+            // moveControl.Move(Vector2.zero);
         }
 
         /// <summary>
