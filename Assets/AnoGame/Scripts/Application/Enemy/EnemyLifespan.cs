@@ -252,15 +252,29 @@ namespace AnoGame.Application.Enemy
             // 既存の破壊タイマーを停止
             StopDestroyTimer();
 
-            // 部分フェードアウト開始時にパーティクルを再生
-            if (disappearEffect2 != null)
+            if (settings.isNormal)
             {
-                disappearEffect2.gameObject.SetActive(true);
-                disappearEffect2.Play();
+                // 部分フェードアウト開始時にパーティクルを再生
+                if (disappearEffect != null)
+                {
+                    disappearEffect.gameObject.SetActive(true);
+                    disappearEffect.Play();
+                }
+            }
+            else
+            {
+                // 部分フェードアウト開始時にパーティクルを再生
+                if (disappearEffect2 != null)
+                {
+                    disappearEffect2.gameObject.SetActive(true);
+                    disappearEffect2.Play();
+                }
             }
 
+
+
             // アウトラインカラーを一度だけ設定（必要ならコルーチン内で補間も可能）
-            foreach (var renderer in _spriteRenderers)
+                foreach (var renderer in _spriteRenderers)
             {
                 Material mat = renderer.material;
                 if (mat.HasProperty("_OutlineColor"))
@@ -382,10 +396,15 @@ namespace AnoGame.Application.Enemy
             }
 
             // 部分フェードアウト開始時にパーティクルを再生
+            if (disappearEffect != null)
+            {
+                disappearEffect.Stop();
+            }
+
+            // 部分フェードアウト開始時にパーティクルを再生
             if (disappearEffect2 != null)
             {
                 disappearEffect2.Stop();
-                // disappearEffect2.gameObject.SetActive(false);
             }
         }
     }
