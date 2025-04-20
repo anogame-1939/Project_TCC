@@ -61,6 +61,24 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+        public void SetStoryMode()
+        {
+            spawnMode = SpawnerMode.Story;
+            spawnManager.SetupToStoryMode();
+        }
+
+        public void SetNormalMode()
+        {
+            spawnMode = SpawnerMode.Story;
+            spawnManager.SetupToNormalMode();
+        }
+
+        public void SetRandomMode()
+        {
+            spawnMode = SpawnerMode.Random;
+            spawnManager.SetupToRamdomMode();
+        }
+
         /// <summary>
         /// 外部から呼び出す敵生成開始メソッド
         /// </summary>
@@ -171,7 +189,7 @@ namespace AnoGame.Application.Enemy
 
 
         /// <summary>
-        /// 雑だけど怪異を部分的にフェードインさせるメソッド
+        /// 雑だけど怪異を部分的にフェードアウトさせるメソッド
         /// </summary>
         /// <param name="settings"></param>
         public void ApFadeToPartialStatepear(PartialFadeSettings settings)

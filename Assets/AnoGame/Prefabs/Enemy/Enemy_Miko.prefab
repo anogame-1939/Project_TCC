@@ -1227,7 +1227,7 @@ GameObject:
   - component: {fileID: 2145959727201834453}
   - component: {fileID: 9038040152966903953}
   m_Layer: 0
-  m_Name: Particle System
+  m_Name: Particle System-Normal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6431,6 +6431,8 @@ MonoBehaviour:
   spriteRenderer: {fileID: 0}
   characterBrain: {fileID: 6182930195229746077}
   characterSettings: {fileID: 8237711469134898448}
+  useAngleSnap: 1
+  snapStep: 45
 --- !u!114 &7179800872246753123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6448,6 +6450,8 @@ MonoBehaviour:
   speedThreshold: 0.1
   animatorChildIndex: 0
   animatorBoolParam: IsMove
+  isChasing: 0
+  isStoryMode: 0
 --- !u!114 &5410025904601978029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6476,7 +6480,7 @@ GameObject:
   - component: {fileID: 291395081883702230}
   - component: {fileID: 1821282061756802229}
   m_Layer: 0
-  m_Name: Particle System_1
+  m_Name: "Particle System-\u6210\u4ECF"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

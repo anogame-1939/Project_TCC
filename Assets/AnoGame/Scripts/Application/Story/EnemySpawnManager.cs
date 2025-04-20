@@ -100,7 +100,7 @@ namespace AnoGame.Application.Enemy
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
-            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
