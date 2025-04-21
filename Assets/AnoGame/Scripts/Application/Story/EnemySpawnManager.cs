@@ -10,11 +10,6 @@ using Unity.TinyCharacterController.Brain;
 using System.Collections;
 using AnoGame.Application.Player.Control;
 using AnoGame.Application.Enmemy.Control;
-using Unity.TinyCharacterController.Core;
-
-
-
-
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -40,6 +35,8 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private GameObject enemyPrefab;
         [SerializeField] private float moveDelay = 3.0f;  // 出現前の待機時間（移動猶予）
         [SerializeField] private float destroyDelay = 5.0f;
+        [SerializeField] private PartialFadeSettings destroyFadeSettings;
+
         private GameObject _currentEnemyInstance;
         public GameObject CurrentEnemyInstance => _currentEnemyInstance;
         private EnemyController _currentEnemyController;
@@ -55,7 +52,6 @@ namespace AnoGame.Application.Enemy
             // SpawnEnemyAtStart();
         }
 
-        // TODO:チャプター毎に生成する怪異を付け替える
         public void InitializeEnemy()
         {
             if (enemyPrefab == null)
@@ -67,6 +63,7 @@ namespace AnoGame.Application.Enemy
             // 既存の敵を破棄
             if (_currentEnemyInstance != null)
             {
+                Debug.Log("既存の敵を破棄");
                 StartCoroutine(DestroyCor(_currentEnemyInstance));
                 _currentEnemyController = null;
             }
@@ -121,15 +118,58 @@ namespace AnoGame.Application.Enemy
             StartCoroutine(DestroyCor(_currentEnemyInstance));
         }
 
+
         private IEnumerator DestroyCor(GameObject enemyObject)
         {
-            enemyObject.GetComponent<EnemyHitDetector>().enabled = false;
-            enemyObject.GetComponent<EnemyLifespan>().enabled = true;
-            enemyObject.GetComponent<EnemyLifespan>().TriggerFadeOutAndDestroy();
+            if (enemyObject == null) yield break;
 
-            yield return new WaitForSeconds(destroyDelay);
-            Destroy(enemyObject);
+            // ① これ以上当たり判定や AI が動かないように停止
+            var hit  = enemyObject.GetComponent<EnemyHitDetector>();
+            if (hit) hit.enabled = false;
+
+            var ai   = enemyObject.GetComponent<EnemyAIController>();
+            if (ai)  ai.enabled  = false;
+
+            // ② Lifespan による部分フェード開始
+            var life = enemyObject.GetComponent<EnemyLifespan>();
+            if (life == null)
+            {
+                Destroy(enemyObject);                     // 保険
+                yield break;
+            }
+
+            life.enabled = true;                         // 無効になっている場合に備えて
+            life.FadeToPartialState(destroyFadeSettings);// ←ここで溶け始める
+
+            // ③ 部分フェードが終わるまで待機
+            yield return new WaitForSeconds(destroyFadeSettings.duration);
+
+            // ④ 残りを完全に溶かす
+            life.CompletePartialFadeOut(0.5f);           // 0.5 秒で完全溶解
+            yield return new WaitForSeconds(0.7f);       // 色残り防止に少し余裕を取る
+
+            Destroy(enemyObject);                        // ⑤ 実体を破棄
         }
+
+        private IEnumerator DuplicateAndFade(GameObject enemyObject)
+        {
+            // 本体を複製（レンダラーとパーティクルだけで十分ならそれら以外の
+            // Component を Remove して負荷を下げても OK）
+            var corpse = Instantiate(enemyObject, enemyObject.transform.position, enemyObject.transform.rotation);
+
+            // 本体はすぐ非表示にする
+            enemyObject.SetActive(false);
+
+            // コピーモデルにフェード処理を適用
+            var life = corpse.AddComponent<EnemyLifespan>();
+            life.FadeToPartialState(destroyFadeSettings);
+            yield return new WaitForSeconds(destroyFadeSettings.duration);
+            life.CompletePartialFadeOut(0.5f);
+            yield return new WaitForSeconds(0.7f);
+
+            Destroy(corpse);
+        }
+
 
         public void SetEnemyPrefab(GameObject prefab)
         {
@@ -287,30 +327,6 @@ namespace AnoGame.Application.Enemy
         public void PlaySpawnedSound()
         {
             GetComponent<AudioSource>().Play();
-        }
-
-        // ※ 既存の SpawnEnemyAt メソッドは、SpawnEnemyCoroutine に処理を分散しています。
-        private void SpawnEnemyAt(Vector3 position, Quaternion rotation, bool isPermanent = false)
-        {
-            _currentEnemyInstance.SetActive(true);
-            _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
-
-            if (isPermanent)
-            {
-                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = false;
-            }
-            else
-            {
-                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = true;
-            }
-            
-            if (_currentEnemyController == null)
-            {
-                Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
-            }
-
-            _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
-            Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
 
         public void SetEventData(EventData eventData)

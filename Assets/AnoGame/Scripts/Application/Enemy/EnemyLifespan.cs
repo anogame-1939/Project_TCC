@@ -274,7 +274,7 @@ namespace AnoGame.Application.Enemy
 
 
             // アウトラインカラーを一度だけ設定（必要ならコルーチン内で補間も可能）
-                foreach (var renderer in _spriteRenderers)
+            foreach (var renderer in _spriteRenderers)
             {
                 Material mat = renderer.material;
                 if (mat.HasProperty("_OutlineColor"))
