@@ -62,6 +62,8 @@ namespace AnoGame.Application.Player
             PlayerSpawnManager.Instance.SpawnPlayerAtRetryPoint();
             // NOTE:エネミーもリトライポイントに移動させるのはいいが、ここでいいのか。。
             EnemySpawnManager.Instance.SpawnEnemyAtRetryPoint();
+
+            GameManager2.Instance.InvokeGameOver();
         }
 
         // HP回復メソッド

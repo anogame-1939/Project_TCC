@@ -24,6 +24,9 @@ namespace AnoGame.Application.Event
         public async void OnGameOver()
         {
             UnityEngine.Debug.Log("OnGameOver");
+
+            GameStateManager.Instance.SetState(GameState.GameOver);
+
             GameManager2.Instance.InvokeGameOver();
 
             return;
@@ -59,6 +62,8 @@ namespace AnoGame.Application.Event
 
             // イベントをリセット
             _eventService.SetCleadEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+
+            GameStateManager.Instance.SetState(GameState.Gameplay);
         }
     }
 }
