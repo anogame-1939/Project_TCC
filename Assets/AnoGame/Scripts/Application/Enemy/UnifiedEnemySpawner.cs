@@ -196,7 +196,7 @@ namespace AnoGame.Application.Enemy
         {
             if (settings != null)
             {
-                // HACK:雑だけどここでヒットディテクタを無効化しておく
+                // HACK:雑だけどここでEnemyHitDetectorを無効化しておく
                 var enemyHitDetector =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyHitDetector>();
                 enemyHitDetector.SetEnabled(false);
 

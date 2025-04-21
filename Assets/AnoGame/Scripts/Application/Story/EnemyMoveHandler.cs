@@ -1,4 +1,5 @@
 using AnoGame.Application.Enemy;
+using AnoGame.Application.Enmemy.Control;
 using AnoGame.Application.Player.Control;
 using UnityEngine;
 
@@ -41,7 +42,12 @@ namespace AnoGame.Application.Story
             ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
             if (enemyForcedMover == null) return;
 
-            enemyForcedMover.EnableForceMode();
+            // enemyForcedMover.EnableForceMode();
+            // enemyForcedMover.enabled = false;
+            // enemyForcedMover.GetComponent<EnemyAIController>().enabled = false;
+
+            EnemySpawnManager.Instance.SetupToStoryMode();
+
         }
 
         public void DisableForceMode()
@@ -49,7 +55,9 @@ namespace AnoGame.Application.Story
             ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
             if (enemyForcedMover == null) return;
 
-            enemyForcedMover.DisableForceMode();
+            // enemyForcedMover.DisableForceMode();
+            enemyForcedMover.enabled = true;
+            enemyForcedMover.GetComponent<EnemyAIController>().enabled = true;
 
             // 敵の移動を通常モードに戻す
             // NOTE:雑にいれたけど問題があれば見直す
