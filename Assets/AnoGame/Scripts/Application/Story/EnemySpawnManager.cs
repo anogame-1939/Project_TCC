@@ -64,7 +64,8 @@ namespace AnoGame.Application.Enemy
             if (_currentEnemyInstance != null)
             {
                 Debug.Log("既存の敵を破棄");
-                StartCoroutine(DestroyCor(_currentEnemyInstance));
+                var tmpEnemyInstance = _currentEnemyInstance;
+                StartCoroutine(DestroyCor(tmpEnemyInstance));
                 _currentEnemyController = null;
             }
 
@@ -86,6 +87,7 @@ namespace AnoGame.Application.Enemy
         public void SetupToStoryMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(true);
+            // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
@@ -106,6 +108,7 @@ namespace AnoGame.Application.Enemy
         public void SetupToRamdomMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
+            // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
@@ -128,7 +131,11 @@ namespace AnoGame.Application.Enemy
             if (hit) hit.enabled = false;
 
             var ai   = enemyObject.GetComponent<EnemyAIController>();
-            if (ai)  ai.enabled  = false;
+            if (ai)
+            {
+                ai.StopChasing();
+                ai.enabled = false;
+            }
 
             // ② Lifespan による部分フェード開始
             var life = enemyObject.GetComponent<EnemyLifespan>();
@@ -146,7 +153,7 @@ namespace AnoGame.Application.Enemy
 
             // ④ 残りを完全に溶かす
             life.CompletePartialFadeOut(0.5f);           // 0.5 秒で完全溶解
-            yield return new WaitForSeconds(0.7f);       // 色残り防止に少し余裕を取る
+            yield return new WaitForSeconds(10f);       // 色残り防止に少し余裕を取る
 
             Destroy(enemyObject);                        // ⑤ 実体を破棄
         }

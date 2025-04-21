@@ -201,7 +201,7 @@ namespace AnoGame.Application.Enmemy.Control
             return new Vector2(x, y);
         }
 
-        public void OnForcedMoveBegin()
+        public void StopChasing()
         {
             // ここではスクリプト自体を無効化
             this.enabled = false;
@@ -211,7 +211,7 @@ namespace AnoGame.Application.Enmemy.Control
         /// <summary>
         /// 強制移動が完了したら呼び出して、PlayerActionControllerを再有効化する
         /// </summary>
-        public void OnForcedMoveEnd()
+        public void StartChasing()
         {
             this.enabled = true;
             agent.isStopped = false;

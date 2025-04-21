@@ -11,8 +11,8 @@ namespace AnoGame.Application.Player.Control
     /// </summary>
     public interface IForcedMoveController
     {
-        void OnForcedMoveBegin();
-        void OnForcedMoveEnd();
+        void StopChasing();
+        void StartChasing();
     }
 
     [RequireComponent(typeof(PlayerInput))]
@@ -216,7 +216,7 @@ namespace AnoGame.Application.Player.Control
         /// <summary>
         /// 強制移動を始める前に呼び出して、PlayerActionControllerを無効化する
         /// </summary>
-        public void OnForcedMoveBegin()
+        public void StopChasing()
         {
             // ここではスクリプト自体を無効化
             this.enabled = false;
@@ -228,7 +228,7 @@ namespace AnoGame.Application.Player.Control
         /// <summary>
         /// 強制移動が完了したら呼び出して、PlayerActionControllerを再有効化する
         /// </summary>
-        public void OnForcedMoveEnd()
+        public void StartChasing()
         {
             this.enabled = true;
 

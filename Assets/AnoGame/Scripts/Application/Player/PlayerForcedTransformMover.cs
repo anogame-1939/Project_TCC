@@ -47,7 +47,7 @@ namespace AnoGame.Application.Player.Control
             PlayerActionController pac = GetComponent<PlayerActionController>();
             if (pac != null)
             {
-                pac.OnForcedMoveBegin();
+                pac.StopChasing();
             }
 
             // コルーチン開始
@@ -92,7 +92,7 @@ namespace AnoGame.Application.Player.Control
             // PlayerActionControllerを再有効化
             if (pac != null)
             {
-                pac.OnForcedMoveEnd();
+                pac.StartChasing();
             }
 
             // アニメーション終了

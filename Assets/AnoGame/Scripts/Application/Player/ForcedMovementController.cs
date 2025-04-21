@@ -91,7 +91,7 @@ namespace AnoGame.Application.Player.Control
         public void EnableForceMode()
         {
             if (actionController != null)
-                actionController.OnForcedMoveBegin();
+                actionController.StopChasing();
             if (cameraAngleController != null)
                 cameraAngleController.OnForcedMoveBegin();
         }
@@ -99,7 +99,7 @@ namespace AnoGame.Application.Player.Control
         public void DisableForceMode()
         {
             if (actionController != null)
-                actionController.OnForcedMoveEnd();
+                actionController.StartChasing();
             if (cameraAngleController != null)
                 cameraAngleController.OnForcedMoveEnd();
         }
