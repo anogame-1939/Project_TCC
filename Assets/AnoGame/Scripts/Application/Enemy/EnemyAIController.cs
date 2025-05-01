@@ -70,7 +70,6 @@ namespace AnoGame.Application.Enmemy.Control
             this.isStoryMode = isStoryMode;
         }
 
-
         /// <summary>
         /// Bolt の「On Update」相当
         /// 毎フレームごとに速度をチェックしてアニメーターに反映する
@@ -217,7 +216,7 @@ namespace AnoGame.Application.Enmemy.Control
             agent.isStopped = false;
         }
 
-        public void SpawnNearPlayer(Vector3 playerPosition, float spawnDistance = 5f)
+        public IEnumerator SpawnNearPlayer(Vector3 playerPosition, float spawnDistance = 5f, float waitTIme = 3f)
         {
             Vector3 randomDirection = Random.insideUnitSphere * spawnDistance;
             randomDirection.y = 0;
@@ -233,6 +232,8 @@ namespace AnoGame.Application.Enmemy.Control
             {
                 Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
             }
+            yield return new WaitForSeconds(waitTIme);
+
         }
 
 

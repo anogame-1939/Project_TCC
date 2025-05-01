@@ -311,12 +311,14 @@ namespace AnoGame.Application.Enemy
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
             con.SetChasing(true);
-            con.SpawnNearPlayer(playerPosition);
 
+            Debug.Log("プレイヤーの近くに敵を出現させます。");
+            yield return con.SpawnNearPlayer(playerPosition);
 
-            Debug.Log("SpawnEnemyCoroutine-SpawnEnemyNearPlayerCoroutine");
             // 出現前エフェクト・効果音の再生
             PlaySpawnedSound();
+
+            Debug.Log("出現前エフェクト・効果音を再生しました。");
             // 出現前のエフェクトの待機（moveDelay秒）
             yield return new WaitForSeconds(moveDelay);
 
@@ -344,8 +346,10 @@ namespace AnoGame.Application.Enemy
 
         public void EnabaleEnemy()
         {
-            // _currentEnemyController.EnableBrain();
+            // TODO:このやり方だと管理がだるいので、EnemyAIControllerの有効化処理で一元管理する
+            _currentEnemyController.EnableBrain();
             _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
+
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
         }
 
