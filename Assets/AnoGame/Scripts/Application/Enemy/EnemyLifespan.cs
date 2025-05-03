@@ -340,6 +340,86 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+
+        /// <summary>
+        /// フェード方向
+        /// </summary>
+        public enum FadeMode
+        {
+            Out,    // DissolveAmount を上げる ＝ 溶かして消す
+            In      // DissolveAmount を下げる ＝ 元に戻す
+        }
+
+        /// <summary>
+        /// PartialFadeSettings に従ってフェードを実行し、完了するまで待機するコルーチン。
+        /// 例:  フェードアウト →  yield return StartCoroutine(PlayPartialFade(settings, FadeMode.Out));
+        ///      フェードイン   →  yield return StartCoroutine(PlayPartialFade(settings, FadeMode.In));
+        /// </summary>
+        public IEnumerator PlayPartialFade(PartialFadeSettings settings, FadeMode mode)
+        {
+            if (settings == null) yield break;          // 設定が無ければ何もしない
+
+            // ── アウトライン色を設定（必要に応じて）
+            foreach (var sr in _spriteRenderers)
+            {
+                var mat = sr.material;
+                if (mat.HasProperty("_OutlineColor"))
+                    mat.SetColor("_OutlineColor", settings.outlineColor);
+
+                // フェードインの時は強制的にDissolveAmountを1にする
+                if (mode == FadeMode.In)
+                {
+                    if (mat.HasProperty("_DissolveAmount"))
+                        mat.SetFloat("_DissolveAmount", 1f);
+                }
+            }
+
+            // ── 開始／終了の DissolveAmount を決定
+            float[] startValues = new float[_spriteRenderers.Length];
+            float[] endValues = new float[_spriteRenderers.Length];
+
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                var mat = _spriteRenderers[i].material;
+                float current = mat.HasProperty("_DissolveAmount") ? mat.GetFloat("_DissolveAmount") : 0f;
+
+                // フェードアウトの場合、現在の値を取得
+                startValues[i] = current;
+                endValues[i] = settings.targetAlpha;
+            }
+
+            // ── フェード本体
+            float elapsed = 0f;
+            while (elapsed < settings.duration)
+            {
+                Debug.Log($"フェード中: {elapsed}/{settings.duration}");
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / settings.duration);
+
+                for (int i = 0; i < _spriteRenderers.Length; i++)
+                {
+                    var mat = _spriteRenderers[i].material;
+                    if (mat.HasProperty("_DissolveAmount"))
+                    {
+                        float val = Mathf.Lerp(startValues[i], endValues[i], t);
+                        mat.SetFloat("_DissolveAmount", val);
+                    }
+                }
+
+                
+                yield return null;  // ‑‑ ここで 1フレーム待機
+            }
+
+            // ── 終了値を固定
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                var mat = _spriteRenderers[i].material;
+                if (mat.HasProperty("_DissolveAmount"))
+                    mat.SetFloat("_DissolveAmount", endValues[i]);
+            }
+        }
+
+
         /// <summary>
         /// 部分的なフェードアウト状態から残りを完全にフェードアウトさせる処理
         /// 現在の _DissolveAmount の値から 1（完全溶解）になるまで補間します。

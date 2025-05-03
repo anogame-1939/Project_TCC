@@ -25,8 +25,7 @@ namespace AnoGame.Application.Enemy
         [SerializeField]
         private SpawnerMode spawnMode = SpawnerMode.Story;
 
-        [SerializeField]
-        private bool isPermanent = false;
+
 
         [SerializeField]
         private EventData eventData;
@@ -149,21 +148,29 @@ namespace AnoGame.Application.Enemy
             {
                 // ランダムな待機時間を設定
                 float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
-
                 Debug.Log("RandomSpawnCoroutine - wait" + waitTime);
                 yield return new WaitForSeconds(waitTime);
+
                 Debug.Log("RandomSpawnCoroutine - start" + waitTime);
+
+                
 
                 // プレイヤーをタグから検索し、近くに敵をスポーン
                 GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
+
                 if (player != null)
                 {
-                    spawnManager.SpawnEnemyNearPlayer(player.transform.position);
+                    yield return spawnManager.SetPositionNearPlayer(player.transform.position);
+                    yield return spawnManager.PlayrSpawnedEffect();
+                    yield return spawnManager.ActivateEnamy();
+
                 }
                 else
                 {
                     Debug.LogError("プレイヤーオブジェクトが見つかりません。");
                 }
+
+                // スポーン時の
 
                 // ランダムモードでは、敵の追跡やタイムアウト消滅など、通常の機能を有効にする
                 // 脳の有効化や移動開始処理を実施

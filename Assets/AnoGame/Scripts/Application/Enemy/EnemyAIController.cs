@@ -81,7 +81,7 @@ namespace AnoGame.Application.Enmemy.Control
                 // ストーリーモードの場合は、プレイヤーを追いかけない
                 return;
             }
-            Debug.Log($"EnemyAIController Update - IsChasing: {isChasing}, {agent.velocity.magnitude}");
+            // Debug.Log($"EnemyAIController Update - IsChasing: {isChasing}, {agent.velocity.magnitude}");
 
 
             // 1. オブジェクトの速度（NavMeshAgent の速度）を取得し、アニメーターの Bool を設定

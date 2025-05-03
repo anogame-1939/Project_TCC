@@ -35,6 +35,11 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private GameObject enemyPrefab;
         [SerializeField] private float moveDelay = 3.0f;  // 出現前の待機時間（移動猶予）
         [SerializeField] private float destroyDelay = 5.0f;
+
+        [SerializeField]
+        private PartialFadeSettings fadeOutSettings;
+        [SerializeField]
+        private PartialFadeSettings fadeInSettings;
         [SerializeField] private PartialFadeSettings destroyFadeSettings;
 
         private GameObject _currentEnemyInstance;
@@ -81,7 +86,7 @@ namespace AnoGame.Application.Enemy
             var targetScene = StoryManager.Instance.MainScene;
             SceneManager.MoveGameObjectToScene(_currentEnemyInstance, targetScene);
 
-            _currentEnemyInstance.SetActive(false); // 初期状態では非アクティブにする
+            // _currentEnemyInstance.SetActive(false); // 初期状態では非アクティブにする
         }
 
         public void SetupToStoryMode()
@@ -108,7 +113,7 @@ namespace AnoGame.Application.Enemy
         public void SetupToRamdomMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
-            // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
@@ -333,9 +338,49 @@ namespace AnoGame.Application.Enemy
             Debug.Log("プレイヤー付近に敵を出現させました。");
         }
 
+
+
+        // プレイヤーの近くに配置
+        // 出現エフェクトの再生
+        // 敵をアクティブ化
+        // ↑この順番で処理させる
+
+        public IEnumerator SetPositionNearPlayer(Vector3 playerPosition)
+        {
+            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
+            con.SetChasing(true);
+
+            Debug.Log("プレイヤーの近くに敵を出現させます。");
+            yield return con.SpawnNearPlayer(playerPosition);
+        }
+
         public void PlaySpawnedSound()
         {
             GetComponent<AudioSource>().Play();
+        }
+
+        public IEnumerator PlayrSpawnedEffect()
+        {
+            // 出現前エフェクト・効果音の再生
+            PlaySpawnedSound();
+            
+            Debug.Log("出現前エフェクト・効果音を再生しました。");
+            _currentEnemyInstance.gameObject.SetActive(true);
+            yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayPartialFade(fadeOutSettings, EnemyLifespan.FadeMode.In);
+
+            // 出現前のエフェクトの待機（moveDelay秒）
+            yield return new WaitForSeconds(moveDelay);
+        }
+
+        public IEnumerator ActivateEnamy()
+        {
+            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
+            con.SetChasing(true);
+
+            Debug.Log("プレイヤーの近くに敵を出現させます。");
+            yield return null;
+
+            // _currentEnemyInstance.SetActive(true);
         }
 
         public void SetEventData(EventData eventData)
