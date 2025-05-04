@@ -95,7 +95,7 @@ namespace AnoGame.Application.Enemy
             // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = false;
             // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
-            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().EnableForceMode();
         }
@@ -105,7 +105,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
-            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
         }
@@ -119,7 +119,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
-            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
         }
@@ -383,7 +383,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().Activate();
             
-            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
 
             
 

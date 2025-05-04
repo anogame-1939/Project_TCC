@@ -5,18 +5,33 @@ namespace AnoGame.Application.Enemy
 {
     public class EnemyHitDetector : MonoBehaviour
     {
-        [SerializeField] bool on = true;
+        [SerializeField] bool _isActive = true;
         [SerializeField] private int damage = 1;
         
         // イベント追加
         public event System.Action OnPlayerHit;
 
+        private void Start()
+        {
+            Deactivate();
+        }
+
+        public void Activate()
+        {
+            _isActive = true;
+        }
+
+        public void Deactivate()
+        {
+            _isActive = false;
+        }
+
         private void OnTriggerEnter(Collider other)
         {
-            if (!on) return;
+            if (!_isActive) return;
             Debug.Log($"enable:{enabled} - hit");
             if (!other.CompareTag("Player")) return;
-            
+
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
@@ -26,9 +41,6 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        public void SetEnabled(bool enabled)
-        {
-            on = enabled;
-        }
+
     }
 }

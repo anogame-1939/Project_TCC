@@ -219,7 +219,7 @@ namespace AnoGame.Application.Enemy
             {
                 // HACK:雑だけどここでヒットディテクタを無効化しておく
                 var enemyHitDetector =  _spawnManager.CurrentEnemyInstance.GetComponent<EnemyHitDetector>();
-                enemyHitDetector.SetEnabled(false);
+                enemyHitDetector.Deactivate();
 
                 var enemyLifespan =  _spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
                 // enemyLifespan.enabled = true;

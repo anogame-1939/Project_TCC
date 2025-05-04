@@ -206,7 +206,7 @@ namespace AnoGame.Application.Enemy
             {
                 // HACK:雑だけどここでEnemyHitDetectorを無効化しておく
                 var enemyHitDetector =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyHitDetector>();
-                enemyHitDetector.SetEnabled(false);
+                enemyHitDetector.Deactivate();
 
                 var enemyLifespan =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
                 // enemyLifespan.enabled = true;
