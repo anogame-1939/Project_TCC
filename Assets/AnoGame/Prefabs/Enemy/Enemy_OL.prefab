@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8458701727734905018}
   - component: {fileID: 7894980580834705688}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Sprite_Enemy_OL_Shadow1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 2903959303063495518}
   - component: {fileID: 7886329656128504222}
   - component: {fileID: 2941988301402983442}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: New VFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -209,7 +209,7 @@ GameObject:
   m_Component:
   - component: {fileID: 302076044325301072}
   - component: {fileID: 1561201729266329964}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Sprite_Enemy_OL_Shadow2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -308,7 +308,7 @@ GameObject:
   - component: {fileID: 1555985007829630829}
   - component: {fileID: 1434583519645761743}
   - component: {fileID: 7066592700834054209}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -479,7 +479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f251a41384cace45b7bf2b85bf61df0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  on: 1
+  _isActive: 1
   damage: 1
 --- !u!135 &8545826120565574306
 SphereCollider:
@@ -630,7 +630,7 @@ GameObject:
   m_Component:
   - component: {fileID: 131131619860660588}
   - component: {fileID: 3983856807045630392}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Sprite_Enemy_OL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -718,7 +718,7 @@ GameObject:
   - component: {fileID: 7665162067455944546}
   - component: {fileID: 6670748954792000966}
   - component: {fileID: 4361078176742228339}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Enemy_OL_Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -931,6 +931,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "Particle System-\u6D88\u6EC5"
       objectReference: {fileID: 0}
+    - target: {fileID: 7511363964571705976, guid: 41f5b99baac3f5b4f88208db1e08d399, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -957,6 +961,10 @@ PrefabInstance:
     - target: {fileID: 2901324676990293315, guid: baf8c8574a911ef4084459b588131f70, type: 3}
       propertyPath: m_Name
       value: "Particle System-\u51FA\u73FE"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2901324676990293315, guid: baf8c8574a911ef4084459b588131f70, type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 7227854239005367329, guid: baf8c8574a911ef4084459b588131f70, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1028,6 +1036,10 @@ PrefabInstance:
     - target: {fileID: 6171239310220575537, guid: 9c8ca5aada3df164080dedc58f3734d7, type: 3}
       propertyPath: m_Name
       value: "Particle System-\u6210\u4ECF"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6171239310220575537, guid: 9c8ca5aada3df164080dedc58f3734d7, type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 6233764849461484684, guid: 9c8ca5aada3df164080dedc58f3734d7, type: 3}
       propertyPath: m_LocalPosition.x

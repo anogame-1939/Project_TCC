@@ -19,11 +19,17 @@ namespace AnoGame.Application.Enemy
         public void Activate()
         {
             _isActive = true;
+            Physics.IgnoreLayerCollision( LayerMask.NameToLayer("Player"),
+                                          LayerMask.NameToLayer("Enemy"),
+                                          false);
         }
 
         public void Deactivate()
         {
             _isActive = false;
+            Physics.IgnoreLayerCollision( LayerMask.NameToLayer("Player"),
+                                          LayerMask.NameToLayer("Enemy"),
+                                          true);
         }
 
         private void OnTriggerEnter(Collider other)
