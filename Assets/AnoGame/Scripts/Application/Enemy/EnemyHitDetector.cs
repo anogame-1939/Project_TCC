@@ -14,7 +14,7 @@ namespace AnoGame.Application.Enemy
         private void OnTriggerEnter(Collider other)
         {
             if (!on) return;
-            Debug.Log("hit");
+            Debug.Log($"enable:{enabled} - hit");
             if (!other.CompareTag("Player")) return;
             
             var damageable = other.GetComponent<IDamageable>();
