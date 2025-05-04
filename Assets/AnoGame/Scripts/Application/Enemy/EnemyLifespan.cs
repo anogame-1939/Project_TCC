@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 using Cysharp.Threading.Tasks.Triggers;
+using Unity.VisualScripting;
 
 namespace AnoGame.Application.Enemy
 {
@@ -23,6 +24,9 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private ParticleSystem fadeInEffect;
         [SerializeField] private ParticleSystem fadeoutEffect;
         [SerializeField] private ParticleSystem disappearEffect;
+        [SerializeField] private GameObject[] shadowObjects;
+        [SerializeField] private AnimationCurve shadowScaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] private float shadowScaleDuration = 0.35f;
 
         private const string DissolveAmountProperty = "_DissolveAmount";
         private const string OutlineColorProperty = "_OutlineColor";
@@ -62,16 +66,19 @@ namespace AnoGame.Application.Enemy
 
         public void Activate()
         {
-            // 非表示状態とする
+            // 表示状態とする
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 Material mat = _spriteRenderers[i].material;
                 if (mat.HasProperty(DissolveAmountProperty))
                 {
                     // 現在の値から targetDissolve までを補間
-                    mat.SetFloat(DissolveAmountProperty, 1f);
+                    mat.SetFloat(DissolveAmountProperty, 0f);
                 }
             }
+
+            ShowShadow();
+            StopAllParticle();
         }
 
         public void Deactivate()
@@ -85,6 +92,24 @@ namespace AnoGame.Application.Enemy
                     // 現在の値から targetDissolve までを補間
                     mat.SetFloat(DissolveAmountProperty, 1f);
                 }
+            }
+
+            HideShadow();
+        }
+
+        private void ShowShadow()
+        {
+            for (int i = 0; i < shadowObjects.Length; i++)
+            {
+                shadowObjects[i].transform.localScale = Vector3.one;
+            }
+        }
+
+        private void HideShadow()
+        {
+            for (int i = 0; i < shadowObjects.Length; i++)
+            {
+                shadowObjects[i].transform.localScale = Vector3.zero;
             }
         }
 
@@ -447,13 +472,26 @@ namespace AnoGame.Application.Enemy
 
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
+                    float val = Mathf.Lerp(startValues[i], endValues[i], t);
+
                     var mat = _spriteRenderers[i].material;
                     if (mat.HasProperty(DissolveAmountProperty))
                     {
-                        float val = Mathf.Lerp(startValues[i], endValues[i], t);
                         mat.SetFloat(DissolveAmountProperty, val);
                     }
+
+                    // 影を徐々に描画
+
+
+                    for (int j = 0; j < shadowObjects.Length; j++)
+                    {
+                        float shadowVal = shadowScaleCurve.Evaluate(val); // val を横軸にしてカーブ評価
+                        shadowObjects[j].transform.localScale = Vector3.one * shadowVal;
+                    }
                 }
+
+
+
                 yield return null;  // ‑‑ ここで 1フレーム待機
             }
 
@@ -465,6 +503,40 @@ namespace AnoGame.Application.Enemy
                     mat.SetFloat(DissolveAmountProperty, endValues[i]);
             }
 
+
+        }
+
+        /// <summary>
+        /// 影オブジェクトを shadowScaleDuration 秒でスケール1にする
+        /// </summary>
+        private IEnumerator ShadowScaleCoroutine()
+        {
+            float elapsed = 0f;
+            float[] start = shadowObjects.Select(s => s.transform.localScale.x).ToArray();
+
+            while (elapsed < shadowScaleDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / shadowScaleDuration);
+
+                // ── カーブで加速／減速を制御
+                float curveT = shadowScaleCurve.Evaluate(t);  // 0→1 の非線形補間係数
+
+                for (int i = 0; i < shadowObjects.Length; i++)
+                {
+                    float scale = Mathf.Lerp(start[i], 1f, curveT);
+                    shadowObjects[i].transform.localScale = Vector3.one * scale;
+                }
+                yield return null;
+            }
+
+            // 終了時に完全な 1 を保証
+            foreach (var sh in shadowObjects)
+                sh.transform.localScale = Vector3.one;
+        }
+
+        private void StopAllParticle()
+        {
             fadeInEffect.Stop();
             fadeoutEffect.Stop();
             disappearEffect.Stop();
