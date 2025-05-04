@@ -415,95 +415,74 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         public IEnumerator PlayPartialFade(PartialFadeSettings settings, FadeMode mode)
         {
-            if (settings == null) yield break;          // 設定が無ければ何もしない
+            if (settings == null) yield break;
 
-            // 部分フェードアウト開始時にパーティクルを再生
+            // --- ① 事前セットアップ（パーティクル・アウトラインなどは従来通り） ---
             if (mode == FadeMode.In)
-            {
                 fadeInEffect.Play();
-            }
-            else if (mode == FadeMode.Out)
-            {
-                if (settings.isNormal)
-                {
-                    fadeoutEffect.Play();
-                }
-                else
-                {
-                    disappearEffect.Play();
-                }
-            }
+            else
+                (settings.isNormal ? fadeoutEffect : disappearEffect).Play();
 
-            // ── アウトライン色を設定（必要に応じて）
             foreach (var sr in _spriteRenderers)
             {
                 var mat = sr.material;
                 if (mat.HasProperty(OutlineColorProperty))
                     mat.SetColor(OutlineColorProperty, settings.outlineColor);
 
-                // フェードインの時は強制的にDissolveAmountを1にする
-                if (mode == FadeMode.In)
-                {
-                    if (mat.HasProperty(DissolveAmountProperty))
-                        mat.SetFloat(DissolveAmountProperty, 1f);
-                }
+                if (mode == FadeMode.In && mat.HasProperty(DissolveAmountProperty))
+                    mat.SetFloat(DissolveAmountProperty, 1f);
             }
 
-            // ── 開始／終了の DissolveAmount を決定
-            float[] startValues = new float[_spriteRenderers.Length];
-            float[] endValues = new float[_spriteRenderers.Length];
+            // --- ② 開始／終了値を算出 ---
+            float[] startVals = new float[_spriteRenderers.Length];
+            float[] endVals   = new float[_spriteRenderers.Length];
 
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 var mat = _spriteRenderers[i].material;
-                float current = mat.HasProperty(DissolveAmountProperty) ? mat.GetFloat(DissolveAmountProperty) : 0f;
-
-                // フェードアウトの場合、現在の値を取得
-                startValues[i] = current;
-                endValues[i] = settings.targetAlpha;
+                startVals[i] = mat.HasProperty(DissolveAmountProperty)
+                            ? mat.GetFloat(DissolveAmountProperty) : 0f;
+                endVals[i]   = settings.targetAlpha;
             }
 
-            // ── フェード本体
+            // --- ③ フェード本体と影スケールを並列起動 ---
+            var dissolveCoroutine = StartCoroutine(DissolveCoroutine(startVals, endVals, settings.duration));
+            var shadowCoroutine   = StartCoroutine(ShadowScaleCoroutine());
+
+            // --- ④ 2 本とも終わるまで順に待機 ---
+            yield return dissolveCoroutine;
+            yield return shadowCoroutine;
+        }
+
+
+        /// <summary>
+        /// SpriteRenderer 群の DissolveAmount を duration 秒かけて補間する
+        /// </summary>
+        private IEnumerator DissolveCoroutine(float[] startVals, float[] endVals, float duration)
+        {
             float elapsed = 0f;
-            while (elapsed < settings.duration)
+            while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / settings.duration);
+                float t = Mathf.Clamp01(elapsed / duration);
 
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
-                    float val = Mathf.Lerp(startValues[i], endValues[i], t);
-
+                    float val = Mathf.Lerp(startVals[i], endVals[i], t);
                     var mat = _spriteRenderers[i].material;
                     if (mat.HasProperty(DissolveAmountProperty))
-                    {
                         mat.SetFloat(DissolveAmountProperty, val);
-                    }
-
-                    // 影を徐々に描画
-
-
-                    for (int j = 0; j < shadowObjects.Length; j++)
-                    {
-                        float shadowVal = shadowScaleCurve.Evaluate(val); // val を横軸にしてカーブ評価
-                        shadowObjects[j].transform.localScale = Vector3.one * shadowVal;
-                    }
                 }
-
-
-
-                yield return null;  // ‑‑ ここで 1フレーム待機
+                yield return null;
             }
 
-            // ── 終了値を固定
+            // 最終値を固定
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 var mat = _spriteRenderers[i].material;
                 if (mat.HasProperty(DissolveAmountProperty))
-                    mat.SetFloat(DissolveAmountProperty, endValues[i]);
+                    mat.SetFloat(DissolveAmountProperty, endVals[i]);
             }
-
-
         }
 
         /// <summary>
