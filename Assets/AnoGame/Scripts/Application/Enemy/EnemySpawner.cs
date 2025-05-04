@@ -145,7 +145,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyNearPlayer(position);
+                // _spawnManager.SpawnEnemyNearPlayer(position);
             }
             else
             {

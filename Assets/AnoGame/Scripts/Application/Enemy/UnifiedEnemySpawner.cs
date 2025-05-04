@@ -149,7 +149,8 @@ namespace AnoGame.Application.Enemy
                 // ランダムな待機時間を設定
                 float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
                 Debug.Log("RandomSpawnCoroutine - wait" + waitTime);
-                yield return new WaitForSeconds(waitTime);
+                // yield return new WaitForSeconds(waitTime);
+                yield return new WaitForSeconds(1f);
 
                 Debug.Log("RandomSpawnCoroutine - start" + waitTime);
 

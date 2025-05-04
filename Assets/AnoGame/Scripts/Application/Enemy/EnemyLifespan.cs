@@ -1,21 +1,31 @@
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using Cysharp.Threading.Tasks.Triggers;
 
 namespace AnoGame.Application.Enemy
 {
     public class EnemyLifespan : MonoBehaviour
     {
-        [SerializeField] private bool isPermanent = false;
+        /// <summary>
+        /// フェード方向
+        /// </summary>
+        public enum FadeMode
+        {
+            Out,    // DissolveAmount を上げる ＝ 溶かして消す
+            In      // DissolveAmount を下げる ＝ 元に戻す
+        }
+
         [SerializeField] private float minLifespan = 5f;
         [SerializeField] private float maxLifespan = 30f;
-        [SerializeField] private bool _isAlive = false;
-        [SerializeField] public bool IsAlive => _isAlive;
         [SerializeField] private float _fadeOutDuration = 1f;
         [SerializeField] private float _particleFadeOutDuration = 0.5f;
+        [SerializeField] private ParticleSystem fadeInEffect;
+        [SerializeField] private ParticleSystem fadeoutEffect;
         [SerializeField] private ParticleSystem disappearEffect;
-        [SerializeField] private ParticleSystem disappearEffect2;
 
+        private const string DissolveAmountProperty = "_DissolveAmount";
+        private const string OutlineColorProperty = "_OutlineColor";
         private SpriteRenderer[] _spriteRenderers;
         private ParticleSystem.MainModule _particleMainModule;
         public event System.Action OnLifespanExpired;
@@ -31,20 +41,57 @@ namespace AnoGame.Application.Enemy
                 Debug.LogWarning($"SpriteRendererが見つかりません: {gameObject.name}");
             }
 
-            if (disappearEffect != null)
+            _particleMainModule = fadeoutEffect.main;
+            // _particleMainModule = fadeoutEffect.main;
+        }
+
+        private void Start()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            // 初期化処理
+            fadeInEffect.Stop();
+            fadeoutEffect.Stop();
+            disappearEffect.Stop();
+
+            Deactivate();
+        }
+
+        public void Activate()
+        {
+            // 非表示状態とする
+            for (int i = 0; i < _spriteRenderers.Length; i++)
             {
-                disappearEffect.gameObject.SetActive(false);
-                _particleMainModule = disappearEffect.main;
+                Material mat = _spriteRenderers[i].material;
+                if (mat.HasProperty(DissolveAmountProperty))
+                {
+                    // 現在の値から targetDissolve までを補間
+                    mat.SetFloat(DissolveAmountProperty, 1f);
+                }
             }
         }
 
+        public void Deactivate()
+        {
+            // 非表示状態とする
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                Material mat = _spriteRenderers[i].material;
+                if (mat.HasProperty(DissolveAmountProperty))
+                {
+                    // 現在の値から targetDissolve までを補間
+                    mat.SetFloat(DissolveAmountProperty, 1f);
+                }
+            }
+        }
+
+        
+
         private void OnEnable()
         {
-            ResetState();
-            if (!isPermanent)
-            {
-                StartDestroyTimer();
-            }
         }
 
         private void OnDisable()
@@ -65,21 +112,16 @@ namespace AnoGame.Application.Enemy
 
                 // DissolveShaderのプロパティをリセット
                 Material mat = renderer.material;
-                if (mat.HasProperty("_DissolveAmount"))
+                if (mat.HasProperty(DissolveAmountProperty))
                 {
-                    mat.SetFloat("_DissolveAmount", 0f); // 0f: 溶解なし
-                }
-                if (mat.HasProperty("_OutlineColor"))
-                {
-                    // 必要に応じてデフォルト値に戻す
-                    mat.SetColor("_OutlineColor", Color.black);
+                    mat.SetFloat(DissolveAmountProperty, 1f);
                 }
             }
 
-            if (disappearEffect != null)
+            if (fadeoutEffect != null)
             {
-                disappearEffect.gameObject.SetActive(false);
-                disappearEffect.Stop();
+                fadeoutEffect.gameObject.SetActive(false);
+                fadeoutEffect.Stop();
                 _particleMainModule.startColor = new ParticleSystem.MinMaxGradient(Color.white);
             }
         }
@@ -89,7 +131,6 @@ namespace AnoGame.Application.Enemy
         {
             StopDestroyTimer();
             _destroyCoroutine = StartCoroutine(DestroyAfterDelay());
-            _isAlive = true;
         }
 
         // 外部から寿命タイマーを停止
@@ -128,7 +169,6 @@ namespace AnoGame.Application.Enemy
             float delay = Random.Range(minLifespan, maxLifespan);
             yield return new WaitForSeconds(delay);
 
-            _isAlive = false;
             StartCoroutine(FadeOutAndDestroy());
         }
 
@@ -138,11 +178,14 @@ namespace AnoGame.Application.Enemy
             StartCoroutine(FadeOutAndDestroy());
         }
 
+
+        // TODO:消すかも
         /// <summary>
         /// 完全に消えるまでのフェードアウト + パーティクル再生
         /// </summary>
         private IEnumerator FadeOutAndDestroy()
         {
+            Debug.Log("使ってる？======================================================================================");
             // 寿命終了イベントを発火
             OnLifespanExpired?.Invoke();
 
@@ -150,10 +193,10 @@ namespace AnoGame.Application.Enemy
             StartCoroutine(FadeOut());
 
             // パーティクルエフェクトの再生
-            if (disappearEffect != null)
+            if (fadeoutEffect != null)
             {
-                disappearEffect.gameObject.SetActive(true);
-                disappearEffect.Play();
+                fadeoutEffect.gameObject.SetActive(true);
+                fadeoutEffect.Play();
                 StartCoroutine(FadeOutParticle());
             }
 
@@ -162,7 +205,7 @@ namespace AnoGame.Application.Enemy
             // パーティクルが完全に消えるまでの余裕を持たせる
             yield return new WaitForSeconds(0.1f);
 
-            disappearEffect.Stop();
+            fadeoutEffect.Stop();
 
             yield return new WaitForSeconds(1f);
 
@@ -255,19 +298,19 @@ namespace AnoGame.Application.Enemy
             if (settings.isNormal)
             {
                 // 部分フェードアウト開始時にパーティクルを再生
-                if (disappearEffect != null)
+                if (fadeoutEffect != null)
                 {
-                    disappearEffect.gameObject.SetActive(true);
-                    disappearEffect.Play();
+                    fadeoutEffect.gameObject.SetActive(true);
+                    fadeoutEffect.Play();
                 }
             }
             else
             {
                 // 部分フェードアウト開始時にパーティクルを再生
-                if (disappearEffect2 != null)
+                if (disappearEffect != null)
                 {
-                    disappearEffect2.gameObject.SetActive(true);
-                    disappearEffect2.Play();
+                    disappearEffect.gameObject.SetActive(true);
+                    disappearEffect.Play();
                 }
             }
 
@@ -277,9 +320,9 @@ namespace AnoGame.Application.Enemy
             foreach (var renderer in _spriteRenderers)
             {
                 Material mat = renderer.material;
-                if (mat.HasProperty("_OutlineColor"))
+                if (mat.HasProperty(OutlineColorProperty))
                 {
-                    mat.SetColor("_OutlineColor", settings.outlineColor);
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
                 }
             }
 
@@ -299,9 +342,9 @@ namespace AnoGame.Application.Enemy
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 Material mat = _spriteRenderers[i].material;
-                if (mat.HasProperty("_DissolveAmount"))
+                if (mat.HasProperty(DissolveAmountProperty))
                 {
-                    initialDissolveValues[i] = mat.GetFloat("_DissolveAmount");
+                    initialDissolveValues[i] = mat.GetFloat(DissolveAmountProperty);
                 }
                 else
                 {
@@ -318,11 +361,11 @@ namespace AnoGame.Application.Enemy
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
                     Material mat = _spriteRenderers[i].material;
-                    if (mat.HasProperty("_DissolveAmount"))
+                    if (mat.HasProperty(DissolveAmountProperty))
                     {
                         // 現在の値から targetDissolve までを補間
                         float current = Mathf.Lerp(initialDissolveValues[i], targetDissolve, normalizedTime);
-                        mat.SetFloat("_DissolveAmount", current);
+                        mat.SetFloat(DissolveAmountProperty, current);
                     }
                 }
 
@@ -333,21 +376,11 @@ namespace AnoGame.Application.Enemy
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 Material mat = _spriteRenderers[i].material;
-                if (mat.HasProperty("_DissolveAmount"))
+                if (mat.HasProperty(DissolveAmountProperty))
                 {
-                    mat.SetFloat("_DissolveAmount", targetDissolve);
+                    mat.SetFloat(DissolveAmountProperty, targetDissolve);
                 }
             }
-        }
-
-
-        /// <summary>
-        /// フェード方向
-        /// </summary>
-        public enum FadeMode
-        {
-            Out,    // DissolveAmount を上げる ＝ 溶かして消す
-            In      // DissolveAmount を下げる ＝ 元に戻す
         }
 
         /// <summary>
@@ -359,18 +392,35 @@ namespace AnoGame.Application.Enemy
         {
             if (settings == null) yield break;          // 設定が無ければ何もしない
 
+            // 部分フェードアウト開始時にパーティクルを再生
+            if (mode == FadeMode.In)
+            {
+                fadeInEffect.Play();
+            }
+            else if (mode == FadeMode.Out)
+            {
+                if (settings.isNormal)
+                {
+                    fadeoutEffect.Play();
+                }
+                else
+                {
+                    disappearEffect.Play();
+                }
+            }
+
             // ── アウトライン色を設定（必要に応じて）
             foreach (var sr in _spriteRenderers)
             {
                 var mat = sr.material;
-                if (mat.HasProperty("_OutlineColor"))
-                    mat.SetColor("_OutlineColor", settings.outlineColor);
+                if (mat.HasProperty(OutlineColorProperty))
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
 
                 // フェードインの時は強制的にDissolveAmountを1にする
                 if (mode == FadeMode.In)
                 {
-                    if (mat.HasProperty("_DissolveAmount"))
-                        mat.SetFloat("_DissolveAmount", 1f);
+                    if (mat.HasProperty(DissolveAmountProperty))
+                        mat.SetFloat(DissolveAmountProperty, 1f);
                 }
             }
 
@@ -381,7 +431,7 @@ namespace AnoGame.Application.Enemy
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 var mat = _spriteRenderers[i].material;
-                float current = mat.HasProperty("_DissolveAmount") ? mat.GetFloat("_DissolveAmount") : 0f;
+                float current = mat.HasProperty(DissolveAmountProperty) ? mat.GetFloat(DissolveAmountProperty) : 0f;
 
                 // フェードアウトの場合、現在の値を取得
                 startValues[i] = current;
@@ -392,21 +442,18 @@ namespace AnoGame.Application.Enemy
             float elapsed = 0f;
             while (elapsed < settings.duration)
             {
-                Debug.Log($"フェード中: {elapsed}/{settings.duration}");
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / settings.duration);
 
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
                     var mat = _spriteRenderers[i].material;
-                    if (mat.HasProperty("_DissolveAmount"))
+                    if (mat.HasProperty(DissolveAmountProperty))
                     {
                         float val = Mathf.Lerp(startValues[i], endValues[i], t);
-                        mat.SetFloat("_DissolveAmount", val);
+                        mat.SetFloat(DissolveAmountProperty, val);
                     }
                 }
-
-                
                 yield return null;  // ‑‑ ここで 1フレーム待機
             }
 
@@ -414,9 +461,13 @@ namespace AnoGame.Application.Enemy
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 var mat = _spriteRenderers[i].material;
-                if (mat.HasProperty("_DissolveAmount"))
-                    mat.SetFloat("_DissolveAmount", endValues[i]);
+                if (mat.HasProperty(DissolveAmountProperty))
+                    mat.SetFloat(DissolveAmountProperty, endValues[i]);
             }
+
+            fadeInEffect.Stop();
+            fadeoutEffect.Stop();
+            disappearEffect.Stop();
         }
 
 
@@ -437,9 +488,9 @@ namespace AnoGame.Application.Enemy
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 Material mat = _spriteRenderers[i].material;
-                if (mat.HasProperty("_DissolveAmount"))
+                if (mat.HasProperty(DissolveAmountProperty))
                 {
-                    currentDissolveValues[i] = mat.GetFloat("_DissolveAmount");
+                    currentDissolveValues[i] = mat.GetFloat(DissolveAmountProperty);
                 }
                 else
                 {
@@ -455,11 +506,11 @@ namespace AnoGame.Application.Enemy
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
                     Material mat = _spriteRenderers[i].material;
-                    if (mat.HasProperty("_DissolveAmount"))
+                    if (mat.HasProperty(DissolveAmountProperty))
                     {
                         // 現在の値から 1（完全に溶解）までを補間
                         float newVal = Mathf.Lerp(currentDissolveValues[i], 1f, normalizedTime);
-                        mat.SetFloat("_DissolveAmount", newVal);
+                        mat.SetFloat(DissolveAmountProperty, newVal);
                     }
                 }
                 yield return null;
@@ -469,22 +520,22 @@ namespace AnoGame.Application.Enemy
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 Material mat = _spriteRenderers[i].material;
-                if (mat.HasProperty("_DissolveAmount"))
+                if (mat.HasProperty(DissolveAmountProperty))
                 {
-                    mat.SetFloat("_DissolveAmount", 1f);
+                    mat.SetFloat(DissolveAmountProperty, 1f);
                 }
+            }
+
+            // 部分フェードアウト開始時にパーティクルを再生
+            if (fadeoutEffect != null)
+            {
+                fadeoutEffect.Stop();
             }
 
             // 部分フェードアウト開始時にパーティクルを再生
             if (disappearEffect != null)
             {
                 disappearEffect.Stop();
-            }
-
-            // 部分フェードアウト開始時にパーティクルを再生
-            if (disappearEffect2 != null)
-            {
-                disappearEffect2.Stop();
             }
         }
     }

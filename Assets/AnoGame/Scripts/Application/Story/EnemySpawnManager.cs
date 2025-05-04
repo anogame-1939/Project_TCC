@@ -94,7 +94,7 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(true);
             // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = false;
-            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
+            // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().EnableForceMode();
@@ -104,19 +104,22 @@ namespace AnoGame.Application.Enemy
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
-            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
+            // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
         }
 
+
+        // NOTE:セットアップというよりは初期化かも
+        // ここではAI、当たり判定を無効化して、後のアクティベートで有効化しているので
         public void SetupToRamdomMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
             _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
-            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
-            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
+            // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
         }
@@ -340,6 +343,7 @@ namespace AnoGame.Application.Enemy
 
 
 
+        // NOTE: ↓↓↓ランダムスポーン関係↓↓↓
         // プレイヤーの近くに配置
         // 出現エフェクトの再生
         // 敵をアクティブ化
@@ -374,14 +378,21 @@ namespace AnoGame.Application.Enemy
 
         public IEnumerator ActivateEnamy()
         {
-            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
-            con.SetChasing(true);
+            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
+            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().Activate();
+            
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().enabled = true;
 
-            Debug.Log("プレイヤーの近くに敵を出現させます。");
+            
+
             yield return null;
 
             // _currentEnemyInstance.SetActive(true);
         }
+
+        // NOTE: ↑↑↑ランダムスポーン関係↑↑↑
 
         public void SetEventData(EventData eventData)
         {
