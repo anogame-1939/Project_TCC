@@ -1455,6 +1455,10 @@ MonoBehaviour:
   fadeInEffect: {fileID: 8174480689089270556}
   fadeoutEffect: {fileID: 2587336557803532613}
   disappearEffect: {fileID: 2674266010562705787}
+  fadeInPlayThreshold: 0.2
+  fadeInStopThreshold: 0.8
+  fadeOutPlayThreshold: 0.4
+  fadeOutStopThreshold: 0.8
   shadowObjects: []
   shadowToBig:
     serializedVersion: 2
@@ -1493,10 +1497,19 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
+      time: 0.7334313
+      value: 0.34540385
+      inSlope: 1.3544357
+      outSlope: 1.3544357
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0

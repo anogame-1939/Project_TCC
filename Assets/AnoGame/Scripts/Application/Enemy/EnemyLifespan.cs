@@ -16,6 +16,17 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private ParticleSystem fadeInEffect;
         [SerializeField] private ParticleSystem fadeoutEffect;
         [SerializeField] private ParticleSystem disappearEffect;
+
+        [Header("それぞれのパーティクルが出現・消滅するタイミング")]
+        [SerializeField, Range(0f, 1f)]
+        private float fadeInPlayThreshold  = 0.2f;
+        [SerializeField, Range(0f, 1f)]
+        private float fadeInStopThreshold  = 0.8f;
+        [SerializeField, Range(0f, 1f)]
+        private float fadeOutPlayThreshold = 0.2f;
+        [SerializeField, Range(0f, 1f)]
+        private float fadeOutStopThreshold = 0.8f;
+
         [SerializeField] private GameObject[] shadowObjects;
         [SerializeField] private AnimationCurve shadowToBig = AnimationCurve.EaseInOut(0, 0, 1, 1);
         [SerializeField] private AnimationCurve shadowToSmall = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -544,7 +555,6 @@ namespace AnoGame.Application.Enemy
         public async UniTask PlayFadeInAsync(PartialFadeSettings settings)
         {
             if (settings == null) return;
-            fadeInEffect.Play();
 
             // マテリアル初期値セット
             foreach (var sr in _spriteRenderers)
@@ -564,11 +574,55 @@ namespace AnoGame.Application.Enemy
                 .ToArray();
             var endVals = Enumerable.Repeat(1f - settings.targetAlpha, _spriteRenderers.Length).ToArray();
 
-            // 並列実行して待機
-            var dissolveTask = DissolveAsync(startVals, endVals, settings.duration);
-            var shadowTask = ShadowScaleAsync(false);
+            bool played = false, stopped = false;
+            async UniTask DissolveWithEffect()
+            {
+                float elapsed = 0f;
+                while (elapsed < settings.duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / settings.duration);
+
+                    // Dissolve 更新
+                    for (int i = 0; i < _spriteRenderers.Length; i++)
+                    {
+                        float val = Mathf.Lerp(startVals[i], endVals[i], t);
+                        var mat = _spriteRenderers[i].material;
+                        if (mat.HasProperty(DissolveAmountProperty))
+                            mat.SetFloat(DissolveAmountProperty, val);
+                    }
+
+                    // しきい値に達したらエフェクト再生／停止
+                    if (!played && t >= fadeInPlayThreshold)
+                    {
+                        fadeInEffect.Play();
+                        played = true;
+                    }
+                    if (!stopped && t >= fadeInStopThreshold)
+                    {
+                        fadeInEffect.Stop();
+                        stopped = true;
+                    }
+
+                    await UniTask.Yield(PlayerLoopTiming.Update);
+                }
+                // 最終値固定
+                for (int i = 0; i < _spriteRenderers.Length; i++)
+                {
+                    var mat = _spriteRenderers[i].material;
+                    if (mat.HasProperty(DissolveAmountProperty))
+                        mat.SetFloat(DissolveAmountProperty, endVals[i]);
+                }
+                // 念のため停止
+                if (!stopped) fadeInEffect.Stop();
+            }
+
+            // 並列実行
+            var dissolveTask = DissolveWithEffect();
+            var shadowTask   = ShadowScaleAsync(settings.duration, false);
             await UniTask.WhenAll(dissolveTask, shadowTask);
         }
+
 
         /// <summary>
         /// 溶かしながらフェードアウト ⇒ UniTask版
@@ -576,15 +630,13 @@ namespace AnoGame.Application.Enemy
         public async UniTask PlayFadeOutAsync(PartialFadeSettings settings)
         {
             if (settings == null) return;
-            fadeoutEffect.Play();
 
+            // マテリアル初期値セット（Outlineのみ）
             foreach (var sr in _spriteRenderers)
             {
                 var mat = sr.material;
                 if (mat.HasProperty(OutlineColorProperty))
                     mat.SetColor(OutlineColorProperty, settings.outlineColor);
-                // if (mat.HasProperty(DissolveAmountProperty))
-                //     mat.SetFloat(DissolveAmountProperty, 1f);
             }
 
             var startVals = _spriteRenderers
@@ -594,10 +646,53 @@ namespace AnoGame.Application.Enemy
                 .ToArray();
             var endVals = Enumerable.Repeat(1 - settings.targetAlpha, _spriteRenderers.Length).ToArray();
 
-            var dissolveTask = DissolveAsync(startVals, endVals, settings.duration);
-            var shadowTask   = ShadowScaleAsync(true);
+            bool played = false, stopped = false;
+            async UniTask DissolveWithEffectOut()
+            {
+                float elapsed = 0f;
+                while (elapsed < settings.duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / settings.duration);
+
+                    // Dissolve 更新
+                    for (int i = 0; i < _spriteRenderers.Length; i++)
+                    {
+                        float val = Mathf.Lerp(startVals[i], endVals[i], t);
+                        var mat = _spriteRenderers[i].material;
+                        if (mat.HasProperty(DissolveAmountProperty))
+                            mat.SetFloat(DissolveAmountProperty, val);
+                    }
+
+                    // しきい値に達したらエフェクト再生／停止
+                    if (!played && t >= fadeOutPlayThreshold)
+                    {
+                        fadeoutEffect.Play();
+                        played = true;
+                    }
+                    if (!stopped && t >= fadeOutStopThreshold)
+                    {
+                        fadeoutEffect.Stop();
+                        stopped = true;
+                    }
+
+                    await UniTask.Yield(PlayerLoopTiming.Update);
+                }
+                // 最終値固定
+                for (int i = 0; i < _spriteRenderers.Length; i++)
+                {
+                    var mat = _spriteRenderers[i].material;
+                    if (mat.HasProperty(DissolveAmountProperty))
+                        mat.SetFloat(DissolveAmountProperty, endVals[i]);
+                }
+                if (!stopped) fadeoutEffect.Stop();
+            }
+
+            var dissolveTask = DissolveWithEffectOut();
+            var shadowTask   = ShadowScaleAsync(settings.duration, true);
             await UniTask.WhenAll(dissolveTask, shadowTask);
         }
+
 
         /// <summary>
         /// SpriteRenderer群のDissolveAmountをduration秒かけて補間するUniTask版
@@ -635,7 +730,7 @@ namespace AnoGame.Application.Enemy
         /// <summary>
         /// 影のスケールを UniTask で補間する
         /// </summary>
-        private async UniTask ShadowScaleAsync(bool toSmall = false)
+        private async UniTask ShadowScaleAsync(float duration, bool toSmall = false)
         {
             float elapsed = 0f;
             // 現在のスケール値（x 成分）を取得
@@ -643,10 +738,10 @@ namespace AnoGame.Application.Enemy
                 .Select(s => s.transform.localScale.x)
                 .ToArray();
 
-            while (elapsed < shadowScaleDuration)
+            while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / shadowScaleDuration);
+                float t = Mathf.Clamp01(elapsed / duration);
 
                 // カーブで加速／減速を制御
                 float curveT = toSmall
