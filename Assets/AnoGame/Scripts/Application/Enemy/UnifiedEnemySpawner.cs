@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections;
 using AnoGame.Data;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using System;
 
 namespace AnoGame.Application.Enemy
 {
@@ -30,12 +33,20 @@ namespace AnoGame.Application.Enemy
         [SerializeField]
         private EventData eventData;
 
-        [Header("ランダムモード設定")]
+        [Header("スポーンの間隔")]
         [SerializeField, Min(1f)]
         private float minSpawnTime = 15f;
 
         [SerializeField, Min(10f)]
         private float maxSpawnTime = 30f;
+
+        // 追跡が続く最短／最長秒数（Inspector で調整）
+        [Header("チェイス時間")]
+        [SerializeField, Min(3f)]  private float minChaseTime = 5f;
+        [SerializeField, Min(5f)]  private float maxChaseTime = 20f;
+
+        // 非同期ループを止めるための CTS
+        private CancellationTokenSource _spawnLoopCts;
 
         // 共通で利用する EnemySpawnManager（シングルトン）
         private EnemySpawnManager spawnManager;
@@ -83,29 +94,24 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         public void TriggerEnemySpawn()
         {
-            Debug.Log("TriggerEnemySpawn - " + spawnMode);
-            // NOTE:ストーリー、ランダム用のセットアップが必要
+            // 旧 Coroutine を停止
+            _spawnLoopCts?.Cancel();
 
-            // もし既にコルーチンが動いていれば停止
-            if (spawnCoroutine != null)
-            {
-                StopCoroutine(spawnCoroutine);
-            }
-
-            // 選択モードに応じて処理を切り替え
             if (spawnMode == SpawnerMode.Story)
             {
                 spawnManager.SetupToStoryMode();
-                spawnCoroutine = StorySpawnCoroutine();
+                // ストーリーは従来どおりコルーチンまたは必要に応じて UniTask 化
+                StartCoroutine(StorySpawnCoroutine());
             }
             else if (spawnMode == SpawnerMode.Random)
             {
                 spawnManager.SetupToRamdomMode();
-                spawnCoroutine = RandomSpawnCoroutine();
-            }
 
-            StartCoroutine(spawnCoroutine);
+                _spawnLoopCts = new CancellationTokenSource();
+                RandomSpawnLoopAsync(_spawnLoopCts.Token).Forget();      // ← ★ UniTask を走らせる
+            }
         }
+
 
         /// <summary>
         /// 外部から呼び出す敵生成開始メソッド
@@ -147,7 +153,7 @@ namespace AnoGame.Application.Enemy
             while (true)
             {
                 // ランダムな待機時間を設定
-                float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
+                float waitTime = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
                 Debug.Log("RandomSpawnCoroutine - wait" + waitTime);
                 // yield return new WaitForSeconds(waitTime);
                 yield return new WaitForSeconds(1f);
@@ -162,6 +168,7 @@ namespace AnoGame.Application.Enemy
                 if (player != null)
                 {
                     yield return spawnManager.SetPositionNearPlayer(player.transform.position);
+
                     yield return spawnManager.PlayrSpawnedEffect();
                     yield return spawnManager.ActivateEnamy();
 
@@ -179,7 +186,7 @@ namespace AnoGame.Application.Enemy
                 // spawnManager.StartEnemyMovement();
 
                 // 敵が追跡状態にある間、待機（IsChasing() が false になれば次のループへ）
-                while (spawnManager.IsChasing())
+                // while (spawnManager.IsChasing())
                 {
                     Debug.Log("Enemy is chasing...");
                     yield return new WaitForSeconds(1f);
@@ -194,6 +201,74 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+    /// <summary>
+    /// Gameplay 中のみランダムに敵をスポーンし、
+    /// さらにランダム時間だけチェイスさせたら Deactivate する非同期ループ
+    /// </summary>
+    private async UniTaskVoid RandomSpawnLoopAsync(CancellationToken token)
+    {
+        // GameState が変わったらキャンセルするハンドラ
+        void OnStateChanged(GameState s)
+        {
+            if (s != GameState.Gameplay) _spawnLoopCts?.Cancel();
+        }
+        GameStateManager.Instance.OnStateChanged += OnStateChanged;
+
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    // ── ❶ Gameplay でなければ 1 フレーム待機 ─────────────
+                    if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
+                    {
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                        continue;
+                    }
+
+                    // ── ❷ 次回スポーンまでの待機 ─────────────────────
+                    float waitTime = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
+                    // HACK:
+                    waitTime = 3.0f;
+                    await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
+
+                    // ── ❸ プレイヤーを取得できなければスキップ ───────────
+                    GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
+                    if (player == null) continue;
+
+                    // ── ❹ 敵をスポーン ─────────────────────────────
+                    await spawnManager.SetPositionNearPlayer(player.transform.position);
+                    await spawnManager.PlayrSpawnedEffect();
+                    await spawnManager.ActivateEnamy();
+                    spawnManager.EnableChaising();
+
+                    // ── ❺ ランダムチェイス時間が経過するまで待機 ──────────
+                    float chaseTime = UnityEngine.Random.Range(minChaseTime, maxChaseTime);
+                    // HACK:
+                    chaseTime = 3.0f;
+                    Debug.Log("逃げてる");
+                    await UniTask.Delay(TimeSpan.FromSeconds(chaseTime), cancellationToken: token);
+                    Debug.Log("逃げ切った");
+
+
+                    // ── ❻ 追跡終了処理（フェードアウトなど） ─────────────
+
+                    spawnManager.DisableChashing();
+
+                    await spawnManager.PlayrDeSpawnedEffect();
+                    await spawnManager.DeactivateEnamy();
+                }
+            }
+            catch (OperationCanceledException oce)
+            {
+                // TODO:キャンセル処理を書く
+                Debug.Log($"キャンセルされた...{oce.Message}, {oce.StackTrace}");
+            
+            }
+            finally
+            {
+                GameStateManager.Instance.OnStateChanged -= OnStateChanged;
+            }
+    }
 
 
         /// <summary>

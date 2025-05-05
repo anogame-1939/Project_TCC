@@ -72,11 +72,7 @@ namespace AnoGame.Application.Enemy
 
         private IEnumerator WaitForEnemyDeath()
         {
-            while (_spawnManager.IsChasing())
-            {
-                Debug.Log($"_spawnManager.IsChasing():{_spawnManager.IsChasing()}");
-                yield return new WaitForSeconds(1f);
-            }
+            yield return null;
         }
 
 

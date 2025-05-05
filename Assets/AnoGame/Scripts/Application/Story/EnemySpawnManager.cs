@@ -37,9 +37,9 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private float destroyDelay = 5.0f;
 
         [SerializeField]
-        private PartialFadeSettings fadeOutSettings;
-        [SerializeField]
         private PartialFadeSettings fadeInSettings;
+        [SerializeField]
+        private PartialFadeSettings fadeOutSettings;
         [SerializeField] private PartialFadeSettings destroyFadeSettings;
 
         private GameObject _currentEnemyInstance;
@@ -92,9 +92,6 @@ namespace AnoGame.Application.Enemy
         public void SetupToStoryMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(true);
-            // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
-            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = false;
-            // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().EnableForceMode();
@@ -103,8 +100,6 @@ namespace AnoGame.Application.Enemy
         public void SetupToNormalMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
-            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
-            // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
@@ -117,8 +112,6 @@ namespace AnoGame.Application.Enemy
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
             _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
-            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
-            // _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
@@ -256,7 +249,7 @@ namespace AnoGame.Application.Enemy
         private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation, bool isPermanent = false)
         {
             yield return null;
-            Debug.Log("SpawnEnemyCoroutine-SpawnEnemyCoroutine");
+            Debug.Log("非推奨-SpawnEnemyCoroutine");
             // 出現前エフェクト・効果音の再生
             // PlaySpawnedSound();
             // ※ エフェクトとしてパーティクル等を再生する処理を追加可能
@@ -312,16 +305,14 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         public void SpawnEnemyNearPlayer(Vector3 playerPosition)
         {
+            Debug.Log("非推奨-SpawnEnemyNearPlayer");
             StartCoroutine(SpawnEnemyNearPlayerCoroutine(playerPosition));
         }
 
         private IEnumerator SpawnEnemyNearPlayerCoroutine(Vector3 playerPosition)
         {
-            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
-            con.SetChasing(true);
-
             Debug.Log("プレイヤーの近くに敵を出現させます。");
-            yield return con.SpawnNearPlayer(playerPosition);
+            // yield return con.SpawnNearPlayer(playerPosition);
 
             // 出現前エフェクト・効果音の再生
             PlaySpawnedSound();
@@ -339,6 +330,18 @@ namespace AnoGame.Application.Enemy
             SetEventData(null);
             // _currentEnemyController.SpawnNearPlayer(playerPosition);
             Debug.Log("プレイヤー付近に敵を出現させました。");
+        }
+
+        public void EnableChaising()
+        {
+            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
+            con.SetChasing(true);
+        }
+
+        public void DisableChashing()
+        {
+            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
+            con.SetChasing(false);
         }
 
 
@@ -369,8 +372,21 @@ namespace AnoGame.Application.Enemy
             PlaySpawnedSound();
             
             Debug.Log("出現前エフェクト・効果音を再生しました。");
-            _currentEnemyInstance.gameObject.SetActive(true);
-            yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayPartialFade(fadeOutSettings, EnemyLifespan.FadeMode.In);
+            // _currentEnemyInstance.gameObject.SetActive(true);
+            yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayFadInParticle(fadeInSettings);
+
+            // 出現前のエフェクトの待機（moveDelay秒）
+            yield return new WaitForSeconds(moveDelay);
+        }
+
+        public IEnumerator PlayrDeSpawnedEffect()
+        {
+            // TODO:消滅SEほしい
+
+            // 当たり判定無効化
+             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
+
+            yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayFadOutParticle(fadeOutSettings);
 
             // 出現前のエフェクトの待機（moveDelay秒）
             yield return new WaitForSeconds(moveDelay);
@@ -378,17 +394,18 @@ namespace AnoGame.Application.Enemy
 
         public IEnumerator ActivateEnamy()
         {
-            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
-            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
-            _currentEnemyInstance.GetComponent<EnemyLifespan>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().Activate();
-            
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
-
-            
-
             yield return null;
+            // _currentEnemyInstance.SetActive(true);
+        }
 
+        public IEnumerator DeactivateEnamy()
+        {
+            // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyLifespan>().Deactivate();
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
+            yield return null;
             // _currentEnemyInstance.SetActive(true);
         }
 
@@ -431,11 +448,6 @@ namespace AnoGame.Application.Enemy
             {
                 _currentEnemyController.StopMoving();
             }
-        }
-
-        public bool IsChasing()
-        {
-            return _currentEnemyInstance.GetComponent<EnemyAIController>().IsChasing;
         }
 
         public void SetRetryPoint(Transform point)

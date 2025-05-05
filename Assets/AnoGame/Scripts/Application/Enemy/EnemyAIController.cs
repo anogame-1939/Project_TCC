@@ -108,6 +108,7 @@ namespace AnoGame.Application.Enmemy.Control
                 // ゲームがプレイ中でない場合は、入力を無視
                 return;
             }
+            if (!isChasing) return;
 
             // 2. タグからプレイヤーを探して、その位置を目標地点に設定
             if (player == null)

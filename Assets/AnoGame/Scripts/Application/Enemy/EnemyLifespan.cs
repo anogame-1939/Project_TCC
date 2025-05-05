@@ -25,7 +25,8 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private ParticleSystem fadeoutEffect;
         [SerializeField] private ParticleSystem disappearEffect;
         [SerializeField] private GameObject[] shadowObjects;
-        [SerializeField] private AnimationCurve shadowScaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] private AnimationCurve shadowToBig = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] private AnimationCurve shadowToSmall = AnimationCurve.EaseInOut(0, 0, 1, 1);
         [SerializeField] private float shadowScaleDuration = 0.35f;
 
         private const string DissolveAmountProperty = "_DissolveAmount";
@@ -121,7 +122,7 @@ namespace AnoGame.Application.Enemy
 
         private void OnDisable()
         {
-            StopDestroyTimer();
+            // StopDestroyTimer();
         }
 
         private void ResetState()
@@ -442,7 +443,7 @@ namespace AnoGame.Application.Enemy
                 var mat = _spriteRenderers[i].material;
                 startVals[i] = mat.HasProperty(DissolveAmountProperty)
                             ? mat.GetFloat(DissolveAmountProperty) : 0f;
-                endVals[i]   = settings.targetAlpha;
+                endVals[i]   = 1 - settings.targetAlpha;
             }
 
             // --- ③ フェード本体と影スケールを並列起動 ---
@@ -454,6 +455,77 @@ namespace AnoGame.Application.Enemy
             yield return shadowCoroutine;
         }
 
+        public IEnumerator PlayFadInParticle(PartialFadeSettings settings)
+        {
+            if (settings == null) yield break;
+            fadeInEffect.Play();
+
+            foreach (var sr in _spriteRenderers)
+            {
+                var mat = sr.material;
+                if (mat.HasProperty(OutlineColorProperty))
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
+
+                if (mat.HasProperty(DissolveAmountProperty))
+                    mat.SetFloat(DissolveAmountProperty, 1f);
+            }
+
+            // --- ② 開始／終了値を算出 ---
+            float[] startVals = new float[_spriteRenderers.Length];
+            float[] endVals   = new float[_spriteRenderers.Length];
+
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                var mat = _spriteRenderers[i].material;
+                startVals[i] = mat.HasProperty(DissolveAmountProperty)
+                            ? mat.GetFloat(DissolveAmountProperty) : 0f;
+                endVals[i]   = 1 - settings.targetAlpha;
+            }
+
+            // --- ③ フェード本体と影スケールを並列起動 ---
+            var dissolveCoroutine = StartCoroutine(DissolveCoroutine(startVals, endVals, settings.duration));
+            var shadowCoroutine   = StartCoroutine(ShadowScaleCoroutine());
+
+            // --- ④ 2 本とも終わるまで順に待機 ---
+            yield return dissolveCoroutine;
+            yield return shadowCoroutine;
+        }
+
+        public IEnumerator PlayFadOutParticle(PartialFadeSettings settings)
+        {
+            if (settings == null) yield break;
+            fadeoutEffect.Play();
+
+            foreach (var sr in _spriteRenderers)
+            {
+                var mat = sr.material;
+                if (mat.HasProperty(OutlineColorProperty))
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
+
+                if (mat.HasProperty(DissolveAmountProperty))
+                    mat.SetFloat(DissolveAmountProperty, 1f);
+            }
+
+            // --- ② 開始／終了値を算出 ---
+            float[] startVals = new float[_spriteRenderers.Length];
+            float[] endVals   = new float[_spriteRenderers.Length];
+
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                var mat = _spriteRenderers[i].material;
+                startVals[i] = mat.HasProperty(DissolveAmountProperty)
+                            ? mat.GetFloat(DissolveAmountProperty) : 0f;
+                endVals[i]   = settings.targetAlpha;
+            }
+
+            // --- ③ フェード本体と影スケールを並列起動 ---
+            var dissolveCoroutine = StartCoroutine(DissolveCoroutine(startVals, endVals, settings.duration));
+            var shadowCoroutine   = StartCoroutine(ShadowScaleCoroutine(true));
+
+            // --- ④ 2 本とも終わるまで順に待機 ---
+            yield return dissolveCoroutine;
+            yield return shadowCoroutine;
+        }
 
         /// <summary>
         /// SpriteRenderer 群の DissolveAmount を duration 秒かけて補間する
@@ -488,7 +560,7 @@ namespace AnoGame.Application.Enemy
         /// <summary>
         /// 影オブジェクトを shadowScaleDuration 秒でスケール1にする
         /// </summary>
-        private IEnumerator ShadowScaleCoroutine()
+        private IEnumerator ShadowScaleCoroutine(bool toSmall = false)
         {
             float elapsed = 0f;
             float[] start = shadowObjects.Select(s => s.transform.localScale.x).ToArray();
@@ -499,19 +571,20 @@ namespace AnoGame.Application.Enemy
                 float t = Mathf.Clamp01(elapsed / shadowScaleDuration);
 
                 // ── カーブで加速／減速を制御
-                float curveT = shadowScaleCurve.Evaluate(t);  // 0→1 の非線形補間係数
+                float curveT = toSmall? shadowToSmall.Evaluate(t) : shadowToBig.Evaluate(t);  // 0→1 の非線形補間係数
 
                 for (int i = 0; i < shadowObjects.Length; i++)
                 {
-                    float scale = Mathf.Lerp(start[i], 1f, curveT);
+                    float scale = toSmall ? Mathf.Lerp(start[i], 0f, curveT) : Mathf.Lerp(start[i], 1f, curveT);
+                    // Debug.Log($"invers:{toSmall}...sclae:{scale}");
                     shadowObjects[i].transform.localScale = Vector3.one * scale;
                 }
                 yield return null;
             }
 
             // 終了時に完全な 1 を保証
-            foreach (var sh in shadowObjects)
-                sh.transform.localScale = Vector3.one;
+            // foreach (var sh in shadowObjects)
+                // sh.transform.localScale = Vector3.one;
         }
 
         private void StopAllParticle()
