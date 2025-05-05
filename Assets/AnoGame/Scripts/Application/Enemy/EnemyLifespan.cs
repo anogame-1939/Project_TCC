@@ -3,20 +3,12 @@ using System.Collections;
 using System.Linq;
 using Cysharp.Threading.Tasks.Triggers;
 using Unity.VisualScripting;
+using Cysharp.Threading.Tasks;
 
 namespace AnoGame.Application.Enemy
 {
     public class EnemyLifespan : MonoBehaviour
     {
-        /// <summary>
-        /// フェード方向
-        /// </summary>
-        public enum FadeMode
-        {
-            Out,    // DissolveAmount を上げる ＝ 溶かして消す
-            In      // DissolveAmount を下げる ＝ 元に戻す
-        }
-
         [SerializeField] private float minLifespan = 5f;
         [SerializeField] private float maxLifespan = 30f;
         [SerializeField] private float _fadeOutDuration = 1f;
@@ -409,52 +401,6 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        /// <summary>
-        /// PartialFadeSettings に従ってフェードを実行し、完了するまで待機するコルーチン。
-        /// 例:  フェードアウト →  yield return StartCoroutine(PlayPartialFade(settings, FadeMode.Out));
-        ///      フェードイン   →  yield return StartCoroutine(PlayPartialFade(settings, FadeMode.In));
-        /// </summary>
-        public IEnumerator PlayPartialFade(PartialFadeSettings settings, FadeMode mode)
-        {
-            if (settings == null) yield break;
-
-            // --- ① 事前セットアップ（パーティクル・アウトラインなどは従来通り） ---
-            if (mode == FadeMode.In)
-                fadeInEffect.Play();
-            else
-                (settings.isNormal ? fadeoutEffect : disappearEffect).Play();
-
-            foreach (var sr in _spriteRenderers)
-            {
-                var mat = sr.material;
-                if (mat.HasProperty(OutlineColorProperty))
-                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
-
-                if (mode == FadeMode.In && mat.HasProperty(DissolveAmountProperty))
-                    mat.SetFloat(DissolveAmountProperty, 1f);
-            }
-
-            // --- ② 開始／終了値を算出 ---
-            float[] startVals = new float[_spriteRenderers.Length];
-            float[] endVals   = new float[_spriteRenderers.Length];
-
-            for (int i = 0; i < _spriteRenderers.Length; i++)
-            {
-                var mat = _spriteRenderers[i].material;
-                startVals[i] = mat.HasProperty(DissolveAmountProperty)
-                            ? mat.GetFloat(DissolveAmountProperty) : 0f;
-                endVals[i]   = 1 - settings.targetAlpha;
-            }
-
-            // --- ③ フェード本体と影スケールを並列起動 ---
-            var dissolveCoroutine = StartCoroutine(DissolveCoroutine(startVals, endVals, settings.duration));
-            var shadowCoroutine   = StartCoroutine(ShadowScaleCoroutine());
-
-            // --- ④ 2 本とも終わるまで順に待機 ---
-            yield return dissolveCoroutine;
-            yield return shadowCoroutine;
-        }
-
         public IEnumerator PlayFadInParticle(PartialFadeSettings settings)
         {
             if (settings == null) yield break;
@@ -594,6 +540,132 @@ namespace AnoGame.Application.Enemy
             disappearEffect.Stop();
         }
 
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+        public async UniTask PlayFadeInAsync(PartialFadeSettings settings)
+        {
+            if (settings == null) return;
+            fadeInEffect.Play();
+
+            // マテリアル初期値セット
+            foreach (var sr in _spriteRenderers)
+            {
+                var mat = sr.material;
+                if (mat.HasProperty(OutlineColorProperty))
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
+                if (mat.HasProperty(DissolveAmountProperty))
+                    mat.SetFloat(DissolveAmountProperty, 1f);
+            }
+
+            // 開始／終了値
+            var startVals = _spriteRenderers
+                .Select(sr => sr.material.HasProperty(DissolveAmountProperty)
+                            ? sr.material.GetFloat(DissolveAmountProperty)
+                            : 0f)
+                .ToArray();
+            var endVals = Enumerable.Repeat(1f - settings.targetAlpha, _spriteRenderers.Length).ToArray();
+
+            // 並列実行して待機
+            var dissolveTask = DissolveAsync(startVals, endVals, settings.duration);
+            var shadowTask = ShadowScaleAsync(false);
+            await UniTask.WhenAll(dissolveTask, shadowTask);
+        }
+
+        /// <summary>
+        /// 溶かしながらフェードアウト ⇒ UniTask版
+        /// </summary>
+        public async UniTask PlayFadeOutAsync(PartialFadeSettings settings)
+        {
+            if (settings == null) return;
+            fadeoutEffect.Play();
+
+            foreach (var sr in _spriteRenderers)
+            {
+                var mat = sr.material;
+                if (mat.HasProperty(OutlineColorProperty))
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
+                // if (mat.HasProperty(DissolveAmountProperty))
+                //     mat.SetFloat(DissolveAmountProperty, 1f);
+            }
+
+            var startVals = _spriteRenderers
+                .Select(sr => sr.material.HasProperty(DissolveAmountProperty)
+                            ? sr.material.GetFloat(DissolveAmountProperty)
+                            : 0f)
+                .ToArray();
+            var endVals = Enumerable.Repeat(1 - settings.targetAlpha, _spriteRenderers.Length).ToArray();
+
+            var dissolveTask = DissolveAsync(startVals, endVals, settings.duration);
+            var shadowTask   = ShadowScaleAsync(true);
+            await UniTask.WhenAll(dissolveTask, shadowTask);
+        }
+
+        /// <summary>
+        /// SpriteRenderer群のDissolveAmountをduration秒かけて補間するUniTask版
+        /// </summary>
+        private async UniTask DissolveAsync(float[] startVals, float[] endVals, float duration)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                for (int i = 0; i < _spriteRenderers.Length; i++)
+                {
+                    float val = Mathf.Lerp(startVals[i], endVals[i], t);
+                    Debug.Log($"val:{val}");
+                    var mat = _spriteRenderers[i].material;
+                    if (mat.HasProperty(DissolveAmountProperty))
+                        mat.SetFloat(DissolveAmountProperty, val);
+                }
+
+                // 次フレームまで待つ
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
+
+            // 最終値を確定
+            for (int i = 0; i < _spriteRenderers.Length; i++)
+            {
+                var mat = _spriteRenderers[i].material;
+                if (mat.HasProperty(DissolveAmountProperty))
+                    mat.SetFloat(DissolveAmountProperty, endVals[i]);
+            }
+        }
+
+        /// <summary>
+        /// 影のスケールを UniTask で補間する
+        /// </summary>
+        private async UniTask ShadowScaleAsync(bool toSmall = false)
+        {
+            float elapsed = 0f;
+            // 現在のスケール値（x 成分）を取得
+            float[] startScales = shadowObjects
+                .Select(s => s.transform.localScale.x)
+                .ToArray();
+
+            while (elapsed < shadowScaleDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / shadowScaleDuration);
+
+                // カーブで加速／減速を制御
+                float curveT = toSmall
+                    ? shadowToSmall.Evaluate(t)  // 0→1 の非線形補間係数
+                    : shadowToBig.Evaluate(t);
+
+                for (int i = 0; i < shadowObjects.Length; i++)
+                {
+                    float target = toSmall
+                        ? Mathf.Lerp(startScales[i], 0f, curveT)
+                        : Mathf.Lerp(startScales[i], 1f, curveT);
+
+                    shadowObjects[i].transform.localScale = Vector3.one * target;
+                }
+
+                // 次フレームまで待機
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
+        }
 
         /// <summary>
         /// 部分的なフェードアウト状態から残りを完全にフェードアウトさせる処理

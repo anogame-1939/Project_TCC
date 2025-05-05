@@ -170,7 +170,7 @@ namespace AnoGame.Application.Enemy
                     yield return spawnManager.SetPositionNearPlayer(player.transform.position);
 
                     yield return spawnManager.PlayrSpawnedEffect();
-                    yield return spawnManager.ActivateEnamy();
+                    // yield return spawnManager.ActivateEnamy();
 
                 }
                 else
@@ -201,75 +201,62 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-    /// <summary>
-    /// Gameplay 中のみランダムに敵をスポーンし、
-    /// さらにランダム時間だけチェイスさせたら Deactivate する非同期ループ
-    /// </summary>
-    private async UniTaskVoid RandomSpawnLoopAsync(CancellationToken token)
-    {
-        // GameState が変わったらキャンセルするハンドラ
-        void OnStateChanged(GameState s)
+        /// <summary>
+        /// Gameplay 中のみランダムに敵をスポーンし、
+        /// さらにランダム時間だけチェイスさせたら Deactivate する非同期ループ
+        /// </summary>
+        private async UniTaskVoid RandomSpawnLoopAsync(CancellationToken token)
         {
-            if (s != GameState.Gameplay) _spawnLoopCts?.Cancel();
-        }
-        GameStateManager.Instance.OnStateChanged += OnStateChanged;
+            void OnStateChanged(GameState s)
+            {
+                if (s != GameState.Gameplay) _spawnLoopCts?.Cancel();
+            }
+            GameStateManager.Instance.OnStateChanged += OnStateChanged;
 
             try
             {
                 while (!token.IsCancellationRequested)
                 {
-                    // ── ❶ Gameplay でなければ 1 フレーム待機 ─────────────
-                    if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
-                    {
-                        await UniTask.Yield(PlayerLoopTiming.Update, token);
-                        continue;
-                    }
+                    // ゲームプレイ外なら 1 フレーム待機
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    if (GameStateManager.Instance.CurrentState != GameState.Gameplay) continue;
 
-                    // ── ❷ 次回スポーンまでの待機 ─────────────────────
                     float waitTime = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
                     // HACK:
                     waitTime = 3.0f;
                     await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
 
-                    // ── ❸ プレイヤーを取得できなければスキップ ───────────
                     GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
                     if (player == null) continue;
 
-                    // ── ❹ 敵をスポーン ─────────────────────────────
-                    await spawnManager.SetPositionNearPlayer(player.transform.position);
-                    await spawnManager.PlayrSpawnedEffect();
-                    await spawnManager.ActivateEnamy();
+                    // 1. 位置決め
+                    await spawnManager.SetPositionNearPlayerAsync(player.transform.position, token);
+
+                    // 2. 出現エフェクト
+                    await spawnManager.PlaySpawnedEffectAsync(token);
+
+                    // 3. 本体アクティベート
+                    spawnManager.ActivateEnemy();
                     spawnManager.EnableChaising();
 
-                    // ── ❺ ランダムチェイス時間が経過するまで待機 ──────────
+                    // 4. ランダム追跡
                     float chaseTime = UnityEngine.Random.Range(minChaseTime, maxChaseTime);
                     // HACK:
                     chaseTime = 3.0f;
-                    Debug.Log("逃げてる");
                     await UniTask.Delay(TimeSpan.FromSeconds(chaseTime), cancellationToken: token);
-                    Debug.Log("逃げ切った");
 
-
-                    // ── ❻ 追跡終了処理（フェードアウトなど） ─────────────
-
+                    // 5. 追跡終了 → フェードアウト
                     spawnManager.DisableChashing();
-
-                    await spawnManager.PlayrDeSpawnedEffect();
-                    await spawnManager.DeactivateEnamy();
+                    await spawnManager.PlayDespawnedEffectAsync(token);
+                    spawnManager.DeactivateEemy();
                 }
             }
-            catch (OperationCanceledException oce)
-            {
-                // TODO:キャンセル処理を書く
-                Debug.Log($"キャンセルされた...{oce.Message}, {oce.StackTrace}");
-            
-            }
+            catch (OperationCanceledException) { /* キャンセル時の後始末 */ }
             finally
             {
                 GameStateManager.Instance.OnStateChanged -= OnStateChanged;
             }
-    }
-
+        }
 
         /// <summary>
         /// 雑だけど怪異を部分的にフェードアウトさせるメソッド

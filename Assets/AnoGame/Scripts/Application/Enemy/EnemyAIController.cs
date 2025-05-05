@@ -6,6 +6,8 @@ using Unity.TinyCharacterController.Control;
 using Unity.TinyCharacterController.Core; // NOTE:微妙...別のnamespaceがいい
 using Unity.TinyCharacterController.Brain;
 using AnoGame.Application.Enemy;
+using Cysharp.Threading.Tasks;
+using System;
 
 namespace AnoGame.Application.Enmemy.Control
 {
@@ -219,7 +221,7 @@ namespace AnoGame.Application.Enmemy.Control
 
         public IEnumerator SpawnNearPlayer(Vector3 playerPosition, float spawnDistance = 5f, float waitTIme = 3f)
         {
-            Vector3 randomDirection = Random.insideUnitSphere * spawnDistance;
+            Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * spawnDistance;
             randomDirection.y = 0;
             Vector3 spawnPosition = playerPosition + randomDirection;
 
@@ -234,9 +236,41 @@ namespace AnoGame.Application.Enmemy.Control
                 Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
             }
             yield return new WaitForSeconds(waitTIme);
-
         }
 
+        /// <summary>
+        /// プレイヤー位置の近くにスポーンし、指定時間待機する非同期メソッド
+        /// </summary>
+        /// <param name="playerPosition">プレイヤーのワールド座標</param>
+        /// <param name="spawnDistance">スポーン位置をランダムに散らす半径（デフォルト5m）</param>
+        /// <param name="waitTime">スポーン後に待機する秒数（デフォルト3秒）</param>
+        public async UniTask SpawnNearPlayerAsync(
+            Vector3 playerPosition,
+            float spawnDistance = 5f,
+            float waitTime = 3f)
+        {
+            // 1. ランダム方向を算出し、高さは固定
+            Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * spawnDistance;
+            randomDirection.y = 0f;
+
+            // 2. 実際のスポーン候補位置
+            Vector3 spawnPosition = playerPosition + randomDirection;
+
+            // 3. NavMesh上の有効な位置をサンプリング
+            if (NavMesh.SamplePosition(spawnPosition, out NavMeshHit hit, spawnDistance, NavMesh.AllAreas))
+            {
+                // BrainBase コンポーネントの Warp メソッドで瞬間移動
+                GetComponent<BrainBase>().Warp(hit.position, randomDirection);
+                // 必要ならここで StartMoving() などを呼ぶ
+            }
+            else
+            {
+                Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
+            }
+
+            // 4. waitTime 秒だけ待機（コルーチンの WaitForSeconds 相当）
+            await UniTask.Delay(TimeSpan.FromSeconds(waitTime));
+        }
 
 
         public void SetChasing(bool chasing)

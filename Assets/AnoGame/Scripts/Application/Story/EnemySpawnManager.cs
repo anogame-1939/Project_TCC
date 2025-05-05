@@ -10,6 +10,12 @@ using Unity.TinyCharacterController.Brain;
 using System.Collections;
 using AnoGame.Application.Player.Control;
 using AnoGame.Application.Enmemy.Control;
+using Cysharp.Threading.Tasks;
+using System.Threading;
+using System;
+
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -361,16 +367,51 @@ namespace AnoGame.Application.Enemy
             yield return con.SpawnNearPlayer(playerPosition);
         }
 
+        public async UniTask SetPositionNearPlayerAsync(Vector3 playerPos, CancellationToken token)
+        {
+            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
+            con.SetChasing(true);
+
+            await con.SpawnNearPlayer(playerPos);   // ★IEnumerator → UniTask 化
+        }
+
         public void PlaySpawnedSound()
         {
             GetComponent<AudioSource>().Play();
         }
 
+        /// <summary>
+        /// 出現 SE とフェードイン演出を実時間で待機しながら再生する
+        /// </summary>
+        public async UniTask PlaySpawnedEffectAsync(CancellationToken token)
+        {
+            PlaySpawnedSound();                // SE 再生
+
+            // Lifespan 側も UniTask 版を用意してある前提
+            await _currentEnemyInstance
+                .GetComponent<EnemyLifespan>()
+                .PlayFadeInAsync(fadeInSettings);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(moveDelay), cancellationToken: token);
+        }
+
+        /// <summary>
+        /// 消滅 SE とフェードアウト演出
+        /// </summary>
+        public async UniTask PlayDespawnedEffectAsync(CancellationToken token)
+        {
+            // 当たり判定を即座に無効化
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
+
+            await _currentEnemyInstance
+                .GetComponent<EnemyLifespan>()
+                .PlayFadeOutAsync(fadeOutSettings);
+        }
         public IEnumerator PlayrSpawnedEffect()
         {
             // 出現前エフェクト・効果音の再生
             PlaySpawnedSound();
-            
+
             Debug.Log("出現前エフェクト・効果音を再生しました。");
             // _currentEnemyInstance.gameObject.SetActive(true);
             yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayFadInParticle(fadeInSettings);
@@ -387,25 +428,21 @@ namespace AnoGame.Application.Enemy
              _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
 
             yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayFadOutParticle(fadeOutSettings);
-
-            // 出現前のエフェクトの待機（moveDelay秒）
-            yield return new WaitForSeconds(moveDelay);
         }
 
-        public IEnumerator ActivateEnamy()
+        public void ActivateEnemy()
         {
-            _currentEnemyInstance.GetComponent<EnemyLifespan>().Activate();
+            var life = _currentEnemyInstance.GetComponent<EnemyLifespan>();
+            life.Activate();
+
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
-            yield return null;
-            // _currentEnemyInstance.SetActive(true);
         }
 
-        public IEnumerator DeactivateEnamy()
+        public void DeactivateEemy()
         {
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().Deactivate();
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
-            yield return null;
             // _currentEnemyInstance.SetActive(true);
         }
 
