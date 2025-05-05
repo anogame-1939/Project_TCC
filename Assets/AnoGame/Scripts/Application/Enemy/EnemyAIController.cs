@@ -100,6 +100,7 @@ namespace AnoGame.Application.Enmemy.Control
         /// </summary>
         void FixedUpdate()
         {
+            // Debug.Log($"IsStoryMode:{IsStoryMode}, GameStateManager.Instance.CurrentState:{GameStateManager.Instance.CurrentState}, isChasing:{isChasing}");
             if (this.IsStoryMode)
             {
                 // ストーリーモードの場合は、プレイヤーを追いかけない
@@ -275,6 +276,7 @@ namespace AnoGame.Application.Enmemy.Control
 
         public void SetChasing(bool chasing)
         {
+            Debug.Log($"SetChasing:{chasing}");
             isChasing = chasing;
             if (isChasing)
             {

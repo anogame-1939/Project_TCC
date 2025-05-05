@@ -117,7 +117,7 @@ namespace AnoGame.Application.Enemy
         public void SetupToRamdomMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
-            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
+            // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
@@ -370,8 +370,6 @@ namespace AnoGame.Application.Enemy
         public async UniTask SetPositionNearPlayerAsync(Vector3 playerPos, CancellationToken token)
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
-            con.SetChasing(true);
-
             await con.SpawnNearPlayer(playerPos);   // ★IEnumerator → UniTask 化
         }
 

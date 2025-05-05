@@ -143,70 +143,12 @@ namespace AnoGame.Application.Enemy
         }
 
         /// <summary>
-        /// ランダムモード用の生成コルーチン
-        /// トリガーされたら、ランダムな間隔で継続的に敵を生成し、通常の追跡・タイムアウト消滅処理を実行
-        /// </summary>
-        private IEnumerator RandomSpawnCoroutine()
-        {
-            Debug.Log("RandomSpawnCoroutine - ");
-            // 終了条件がある場合はそれに合わせてループ条件を変更してください。
-            while (true)
-            {
-                // ランダムな待機時間を設定
-                float waitTime = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
-                Debug.Log("RandomSpawnCoroutine - wait" + waitTime);
-                // yield return new WaitForSeconds(waitTime);
-                yield return new WaitForSeconds(1f);
-
-                Debug.Log("RandomSpawnCoroutine - start" + waitTime);
-
-                
-
-                // プレイヤーをタグから検索し、近くに敵をスポーン
-                GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
-
-                if (player != null)
-                {
-                    yield return spawnManager.SetPositionNearPlayer(player.transform.position);
-
-                    yield return spawnManager.PlayrSpawnedEffect();
-                    // yield return spawnManager.ActivateEnamy();
-
-                }
-                else
-                {
-                    Debug.LogError("プレイヤーオブジェクトが見つかりません。");
-                }
-
-                // スポーン時の
-
-                // ランダムモードでは、敵の追跡やタイムアウト消滅など、通常の機能を有効にする
-                // 脳の有効化や移動開始処理を実施
-                // spawnManager.EnabaleEnemy();
-                // spawnManager.StartEnemyMovement();
-
-                // 敵が追跡状態にある間、待機（IsChasing() が false になれば次のループへ）
-                // while (spawnManager.IsChasing())
-                {
-                    Debug.Log("Enemy is chasing...");
-                    yield return new WaitForSeconds(1f);
-                }
-
-                Debug.Log("Enemy has stopped chasing.");
-
-                // 状態が変わった場合に移動停止などの後処理を実施
-                // spawnManager.StopEnemyMovement();
-
-                yield return new WaitForSeconds(10f);
-            }
-        }
-
-        /// <summary>
         /// Gameplay 中のみランダムに敵をスポーンし、
         /// さらにランダム時間だけチェイスさせたら Deactivate する非同期ループ
         /// </summary>
         private async UniTaskVoid RandomSpawnLoopAsync(CancellationToken token)
         {
+            Debug.Log("RandomSpawnLoopAsync-Start");
             void OnStateChanged(GameState s)
             {
                 if (s != GameState.Gameplay) _spawnLoopCts?.Cancel();
@@ -217,6 +159,7 @@ namespace AnoGame.Application.Enemy
             {
                 while (!token.IsCancellationRequested)
                 {
+                    Debug.Log($"RandomSpawnLoopAsync-GameStateManager.Instance:{GameStateManager.Instance.CurrentState}");
                     // ゲームプレイ外なら 1 フレーム待機
                     await UniTask.Yield(PlayerLoopTiming.Update, token);
                     if (GameStateManager.Instance.CurrentState != GameState.Gameplay) continue;
@@ -251,7 +194,18 @@ namespace AnoGame.Application.Enemy
                     spawnManager.DeactivateEemy();
                 }
             }
-            catch (OperationCanceledException) { /* キャンセル時の後始末 */ }
+            catch (OperationCanceledException)
+            {
+                // TODO:キャンセル処理
+                Debug.Log("RandomSpawnLoopAsync-キャンセル");
+
+                spawnManager.DeactivateEemy();
+
+                Debug.Log("RandomSpawnLoopAsync-おわた");
+
+
+
+            }
             finally
             {
                 GameStateManager.Instance.OnStateChanged -= OnStateChanged;

@@ -57,7 +57,7 @@ namespace AnoGame.Application.Story
 
             // enemyForcedMover.DisableForceMode();
             enemyForcedMover.enabled = true;
-            enemyForcedMover.GetComponent<EnemyAIController>().enabled = true;
+            enemyForcedMover.GetComponent<EnemyAIController>().SetChasing(true);
 
             // 敵の移動を通常モードに戻す
             // NOTE:雑にいれたけど問題があれば見直す

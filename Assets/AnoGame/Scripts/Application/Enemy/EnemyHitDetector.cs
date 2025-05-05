@@ -43,7 +43,7 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.Log("Player");
                 damageable.TakeDamage(damage);
-                OnPlayerHit?.Invoke();  // イベント発火
+                OnPlayerHit?.Invoke();  // これ自体はちゃんと使わてない
             }
         }
 
