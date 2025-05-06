@@ -78,14 +78,6 @@ namespace AnoGame.Application.Enmemy.Control
         /// </summary>
         void Update()
         {
-            if (this.IsStoryMode)
-            {
-                // ストーリーモードの場合は、プレイヤーを追いかけない
-                return;
-            }
-            // Debug.Log($"EnemyAIController Update - IsChasing: {isChasing}, {agent.velocity.magnitude}");
-
-
             // 1. オブジェクトの速度（NavMeshAgent の速度）を取得し、アニメーターの Bool を設定
             float speed = agent.velocity.magnitude;
             bool isMoving = speed > speedThreshold;

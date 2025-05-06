@@ -136,7 +136,7 @@ namespace AnoGame.Application.Enemy
             // isPermanentや eventData を渡して開始位置に敵を生成
             spawnManager.SetEventData(eventData);
 
-            spawnManager.SpawnEnemyAtStart(true);
+            spawnManager.SpawnEnemyAtStart();
             yield return null;
 
             // Storyモードでは、敵の追跡や自動消滅処理は実施しないので、追加の処理は不要
@@ -148,7 +148,6 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         private async UniTaskVoid RandomSpawnLoopAsync(CancellationToken token)
         {
-            Debug.Log("RandomSpawnLoopAsync-Start");
             void OnStateChanged(GameState s)
             {
                 if (s != GameState.Gameplay) _spawnLoopCts?.Cancel();
@@ -188,9 +187,18 @@ namespace AnoGame.Application.Enemy
                     chaseTime = 3.0f;
                     await UniTask.Delay(TimeSpan.FromSeconds(chaseTime), cancellationToken: token);
 
-                    // 5. 追跡終了 → フェードアウト
+                    var playTask = spawnManager.PlayDespawnedEffectAsync(token);
+
+                    // １秒後に DeactivateEemy() を実行する fire-and-forget タスク
+                    UniTask.Void(async () =>
+                    {
+                        await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
+                        spawnManager.DeactivateEemy();
+                    });
+
+                    // PlayDespawnedEffectAsync の完了を待ってから DisableChashing()
+                    await playTask;
                     spawnManager.DisableChashing();
-                    await spawnManager.PlayDespawnedEffectAsync(token);
                     spawnManager.DeactivateEemy();
                 }
             }
@@ -198,8 +206,9 @@ namespace AnoGame.Application.Enemy
             {
                 // TODO:キャンセル処理
                 Debug.Log("RandomSpawnLoopAsync-キャンセル");
+                Debug.Log($"RandomSpawnLoopAsync-GameStateManager.Instance:{GameStateManager.Instance.CurrentState}");
 
-                spawnManager.DeactivateEemy();
+                spawnManager.DestroyCurrentEnemyInstance();
 
                 Debug.Log("RandomSpawnLoopAsync-おわた");
 

@@ -71,13 +71,14 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
-            // 既存の敵を破棄
+            // ストーリー遷移時に前のシーンの敵が残ってたら消す
             if (_currentEnemyInstance != null)
             {
-                Debug.Log("既存の敵を破棄");
-                var tmpEnemyInstance = _currentEnemyInstance;
-                StartCoroutine(DestroyCor(tmpEnemyInstance));
-                _currentEnemyController = null;
+                UniTask.Void(async () =>
+                {
+                    await PlayDespawnedEffectAsync(new CancellationToken());
+                    Destroy(CurrentEnemyInstance);
+                });
             }
 
             // 新しい敵をスポーン（※初期状態では非アクティブにしておくなど、事前設定が必要な場合はこちらで対応）
@@ -125,65 +126,8 @@ namespace AnoGame.Application.Enemy
 
         public void DestroyCurrentEnemyInstance()
         {
-            StartCoroutine(DestroyCor(_currentEnemyInstance));
+            Destroy(_currentEnemyInstance);
         }
-
-
-        private IEnumerator DestroyCor(GameObject enemyObject)
-        {
-            if (enemyObject == null) yield break;
-
-            // ① これ以上当たり判定や AI が動かないように停止
-            var hit  = enemyObject.GetComponent<EnemyHitDetector>();
-            if (hit) hit.enabled = false;
-
-            var ai   = enemyObject.GetComponent<EnemyAIController>();
-            if (ai)
-            {
-                ai.StopChasing();
-                ai.enabled = false;
-            }
-
-            // ② Lifespan による部分フェード開始
-            var life = enemyObject.GetComponent<EnemyLifespan>();
-            if (life == null)
-            {
-                Destroy(enemyObject);                     // 保険
-                yield break;
-            }
-
-            life.enabled = true;                         // 無効になっている場合に備えて
-            life.FadeToPartialState(destroyFadeSettings);// ←ここで溶け始める
-
-            // ③ 部分フェードが終わるまで待機
-            yield return new WaitForSeconds(destroyFadeSettings.duration);
-
-            // ④ 残りを完全に溶かす
-            life.CompletePartialFadeOut(0.5f);           // 0.5 秒で完全溶解
-            yield return new WaitForSeconds(10f);       // 色残り防止に少し余裕を取る
-
-            Destroy(enemyObject);                        // ⑤ 実体を破棄
-        }
-
-        private IEnumerator DuplicateAndFade(GameObject enemyObject)
-        {
-            // 本体を複製（レンダラーとパーティクルだけで十分ならそれら以外の
-            // Component を Remove して負荷を下げても OK）
-            var corpse = Instantiate(enemyObject, enemyObject.transform.position, enemyObject.transform.rotation);
-
-            // 本体はすぐ非表示にする
-            enemyObject.SetActive(false);
-
-            // コピーモデルにフェード処理を適用
-            var life = corpse.AddComponent<EnemyLifespan>();
-            life.FadeToPartialState(destroyFadeSettings);
-            yield return new WaitForSeconds(destroyFadeSettings.duration);
-            life.CompletePartialFadeOut(0.5f);
-            yield return new WaitForSeconds(0.7f);
-
-            Destroy(corpse);
-        }
-
 
         public void SetEnemyPrefab(GameObject prefab)
         {
@@ -223,13 +167,13 @@ namespace AnoGame.Application.Enemy
         /// <summary>
         /// スタート地点に敵を出現させる。
         /// </summary>
-        public void SpawnEnemyAtStart(bool isPermanent = false)
+        public void SpawnEnemyAtStart()
         {
             var startPoint = GetStartPoint();
             if (startPoint == null) return;
 
             // 出現前効果再生後に敵を出現させるコルーチンを呼び出す
-            StartCoroutine(SpawnEnemyCoroutine(startPoint.position, startPoint.rotation, isPermanent));
+            StartCoroutine(SpawnEnemyCoroutine(startPoint.position, startPoint.rotation));
         }
 
         /// <summary>
@@ -252,7 +196,7 @@ namespace AnoGame.Application.Enemy
         /// <summary>
         /// 出現前のエフェクト・効果音再生後、一定時間待機してから敵を出現させるコルーチン
         /// </summary>
-        private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation, bool isPermanent = false)
+        private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation)
         {
             yield return null;
             Debug.Log("非推奨-SpawnEnemyCoroutine");
@@ -266,20 +210,16 @@ namespace AnoGame.Application.Enemy
 
             // 敵をアクティブ化して位置・回転を設定
             _currentEnemyInstance.SetActive(true);
+
+            // NOTE:これいる？？
             _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+
+            // 敵の有効化(表示、当たり判定有効化)
+            ActivateEnemy();
 
             if (_currentEnemyController == null)
             {
                 Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
-            }
-            
-            if (isPermanent)
-            {
-                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = false;
-            }
-            else
-            {
-                _currentEnemyController.GetComponent<EnemyLifespan>().enabled = true;
             }
             
             _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
@@ -456,7 +396,7 @@ namespace AnoGame.Application.Enemy
         {
             // TODO:このやり方だと管理がだるいので、EnemyAIControllerの有効化処理で一元管理する
             _currentEnemyController.EnableBrain();
-            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = true;
+            _currentEnemyInstance.GetComponent<EnemyAIController>().SetChasing(true);
 
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
         }
@@ -464,7 +404,7 @@ namespace AnoGame.Application.Enemy
         public void DisabaleEnamy()
         {
             // _currentEnemyController.DisableBrain();
-            _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
+            _currentEnemyInstance.GetComponent<EnemyAIController>().SetChasing(false);
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = true;
         }
 

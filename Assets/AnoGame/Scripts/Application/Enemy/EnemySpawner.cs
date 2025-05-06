@@ -81,7 +81,7 @@ namespace AnoGame.Application.Enemy
         {
             _spawnManager.EnabaleEnemy();
             yield return null;
-            _spawnManager.SpawnEnemyAtStart(isPermanent);
+            _spawnManager.SpawnEnemyAtStart();
             yield return null;
             _spawnManager.DisabaleEnamy();
         }
@@ -90,7 +90,7 @@ namespace AnoGame.Application.Enemy
         {
             // _spawnManager.EnabaleEnamy();
             yield return null;
-            _spawnManager.SpawnEnemyAtStart(isPermanent);
+            _spawnManager.SpawnEnemyAtStart();
             yield return null;
             // _spawnManager.DisabaleEnamy();
         }

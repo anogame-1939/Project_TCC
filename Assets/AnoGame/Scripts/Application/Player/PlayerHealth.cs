@@ -55,6 +55,9 @@ namespace AnoGame.Application.Player
 
         private void OnDeath()
         {
+            GameStateManager.Instance.SetState(GameState.GameOver);
+
+            // NOTE:本当はGameOverManagerから下記を読んだ方がいい
             // 死亡時の処理を実装
             // 例：ゲームオーバー画面表示、リスポーン処理など
             // リトライポイントへ
