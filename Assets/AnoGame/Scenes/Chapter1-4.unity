@@ -466,51 +466,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d81a5a43bd28f6a48a423636d43d8316, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &854508862
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 854508864}
-  - component: {fileID: 854508863}
-  m_Layer: 0
-  m_Name: Dialogue System Scene Events
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &854508863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 854508862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca55201633b97d3408f439eb84ecb249, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueEntrySceneEvents: []
---- !u!4 &854508864
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 854508862}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1007964548
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,7 +1001,7 @@ MonoBehaviour:
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 2
+          m_CallState: 0
         - m_Target: {fileID: 2098576260}
           m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
             AnoGame.Application
@@ -1087,7 +1042,7 @@ MonoBehaviour:
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 2
+          m_CallState: 0
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:
@@ -1542,7 +1497,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3101630296262868960, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: _isAutoSave
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6012029449518595477, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: m_IsActive
@@ -1643,4 +1598,3 @@ SceneRoots:
   - {fileID: 372233107}
   - {fileID: 2062973285}
   - {fileID: 1873760265}
-  - {fileID: 854508864}

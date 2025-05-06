@@ -28,8 +28,6 @@ namespace AnoGame.Application.Enemy
         [SerializeField]
         private SpawnerMode spawnMode = SpawnerMode.Story;
 
-
-
         [SerializeField]
         private EventData eventData;
 

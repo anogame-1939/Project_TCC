@@ -71,13 +71,23 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
-            // ストーリー遷移時に前のシーンの敵が残ってたら消す
             if (_currentEnemyInstance != null)
             {
+                var oldInstance = _currentEnemyInstance;
+
+                // ② 非同期でフェードアウト→破棄
                 UniTask.Void(async () =>
                 {
-                    await PlayDespawnedEffectAsync(new CancellationToken());
-                    Destroy(CurrentEnemyInstance);
+                    // ヒット判定を先にオフにしたいならここで
+                    // oldInstance.GetComponent<EnemyHitDetector>().Deactivate();
+
+                    // 古いインスタンスのフェードアウトを直接呼び出し
+                    await oldInstance
+                        .GetComponent<EnemyLifespan>()
+                        .PlayFadeOutAsync(fadeOutSettings);
+
+                    // フェードし終えたら破棄
+                    Destroy(oldInstance);
                 });
             }
 

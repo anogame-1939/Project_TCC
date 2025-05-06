@@ -4,7 +4,6 @@ using UnityEngine.AI;
 using AnoGame.Application.Player.Control;
 using Unity.TinyCharacterController.Control;
 using Unity.TinyCharacterController.Core; // NOTE:微妙...別のnamespaceがいい
-using Unity.TinyCharacterController.Brain;
 using AnoGame.Application.Enemy;
 using Cysharp.Threading.Tasks;
 using System;
@@ -69,11 +68,11 @@ namespace AnoGame.Application.Enmemy.Control
 
         public void SetStoryMode(bool isStoryMode)
         {
+            Debug.Log($"isStoryMode:{isStoryMode}");
             this.isStoryMode = isStoryMode;
         }
 
         /// <summary>
-        /// Bolt の「On Update」相当
         /// 毎フレームごとに速度をチェックしてアニメーターに反映する
         /// </summary>
         void Update()
@@ -87,7 +86,6 @@ namespace AnoGame.Application.Enmemy.Control
         }
 
         /// <summary>
-        /// Bolt の「On Fixed Update」相当
         /// 物理演算やエージェントの移動更新タイミングに合わせて呼び出される
         /// </summary>
         void FixedUpdate()
@@ -273,10 +271,12 @@ namespace AnoGame.Application.Enmemy.Control
             if (isChasing)
             {
                 // ChasePlayer(); // プレイヤーを追いかける処理を実行
+                agent.isStopped = false;
             }
             else
             {
                 // StopChasing(); // プレイヤーの追跡を停止する処理を実行
+                agent.isStopped = true;
             }
         }
     }
