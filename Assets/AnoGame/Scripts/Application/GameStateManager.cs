@@ -14,6 +14,8 @@ namespace AnoGame.Application
         // ゲーム状態変更時に通知するためのイベント
         public event Action<GameState> OnStateChanged;
 
+        [SerializeField] private bool isDebug = false; 
+
         private void Awake()
         {
             // 既に存在する場合は重複を避けるため削除する
@@ -25,6 +27,15 @@ namespace AnoGame.Application
             Instance = this;
             // シーン遷移しても破棄されないようにする
             DontDestroyOnLoad(gameObject);
+        }
+
+        void Update()
+        {
+            if (isDebug)
+            {
+                Debug.Log(CurrentState);
+            }
+            
         }
 
         /// <summary>

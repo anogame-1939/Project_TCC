@@ -21,32 +21,22 @@ namespace AnoGame.Application.Event
             _inventoryService = inventoryService;
             _eventService = eventService;
         }
+        
         public async void OnGameOver()
         {
             UnityEngine.Debug.Log("OnGameOver");
 
             GameStateManager.Instance.SetState(GameState.GameOver);
 
+            // 主にゲームオーバー画面表示で使用
             GameManager2.Instance.InvokeGameOver();
 
+            // ここでリトライシーンを読み込む
+            OnRetryGame();
+
+            
+
             return;
-
-            // データをリロード
-            await GameManager2.Instance.ReloadDataAsync();
-
-            // アイテムをリセット
-            var itemNames = GameManager2.Instance.CurrentGameData.Inventory.Items
-                            .Select(x => x.ItemName)
-                            .ToHashSet();
-            _inventoryService.SetItems(itemNames);
-            UnityEngine.Debug.Log($"itemNames.Count:{itemNames.Count}");
-
-            // イベントをリセット
-            _eventService.SetCleadEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
-
-
-
-            // TODO:イベント公開する
         }
 
         public async void OnRetryGame()

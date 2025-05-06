@@ -24,7 +24,7 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.LogError("EnemySpawnManagerが見つかりません。");
             }
-            GameManager2.Instance.GameOver += StopSpawner;
+            // GameManager2.Instance.GameOver += StopSpawner;
             
         }
 

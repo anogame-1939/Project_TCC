@@ -62,9 +62,9 @@ namespace AnoGame.Application.Player
             // 例：ゲームオーバー画面表示、リスポーン処理など
             // リトライポイントへ
             // StoryManager.Instance.RetyrCurrentScene();
-            PlayerSpawnManager.Instance.SpawnPlayerAtRetryPoint();
+            // PlayerSpawnManager.Instance.SpawnPlayerAtRetryPoint();
             // NOTE:エネミーもリトライポイントに移動させるのはいいが、ここでいいのか。。
-            EnemySpawnManager.Instance.SpawnEnemyAtRetryPoint();
+            // EnemySpawnManager.Instance.SpawnEnemyAtRetryPoint();
 
             GameManager2.Instance.InvokeGameOver();
         }

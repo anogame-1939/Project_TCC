@@ -148,7 +148,7 @@ namespace AnoGame.Application.Enemy
         {
             void OnStateChanged(GameState s)
             {
-                if (s != GameState.Gameplay) _spawnLoopCts?.Cancel();
+                if (s == GameState.GameOver) _spawnLoopCts?.Cancel();
             }
             GameStateManager.Instance.OnStateChanged += OnStateChanged;
 

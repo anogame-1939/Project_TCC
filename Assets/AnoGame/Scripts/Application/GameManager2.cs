@@ -164,6 +164,7 @@ namespace AnoGame.Application
         public void InvokeGameOver()
         {
             Debug.Log("InvokeGameOver");
+            GameStateManager.Instance.SetState(GameState.GameOver);
             GameOver?.Invoke();
         }
     }
