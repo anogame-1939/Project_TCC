@@ -16,6 +16,8 @@ namespace AnoGame.Application.GameOver
         {
             GameManager2.Instance.GameOver += ShowGameOverPanel;
             HideGameOverPanel();
+
+            DontDestroyOnLoad(this);
         }
 
         private void ShowGameOverPanel()
