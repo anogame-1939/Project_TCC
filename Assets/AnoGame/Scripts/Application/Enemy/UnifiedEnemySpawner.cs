@@ -43,6 +43,8 @@ namespace AnoGame.Application.Enemy
         // 非同期ループを止めるための CTS
         private CancellationTokenSource _spawnLoopCts;
 
+        private CancellationTokenSource _despawnTimerCts;
+
         // 共通で利用する EnemySpawnManager（シングルトン）
         private EnemySpawnManager spawnManager;
 
@@ -93,7 +95,6 @@ namespace AnoGame.Application.Enemy
         public void SetEventData(EventData eventData)
         {
             spawnManager.SetEventData(eventData);
-            
         }
 
         public async void SpawnfixedPsition(Transform position)
@@ -102,6 +103,75 @@ namespace AnoGame.Application.Enemy
             spawnManager.EnableChaising();
 
         }
+
+        /// <summary>
+        /// 引数の秒数経過後、敵をフェードアウト＆デスポーンさせるタイマーを開始する。
+        /// すでにタイマーが走っている場合は上書きする。
+        /// </summary>
+        /// <param name="seconds">フェードアウト開始までの待機秒数</param>
+        public void StartDespawnTimer(float seconds)
+        {
+            // 前回のタイマーがあれば停止
+            _despawnTimerCts?.Cancel();
+            _despawnTimerCts?.Dispose();
+
+            _despawnTimerCts = new CancellationTokenSource();
+            // fire‑and‑forget で非同期処理へ
+            HandleDespawnTimerAsync(seconds, _despawnTimerCts.Token).Forget();
+        }
+
+        /// <remarks>
+        /// ・敵が存在しない、または SpawnManager が null の場合は何もしない
+        /// ・フェードアウト演出中でも CTS がキャンセルされたら即終了
+        /// </remarks>
+        private async UniTaskVoid HandleDespawnTimerAsync(float seconds, CancellationToken token)
+        {
+            void OnStateChanged(GameState s)
+            {
+                // TODO:ゲームオーバーではなく会話シーンに突入したときにする。ゲームオーバー時の敵削除は別でやる
+                if (s == GameState.GameOver) _despawnTimerCts?.Cancel();
+            }
+            GameStateManager.Instance.OnStateChanged += OnStateChanged;
+            try
+            {
+                // 指定秒数待機
+                await UniTask.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: token);
+
+                // ここでチェイス停止
+                spawnManager.DisableChashing();
+                Debug.Log("逃げ切り成功");
+
+                // 敵がまだ生きているか確認
+                if (spawnManager?.CurrentEnemyInstance == null) return;
+
+                // フェードアウト演出開始
+                var playTask = spawnManager.PlayDespawnedEffectAsync(token);
+
+                // 1 秒後に DeactivateEemy() を実行
+                UniTask.Void(async () =>
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
+                    spawnManager.DeactivateEemy();
+                });
+
+                // エフェクト完了を待つ
+                await playTask;
+
+                // 念のため Deactivate
+                
+                spawnManager.DeactivateEemy();
+
+                // EventDataを成功とする
+                spawnManager.ScuccesEvent();
+                
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("逃げ切り失敗");
+                // タイマーが途中でキャンセルされた場合は何もしない
+            }
+        }
+
 
 
 

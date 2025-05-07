@@ -35,8 +35,6 @@ namespace AnoGame.Application.Enemy
             _eventData = eventData;
             
             // EnemyLifespanのOnDestroyの前に判定を行うために
-            lifespan.OnLifespanExpired += HandleEscapeSuccess;
-            hitDetector.OnPlayerHit += HandleEscapeFail;
             isChasing = true;
             Debug.Log("セットアップ");
         }
@@ -47,7 +45,7 @@ namespace AnoGame.Application.Enemy
         }
 
         // 時間切れ = 逃走成功
-        private void HandleEscapeSuccess()
+        public void HandleEscapeSuccess()
         {
             if (_eventData != null)
             {
@@ -56,7 +54,6 @@ namespace AnoGame.Application.Enemy
                 // イベントトリガーの実行
                 _eventService.TriggerEventComplete(_eventData.EventId);
             }
-            Dispose();
         }
 
         // プレイヤーヒット = 逃走失敗
@@ -75,15 +72,6 @@ namespace AnoGame.Application.Enemy
 
         private void Dispose()
         {
-            if (lifespan != null)
-            {
-                lifespan.OnLifespanExpired -= HandleEscapeSuccess;
-            }
-            if (hitDetector != null)
-            {
-                hitDetector.OnPlayerHit -= HandleEscapeFail;
-            }
-            isChasing = false;
         }
     }
 }

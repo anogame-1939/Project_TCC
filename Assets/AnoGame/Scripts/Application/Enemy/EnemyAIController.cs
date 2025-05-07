@@ -50,8 +50,6 @@ namespace AnoGame.Application.Enmemy.Control
             // 指定した子オブジェクトから Animator を取得
             animator = transform.GetChild(animatorChildIndex).GetComponent<Animator>();
 
-            GetComponent<EnemyLifespan>().OnLifespanExpired += OnLifespanExpired;
-            GetComponent<EnemyHitDetector>().OnPlayerHit += OnPlayerHit;
         }
 
         private void OnLifespanExpired()

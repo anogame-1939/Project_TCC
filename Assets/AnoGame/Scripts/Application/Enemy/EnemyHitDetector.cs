@@ -9,7 +9,6 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private int damage = 1;
         
         // イベント追加
-        public event System.Action OnPlayerHit;
 
         private void Start()
         {

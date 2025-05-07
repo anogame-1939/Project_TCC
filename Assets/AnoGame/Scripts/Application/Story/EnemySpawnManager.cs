@@ -366,6 +366,13 @@ namespace AnoGame.Application.Enemy
             enemyEventController.Initialize(eventData);
         }
 
+        public void ScuccesEvent()
+        {
+            var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
+            enemyEventController.HandleEscapeSuccess();
+        }
+        
+
         public void DisabaleEnamy()
         {
             // _currentEnemyController.DisableBrain();
