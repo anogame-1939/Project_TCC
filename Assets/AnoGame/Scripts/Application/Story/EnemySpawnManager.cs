@@ -73,6 +73,7 @@ namespace AnoGame.Application.Enemy
 
             if (_currentEnemyInstance != null)
             {
+                Debug.Log($"_currentEnemyInstance:{_currentEnemyInstance}");
                 var oldInstance = _currentEnemyInstance;
 
                 // ② 非同期でフェードアウト→破棄
@@ -252,40 +253,6 @@ namespace AnoGame.Application.Enemy
             {
                 SetEventData(eventData);
             }
-            EnabaleEnemy();
-        }
-
-        /// <summary>
-        /// プレイヤー付近に敵を出現させる。
-        /// 出現前効果再生後、一定時間待機してからEnemyControllerのSpawnNearPlayerを呼び出すコルーチンを実行する。
-        /// </summary>
-        public void SpawnEnemyNearPlayer(Vector3 playerPosition)
-        {
-            Debug.Log("非推奨-SpawnEnemyNearPlayer");
-            StartCoroutine(SpawnEnemyNearPlayerCoroutine(playerPosition));
-        }
-
-        private IEnumerator SpawnEnemyNearPlayerCoroutine(Vector3 playerPosition)
-        {
-            Debug.Log("プレイヤーの近くに敵を出現させます。");
-            // yield return con.SpawnNearPlayer(playerPosition);
-
-            // 出現前エフェクト・効果音の再生
-            PlaySpawnedSound();
-
-            Debug.Log("出現前エフェクト・効果音を再生しました。");
-            // 出現前のエフェクトの待機（moveDelay秒）
-            yield return new WaitForSeconds(moveDelay);
-
-            // 敵をアクティブ化
-            _currentEnemyInstance.SetActive(true);
-            // _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
-
-            // プレイヤー付近での出現処理を行う
-            EnabaleEnemy();
-            SetEventData(null);
-            // _currentEnemyController.SpawnNearPlayer(playerPosition);
-            Debug.Log("プレイヤー付近に敵を出現させました。");
         }
 
         public void EnableChaising()
@@ -355,28 +322,6 @@ namespace AnoGame.Application.Enemy
                 .GetComponent<EnemyLifespan>()
                 .PlayFadeOutAsync(fadeOutSettings);
         }
-        public IEnumerator PlayrSpawnedEffect()
-        {
-            // 出現前エフェクト・効果音の再生
-            PlaySpawnedSound();
-
-            Debug.Log("出現前エフェクト・効果音を再生しました。");
-            // _currentEnemyInstance.gameObject.SetActive(true);
-            yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayFadInParticle(fadeInSettings);
-
-            // 出現前のエフェクトの待機（moveDelay秒）
-            yield return new WaitForSeconds(moveDelay);
-        }
-
-        public IEnumerator PlayrDeSpawnedEffect()
-        {
-            // TODO:消滅SEほしい
-
-            // 当たり判定無効化
-             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
-
-            yield return _currentEnemyInstance.GetComponent<EnemyLifespan>().PlayFadOutParticle(fadeOutSettings);
-        }
 
         public void ActivateEnemy()
         {
@@ -400,15 +345,6 @@ namespace AnoGame.Application.Enemy
         {
             var enemyEventController = _currentEnemyInstance.GetComponent<EnemyEventController>();
             enemyEventController.Initialize(eventData);
-        }
-
-        public void EnabaleEnemy()
-        {
-            // TODO:このやり方だと管理がだるいので、EnemyAIControllerの有効化処理で一元管理する
-            _currentEnemyController.EnableBrain();
-            _currentEnemyInstance.GetComponent<EnemyAIController>().SetChasing(true);
-
-            _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
         }
 
         public void DisabaleEnamy()

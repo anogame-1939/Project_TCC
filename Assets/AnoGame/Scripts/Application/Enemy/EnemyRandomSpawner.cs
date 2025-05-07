@@ -111,7 +111,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyAtExactPosition(position, rotation);
+                // _spawnManager.SpawnEnemyAtExactPosition(position, rotation);
             }
             else
             {
@@ -158,12 +158,10 @@ namespace AnoGame.Application.Enemy
 
         public void EnableBrain()
         {
-            _spawnManager.EnabaleEnemy();
         }
 
         public void DisableBrain()
         {
-            _spawnManager.DisabaleEnamy();
         }
 
         public void Appear()

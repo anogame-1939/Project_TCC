@@ -1,6 +1,8 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using AnoGame.Application.Core;
+using AnoGame.Application.Enemy;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
 using VContainer;
@@ -10,6 +12,8 @@ namespace AnoGame.Application.Event
 {
     public class GameOverManager : SingletonMonoBehaviour<GameOverManager>
     {
+        public event Action GameOver;
+        
         [Inject] private IInventoryService _inventoryService;
         [Inject] private IEventService _eventService;
         [Inject]
@@ -27,19 +31,16 @@ namespace AnoGame.Application.Event
             UnityEngine.Debug.Log("OnGameOver");
 
             GameStateManager.Instance.SetState(GameState.GameOver);
+            EnemySpawnManager.Instance.DestroyCurrentEnemyInstance();
 
             // 主にゲームオーバー画面表示で使用
-            GameManager2.Instance.InvokeGameOver();
+            GameOver?.Invoke();
 
             // ここでリトライシーンを読み込む
-            OnRetryGame();
-
-            
-
-            return;
+            ReloadData();
         }
 
-        public async void OnRetryGame()
+        private async void ReloadData()
         {
             await GameManager2.Instance.ReloadDataAsync();
 
@@ -52,7 +53,10 @@ namespace AnoGame.Application.Event
 
             // イベントをリセット
             _eventService.SetCleadEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+        }
 
+        public async void OnRetryGame()
+        {
             GameStateManager.Instance.SetState(GameState.Gameplay);
         }
     }

@@ -52,7 +52,8 @@ namespace AnoGame.Application.Player.Effects
                     if (!_activeInstantEffects.Contains(effectType))
                     {
                         _activeInstantEffects.Add(effectType);
-                        enemySpawner.TriggerEnemySpawn();
+                        // TODO:罠機能使うならここ直す必要あり
+                        Debug.LogError("罠機能使うならここ直す必要あり");
                         _activeInstantEffects.Remove(effectType);
                     }
                     break;

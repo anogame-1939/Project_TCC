@@ -2,6 +2,7 @@ using UnityEngine;
 using AnoGame.Application.Damage;
 using AnoGame.Application.Story;
 using AnoGame.Application.Enemy;
+using AnoGame.Application.Event;
 
 namespace AnoGame.Application.Player
 {
@@ -56,17 +57,7 @@ namespace AnoGame.Application.Player
         private void OnDeath()
         {
             GameStateManager.Instance.SetState(GameState.GameOver);
-
-            // NOTE:本当はGameOverManagerから下記を読んだ方がいい
-            // 死亡時の処理を実装
-            // 例：ゲームオーバー画面表示、リスポーン処理など
-            // リトライポイントへ
-            // StoryManager.Instance.RetyrCurrentScene();
-            // PlayerSpawnManager.Instance.SpawnPlayerAtRetryPoint();
-            // NOTE:エネミーもリトライポイントに移動させるのはいいが、ここでいいのか。。
-            // EnemySpawnManager.Instance.SpawnEnemyAtRetryPoint();
-
-            GameManager2.Instance.InvokeGameOver();
+            GameOverManager.Instance.OnGameOver();
         }
 
         // HP回復メソッド

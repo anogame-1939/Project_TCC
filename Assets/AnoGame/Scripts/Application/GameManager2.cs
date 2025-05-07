@@ -20,7 +20,6 @@ namespace AnoGame.Application
 
         public event Action<GameData> SaveGameData;
         public event Action<GameData> LoadGameData;
-        public event Action GameOver;
 
         private GameData _currentGameData;
         public GameData CurrentGameData => _currentGameData;
@@ -161,11 +160,6 @@ namespace AnoGame.Application
 #endif
         }
 
-        public void InvokeGameOver()
-        {
-            Debug.Log("InvokeGameOver");
-            GameStateManager.Instance.SetState(GameState.GameOver);
-            GameOver?.Invoke();
-        }
+
     }
 }

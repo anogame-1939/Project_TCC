@@ -51,40 +51,9 @@ namespace AnoGame.Application.Enemy
             
             if (audoStart)
             {
-                TriggerEnemySpawn();
             }
         }
 
-        /// <summary>
-        /// エネミーのスタートポイントに出現させる
-        /// </summary>
-        public void TriggerEnemySpawn()
-        {
-            if (_spawnManager != null)
-            {
-                if (isStoryMode)
-                {
-                    StartCoroutine(TriggerEnemySpawnToStoryModeCor());
-                }
-                else
-                {
-                    StartCoroutine(TriggerEnemySpawnCor());
-                }
-            }
-            else
-            {
-                Debug.LogError("EnemySpawnManagerの参照が見つかりません。");
-            }
-        }
-
-        private IEnumerator TriggerEnemySpawnCor()
-        {
-            _spawnManager.EnabaleEnemy();
-            yield return null;
-            _spawnManager.SpawnEnemyAtStart();
-            yield return null;
-            _spawnManager.DisabaleEnamy();
-        }
 
         private IEnumerator TriggerEnemySpawnToStoryModeCor()
         {
@@ -130,7 +99,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.SpawnEnemyAtExactPosition(position, rotation, _eventaData);
+                // _spawnManager.SpawnEnemyAtExactPosition(position, rotation, _eventaData);
             }
             else
             {
@@ -177,7 +146,6 @@ namespace AnoGame.Application.Enemy
 
         public void EnableBrain()
         {
-            _spawnManager.EnabaleEnemy();
         }
 
         public void DisableBrain()

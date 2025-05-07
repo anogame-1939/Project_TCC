@@ -14,7 +14,7 @@ namespace AnoGame.Application.GameOver
 
         private void Awake()
         {
-            GameManager2.Instance.GameOver += ShowGameOverPanel;
+            GameOverManager.Instance.GameOver += ShowGameOverPanel;
             HideGameOverPanel();
 
             DontDestroyOnLoad(this);
@@ -43,7 +43,7 @@ namespace AnoGame.Application.GameOver
             Debug.Log("Retry Button Clicked!");
             HideGameOverPanel();
             // 現在のシーンをやり直す
-            StoryManager.Instance.RetyrCurrentScene();
+            // StoryManager.Instance.RetyrCurrentScene();
 
             GameOverManager.Instance.OnRetryGame();
         }
