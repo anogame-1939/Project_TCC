@@ -43461,6 +43461,7 @@ GameObject:
   - component: {fileID: 4254808555920615629}
   - component: {fileID: 4254808555920615630}
   - component: {fileID: 4254808555920615631}
+  - component: {fileID: 4254808555920615632}
   m_Layer: 3
   m_Name: Popup
   m_TagString: Player
@@ -43476,10 +43477,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4208349406408657136}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0070601767, y: -0.8451921, z: 0.011168281, w: 0.5342994}
-  m_LocalPosition: {x: 0.756, y: 1.886, z: 0.39}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: -0.0010442219, y: -0.8415596, z: -0.0016268765, w: 0.5401609}
+  m_LocalPosition: {x: 0.81, y: 4.91, z: 1.93}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6976612069554673663}
   m_Father: {fileID: 2069014038}
@@ -43511,6 +43512,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flip: 0
+  characterSettings: {fileID: 4254808555920615632}
+--- !u!114 &4254808555920615632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4208349406408657136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21501635e762343f1b16e2d5c7aed266, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _environmentLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  _mass: 1
+  _height: 1.4
+  _radius: 0.5
 --- !u!1001 &4587226390067968349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43637,7 +43657,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3915539078406261636}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.70710677, z: -0, w: 0.70710677}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0.19999993, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
