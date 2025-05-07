@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &621707324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,9 +161,9 @@ MonoBehaviour:
   onEventStart:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 621707325}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
+      - m_Target: {fileID: 1295807363}
+        m_TargetAssemblyTypeName: AnoGame.Application.GameStateHandler, AnoGame.Application
+        m_MethodName: SetGameplay
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -172,7 +172,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 0
+        m_CallState: 2
       - m_Target: {fileID: 1078756857}
         m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerSpawnHandler, AnoGame.Application
         m_MethodName: SpawnAtStartPoint
@@ -196,10 +196,10 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1078756856}
-        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
-        m_MethodName: EnableBrain
+        m_CallState: 0
+      - m_Target: {fileID: 621707325}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -208,7 +208,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
   onEventFinish:
     m_PersistentCalls:
       m_Calls: []
@@ -534,6 +534,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cce0ef525de93448b2d8c1e5c0c2971, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1295807363 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6871539816348813892, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 1078756855}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d205f025553f9f447a5ff9d0f64ec7cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1307299255
