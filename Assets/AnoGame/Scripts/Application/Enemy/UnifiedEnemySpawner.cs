@@ -87,15 +87,24 @@ namespace AnoGame.Application.Enemy
         {
             spawnManager.SetupToStoryMode();
 
-            // いらんかも
             spawnManager.SpawnEnemyAtStart();
         }
 
-        public void StorySpawn(EventData eventData)
+        public void SetEventData(EventData eventData)
         {
             spawnManager.SetEventData(eventData);
-            spawnManager.SpawnEnemyAtStart();
+            
         }
+
+        public async void SpawnfixedPsition(Transform position)
+        {
+            await spawnManager.SpawnfixedPsition(position.position, position.localRotation);
+            spawnManager.EnableChaising();
+
+        }
+
+
+
 
         public void RandomSpawnLoop()
         {

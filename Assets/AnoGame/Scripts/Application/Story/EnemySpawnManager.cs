@@ -205,12 +205,40 @@ namespace AnoGame.Application.Enemy
         }
 
         /// <summary>
-        /// 出現前のエフェクト・効果音再生後、一定時間待機してから敵を出現させるコルーチン
+        /// イベントとかで急に現れる時に使う
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        public async UniTask SpawnfixedPsition(Vector3 position, Quaternion rotation)
+        {
+            Debug.Log("こっちがいいかも-SpawnEnemyCoroutine");
+            _currentEnemyInstance.SetActive(true);
+            _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
+
+            // NOTE:これいる？？
+            // _currentEnemyController = _currentEnemyInstance.GetComponent<EnemyController>();
+
+            await PlaySpawnedEffectAsync(new CancellationToken());
+
+            // 敵の有効化(表示、当たり判定有効化)
+            ActivateEnemy();
+
+            if (_currentEnemyController == null)
+            {
+                Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
+            }
+
+            
+            Debug.Log($"敵を ({position}) の位置にスポーンしました。");
+        }
+
+        /// <summary>
+        /// イベントとかで予め実体化していてほしい時に使う
         /// </summary>
         private IEnumerator SpawnEnemyCoroutine(Vector3 position, Quaternion rotation)
         {
             yield return null;
-            Debug.Log("非推奨-SpawnEnemyCoroutine");
+            Debug.Log("非推奨じゃないかもしれない-SpawnEnemyCoroutine");
             // 出現前エフェクト・効果音の再生
             // PlaySpawnedSound();
             // ※ エフェクトとしてパーティクル等を再生する処理を追加可能
@@ -232,7 +260,7 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
             }
-            
+
             _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
@@ -274,15 +302,6 @@ namespace AnoGame.Application.Enemy
         // 出現エフェクトの再生
         // 敵をアクティブ化
         // ↑この順番で処理させる
-
-        public IEnumerator SetPositionNearPlayer(Vector3 playerPosition)
-        {
-            var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
-            con.SetChasing(true);
-
-            Debug.Log("プレイヤーの近くに敵を出現させます。");
-            yield return con.SpawnNearPlayer(playerPosition);
-        }
 
         public async UniTask SetPositionNearPlayerAsync(Vector3 playerPos, CancellationToken token)
         {
