@@ -69,7 +69,7 @@ namespace AnoGame.Application.Enemy
 
         public void SetStoryMode()
         {
-            Debug.LogError("廃止");
+            Debug.LogError("廃止-いや、まて。。");
             spawnManager.SetupToStoryMode();
         }
 

@@ -196,18 +196,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1078756856}
-        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
-        m_MethodName: SpawnAtObject
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1307299255}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
       - m_Target: {fileID: 621707325}
         m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
         m_MethodName: Play
@@ -230,6 +218,31 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 606505075}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: SetStoryMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2020212882}
+        m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+        m_MethodName: SetAngle
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 135
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
@@ -404,6 +417,37 @@ PlayableDirector:
   m_CorrespondingSourceObject: {fileID: 8723724664311499656, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
   m_PrefabInstance: {fileID: 1729356093}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &880446244
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 880446245}
+  m_Layer: 0
+  m_Name: "StartPoint-\u602A\u7570\u7528_1"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &880446245
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 880446244}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.01, y: 0, z: -2.63}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &933727827 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4697333048390941874, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
@@ -524,17 +568,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
---- !u!114 &1078756856 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8385771261621888772, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
-  m_PrefabInstance: {fileID: 1078756855}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9170fd179ea0e41adb7c2317c32a52a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1078756857 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8861188789632177641, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
@@ -604,7 +637,7 @@ Transform:
   m_GameObject: {fileID: 1307299255}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.79, y: 0, z: -5.31}
+  m_LocalPosition: {x: 1.43, y: 0, z: -5.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -809,6 +842,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 81ef188857d49405bb00fccd35fe8b4f, type: 2}
     - {fileID: 11400000, guid: acbf17cea7f3c4ffba310dfce5499b43, type: 2}
     - {fileID: 11400000, guid: 7110b4a6ea14546429a6d2d25af2a9ef, type: 2}
+    - {fileID: 11400000, guid: 02ed639cd8594c34997735c4992ef0d3, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -859,6 +893,20 @@ MonoBehaviour:
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2020212882}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: MoveToTarget
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 880446244}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -1482,6 +1530,17 @@ PlayableDirector:
   m_CorrespondingSourceObject: {fileID: 573768938222003664, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
   m_PrefabInstance: {fileID: 1729356093}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2020212882 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 912642633394794230, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 1078756855}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d81a5a43bd28f6a48a423636d43d8316, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4722844012616427823
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1630,3 +1689,4 @@ SceneRoots:
   - {fileID: 621707326}
   - {fileID: 1022978318}
   - {fileID: 1307299256}
+  - {fileID: 880446245}
