@@ -33,7 +33,7 @@ namespace AnoGame.Application.Event
         protected override void OnStartEvent()
         {
             base.OnStartEvent();
-            Debug.Log("OnStartEvent-InstantEventTrigger");
+            Debug.Log($"InstantEventTrigger-OnStartEvent:{name}");
 
             // スタートと同時にイベントをクリアする
             _eventService.TriggerEventComplete(eventData.EventId);
@@ -44,7 +44,7 @@ namespace AnoGame.Application.Event
         public override void OnFinishEvent()
         {
             base.OnFinishEvent();
-            Debug.Log("OnCompleteEvent-InstantEventTrigger");
+            Debug.Log($"InstantEventTrigger-OnCompleteEvent:{name}");
         }
     }
 }

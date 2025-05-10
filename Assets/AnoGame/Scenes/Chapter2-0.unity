@@ -183,7 +183,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
       - m_Target: {fileID: 1078756857}
         m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerSpawnHandler, AnoGame.Application
         m_MethodName: SpawnAtStartPoint
@@ -196,9 +196,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 621707325}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
+      - m_Target: {fileID: 1078756859}
+        m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler, AnoGame.Application
+        m_MethodName: EnableForceMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -246,6 +246,30 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1078756859}
+        m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler, AnoGame.Application
+        m_MethodName: SetAngle
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: -45
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 621707325}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventFinish:
     m_PersistentCalls:
       m_Calls:
@@ -261,7 +285,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
   onEventDone:
     m_PersistentCalls:
       m_Calls:
@@ -277,7 +301,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
   onEventFailed:
     m_PersistentCalls:
       m_Calls: []
@@ -468,7 +492,7 @@ Transform:
   m_GameObject: {fileID: 880446244}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01, y: 0, z: -2.63}
+  m_LocalPosition: {x: 1.25, y: 0, z: -1.89}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -510,7 +534,7 @@ Transform:
   m_GameObject: {fileID: 951679490}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.21, y: 0, z: 1.41}
+  m_LocalPosition: {x: -1.13, y: 0, z: 3.78}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -658,6 +682,111 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cce0ef525de93448b2d8c1e5c0c2971, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1209250936
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1209250938}
+  - component: {fileID: 1209250939}
+  m_Layer: 0
+  m_Name: "002.\u63A2\u7D22\u958B\u59CB"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1209250938
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209250936}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.25, y: 0, z: -1.89}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1209250939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209250936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b8f182e870d44baa9c3f3e32a5d56f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: bf335696d7f93e84ba9d6f5afee85132, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 606505075}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: RandomSpawnLoop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents: []
+--- !u!1 &1236436880
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1236436881}
+  m_Layer: 0
+  m_Name: "\u4F4D\u7F6E-\u602A\u7570\u304C\u30D7\u30EC\u30A4\u30E4\u30FC\u306B\u3055\u3089\u306B\u63A5\u8FD1"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1236436881
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1236436880}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.56, y: 0, z: 0.88}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1295807363 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6871539816348813892, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
@@ -694,7 +823,7 @@ Transform:
   m_GameObject: {fileID: 1307299255}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.43, y: 0, z: -5.31}
+  m_LocalPosition: {x: 2.07, y: 0, z: -3.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -890,7 +1019,7 @@ Transform:
   m_GameObject: {fileID: 1642275830}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.6, y: 0, z: -0.76}
+  m_LocalPosition: {x: -0.61, y: 0, z: 1.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -907,7 +1036,7 @@ GameObject:
   - component: {fileID: 1715894293}
   - component: {fileID: 1715894292}
   m_Layer: 0
-  m_Name: 2-0.SignalReceiver
+  m_Name: "2-0.SG-\u30B9\u30C8\u30FC\u30EA\u30FC2\u958B\u59CB"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -927,39 +1056,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Events:
     m_Signals:
-    - {fileID: 11400000, guid: 81ef188857d49405bb00fccd35fe8b4f, type: 2}
     - {fileID: 11400000, guid: acbf17cea7f3c4ffba310dfce5499b43, type: 2}
     - {fileID: 11400000, guid: 7110b4a6ea14546429a6d2d25af2a9ef, type: 2}
     - {fileID: 11400000, guid: 02ed639cd8594c34997735c4992ef0d3, type: 2}
     - {fileID: 11400000, guid: 3855a23f525eaa7418035b50a5d03074, type: 2}
-    - {fileID: 11400000, guid: 6b8a14dbd5860c84fa3acb75a02c3218, type: 2}
+    - {fileID: 11400000, guid: ba9c0ecaf94c7ec46a5c4808fb514c90, type: 2}
     m_Events:
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.StoryHandler, AnoGame.Application
-          m_MethodName: LoadStory
-          m_Mode: 3
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 1
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.StoryHandler, AnoGame.Application
-          m_MethodName: LoadStory2
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1509391777}
@@ -974,6 +1076,19 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 1078756859}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
+            AnoGame.Application
+          m_MethodName: SetAngle
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: -45
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 0
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1509391777}
@@ -1022,6 +1137,19 @@ MonoBehaviour:
         - m_Target: {fileID: 1078756859}
           m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
             AnoGame.Application
+          m_MethodName: SetAngle
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 135
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1078756859}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
+            AnoGame.Application
           m_MethodName: MoveToTargetBackstep
           m_Mode: 2
           m_Arguments:
@@ -1032,10 +1160,73 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 2020212882}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: MoveToTarget
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1236436880}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 606505075}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
+          m_MethodName: SetEventData
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: bf335696d7f93e84ba9d6f5afee85132, type: 2}
+            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.EventData, AnoGame.Application
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
         - m_Target: {fileID: 606505075}
           m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
             AnoGame.Application
           m_MethodName: SetRandomMode
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 606505075}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
+          m_MethodName: StartDespawnTimer
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 5
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1078756859}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
+            AnoGame.Application
+          m_MethodName: DisableForceMode
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1295807363}
+          m_TargetAssemblyTypeName: AnoGame.Application.GameStateHandler, AnoGame.Application
+          m_MethodName: SetGameplay
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1813,15 +2004,17 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1715894293}
   - {fileID: 1916187286}
   - {fileID: 1078756855}
   - {fileID: 1509391776}
   - {fileID: 4722844012616427823}
   - {fileID: 1729356093}
   - {fileID: 621707326}
+  - {fileID: 1715894293}
   - {fileID: 1022978318}
   - {fileID: 1307299256}
   - {fileID: 880446245}
   - {fileID: 1642275831}
   - {fileID: 951679491}
+  - {fileID: 1236436881}
+  - {fileID: 1209250938}

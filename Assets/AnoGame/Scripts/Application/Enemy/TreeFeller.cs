@@ -31,11 +31,12 @@ namespace AnoGame.Application.Enemy
 
         public MMF_Player mMF_Player_Skill1;
         public MMF_Player mMF_Player_Skill2;
-        
+
+        private const string TreeTag = "Tree";
+        private const string FallenTreeTag = "FallenTree";
 
         void Start()
         {
-            // duration 秒ごとに木を倒す処理をコルーチンで実行
             StartCoroutine(TreeFellingRoutine());
         }
 
@@ -48,46 +49,39 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        /// <summary>
-        /// 周囲の木を検出して倒す処理
-        /// インスペクターから右クリックメニューでも呼び出せる
-        /// </summary>
         [ContextMenu("Fell Trees")]
         public void FellTrees()
         {
             Debug.Log("FellTrees: 処理開始");
 
-            // 自身の周囲(detectionRadius内)のColliderを取得
+            // 必要ならLayerMaskを使ってさらに絞り込んでもOK
             Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
             foreach (Collider col in colliders)
             {
-                // "Tree" タグのオブジェクトを対象にする
-                if (col.CompareTag("Tree"))
+                // 「倒す対象の木」は元のタグ "Tree" のまま
+                // 倒したら FallenTree に変わるので、既に倒れた木はここでスキップされる
+                if (!col.CompareTag(TreeTag))
+                    continue;
+
+                PreTreeFallen();
+
+                var fallScript = col.GetComponent<CustomTreeRigidbody>();
+                if (fallScript == null)
                 {
-                    // 木が倒れる前の処理を実行
-                    PreTreeFallen();
-
-                    // まだ CustomTreeRigidbody が付いていなければアタッチ
-                    CustomTreeRigidbody fallScript = col.GetComponent<CustomTreeRigidbody>();
-                    if (fallScript == null)
-                    {
-                        fallScript = col.gameObject.AddComponent<CustomTreeRigidbody>();
-                    }
-
-                    // イベント購読
-                    fallScript.OnTreeFallen += OnTreeFallenHandler;
-
-                    float randomDuration = fallDuration * Random.Range(minDurationMultiplier, maxDurationMultiplier);
-
-                    // 「倒す」処理を実行 (本スクリプト側のパラメータを渡す)
-                    fallScript.Fall(
-                        fellerPosition : transform.position,
-                        fallDuration   : randomDuration,
-                        fallAngle      : fallAngle,
-                        pivotOffset    : pivotOffset,
-                        fallCurve      : fallCurve
-                    );
+                    fallScript = col.gameObject.AddComponent<CustomTreeRigidbody>();
                 }
+
+                fallScript.OnTreeFallen += OnTreeFallenHandler;
+
+                float randomDuration = fallDuration * Random.Range(minDurationMultiplier, maxDurationMultiplier);
+
+                fallScript.Fall(
+                    fellerPosition: transform.position,
+                    fallDuration:   randomDuration,
+                    fallAngle:      fallAngle,
+                    pivotOffset:    pivotOffset,
+                    fallCurve:      fallCurve
+                );
             }
         }
 
@@ -99,23 +93,21 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        // 木が倒れ終わった時に呼ばれるハンドラ
+        // 倒れ終わった木を FallenTree にタグ変更
         private void OnTreeFallenHandler(CustomTreeRigidbody fallenTree)
         {
-            // 必要に応じて購読解除
+            // タグを変更して次回以降の検出から外す
+            fallenTree.gameObject.tag = FallenTreeTag;
+
             fallenTree.OnTreeFallen -= OnTreeFallenHandler;
 
-            // Feelでカメラシェイクなどを実行
             Debug.Log("木が倒れ終わりました！ カメラシェイクを実行します。");
-            // ここでFeelのFeedbackを呼ぶ etc...
-
             if (!mMF_Player_Skill2.IsPlaying)
             {
                 mMF_Player_Skill2.PlayFeedbacks();
             }
         }
 
-        // デバッグ用に detectionRadius を描画する
         void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;

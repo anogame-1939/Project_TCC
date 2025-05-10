@@ -47,6 +47,7 @@ namespace AnoGame.Application.Enemy
         // 時間切れ = 逃走成功
         public void HandleEscapeSuccess()
         {
+            Debug.Log("HandleEscapeSuccess" + _eventData.EventName);
             if (_eventData != null)
             {
                 // クリア済みのイベントIDを登録
