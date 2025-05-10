@@ -248,10 +248,36 @@ MonoBehaviour:
         m_CallState: 2
   onEventFinish:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 606505075}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: RandomSpawnLoop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventDone:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 606505075}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: RandomSpawnLoop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventFailed:
     m_PersistentCalls:
       m_Calls: []
@@ -427,7 +453,7 @@ GameObject:
   m_Component:
   - component: {fileID: 880446245}
   m_Layer: 0
-  m_Name: "StartPoint-\u602A\u7570\u7528_1"
+  m_Name: "\u4F4D\u7F6E-\u602A\u7570\u304C\u30D7\u30EC\u30A4\u30E4\u30FC\u306B\u63A5\u8FD1"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -459,6 +485,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 070c9411b272c4e03bdba48b4561adbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &951679490
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 951679491}
+  m_Layer: 0
+  m_Name: "\u4F4D\u7F6E-\u30D7\u30EC\u30A4\u30E4\u30FC\u9003\u8D70"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &951679491
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951679490}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.21, y: 0, z: 1.41}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1014257700 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3735792761940572698, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
@@ -808,6 +865,37 @@ PlayableDirector:
   m_CorrespondingSourceObject: {fileID: 6929344616936431420, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
   m_PrefabInstance: {fileID: 1729356093}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1642275830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1642275831}
+  m_Layer: 0
+  m_Name: "\u4F4D\u7F6E-\u30D7\u30EC\u30A4\u30E4\u30FC\u5F8C\u9000\u308A"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1642275831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642275830}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.6, y: 0, z: -0.76}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1715894291
 GameObject:
   m_ObjectHideFlags: 0
@@ -843,6 +931,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: acbf17cea7f3c4ffba310dfce5499b43, type: 2}
     - {fileID: 11400000, guid: 7110b4a6ea14546429a6d2d25af2a9ef, type: 2}
     - {fileID: 11400000, guid: 02ed639cd8594c34997735c4992ef0d3, type: 2}
+    - {fileID: 11400000, guid: 3855a23f525eaa7418035b50a5d03074, type: 2}
+    - {fileID: 11400000, guid: 6b8a14dbd5860c84fa3acb75a02c3218, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -907,6 +997,49 @@ MonoBehaviour:
           m_Arguments:
             m_ObjectArgument: {fileID: 880446244}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1078756859}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
+            AnoGame.Application
+          m_MethodName: MoveToTargetBackstep
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1642275830}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1078756859}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
+            AnoGame.Application
+          m_MethodName: MoveToTargetBackstep
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 951679490}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 606505075}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
+          m_MethodName: SetRandomMode
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -1690,3 +1823,5 @@ SceneRoots:
   - {fileID: 1022978318}
   - {fileID: 1307299256}
   - {fileID: 880446245}
+  - {fileID: 1642275831}
+  - {fileID: 951679491}
