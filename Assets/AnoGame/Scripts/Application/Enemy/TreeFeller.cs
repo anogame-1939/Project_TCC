@@ -1,6 +1,8 @@
-using System.Collections;
+using System;
 using UnityEngine;
 using MoreMountains.Feedbacks;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace AnoGame.Application.Enemy
 {
@@ -35,17 +37,45 @@ namespace AnoGame.Application.Enemy
         private const string TreeTag = "Tree";
         private const string FallenTreeTag = "FallenTree";
 
-        void Start()
+        // ループ制御用のCTS
+        private CancellationTokenSource _cts;
+
+        /// <summary>
+        /// 外部から呼び出してスキルループを開始
+        /// </summary>
+        public void PlaySkillLoop()
         {
-            StartCoroutine(TreeFellingRoutine());
+            // 既存タスクがあればキャンセル
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+            FellingLoopAsync(_cts.Token).Forget();
         }
 
-        IEnumerator TreeFellingRoutine()
+        /// <summary>
+        /// 外部から呼び出してスキルループを停止
+        /// </summary>
+        public void StopSkillLoop()
         {
-            while (true)
+            _cts?.Cancel();
+            _cts = null;
+        }
+
+        /// <summary>
+        /// UniTaskでの繰り返し処理
+        /// </summary>
+        private async UniTaskVoid FellingLoopAsync(CancellationToken token)
+        {
+            try
             {
-                FellTrees();
-                yield return new WaitForSeconds(duration);
+                while (!token.IsCancellationRequested)
+                {
+                    FellTrees();
+                    await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // キャンセル例外は無視
             }
         }
 
@@ -54,26 +84,21 @@ namespace AnoGame.Application.Enemy
         {
             Debug.Log("FellTrees: 処理開始");
 
-            // 必要ならLayerMaskを使ってさらに絞り込んでもOK
             Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
             foreach (Collider col in colliders)
             {
-                // 「倒す対象の木」は元のタグ "Tree" のまま
-                // 倒したら FallenTree に変わるので、既に倒れた木はここでスキップされる
                 if (!col.CompareTag(TreeTag))
                     continue;
 
                 PreTreeFallen();
 
-                var fallScript = col.GetComponent<CustomTreeRigidbody>();
-                if (fallScript == null)
-                {
-                    fallScript = col.gameObject.AddComponent<CustomTreeRigidbody>();
-                }
+                var fallScript = col.GetComponent<CustomTreeRigidbody>()
+                                 ?? col.gameObject.AddComponent<CustomTreeRigidbody>();
 
                 fallScript.OnTreeFallen += OnTreeFallenHandler;
 
-                float randomDuration = fallDuration * Random.Range(minDurationMultiplier, maxDurationMultiplier);
+                float randomDuration = fallDuration *
+                                       UnityEngine.Random.Range(minDurationMultiplier, maxDurationMultiplier);
 
                 fallScript.Fall(
                     fellerPosition: transform.position,
@@ -93,12 +118,9 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        // 倒れ終わった木を FallenTree にタグ変更
         private void OnTreeFallenHandler(CustomTreeRigidbody fallenTree)
         {
-            // タグを変更して次回以降の検出から外す
             fallenTree.gameObject.tag = FallenTreeTag;
-
             fallenTree.OnTreeFallen -= OnTreeFallenHandler;
 
             Debug.Log("木が倒れ終わりました！ カメラシェイクを実行します。");

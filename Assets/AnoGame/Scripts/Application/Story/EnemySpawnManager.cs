@@ -348,6 +348,13 @@ namespace AnoGame.Application.Enemy
             life.Activate();
 
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
+
+            // NOTE:スキル用のインターフェースにすべきだが今回はこれでいく
+            var treeFeller = _currentEnemyInstance.GetComponent<TreeFeller>();
+            if (treeFeller != null)
+            {
+                treeFeller.PlaySkillLoop();
+            }
         }
 
         public void DeactivateEemy()
@@ -356,6 +363,13 @@ namespace AnoGame.Application.Enemy
             _currentEnemyInstance.GetComponent<EnemyLifespan>().Deactivate();
             _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
             // _currentEnemyInstance.SetActive(true);
+
+            // NOTE:スキル用のインターフェースにすべきだが今回はこれでいく
+            var treeFeller = _currentEnemyInstance.GetComponent<TreeFeller>();
+            if (treeFeller != null)
+            {
+                treeFeller.StopSkillLoop();
+            }
         }
 
         // NOTE: ↑↑↑ランダムスポーン関係↑↑↑
