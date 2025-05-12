@@ -6,6 +6,9 @@ namespace AnoGame.EditorExtensions
 {
     public class ProceduralPlacementTool : EditorWindow
     {
+        // --- ① クラスフィールドに追加 ---
+        private bool placeOnPerimeter = false; // true: 円周、false: 円内
+
         private GameObject prefab;
         private int count = 10;
         private float radius = 5f;
@@ -28,6 +31,9 @@ namespace AnoGame.EditorExtensions
         private void OnGUI()
         {
             GUILayout.Label("Procedural Placement Settings", EditorStyles.boldLabel);
+
+            // 円内／円周配置オプション
+            placeOnPerimeter = EditorGUILayout.Toggle("Place On Perimeter", placeOnPerimeter);
 
             prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefab, typeof(GameObject), false);
             count = EditorGUILayout.IntField("Count", count);
@@ -69,45 +75,52 @@ namespace AnoGame.EditorExtensions
         private List<Vector3> GeneratePositions()
         {
             List<Vector3> positions = new List<Vector3>();
-            int maxAttempts = count * 10;
+            int maxAttempts = placeOnPerimeter ? count * 2 : count * 10;
             int currentAttempts = 0;
 
             while (positions.Count < count && currentAttempts < maxAttempts)
             {
-                // 極座標でランダムな位置を生成
                 float angle = Random.Range(0f, Mathf.PI * 2f);
-                float distanceFromCenter = radius * Mathf.Sqrt(Random.Range(0f, 1f));
-                
-                // 中心からの距離に応じて配置確率を調整
-                float normalizedDistance = distanceFromCenter / radius;
-                float placementProbability = Mathf.Pow(normalizedDistance, densityMultiplier);
-                
-                if (Random.value < placementProbability)
+
+                // 円周配置なら距離は常に radius、円内配置なら従来ロジック
+                float distanceFromCenter = placeOnPerimeter
+                    ? radius
+                   : radius * Mathf.Sqrt(Random.Range(0f, 1f));
+
+                // 円周配置時は密度調整不要
+                if (!placeOnPerimeter)
                 {
-                    // 極座標からデカルト座標に変換
-                    Vector3 position = new Vector3(
-                        distanceFromCenter * Mathf.Cos(angle),
-                        0,
-                        distanceFromCenter * Mathf.Sin(angle)
-                    );
-                    
-                    // 最小距離チェック
-                    bool tooClose = false;
-                    foreach (Vector3 existingPos in positions)
+                    float normalizedDistance = distanceFromCenter / radius;
+                    float placementProbability = Mathf.Pow(normalizedDistance, densityMultiplier);
+                    if (Random.value >= placementProbability)
                     {
-                        if (Vector3.Distance(position, existingPos) < minDistance)
-                        {
-                            tooClose = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!tooClose)
-                    {
-                        positions.Add(position);
+                        currentAttempts++;
+                        continue;
                     }
                 }
-                
+
+                Vector3 position = new Vector3(
+                    distanceFromCenter * Mathf.Cos(angle),
+                    0,
+                    distanceFromCenter * Mathf.Sin(angle)
+                );
+
+                // 最小距離チェック
+                bool tooClose = false;
+                foreach (Vector3 existingPos in positions)
+                {
+                    if (Vector3.Distance(position, existingPos) < minDistance)
+                    {
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (!tooClose)
+                {
+                    positions.Add(position);
+                }
+
                 currentAttempts++;
             }
 
