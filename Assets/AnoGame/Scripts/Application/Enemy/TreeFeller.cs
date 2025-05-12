@@ -35,6 +35,8 @@ namespace AnoGame.Application.Enemy
         public MMF_Player mMF_Player_Skill2;
 
         private const string TreeTag = "Tree";
+        [SerializeField]
+        private LayerMask detectionMask;
         private const string FallenTreeTag = "FallenTree";
 
         // ループ制御用のCTS
@@ -84,7 +86,7 @@ namespace AnoGame.Application.Enemy
         {
             Debug.Log("FellTrees: 処理開始");
 
-            Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
+            Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, detectionMask);
             foreach (Collider col in colliders)
             {
                 if (!col.CompareTag(TreeTag))
@@ -120,6 +122,7 @@ namespace AnoGame.Application.Enemy
 
         private void OnTreeFallenHandler(CustomTreeRigidbody fallenTree)
         {
+            fallenTree.gameObject.layer = -1;
             fallenTree.gameObject.tag = FallenTreeTag;
             fallenTree.OnTreeFallen -= OnTreeFallenHandler;
 
