@@ -4,6 +4,7 @@ using AnoGame.Data;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using System;
+using UnityEditor.Search;
 
 namespace AnoGame.Application.Enemy
 {
@@ -101,7 +102,11 @@ namespace AnoGame.Application.Enemy
         {
             await spawnManager.SpawnfixedPsition(position.position, position.localRotation);
             spawnManager.EnableChaising();
+        }
 
+        public async void SpawnfixedPsition_Story(Transform position)
+        {
+            await spawnManager.SpawnfixedPsition_Story(position.position, position.localRotation);
         }
 
         /// <summary>
@@ -277,18 +282,21 @@ namespace AnoGame.Application.Enemy
         /// 雑だけど怪異を部分的にフェードアウトさせるメソッド
         /// </summary>
         /// <param name="settings"></param>
-        public void ApFadeToPartialStatepear(PartialFadeSettings settings)
+        public async void ApFadeToPartialStatepear(PartialFadeSettings settings)
         {
+            _despawnTimerCts?.Cancel();
+            _despawnTimerCts?.Dispose();
+
+            _despawnTimerCts = new CancellationTokenSource();
+            var token = _despawnTimerCts.Token;
             if (settings != null)
             {
-                // HACK:雑だけどここでEnemyHitDetectorを無効化しておく
-                var enemyHitDetector =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyHitDetector>();
-                enemyHitDetector.Deactivate();
+                var playTask = spawnManager.PlayDespawnedEffectAsync(settings, token);
 
-                var enemyLifespan =  spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
-                // enemyLifespan.enabled = true;
-                enemyLifespan.FadeToPartialState(settings);
-                
+                // PlayDespawnedEffectAsync の完了を待ってから DisableChashing()
+                await playTask;
+
+
             }
         }
 

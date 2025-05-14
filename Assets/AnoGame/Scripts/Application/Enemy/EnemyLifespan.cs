@@ -664,15 +664,20 @@ namespace AnoGame.Application.Enemy
                             mat.SetFloat(DissolveAmountProperty, val);
                     }
 
+                    Debug.Log($"t >= fadeOutPlayThreshold: {t} >= {fadeOutPlayThreshold}");
+                    Debug.Log($"settings.isNormal:{settings.isNormal}");
+
                     // しきい値に達したらエフェクト再生／停止
                     if (!played && t >= fadeOutPlayThreshold)
                     {
-                        fadeoutEffect.Play();
+                        if (settings.isNormal) fadeoutEffect.Play();
+                        else disappearEffect.Play();
                         played = true;
                     }
                     if (!stopped && t >= fadeOutStopThreshold)
                     {
-                        fadeoutEffect.Stop();
+                        if (settings.isNormal) fadeoutEffect.Stop();
+                        else disappearEffect.Stop();
                         stopped = true;
                     }
 

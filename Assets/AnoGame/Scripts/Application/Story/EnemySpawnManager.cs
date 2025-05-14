@@ -232,6 +232,32 @@ namespace AnoGame.Application.Enemy
             Debug.Log($"敵を ({position}) の位置にスポーンしました。");
         }
 
+        public async UniTask SpawnfixedPsition_Story(Vector3 position, Quaternion rotation)
+        {
+            Debug.Log("こっちがいいかも-SpawnEnemyCoroutine");
+            _currentEnemyInstance.SetActive(true);
+            _currentEnemyInstance.GetComponent<CharacterBrain>().Warp(position, rotation);
+
+            // NOTE:スキル用のインターフェースにすべきだが今回はこれでいく
+            var treeFeller = _currentEnemyInstance.GetComponent<TreeFeller>();
+            if (treeFeller != null)
+            {
+                treeFeller.StopSkillLoop();
+            }
+
+            await PlaySpawnedEffectAsync(new CancellationToken(), true);
+
+            // スキル無効化
+
+            if (_currentEnemyController == null)
+            {
+                Debug.LogError("スポーンした敵にEnemyControllerが見つかりません。");
+            }
+
+            
+            Debug.Log($"敵を ({position}) の位置にスポーンしました。");
+        }
+
         /// <summary>
         /// イベントとかで予め実体化していてほしい時に使う
         /// </summary>
@@ -317,9 +343,9 @@ namespace AnoGame.Application.Enemy
         /// <summary>
         /// 出現 SE とフェードイン演出を実時間で待機しながら再生する
         /// </summary>
-        public async UniTask PlaySpawnedEffectAsync(CancellationToken token)
+        public async UniTask PlaySpawnedEffectAsync(CancellationToken token, bool noSound = false)
         {
-            PlaySpawnedSound();                // SE 再生
+            if (!noSound) PlaySpawnedSound();                // SE 再生
 
             // Lifespan 側も UniTask 版を用意してある前提
             await _currentEnemyInstance
@@ -340,6 +366,16 @@ namespace AnoGame.Application.Enemy
             await _currentEnemyInstance
                 .GetComponent<EnemyLifespan>()
                 .PlayFadeOutAsync(fadeOutSettings);
+        }
+
+        public async UniTask PlayDespawnedEffectAsync(PartialFadeSettings originSettings, CancellationToken token)
+        {
+            // 当たり判定を即座に無効化
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
+
+            await _currentEnemyInstance
+                .GetComponent<EnemyLifespan>()
+                .PlayFadeOutAsync(originSettings);
         }
 
         public void ActivateEnemy()
