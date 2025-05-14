@@ -10,11 +10,12 @@ namespace AnoGame.Application
 
         // 現在のゲーム状態（初期状態は Gameplay とする）
         public GameState CurrentState { get; private set; } = GameState.Gameplay;
+        public GameSubState CurrentSubState { get; private set; } = GameSubState.None;
 
         // ゲーム状態変更時に通知するためのイベント
         public event Action<GameState> OnStateChanged;
 
-        [SerializeField] private bool isDebug = false; 
+        [SerializeField] private bool isDebug = false;
 
         private void Awake()
         {
@@ -35,7 +36,7 @@ namespace AnoGame.Application
             {
                 Debug.Log(CurrentState);
             }
-            
+
         }
 
         /// <summary>
@@ -48,6 +49,14 @@ namespace AnoGame.Application
 
             CurrentState = newState;
             OnStateChanged?.Invoke(newState);
+        }
+        
+        public void SetSubState(GameSubState newState)
+        {
+            if (CurrentSubState == newState) return;
+
+            CurrentSubState = newState;
+            // OnStateChanged?.Invoke(newState);
         }
     }
 }

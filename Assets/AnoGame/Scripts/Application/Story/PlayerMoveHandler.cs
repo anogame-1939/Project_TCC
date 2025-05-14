@@ -60,7 +60,9 @@ namespace AnoGame.Application.Story
 
         public void MoveToTargetBackstep(GameObject target)
         {
+            Debug.Log("MoveToTargetBackstep");
             MoveToTarget(target, true);
+            Debug.Log("MoveToTargetBackstep");
         }
 
         public void SetAngle(float angle)

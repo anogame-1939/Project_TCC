@@ -213,6 +213,7 @@ namespace AnoGame.Application.Enemy
                     // ゲームプレイ外なら 1 フレーム待機
                     await UniTask.Yield(PlayerLoopTiming.Update, token);
                     if (GameStateManager.Instance.CurrentState != GameState.Gameplay) continue;
+                    if (GameStateManager.Instance.CurrentSubState == GameSubState.Safety) continue;
 
                     float waitTime = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
                     // HACK:
