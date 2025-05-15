@@ -20,56 +20,11 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
-
-public class FadeImage : UnityEngine.UI.Graphic , IFade
+namespace AnoGame.Application.UI
 {
-	[SerializeField]
-	private Texture maskTexture = null;
-
-	[SerializeField, Range (0, 1)]
-	private float cutoutRange;
-
-	public float Range {
-		get {
-			return cutoutRange;
-		}
-		set {
-			cutoutRange = value;
-			UpdateMaskCutout (cutoutRange);
-		}
-	}
-
-	protected override void Start ()
+	public interface IFade
 	{
-		base.Start ();
-		UpdateMaskTexture (maskTexture);
+		float Range { get; set; }
 	}
 
-	private void UpdateMaskCutout (float range)
-	{
-		enabled = true;
-		material.SetFloat ("_Range", 1 - range);
-
-		if (range <= 0) {
-			this.enabled = false;
-		}
-	}
-
-	public void UpdateMaskTexture (Texture texture)
-	{
-		material.SetTexture ("_MaskTex", texture);
-		material.SetColor ("_Color", color);
-	}
-
-	#if UNITY_EDITOR
-	protected override void OnValidate ()
-	{
-		base.OnValidate ();
-		UpdateMaskCutout (Range);
-		UpdateMaskTexture (maskTexture);
-	}
-	#endif
 }

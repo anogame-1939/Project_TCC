@@ -24,14 +24,14 @@ namespace AnoGame.Application.Story
         private int _currentChapterIndex = 0;
 
         private ISceneLoader _sceneLoader;
-        private List<Scene> _loadedStoryScenes = new List<Scene>();
+        private List<UnityEngine.SceneManagement.Scene> _loadedStoryScenes = new List<UnityEngine.SceneManagement.Scene>();
         private SceneReference _mainMapScene;
         
         // インスペクターでメインシーン名を設定
         [SerializeField]
         private string mainSceneName;
-        private Scene _mainScene;
-        public Scene MainScene => _mainScene;
+        private UnityEngine.SceneManagement.Scene _mainScene;
+        public UnityEngine.SceneManagement.Scene MainScene => _mainScene;
         
         private bool _isLoadingScene = false;
 
@@ -224,7 +224,7 @@ namespace AnoGame.Application.Story
         private IEnumerator LoadSceneCoroutine(bool useRetryPoint)
         {
             // 変更後：インスペクターで設定した mainSceneName からシーンを取得して待機
-            Scene scene = SceneManager.GetSceneByName(mainSceneName);
+            UnityEngine.SceneManagement.Scene scene = SceneManager.GetSceneByName(mainSceneName);
             while (!scene.isLoaded)
             {
                 Debug.Log($"メインシーン {mainSceneName} の読み込みが完了するまで待機中...");
@@ -284,7 +284,7 @@ namespace AnoGame.Application.Story
 
             yield return loadOperation;
 
-            Scene newScene = SceneManager.GetSceneByPath(
+            UnityEngine.SceneManagement.Scene newScene = SceneManager.GetSceneByPath(
                 currentScene.sceneReference.ScenePath
             );
             
@@ -302,7 +302,7 @@ namespace AnoGame.Application.Story
 
         private IEnumerator UnloadCurrentScenesCoroutine()
         {
-            var scenesToUnload = new List<Scene>(_loadedStoryScenes);
+            var scenesToUnload = new List<UnityEngine.SceneManagement.Scene>(_loadedStoryScenes);
             Debug.Log($"Starting to unload {scenesToUnload.Count} story scenes");
             
             foreach (var scene in scenesToUnload)

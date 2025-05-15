@@ -21,7 +21,7 @@ namespace AnoGame.Application.Title
         private IEnumerator LoadNextSceneCor()
         {
             // 現在のシーン（タイトルシーン）を取得
-            Scene currentScene = SceneManager.GetActiveScene();
+            UnityEngine.SceneManagement.Scene currentScene = SceneManager.GetActiveScene();
 
             // 指定されたシーンをAdditiveモードで非同期ロード
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
@@ -33,7 +33,7 @@ namespace AnoGame.Application.Title
             }
 
             // ロード完了後、追加ロードしたシーンを取得し、アクティブに設定
-            Scene newScene = SceneManager.GetSceneByName(nextSceneName);
+            UnityEngine.SceneManagement.Scene newScene = SceneManager.GetSceneByName(nextSceneName);
             SceneManager.SetActiveScene(newScene);
 
 

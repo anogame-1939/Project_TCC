@@ -13,14 +13,14 @@ namespace AnoGame.Application.Title
         /// ※ この方法は、一時的にDontDestroyOnLoad対象のオブジェクトを作成して、その属するシーンを参照するテクニックです。
         /// </summary>
         /// <returns>DontDestroyOnLoad の内部シーン</returns>
-        private Scene GetDontDestroyOnLoadScene()
+        private UnityEngine.SceneManagement.Scene GetDontDestroyOnLoadScene()
         {
             // 一時的なゲームオブジェクトを作成し、DontDestroyOnLoad を付与する
             GameObject temp = new GameObject("Temp");
             DontDestroyOnLoad(temp);
 
             // 一時オブジェクトが属するシーンが、DontDestroyOnLoad対象のシーンとなる
-            Scene dontDestroyOnLoadScene = temp.scene;
+            UnityEngine.SceneManagement.Scene dontDestroyOnLoadScene = temp.scene;
 
             // 一時オブジェクトは不要なので削除する
             Destroy(temp);
@@ -34,7 +34,7 @@ namespace AnoGame.Application.Title
         public void ReturnToTitle()
         {
             // DontDestroyOnLoad オブジェクトが配置されているシーンを取得
-            Scene dontDestroyOnLoadScene = GetDontDestroyOnLoadScene();
+            UnityEngine.SceneManagement.Scene dontDestroyOnLoadScene = GetDontDestroyOnLoadScene();
 
             // このシーン内の全ルートオブジェクトを取得する
             List<GameObject> rootObjects = new List<GameObject>();
