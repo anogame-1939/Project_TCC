@@ -291,12 +291,10 @@ namespace AnoGame.Application.Enemy
             var token = _despawnTimerCts.Token;
             if (settings != null)
             {
-                var playTask = spawnManager.PlayDespawnedEffectAsync(settings, token);
+                var playTask = spawnManager.PlayDespawnedEffectLoopAsync(settings, token);
 
                 // PlayDespawnedEffectAsync の完了を待ってから DisableChashing()
                 await playTask;
-
-
             }
         }
 
@@ -304,17 +302,10 @@ namespace AnoGame.Application.Enemy
         /// 部分フェードアウト状態になっている敵を、完全にフェードアウトさせる（消失させる）メソッド
         /// </summary>
         /// <param name="duration">完全フェードアウトにかかる時間</param>
-        public void ApCompletePartialFadeOut(float duration)
+        public async void ApCompletePartialFadeOut(float duration)
         {
-            var enemyLifespan = spawnManager.CurrentEnemyInstance.GetComponent<EnemyLifespan>();
-            if(enemyLifespan != null)
-            {
-                enemyLifespan.CompletePartialFadeOut(duration);
-            }
-            else
-            {
-                Debug.LogError("CurrentEnemyInstance に EnemyLifespan コンポーネントが見つかりません。");
-            }
+            var playTask = spawnManager.PlayDespawnedEffectLoopEndAsync(duration);
+            await playTask;
         }
     }
 }

@@ -16985,8 +16985,9 @@ MonoBehaviour:
     m_Events:
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1992210893}
-          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySpawner, AnoGame.Application
+        - m_Target: {fileID: 1524738180}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
           m_MethodName: ApCompletePartialFadeOut
           m_Mode: 4
           m_Arguments:
@@ -16996,7 +16997,7 @@ MonoBehaviour:
             m_FloatArgument: 5
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 0
+          m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 269135604}
@@ -22799,11 +22800,11 @@ MonoBehaviour:
       - m_Target: {fileID: 1524738180}
         m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
           AnoGame.Application
-        m_MethodName: TriggerEnemySpawnToStory
-        m_Mode: 1
+        m_MethodName: SpawnfixedPsition_Story
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1257663183}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

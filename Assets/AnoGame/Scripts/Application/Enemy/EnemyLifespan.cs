@@ -664,9 +664,6 @@ namespace AnoGame.Application.Enemy
                             mat.SetFloat(DissolveAmountProperty, val);
                     }
 
-                    Debug.Log($"t >= fadeOutPlayThreshold: {t} >= {fadeOutPlayThreshold}");
-                    Debug.Log($"settings.isNormal:{settings.isNormal}");
-
                     // しきい値に達したらエフェクト再生／停止
                     if (!played && t >= fadeOutPlayThreshold)
                     {
@@ -698,39 +695,111 @@ namespace AnoGame.Application.Enemy
             await UniTask.WhenAll(dissolveTask, shadowTask);
         }
 
-
-        /// <summary>
-        /// SpriteRenderer群のDissolveAmountをduration秒かけて補間するUniTask版
-        /// </summary>
-        private async UniTask DissolveAsync(float[] startVals, float[] endVals, float duration)
+        public async UniTask PlayFadeOutLoopAsync(PartialFadeSettings settings)
         {
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
+            if (settings == null) return;
 
+            // マテリアル初期値セット（Outlineのみ）
+            foreach (var sr in _spriteRenderers)
+            {
+                var mat = sr.material;
+                if (mat.HasProperty(OutlineColorProperty))
+                    mat.SetColor(OutlineColorProperty, settings.outlineColor);
+            }
+
+            var startVals = _spriteRenderers
+                .Select(sr => sr.material.HasProperty(DissolveAmountProperty)
+                            ? sr.material.GetFloat(DissolveAmountProperty)
+                            : 0f)
+                .ToArray();
+            var endVals = Enumerable.Repeat(1 - settings.targetAlpha, _spriteRenderers.Length).ToArray();
+
+            bool played = false, stopped = false;
+            async UniTask DissolveWithEffectOut()
+            {
+                float elapsed = 0f;
+                while (elapsed < settings.duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / settings.duration);
+
+                    // Dissolve 更新
+                    for (int i = 0; i < _spriteRenderers.Length; i++)
+                    {
+                        float val = Mathf.Lerp(startVals[i], endVals[i], t);
+                        var mat = _spriteRenderers[i].material;
+                        if (mat.HasProperty(DissolveAmountProperty))
+                            mat.SetFloat(DissolveAmountProperty, val);
+                    }
+
+                    // しきい値に達したらエフェクト再生／停止
+                    if (!played && t >= fadeOutPlayThreshold)
+                    {
+                        if (settings.isNormal) fadeoutEffect.Play();
+                        else disappearEffect.Play();
+                        played = true;
+                    }
+                    await UniTask.Yield(PlayerLoopTiming.Update);
+                }
+            }
+
+            var dissolveTask = DissolveWithEffectOut();
+            // var shadowTask = ShadowScaleAsync(settings.duration, true);
+            // await UniTask.WhenAll(dissolveTask, shadowTask);
+            await dissolveTask;
+        }
+
+        public async UniTask PlayFadeOutLoopEndAsync(float duration)
+        {
+            var startVals = _spriteRenderers
+                .Select(sr => sr.material.HasProperty(DissolveAmountProperty)
+                            ? sr.material.GetFloat(DissolveAmountProperty)
+                            : 0f)
+                .ToArray();
+            var endVals = Enumerable.Repeat(1, _spriteRenderers.Length).ToArray();
+
+            bool stopped = false;
+            async UniTask DissolveWithEffectOut()
+            {
+                float elapsed = 0f;
+                while (elapsed < duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+
+                    // Dissolve 更新
+                    for (int i = 0; i < _spriteRenderers.Length; i++)
+                    {
+                        float val = Mathf.Lerp(startVals[i], endVals[i], t);
+                        var mat = _spriteRenderers[i].material;
+                        if (mat.HasProperty(DissolveAmountProperty))
+                            mat.SetFloat(DissolveAmountProperty, val);
+                    }
+
+                    if (!stopped && t >= fadeOutStopThreshold)
+                    {
+                        fadeoutEffect.Stop();
+                        disappearEffect.Stop();
+                        stopped = true;
+                    }
+
+                    await UniTask.Yield(PlayerLoopTiming.Update);
+                }
+                // 最終値固定
                 for (int i = 0; i < _spriteRenderers.Length; i++)
                 {
-                    float val = Mathf.Lerp(startVals[i], endVals[i], t);
-                    Debug.Log($"val:{val}");
                     var mat = _spriteRenderers[i].material;
                     if (mat.HasProperty(DissolveAmountProperty))
-                        mat.SetFloat(DissolveAmountProperty, val);
+                        mat.SetFloat(DissolveAmountProperty, endVals[i]);
                 }
-
-                // 次フレームまで待つ
-                await UniTask.Yield(PlayerLoopTiming.Update);
+                if (!stopped) fadeoutEffect.Stop();
             }
 
-            // 最終値を確定
-            for (int i = 0; i < _spriteRenderers.Length; i++)
-            {
-                var mat = _spriteRenderers[i].material;
-                if (mat.HasProperty(DissolveAmountProperty))
-                    mat.SetFloat(DissolveAmountProperty, endVals[i]);
-            }
+            var dissolveTask = DissolveWithEffectOut();
+            var shadowTask   = ShadowScaleAsync(duration, true);
+            await UniTask.WhenAll(dissolveTask, shadowTask);
         }
+
 
         /// <summary>
         /// 影のスケールを UniTask で補間する

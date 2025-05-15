@@ -378,6 +378,21 @@ namespace AnoGame.Application.Enemy
                 .PlayFadeOutAsync(originSettings);
         }
 
+        public async UniTask PlayDespawnedEffectLoopAsync(PartialFadeSettings originSettings, CancellationToken token)
+        {
+            await _currentEnemyInstance
+                .GetComponent<EnemyLifespan>()
+                .PlayFadeOutLoopAsync(originSettings);
+        }
+
+        public async UniTask PlayDespawnedEffectLoopEndAsync(float duration)
+        {
+            await _currentEnemyInstance
+                .GetComponent<EnemyLifespan>()
+                .PlayFadeOutLoopEndAsync(duration);
+        }
+
+
         public void ActivateEnemy()
         {
             var life = _currentEnemyInstance.GetComponent<EnemyLifespan>();
