@@ -175,12 +175,7 @@ namespace AnoGame.Application.Settings
         /// </summary>
         private float ToDecibel(float linear)
         {
-            // ユーザー設定の1.0 = 0dB、0.0001 = -80dB 相当に変換
-            float clamped = Mathf.Clamp(linear, 0.0001f, 1f);
-            // 0.0001 → 0.0, 1.0 → 1.0 に変換（対数スケール）
-            float t = (Mathf.Log10(clamped) - Mathf.Log10(0.0001f)) / (Mathf.Log10(1f) - Mathf.Log10(0.0001f)); // 0〜1
-            float dB = Mathf.Lerp(-80f, 20f, t); // 対応するdBに変換
-            return dB;
+            return Mathf.Log10(Mathf.Clamp(linear, 0.0001f, 1f)) * 20f;
         }
     }
 }
