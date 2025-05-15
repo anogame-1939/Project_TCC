@@ -3,12 +3,14 @@ using UnityEngine.InputSystem;
 
 namespace AnoGame.Application.UI
 {
-    public class SettingsDisplaController : MonoBehaviour
+    public class SettingsDisplayController : MonoBehaviour
     {
         [SerializeField] private InputActionAsset _inputActionAsset;
         [SerializeField] private SettingsDisplay _settingsDisplay; // SettingsDisplayがアタッチされたUIパネル
 
         private CanvasGroup _canvasGroup;
+        private InputAction _settingsAction;
+
         void Start()
         {
             if (_inputActionAsset == null)
@@ -25,13 +27,14 @@ namespace AnoGame.Application.UI
             var actionMap = _inputActionAsset.FindActionMap("Player");
             actionMap.Enable();
 
-            var settingsAction = actionMap.FindAction("Settings");
-            if (settingsAction == null)
+            _settingsAction = actionMap.FindAction("Settings");
+            if (_settingsAction == null)
             {
                 Debug.LogError("Settingsアクションが見つかりません。");
                 return;
             }
-            settingsAction.performed += ctx => ToggleSettings();
+            // ToggleSettings メソッドを購読
+            _settingsAction.performed += OnSettingsPerformed;
 
             _canvasGroup = GetComponent<CanvasGroup>();
             if (_canvasGroup == null)
@@ -42,9 +45,22 @@ namespace AnoGame.Application.UI
             HideSettings();
         }
 
+        private void OnSettingsPerformed(InputAction.CallbackContext context)
+        {
+            ToggleSettings();
+        }
+
+        void OnDestroy()
+        {
+            // 購読解除
+            if (_settingsAction != null)
+            {
+                _settingsAction.performed -= OnSettingsPerformed;
+            }
+        }
+
         void ToggleSettings()
         {
-
             var currentState = GameStateManager.Instance.CurrentState;
 
             if (currentState == GameState.Gameplay)
@@ -66,7 +82,7 @@ namespace AnoGame.Application.UI
             if (_canvasGroup != null)
                 _canvasGroup.alpha = 1;
 
-            // Settings表示中はカーソルを開放
+            // Settings表示中はカーソルを解放
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
