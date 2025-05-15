@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using AnoGame.Domain.Data.Models;
 using AnoGame.Domain.Data.Services;
 using VContainer;
+using UnityEngine.Audio; // ★ 追加
 
 namespace AnoGame.Application.Settings
 {
@@ -14,6 +15,9 @@ namespace AnoGame.Application.Settings
         public event Action<SettingsData> OnSettingsDataChanged;
 
         [Inject] private ISettingsDataRepository _repository;
+
+        [Header("Audio Mixer")] // ★ インスペクターで設定
+        [SerializeField] private AudioMixer audioMixer;
 
         [Inject]
         public void Construct(ISettingsDataRepository repository)
@@ -26,118 +30,76 @@ namespace AnoGame.Application.Settings
         {
             try
             {
-                Debug.Log($"InitializeSettingsData");
                 var tmpsettingsData = await _repository.LoadDataAsync();
-                if (tmpsettingsData != null)
-                {
-                    Debug.Log($"InitializeSettingsData:tmpsettingsData:{tmpsettingsData}");
-                    Debug.Log($"InitializeSettingsData:tmpsettingsData.Language:{tmpsettingsData.Language}");
-                }
-                else
-                {
-                    Debug.Log($"InitializeSettingsData:tmpsettingsData is null");
-                }
-                _settingsData = tmpsettingsData ?? new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
-                Debug.Log($"InitializeSettingsData-_settingsData.Language:{_settingsData.Language}");
+                _settingsData = tmpsettingsData ?? GetDefaultSettingsData();
+                ApplyAudioMixerVolumes(); // ★ 追加：初期値反映
                 OnSettingsDataChanged?.Invoke(_settingsData);
             }
             catch (Exception ex)
             {
                 Debug.LogError($"Failed to initialize settings data: {ex.Message}");
-                _settingsData = new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
+                _settingsData = GetDefaultSettingsData();
+                ApplyAudioMixerVolumes(); // ★
                 OnSettingsDataChanged?.Invoke(_settingsData);
             }
         }
 
         public SettingsData CurrentSettingsData => _settingsData;
 
-        /// <summary>
-        /// 既存の設定データを上書きします（4項目一括更新）
-        /// </summary>
         public void SetSettingsData(float masterVolume, float bgmVolume, float seSoundVolume, Language language)
         {
             if (_settingsData == null)
-            {
                 _settingsData = GetDefaultSettingsData();
-            }
-            else
-            {
-                _settingsData.MasterVolume = masterVolume;
-                _settingsData.BGMVolume = bgmVolume;
-                _settingsData.SESoundVolume = seSoundVolume;
-                _settingsData.Language = language;
-            }
+
+            _settingsData.MasterVolume = masterVolume;
+            _settingsData.BGMVolume = bgmVolume;
+            _settingsData.SESoundVolume = seSoundVolume;
+            _settingsData.Language = language;
+
+            ApplyAudioMixerVolumes(); // ★
             OnSettingsDataChanged?.Invoke(_settingsData);
         }
 
-        /// <summary>
-        /// マスター音量のみを更新するメソッド
-        /// </summary>
         public void UpdateMasterVolume(float masterVolume)
         {
             if (_settingsData == null)
-            {
                 _settingsData = GetDefaultSettingsData();
-                _settingsData.MasterVolume = masterVolume;
-            }
-            else
-            {
-                _settingsData.MasterVolume = masterVolume;
-            }
+
+            _settingsData.MasterVolume = masterVolume;
+            ApplyAudioMixerVolumes(); // ★
             OnSettingsDataChanged?.Invoke(_settingsData);
         }
 
-        /// <summary>
-        /// BGM音量のみを更新するメソッド
-        /// </summary>
         public void UpdateBgmVolume(float bgmVolume)
         {
             if (_settingsData == null)
-            {
                 _settingsData = GetDefaultSettingsData();
-                _settingsData.BGMVolume = bgmVolume;
-            }
-            else
-            {
-                _settingsData.BGMVolume = bgmVolume;
-            }
+
+            _settingsData.BGMVolume = bgmVolume;
+            ApplyAudioMixerVolumes(); // ★
             OnSettingsDataChanged?.Invoke(_settingsData);
         }
 
-        /// <summary>
-        /// SE音量のみを更新するメソッド
-        /// </summary>
         public void UpdateSeSoundVolume(float seSoundVolume)
         {
             if (_settingsData == null)
-            {
                 _settingsData = GetDefaultSettingsData();
-                _settingsData.SESoundVolume = seSoundVolume;
-            }
-            else
-            {
-                _settingsData.SESoundVolume = seSoundVolume;
-            }
+
+            _settingsData.SESoundVolume = seSoundVolume;
+            ApplyAudioMixerVolumes(); // ★
             OnSettingsDataChanged?.Invoke(_settingsData);
         }
 
-        /// <summary>
-        /// int型を受け付け、受け取った値を Language enum に変換して更新するメソッド
-        /// </summary>
         public void UpdateLanguageFromInt(int languageValue)
         {
             if (Enum.IsDefined(typeof(Language), languageValue))
             {
                 Language languageEnum = (Language)languageValue;
+
                 if (_settingsData == null)
-                {
                     _settingsData = GetDefaultSettingsData();
-                    _settingsData.Language = languageEnum;
-                }
-                else
-                {
-                    _settingsData.Language = languageEnum;
-                }
+
+                _settingsData.Language = languageEnum;
                 OnSettingsDataChanged?.Invoke(_settingsData);
             }
             else
@@ -170,6 +132,7 @@ namespace AnoGame.Application.Settings
         public void ResetSettings()
         {
             _settingsData = GetDefaultSettingsData();
+            ApplyAudioMixerVolumes(); // ★
             OnSettingsDataChanged?.Invoke(_settingsData);
         }
 
@@ -180,16 +143,39 @@ namespace AnoGame.Application.Settings
 
         private Language GetDefaultLanguageBasedOnSystem()
         {
-            switch(UnityEngine.Application.systemLanguage)
+            switch (UnityEngine.Application.systemLanguage)
             {
                 case SystemLanguage.Japanese:
                     return Language.Japanese;
                 case SystemLanguage.English:
                     return Language.English;
-                // 必要に応じて他の言語も追加
                 default:
-                    return Language.English; // デフォルトは English に設定
+                    return Language.English;
             }
+        }
+
+        /// <summary>
+        /// AudioMixer に音量を反映させる
+        /// </summary>
+        private void ApplyAudioMixerVolumes()
+        {
+            if (audioMixer == null)
+            {
+                Debug.LogWarning("AudioMixer が設定されていません。");
+                return;
+            }
+
+            audioMixer.SetFloat("MasterVolume", ToDecibel(_settingsData.MasterVolume));
+            audioMixer.SetFloat("BGMVolume", ToDecibel(_settingsData.BGMVolume));
+            audioMixer.SetFloat("SEVolume", ToDecibel(_settingsData.SESoundVolume));
+        }
+
+        /// <summary>
+        /// Linear(0〜1) を dB に変換
+        /// </summary>
+        private float ToDecibel(float linear)
+        {
+            return Mathf.Log10(Mathf.Clamp(linear, 0.0001f, 1f)) * 20f;
         }
     }
 }
