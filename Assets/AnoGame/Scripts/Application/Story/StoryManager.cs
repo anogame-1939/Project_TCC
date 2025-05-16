@@ -8,11 +8,14 @@ using AnoGame.Application.Data;
 using AnoGame.Domain.Data.Models;
 using AnoGame.Application.Core.Scene;
 using Cysharp.Threading.Tasks;
+using System.Linq;
 
 namespace AnoGame.Application.Story
 {
     public class StoryManager : SingletonMonoBehaviour<StoryManager>
-    {   
+    {
+        [SerializeField]
+        string[] ignoreScenes;
         public event Action<bool> StoryLoaded;
         public event Action<bool> ChapterLoaded;
         
@@ -307,11 +310,15 @@ namespace AnoGame.Application.Story
             
             foreach (var scene in scenesToUnload)
             {
-                if (!scene.isLoaded || !scene.IsValid())
+                if (ignoreScenes.Contains(scene.name))
                 {
-                    Debug.Log($"Skipping scene {scene.path}: not loaded or invalid");
                     continue;
                 }
+                if (!scene.isLoaded || !scene.IsValid())
+                    {
+                        Debug.Log($"Skipping scene {scene.path}: not loaded or invalid");
+                        continue;
+                    }
 
                 AsyncOperation unloadOperation = null;
                 try

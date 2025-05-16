@@ -64,11 +64,11 @@ namespace AnoGame.Application.Scene
 
             UniTask.Void(async () =>
             {
-                NowLoadingUI.Instance.ShowLoadingImage();
+                FadeManager.Instance.FadeOut(_fadeInSpeed);
 
                 await UniTask.Delay(TimeSpan.FromSeconds(_defaltWaitTime), cancellationToken: ct);
 
-                FadeManager.Instance.FadeIn(_fadeInSpeed);
+                NowLoadingUI.Instance.ShowLoadingImage();
 
                 await UniTask.Delay(TimeSpan.FromSeconds(_defaltWaitTime), cancellationToken: ct);
 

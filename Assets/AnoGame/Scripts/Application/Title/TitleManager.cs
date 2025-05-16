@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,9 @@ namespace AnoGame.Application.Title
     public class TitleManager : MonoBehaviour
     {
         [SerializeField] private string titleSceneName;
+
+        [SerializeField]
+        string[] ignoreObjects;
 
         /// <summary>
         /// DontDestroyOnLoad で保持されたオブジェクトが配置される内部シーンを取得する。
@@ -43,11 +47,13 @@ namespace AnoGame.Application.Title
             // 取得した各オブジェクトを削除する（必要に応じて、特定のオブジェクトだけ削除する処理に変更可能）
             foreach (GameObject obj in rootObjects)
             {
+                if (ignoreObjects.Contains(obj.name)) continue;
                 Destroy(obj);
             }
 
             // タイトルシーン (シーン名："TitleScene") をロードする
-            SceneManager.LoadScene(titleSceneName);
+            // SceneManager.LoadScene(titleSceneName);
+            AnoGame.Application.Scene.SceneManager.Instance.LoadScene(titleSceneName);
         }
     }
 }

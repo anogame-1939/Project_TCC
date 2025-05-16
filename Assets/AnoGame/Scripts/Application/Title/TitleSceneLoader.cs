@@ -14,7 +14,8 @@ namespace AnoGame.Application.Title
         // シーンロード開始時に非同期処理を開始します
         public void LoadNextScene()
         {
-            StartCoroutine(LoadNextSceneCor());
+            // StartCoroutine(LoadNextSceneCor());
+            AnoGame.Application.Scene.SceneManager.Instance.LoadScene(nextSceneName);
         }
 
         // 非同期でシーンをロードし、完了後にEventSystemの初期化と現在のシーンをアンロードするコルーチン

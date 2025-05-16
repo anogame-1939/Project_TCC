@@ -75,6 +75,12 @@ namespace AnoGame.Application.UI
             }
         }
 
+        public void Close()
+        {
+            GameStateManager.Instance.SetState(GameState.Gameplay);
+            HideSettings();
+        }
+
         public void ShowSettings()
         {
             // SettingsDisplayが有効になるとOnEnableで表示更新が行われる想定

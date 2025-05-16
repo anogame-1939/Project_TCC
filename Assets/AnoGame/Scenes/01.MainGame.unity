@@ -62071,6 +62071,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FadeCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 141186, guid: 53c22e1773be7f84aad8ed8b7b58fa6e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 11486218, guid: 53c22e1773be7f84aad8ed8b7b58fa6e, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -74222,6 +74226,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dontDestroy: 0
+  ignoreScenes:
+  - _Startup
   _storyDataList:
   - {fileID: 11400000, guid: 8528b19a7e9564cfeacae5c3cc97e9d9, type: 2}
   - {fileID: 11400000, guid: c303c31861d554b429b46616796ccb73, type: 2}
@@ -75367,6 +75373,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   titleSceneName: 00.Title
+  ignoreObjects:
+  - FadeCanvas
 --- !u!1001 &1862956421
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79762,10 +79770,11 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: AnoGame.Application.UI.UIManager, AnoGame.Application
-        m_MethodName: ShowSection
-        m_Mode: 3
+      - m_Target: {fileID: 1859354960}
+        m_TargetAssemblyTypeName: AnoGame.Application.UI.SettingsDisplayController,
+          AnoGame.Application
+        m_MethodName: Close
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
