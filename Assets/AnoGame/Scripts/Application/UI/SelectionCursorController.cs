@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using System.Collections.Generic;
 using UnityEngine.Events;
 using TMPro;
+using Cysharp.Threading.Tasks;
 
 namespace AnoGame.Application.UI
 {
@@ -14,6 +14,9 @@ namespace AnoGame.Application.UI
         [SerializeField] private UnityEvent onSelect;
         [SerializeField] private UnityEvent onConfirm;
         [SerializeField] private UnityEvent onCancel;
+        [Header("=== Selection Cooldown ===")]
+        [SerializeField] private float selectionCooldown = 1f;   // クールタイム（秒）
+        private bool isSelectionOnCooldown = false;               // クールタイム中フラグ
 
         private PlayerInput playerInput;
         private InputAction selectAction;
@@ -123,23 +126,25 @@ namespace AnoGame.Application.UI
         // Selectアクションの処理
         //========================
 
-        private void OnSelectPerformed(InputAction.CallbackContext context)
+        private async void OnSelectPerformed(InputAction.CallbackContext context)
         {
+            if (isSelectionOnCooldown) return;
+
             onSelect?.Invoke();
 
             if (currentSection == null || currentSection.selectables.Count == 0) return;
 
-            Vector2 inputValue = context.ReadValue<Vector2>();
+            // クールタイム開始
+            isSelectionOnCooldown = true;
 
-            // 上下入力
-            if (inputValue.y > 0f)
-            {
-                MoveSelectionUp();
-            }
-            else if (inputValue.y < 0f)
-            {
-                MoveSelectionDown();
-            }
+            // 入力読み取り＆移動
+            Vector2 inputValue = context.ReadValue<Vector2>();
+            if (inputValue.y > 0f) MoveSelectionUp();
+            else if (inputValue.y < 0f) MoveSelectionDown();
+
+            // 指定秒だけ待機
+            await UniTask.Delay(System.TimeSpan.FromSeconds(selectionCooldown));
+            isSelectionOnCooldown = false;
         }
 
         //========================
