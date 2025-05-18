@@ -56,7 +56,7 @@ namespace AnoGame.Application
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to initialize game data: {ex.Message}");
+                Debug.LogError($"Failed to initialize game data: {ex.Message}, {ex.StackTrace}");
                 _currentGameData = CreateNewGameData();
                 LoadGameData?.Invoke(_currentGameData);
             }
