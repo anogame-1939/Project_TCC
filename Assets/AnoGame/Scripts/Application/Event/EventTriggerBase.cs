@@ -7,6 +7,7 @@ using AnoGame.Data;
 using AnoGame.Domain.Event.Conditions;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace AnoGame.Application.Event
 {
@@ -151,7 +152,16 @@ namespace AnoGame.Application.Event
         public virtual void OnDoneEvent()
         {
             Debug.Log("OnDoneEvent");
-            onEventDone?.Invoke();
+            try
+            {
+                onEventDone?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"OnDoneEventでエラー。急場で握りつぶし。:{e.Message}");
+
+
+            }
 
             if (!eventData.IsOneTime)
             {
