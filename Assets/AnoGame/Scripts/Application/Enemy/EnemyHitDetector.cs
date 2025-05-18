@@ -37,6 +37,8 @@ namespace AnoGame.Application.Enemy
             Debug.Log($"enable:{enabled} - hit");
             if (!other.CompareTag("Player")) return;
 
+            if (GameStateManager.Instance.CurrentState != GameState.Gameplay) return;
+
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
