@@ -119,6 +119,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &44305441 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3101630296262868960, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 1078756855}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 560a9412b08dc3147b0c6fb8751115b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &56874836
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,7 +186,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5450,6 +5461,21 @@ MonoBehaviour:
   onEventStart:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 44305441}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.SaveHandler, AnoGame.Application
+        m_MethodName: Save
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls:
       - m_Target: {fileID: 227194830}
         m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
           AnoGame.Application
@@ -5487,9 +5513,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onEventFinish:
-    m_PersistentCalls:
-      m_Calls: []
+      - m_Target: {fileID: 1047622359}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventDone:
     m_PersistentCalls:
       m_Calls: []
@@ -5812,7 +5847,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10656,7 +10691,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -15565,7 +15600,7 @@ PlayableDirector:
   m_Enabled: 1
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: 2da0e20d2f2269a48ac56042e5e16a84, type: 2}
-  m_InitialState: 1
+  m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
@@ -15902,7 +15937,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -20746,7 +20781,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -25773,7 +25808,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -30865,7 +30900,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -35788,7 +35823,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
