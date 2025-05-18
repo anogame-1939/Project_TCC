@@ -7,6 +7,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using AnoGame.Domain.Data.Models;
 using VContainer;
+using Cysharp.Threading.Tasks;
 
 namespace AnoGame.Application.Inventory
 {
@@ -84,11 +85,17 @@ namespace AnoGame.Application.Inventory
                     var item = _allItems[itemIndex];
                     if (spriteCache.TryGetValue(item.ItemName, out var sprite))
                     {
-                        visibleSlots[i].SetItem(item, sprite);
+                        UniTask.Void(async () =>
+                        {
+                            await visibleSlots[i].SetItemAsync(item, sprite);
+                        });
                     }
                     else
                     {
-                        visibleSlots[i].SetItem(item, null);
+                        UniTask.Void(async () =>
+                        {
+                            await visibleSlots[i].SetItemAsync(item, null);
+                        });
                     }
                 }
             }
