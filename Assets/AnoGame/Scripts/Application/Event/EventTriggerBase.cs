@@ -70,35 +70,40 @@ namespace AnoGame.Application.Event
         protected virtual void InitializeConditions()
         {
             if (conditionComponents == null) return;
-            
+
             foreach (var component in conditionComponents)
             {
                 if (component != null)
                 {
                     var condition = component.CreateCondition();
                     _conditions.Add(condition);
-                    
+
                     // コンディションの状態変化を監視
                     if (condition is IObservableCondition observableCondition)
                     {
-                        observableCondition.OnConditionChanged += PrepareEvent;
+                        observableCondition.OnConditionChanged += StartEvent;
                     }
                 }
             }
 
+            Debug.Log("PrepareEvent:" + name);
+
             // 初期化のタイミングでチェック
             PrepareEvent();
+
+            // 条件がそろっていればStartEventを実行
+            // if (CheckConditions())
+            {
+                // StartEvent();
+            }
         }
 
         /// <summary>
-        /// TODO:未使用。どういう扱いにするのか後で考える。当初はアイテム持ってたらトリガーオブジェクトを有効にするとか考えてた。
+        /// NOTE:シーンロード時に必ず実行される
         /// </summary>
         private void PrepareEvent()
         {
-            if (CheckConditions())
-            {
-                onPrepareEvent?.Invoke();
-            }
+            onPrepareEvent?.Invoke();
         }
 
         protected bool CheckConditions()
@@ -115,7 +120,7 @@ namespace AnoGame.Application.Event
             {
                 if (condition is IObservableCondition observableCondition)
                 {
-                    observableCondition.OnConditionChanged -= PrepareEvent;
+                    observableCondition.OnConditionChanged -= StartEvent;
                 }
             }
         }
@@ -128,8 +133,8 @@ namespace AnoGame.Application.Event
         protected virtual void OnStartEvent()
         {
             Debug.Log($"OnStartEvent:{name}");
-            // if (!CheckConditions())
-                // return;
+            if (!CheckConditions())
+                return;
 
             onEventStart?.Invoke();
         }

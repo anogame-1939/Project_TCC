@@ -3,11 +3,13 @@ using VContainer;
 
 namespace AnoGame.Application.Event
 {
+    // NOTE:コンディションチェックをStartでやった方がよさそうということで改良版
+    // 影響範囲がわからんのでとりあえずチャプター3-1のみで使用
     /// <summary>
     /// イベントがスタートしたら即時にクリアする
     /// </summary>
     [DefaultExecutionOrder(999)] 
-    public class InstantEventTrigger : EventTriggerBase
+    public class InstantEventTrigger_V2 : EventTriggerBase
     {
         [SerializeField]
         private bool _onStart = false;
@@ -24,7 +26,10 @@ namespace AnoGame.Application.Event
         protected override void Start()
         {
             base.Start();
-            base._eventService.TriggerEventStart(eventData.EventId);
+            if (_onStart)
+            {
+                base._eventService.TriggerEventStart(eventData.EventId);
+            }
         }
 
         protected override void OnStartEvent()
@@ -32,12 +37,9 @@ namespace AnoGame.Application.Event
             base.OnStartEvent();
             Debug.Log($"InstantEventTrigger-OnStartEvent:{name}");
 
-            if (CheckConditions())
-            {
-                // スタートと同時にイベントをクリアする
-                _eventService.TriggerEventComplete(eventData.EventId);
-                _eventManager.AddClearedEvent(eventData.EventId);
-            }
+            // スタートと同時にイベントをクリアする
+            _eventService.TriggerEventComplete(eventData.EventId);
+            _eventManager.AddClearedEvent(eventData.EventId);
 
         }
 

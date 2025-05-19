@@ -188,6 +188,11 @@ namespace AnoGame.Application.Enemy
             RandomSpawnLoopAsync(_spawnLoopCts.Token).Forget();
         }
 
+        public void CancelRandomSpawnLoop()
+        {
+            _spawnLoopCts.Cancel();
+        }
+
 
         /// <summary>
         /// 外部から呼び出す敵生成開始メソッド
