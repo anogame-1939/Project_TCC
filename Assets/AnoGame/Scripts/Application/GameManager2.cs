@@ -5,6 +5,7 @@ using AnoGame.Application.Core;
 using AnoGame.Domain.Data.Services;
 using AnoGame.Domain.Data.Models;
 using VContainer;
+using AnoGame.Application.Title;
 
 namespace AnoGame.Application
 {
@@ -136,6 +137,17 @@ namespace AnoGame.Application
             {
                 Debug.LogError($"Failed to save game state: {ex.Message}");
             }
+        }
+
+        // NOTE:横着。タイトル画面でデータリセットしてゲームを始めたいだけ。
+        public async void ResetToPlayStarGame()
+        {
+            ResetDataAsync();
+            await SaveCurrentGameState();
+
+            var titleSceneLoader = FindFirstObjectByType<TitleSceneLoader>();
+            titleSceneLoader.LoadNextScene();
+
         }
 
         private void OnApplicationQuit()

@@ -267,14 +267,11 @@ namespace Localizer
                     Debug.Log($"テキスト翻訳スキップ:{tmpro.text}");
                     continue;
                 }
-                Debug.Log($"おそらくここでエラー:{_localizedStringTable}");
-                Debug.Log($"おそらくここでエラー:{_localizedStringTable.TableReference}");
-                Debug.Log($"おそらくここでエラー:{_localizedStringTable.TableReference.TableCollectionName}");
                 string tableName = _localizedStringTable.TableReference.TableCollectionName;
                 var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
                 if (entry != null)
                 {
-                    Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
+                    // Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
                     tmpro.text = entry.LocalizedValue;
                 }
                 
