@@ -1694,7 +1694,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6538,7 +6538,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11382,7 +11382,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -17215,10 +17215,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 098f667e1801f614aa239558870105fc, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -17226,7 +17230,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 699714265}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -17234,11 +17246,23 @@ PrefabInstance:
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -17740,7 +17764,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -22822,6 +22846,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 1524738180}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: CancelRandomSpawnLoop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 0
   onEventStart:
     m_PersistentCalls:
       m_Calls:
@@ -22840,10 +22877,34 @@ MonoBehaviour:
         m_CallState: 2
   onEventFinish:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 577036378}
+        m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
+        m_MethodName: Log
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Finish
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventDone:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 577036378}
+        m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
+        m_MethodName: Log
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Done
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventFailed:
     m_PersistentCalls:
       m_Calls: []
@@ -24134,10 +24195,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 140ae5ac385d87147a1055e5ac3016c9, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -24145,7 +24210,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1433394215}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -24153,11 +24226,23 @@ PrefabInstance:
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -26963,7 +27048,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -32359,6 +32444,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1140283849
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1140283851}
+  - component: {fileID: 1140283850}
+  m_Layer: 0
+  m_Name: StartEventTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1140283850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140283849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75601880849c17042974bdc7cb266f7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1524738180}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: RandomSpawnLoop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!4 &1140283851
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140283849}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1147207162
 GameObject:
   m_ObjectHideFlags: 0
@@ -32777,10 +32922,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 47a83ba324633664892535906589c980, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -32788,7 +32937,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 946312857}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -32796,11 +32953,23 @@ PrefabInstance:
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 6461161247911516664, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -35255,10 +35424,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: e2117b358976e7c4aa84be8f0401269c, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -35266,7 +35439,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 151038491}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -35274,11 +35455,23 @@ PrefabInstance:
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -36203,7 +36396,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -41132,14 +41325,22 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: f7f5b2ecb3426a547b0d5d7da1f2713f, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 813777666}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -41147,15 +41348,31 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -41501,7 +41718,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -47874,10 +48091,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 91a0318bd4db2e449bd9af1feeffc663, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -47885,7 +48106,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 372186228}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -47893,11 +48122,23 @@ PrefabInstance:
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 6461161247911516664, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -48173,7 +48414,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d692895daab36664ab0a3e68eb57f44d, type: 2}
+  - {fileID: 2100000, guid: eb883ff36e2ffc144b64a75ae479bac5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -54111,10 +54352,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 9e75e52e67936d240b83dc2d3d1b8132, type: 2}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -54122,7 +54367,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1099812232}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1992210895}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -54130,11 +54383,23 @@ PrefabInstance:
       value: OnUse
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetInGameEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: PixelCrushers.DialogueSystem.DialogueSystemTrigger, Assembly-CSharp-firstpass
       objectReference: {fileID: 0}
     - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.GameStateHandler, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6392134370657896132, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
+      propertyPath: relatedUnityEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 6461161247911516664, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
@@ -54178,6 +54443,7 @@ SceneRoots:
   - {fileID: 699615022}
   - {fileID: 735179720}
   - {fileID: 1434073257}
+  - {fileID: 1140283851}
   - {fileID: 903316186}
   - {fileID: 1089331663}
   - {fileID: 1742198985}
