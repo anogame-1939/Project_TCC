@@ -22883,10 +22883,11 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 599132071}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
+        m_CallState: 0
+      - m_Target: {fileID: 1524738180}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: CancelRandomSpawnLoop
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -22896,10 +22897,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1524738180}
-        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
-          AnoGame.Application
-        m_MethodName: CancelRandomSpawnLoop
+      - m_Target: {fileID: 599132071}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -22914,7 +22914,82 @@ MonoBehaviour:
       m_Calls: []
   onEventDone:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 577036378}
+        m_TargetAssemblyTypeName: AnoGame.Application.SLFBDebug.SimpleOutputLog,
+          AnoGame.Application
+        m_MethodName: Log
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: "\u305D\u308D\u305F\u304C\uFF1F\uFF1F"
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1089331662}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1716263834}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1524738180}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: SpawnfixedPsition_Story
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1257663183}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 0
+      - m_Target: {fileID: 1524738180}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+          AnoGame.Application
+        m_MethodName: CancelRandomSpawnLoop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 599132071}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onEventFailed:
     m_PersistentCalls:
       m_Calls: []
@@ -24558,6 +24633,19 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 1524738180}
+          m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
+            AnoGame.Application
+          m_MethodName: SpawnfixedPsition_Story
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1257663183}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1992210894}
@@ -24583,18 +24671,6 @@ MonoBehaviour:
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: -45
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 735179718}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
-          m_MethodName: 
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
@@ -53701,7 +53777,7 @@ GameObject:
   - component: {fileID: 2081084034}
   - component: {fileID: 2081084037}
   m_Layer: 0
-  m_Name: "=\u4F1A\u8A71-3-2-0.\u5DEB\u5973\u306B\u8A71\u3057\u304B\u3051\u308B\u4E3B\u4EBA\u516C"
+  m_Name: "\u4F1A\u8A71-3-2-0.\u5DEB\u5973\u306B\u8A71\u3057\u304B\u3051\u308B\u4E3B\u4EBA\u516C"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53831,18 +53907,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 1321459067}
-          m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-          m_MethodName: Play
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:

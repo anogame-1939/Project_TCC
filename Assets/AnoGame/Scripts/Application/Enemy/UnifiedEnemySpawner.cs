@@ -188,9 +188,17 @@ namespace AnoGame.Application.Enemy
             RandomSpawnLoopAsync(_spawnLoopCts.Token).Forget();
         }
 
-        public void CancelRandomSpawnLoop()
+        public async void CancelRandomSpawnLoop()
         {
+            spawnManager.DisableChashing();
+
             _spawnLoopCts.Cancel();
+            _spawnLoopCts = new CancellationTokenSource();
+            var token = _spawnLoopCts.Token;
+
+            var playTask = spawnManager.PlayDespawnedEffectAsync(token);
+            await playTask;
+            
         }
 
 

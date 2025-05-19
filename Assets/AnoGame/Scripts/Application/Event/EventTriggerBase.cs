@@ -156,7 +156,7 @@ namespace AnoGame.Application.Event
 
         public virtual void OnDoneEvent()
         {
-            Debug.Log("OnDoneEvent:" + name);
+            // Debug.Log("OnDoneEvent:" + name);
             try
             {
                 onEventDone?.Invoke();
