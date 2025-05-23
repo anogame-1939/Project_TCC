@@ -4,7 +4,6 @@ using AnoGame.Data;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using System;
-using UnityEditor.Search;
 
 namespace AnoGame.Application.Enemy
 {
