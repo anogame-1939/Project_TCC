@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,8 +10,15 @@ namespace AnoGame.Application.Event
     public class StartEventTrigger : MonoBehaviour
     {
         [SerializeField] UnityEvent startEvent;
+        [SerializeField] float delay = 0f;
         public void Start()
         {
+            StartCoroutine(StartCoroutine());
+        }
+
+        private IEnumerator StartCoroutine()
+        {
+            yield return new WaitForSeconds(delay);
             startEvent?.Invoke();
         }
     }

@@ -15,6 +15,19 @@ namespace AnoGame.Application.UI
         // 初期アンカー位置を保持
         private Vector2 _initialAnchoredPosition;
 
+        [Header("アニメーション設定")]
+        [SerializeField]
+        // 移動量・時間・待機時間を調整
+        [Tooltip("右に移動する量（px）")]
+        [Range(0f, 500f)]
+        private float moveDistance = 200f;   // 右に移動する量（px）
+        [SerializeField]
+        [Tooltip("移動にかける時間（秒）")]
+        private float moveDuration = 2f;     // 移動にかける時間（秒）
+        [SerializeField]
+        [Tooltip("右端で待つ時間（秒）")]
+        private float waitDuration = 1f;     // 右端で待つ時間（秒）
+
         protected void Awake()
         {
             base.Awake();
@@ -34,9 +47,7 @@ namespace AnoGame.Application.UI
 
             // 既存シーケンスがあれば停止・破棄
             if (_loadingSequence != null && _loadingSequence.IsActive())
-            {
                 _loadingSequence.Kill();
-            }
 
             _loadingImage.gameObject.SetActive(true);
 
@@ -44,18 +55,22 @@ namespace AnoGame.Application.UI
             _loadingImage.color = new Color(1f, 1f, 1f, 1f);
             _loadingImage.rectTransform.anchoredPosition = _initialAnchoredPosition;
 
+
+
             // シーケンス生成
             _loadingSequence = DOTween.Sequence()
-                // フェードアウト → フェードイン
-                .Append(_loadingImage.DOFade(0f, 0.5f))
-                .Append(_loadingImage.DOFade(1f, 0.5f))
-                // 相対移動で上方向に30px → 自動でYoyoリターン
-                .Join(_loadingImage.rectTransform
-                    .DOAnchorPosY(30f, 0.5f)
-                    .SetRelative(true)
-                    .SetLoops(2, LoopType.Yoyo)
-                    .SetEase(Ease.InOutSine))
-                // 無限ループで全体を繰り返し
+                // 1) 右へ移動（相対）
+                .Append(_loadingImage.rectTransform
+                    .DOAnchorPosX(moveDistance, moveDuration)
+                    .SetRelative()
+                    .SetEase(Ease.Linear))
+                // 2) 右端で少し待機
+                .AppendInterval(waitDuration)
+                // 3) 開始点へ瞬間ジャンプ戻り（相対）
+                .Append(_loadingImage.rectTransform
+                    .DOAnchorPosX(-moveDistance, 0f)
+                    .SetRelative())
+                // 4) この一連を無限ループ
                 .SetLoops(-1, LoopType.Restart);
         }
 
