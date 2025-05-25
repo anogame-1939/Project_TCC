@@ -122,7 +122,7 @@ namespace AnoGame.Application.Enemy
 
         private void OnTreeFallenHandler(CustomTreeRigidbody fallenTree)
         {
-            fallenTree.gameObject.layer = -1;
+            fallenTree.gameObject.layer = 0;
             fallenTree.gameObject.tag = FallenTreeTag;
             fallenTree.OnTreeFallen -= OnTreeFallenHandler;
 

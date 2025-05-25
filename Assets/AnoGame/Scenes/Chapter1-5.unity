@@ -6626,11 +6626,6 @@ MonoBehaviour:
       m_Calls: []
   conditionComponents: []
   playerTag: Player
---- !u!1 &534795883 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
-  m_PrefabInstance: {fileID: 1804489848}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &560471003
 GameObject:
   m_ObjectHideFlags: 0
@@ -16433,18 +16428,6 @@ MonoBehaviour:
     onExecute:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1251232656}
-          m_TargetAssemblyTypeName: FadeImageController, Assembly-CSharp
-          m_MethodName: FadeOut
-          m_Mode: 4
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 1
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 0
         - m_Target: {fileID: 168223072}
           m_TargetAssemblyTypeName: AnoGame.Application.Audio.AudioController, Assembly-CSharp
           m_MethodName: Stop
@@ -21542,19 +21525,7 @@ MonoBehaviour:
       m_Calls: []
   onEventFailed:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 713851155}
-        m_TargetAssemblyTypeName: AnoGame.Application.Event.GameOverHandler, AnoGame.Application
-        m_MethodName: GameOver
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
+      m_Calls: []
   conditionComponents: []
 --- !u!114 &1196875138
 MonoBehaviour:
@@ -26945,7 +26916,19 @@ MonoBehaviour:
   eventData: {fileID: 11400000, guid: b690ee1e66a9648a788615f8c197b85c, type: 2}
   onPrepareEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1773703090}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEventStart:
     m_PersistentCalls:
       m_Calls:
@@ -26977,24 +26960,36 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onEventDone:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventFailed:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 713851155}
-        m_TargetAssemblyTypeName: AnoGame.Application.Event.GameOverHandler, AnoGame.Application
-        m_MethodName: GameOver
-        m_Mode: 1
+      - m_Target: {fileID: 1773703090}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
+          m_BoolArgument: 1
+        m_CallState: 2
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1773703090}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
   conditionComponents: []
 --- !u!1 &1390966962
 GameObject:
@@ -32352,7 +32347,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8f182e870d44baa9c3f3e32a5d56f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventData: {fileID: 11400000, guid: b690ee1e66a9648a788615f8c197b85c, type: 2}
+  eventData: {fileID: 11400000, guid: cf96049929a1546d5a937b687f34dde7, type: 2}
   onPrepareEvent:
     m_PersistentCalls:
       m_Calls:
@@ -32365,48 +32360,12 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 0
-      - m_Target: {fileID: 1633008398}
-        m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-        m_MethodName: Log
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
           m_StringArgument: "\u624B\u5E33\u5165\u624B"
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
   onEventStart:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 534795883}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 1633008398}
-        m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-        m_MethodName: Log
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: "\u624B\u5E33\u5165\u624B"
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   onEventFinish:
     m_PersistentCalls:
       m_Calls:
@@ -32421,7 +32380,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
-        m_CallState: 0
+        m_CallState: 2
       - m_Target: {fileID: 1633008398}
         m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
         m_MethodName: Log
@@ -32431,7 +32390,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: "\u624B\u5E33\u5165\u624B"
+          m_StringArgument: "\u624B\u5E33\u5165\u624B-Finish"
           m_BoolArgument: 1
         m_CallState: 2
   onEventDone:
@@ -32448,7 +32407,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
-        m_CallState: 0
+        m_CallState: 2
       - m_Target: {fileID: 1633008398}
         m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
         m_MethodName: Log
@@ -32458,7 +32417,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: "\u624B\u5E33\u5165\u624B"
+          m_StringArgument: "\u624B\u5E33\u5165\u624B-DONE"
           m_BoolArgument: 1
         m_CallState: 2
   onEventFailed:
@@ -43274,7 +43233,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7170942701508748602, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8294370851075276902, guid: 677bd74dc7d8bd3438020ac4e0e1814a, type: 3}
       propertyPath: amplitude
