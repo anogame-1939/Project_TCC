@@ -24,7 +24,11 @@ namespace AnoGame.Application.Event
         protected override void Start()
         {
             base.Start();
-            base._eventService.TriggerEventStart(eventData.EventId);
+            if (_onStart)
+            {
+                // イベント開始をトリガーする
+                base._eventService.TriggerEventStart(eventData.EventId);
+            }
         }
 
         protected override void OnStartEvent()
