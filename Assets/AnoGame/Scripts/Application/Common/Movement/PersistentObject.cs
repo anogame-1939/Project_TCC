@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace AnoGame.Application.UI
+namespace AnoGame.Application.Common
 {
-    public class PersistentOverlayUI : MonoBehaviour
+    public class PersistentObject : MonoBehaviour
     {
         void Start()
         {
