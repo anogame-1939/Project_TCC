@@ -10,6 +10,8 @@ namespace AnoGame.Application.UI
         [SerializeField] private List<UISection> sections;
         private int currentSectionIndex = 0;
 
+        [SerializeField] private bool onStat = true;
+
         private void Start()
         {
             foreach (var section in sections)
@@ -18,7 +20,7 @@ namespace AnoGame.Application.UI
             }
 
             // 起動時はメインメニュー（例：0番）を表示
-            ShowSection(0);
+            if (onStat) ShowSection(0);
         }
 
         private void Initialize()
