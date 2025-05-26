@@ -278,6 +278,8 @@ namespace AnoGame.Application.Enemy
                 Debug.Log($"RandomSpawnLoopAsync-GameStateManager.Instance:{GameStateManager.Instance.CurrentState}");
 
                 // spawnManager.DestroyCurrentEnemyInstance();
+                spawnManager.DisableChashing();
+                spawnManager.DeactivateEemy();
 
                 Debug.Log("RandomSpawnLoopAsync-おわた");
 
