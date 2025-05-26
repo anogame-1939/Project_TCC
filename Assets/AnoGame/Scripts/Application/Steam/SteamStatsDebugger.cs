@@ -9,7 +9,7 @@ namespace AnoGame.Application.Steam
     /// Tracks stats (games played, wins, losses, distance traveled, etc.)
     /// and provides methods to unlock achievements.
     /// </summary>
-    public class SteamStatsAndAchievements : SingletonMonoBehaviour<SteamStatsAndAchievements>
+    public class SteamStatsDebugger : SingletonMonoBehaviour<SteamStatsAndAchievements>
     {
         /// <summary>
         /// Achievements defined for the game.
