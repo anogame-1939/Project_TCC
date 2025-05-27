@@ -1,6 +1,7 @@
 using Steamworks;
 using System;
 using AnoGame.Application.Core;
+using UniRx;
 
 namespace AnoGame.Application.Steam
 {
@@ -17,10 +18,20 @@ namespace AnoGame.Application.Steam
         public enum Achievement : int
         {
             START_GAME,
-            ACH_WIN_100_GAMES,
-            ACH_HEAVY_FIRE,
-            ACH_TRAVEL_FAR_ACCUM,
-            ACH_TRAVEL_FAR_SINGLE,
+            BEGINNING_MORNING,
+            INDOMITABLE_SPIRIT,
+            ENCOUNTER_WITH_UNKNOWN,
+            MEMORIES_OF_THAT_DAY,
+            LITTLE_SUN,
+            PURE_HEART,
+            UNFORESEEN_ACCIDENT,
+            LORE,
+            SEVEN_TALISMANS,
+            GEDATSU,
+            TAIKAN,
+            SHASHIN,
+            JOJU,
+            NIRVANA
         }
 
         /// <summary>
@@ -46,9 +57,9 @@ namespace AnoGame.Application.Steam
         private Achievement_t[] m_Achievements = new Achievement_t[]
         {
             new Achievement_t(Achievement.START_GAME,    "000_First",      "Win your first game"),
-            new Achievement_t(Achievement.ACH_WIN_100_GAMES,   "Champion",    "Win 100 games"),
-            new Achievement_t(Achievement.ACH_TRAVEL_FAR_ACCUM, "Interstellar","Accumulate 5280 feet traveled"),
-            new Achievement_t(Achievement.ACH_TRAVEL_FAR_SINGLE,"Orbiter",     "Travel 500 feet in a single game"),
+            // new Achievement_t(Achievement.ACH_WIN_100_GAMES,   "Champion",    "Win 100 games"),
+            // new Achievement_t(Achievement.ACH_TRAVEL_FAR_ACCUM, "Interstellar","Accumulate 5280 feet traveled"),
+            // new Achievement_t(Achievement.ACH_TRAVEL_FAR_SINGLE,"Orbiter",     "Travel 500 feet in a single game"),
         };
 
         private CGameID m_GameID;
@@ -66,8 +77,10 @@ namespace AnoGame.Application.Steam
         private float m_flMaxFeetTraveled;
         private float m_flAverageSpeed;
 
-        protected Callback<UserStatsReceived_t>     m_UserStatsReceived;
-        protected Callback<UserStatsStored_t>       m_UserStatsStored;
+        private float m_nTotalNeverGiveup;
+
+        protected Callback<UserStatsReceived_t> m_UserStatsReceived;
+        protected Callback<UserStatsStored_t> m_UserStatsStored;
         protected Callback<UserAchievementStored_t> m_UserAchievementStored;
 
         void OnEnable()
@@ -76,12 +89,23 @@ namespace AnoGame.Application.Steam
                 return;
 
             m_GameID = new CGameID(SteamUtils.GetAppID());
-            m_UserStatsReceived   = Callback<UserStatsReceived_t>.Create(OnUserStatsReceived);
-            m_UserStatsStored     = Callback<UserStatsStored_t>.Create(OnUserStatsStored);
+            m_UserStatsReceived = Callback<UserStatsReceived_t>.Create(OnUserStatsReceived);
+            m_UserStatsStored = Callback<UserStatsStored_t>.Create(OnUserStatsStored);
             m_UserAchievementStored = Callback<UserAchievementStored_t>.Create(OnAchievementStored);
 
             m_bRequestedStats = false;
-            m_bStatsValid     = false;
+            m_bStatsValid = false;
+        }
+
+        void Start()
+        {
+            // --- 追加ここから ---
+            // 外部で「PlayerDiedEvent」を Publish すると AddDeath() が呼ばれる
+            MessageBroker.Default
+                .Receive<PlayerRespawnedEvent>()
+                .Subscribe(_ => AddDeath())
+                .AddTo(this);
+            // --- 追加ここまで ---
         }
 
         void Update()
@@ -135,11 +159,11 @@ namespace AnoGame.Application.Steam
 
         private void StoreStats()
         {
-            SteamUserStats.SetStat("NumGames",      m_nTotalGamesPlayed);
-            SteamUserStats.SetStat("NumWins",        m_nTotalNumWins);
-            SteamUserStats.SetStat("NumLosses",      m_nTotalNumLosses);
-            SteamUserStats.SetStat("FeetTraveled",   m_flTotalFeetTraveled);
-            SteamUserStats.SetStat("MaxFeetTraveled",m_flMaxFeetTraveled);
+            SteamUserStats.SetStat("NumGames", m_nTotalGamesPlayed);
+            SteamUserStats.SetStat("NumWins", m_nTotalNumWins);
+            SteamUserStats.SetStat("NumLosses", m_nTotalNumLosses);
+            SteamUserStats.SetStat("FeetTraveled", m_flTotalFeetTraveled);
+            SteamUserStats.SetStat("MaxFeetTraveled", m_flMaxFeetTraveled);
             SteamUserStats.UpdateAvgRateStat("AverageSpeed", m_flGameFeetTraveled, m_flGameDurationSeconds);
             SteamUserStats.GetStat("AverageSpeed", out m_flAverageSpeed);
 
@@ -182,15 +206,15 @@ namespace AnoGame.Application.Steam
             foreach (var ach in m_Achievements)
             {
                 SteamUserStats.GetAchievement(ach.m_eAchievementID.ToString(), out ach.m_bAchieved);
-                ach.m_strName        = SteamUserStats.GetAchievementDisplayAttribute(ach.m_eAchievementID.ToString(), "name");
+                ach.m_strName = SteamUserStats.GetAchievementDisplayAttribute(ach.m_eAchievementID.ToString(), "name");
                 ach.m_strDescription = SteamUserStats.GetAchievementDisplayAttribute(ach.m_eAchievementID.ToString(), "desc");
             }
 
-            SteamUserStats.GetStat("NumGames",      out m_nTotalGamesPlayed);
-            SteamUserStats.GetStat("NumWins",        out m_nTotalNumWins);
-            SteamUserStats.GetStat("NumLosses",      out m_nTotalNumLosses);
-            SteamUserStats.GetStat("FeetTraveled",   out m_flTotalFeetTraveled);
-            SteamUserStats.GetStat("MaxFeetTraveled",out m_flMaxFeetTraveled);
+            SteamUserStats.GetStat("NumGames", out m_nTotalGamesPlayed);
+            SteamUserStats.GetStat("NumWins", out m_nTotalNumWins);
+            SteamUserStats.GetStat("NumLosses", out m_nTotalNumLosses);
+            SteamUserStats.GetStat("FeetTraveled", out m_flTotalFeetTraveled);
+            SteamUserStats.GetStat("MaxFeetTraveled", out m_flMaxFeetTraveled);
         }
 
         private void OnUserStatsStored(UserStatsStored_t callback)
@@ -206,5 +230,39 @@ namespace AnoGame.Application.Steam
         {
             // Optional: handle progress/logging
         }
+
+        public void AddDeath()
+        {
+            m_nTotalNeverGiveup++;
+            m_bStoreStats = true;    // 次の Update() で StoreStats() が呼ばれる
+
+            // 死亡系実績が条件を満たしていれば解除
+            if (m_nTotalNeverGiveup >= 3)
+                ForceUnlockAchievement(Achievement.BEGINNING_MORNING);
+        }
+
+        /// <summary>
+        /// すべての
+        /// </summary>
+        /// <returns></returns>
+        bool AreAllAchievementsCleared()
+        {
+            // ユーザーデータをリクエスト（必要に応じて）
+            SteamUserStats.RequestUserStats(SteamUser.GetSteamID());
+
+            uint total = SteamUserStats.GetNumAchievements();
+            for (uint i = 0; i < total; i++)
+            {
+                string achName = SteamUserStats.GetAchievementName(i);
+                bool achieved;
+                SteamUserStats.GetAchievement(achName, out achieved);
+                if (!achieved)
+                    return false;
+            }
+            return true;
+        }
+
     }
+    
+    public class PlayerRespawnedEvent { } // Placeholder for actual event class
 }
