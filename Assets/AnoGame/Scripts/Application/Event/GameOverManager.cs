@@ -1,10 +1,11 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using AnoGame.Application.Core;
 using AnoGame.Application.Enemy;
+using AnoGame.Application.Steam;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
+using UniRx;
 using VContainer;
 
 
@@ -58,6 +59,7 @@ namespace AnoGame.Application.Event
         public async void OnRetryGame()
         {
             GameStateManager.Instance.SetState(GameState.Gameplay);
+            MessageBroker.Default.Publish(new PlayerRetriedEvent());
         }
     }
 }

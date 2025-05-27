@@ -77,8 +77,6 @@ namespace AnoGame.Application.Steam
         private float m_flMaxFeetTraveled;
         private float m_flAverageSpeed;
 
-        private float m_nTotalNeverGiveup;
-
         protected Callback<UserStatsReceived_t> m_UserStatsReceived;
         protected Callback<UserStatsStored_t> m_UserStatsStored;
         protected Callback<UserAchievementStored_t> m_UserAchievementStored;
@@ -95,17 +93,6 @@ namespace AnoGame.Application.Steam
 
             m_bRequestedStats = false;
             m_bStatsValid = false;
-        }
-
-        void Start()
-        {
-            // --- 追加ここから ---
-            // 外部で「PlayerDiedEvent」を Publish すると AddDeath() が呼ばれる
-            MessageBroker.Default
-                .Receive<PlayerRespawnedEvent>()
-                .Subscribe(_ => AddDeath())
-                .AddTo(this);
-            // --- 追加ここまで ---
         }
 
         void Update()
@@ -141,6 +128,7 @@ namespace AnoGame.Application.Steam
                         if (m_nTotalNumWins > 0)
                             UnlockAchievement(ach);
                         break;
+                    /*
                     case Achievement.ACH_WIN_100_GAMES:
                         if (m_nTotalNumWins >= 100)
                             UnlockAchievement(ach);
@@ -153,6 +141,8 @@ namespace AnoGame.Application.Steam
                         if (m_flGameFeetTraveled >= 500f)
                             UnlockAchievement(ach);
                         break;
+                        }
+                    */
                 }
             }
         }
@@ -231,16 +221,6 @@ namespace AnoGame.Application.Steam
             // Optional: handle progress/logging
         }
 
-        public void AddDeath()
-        {
-            m_nTotalNeverGiveup++;
-            m_bStoreStats = true;    // 次の Update() で StoreStats() が呼ばれる
-
-            // 死亡系実績が条件を満たしていれば解除
-            if (m_nTotalNeverGiveup >= 3)
-                ForceUnlockAchievement(Achievement.BEGINNING_MORNING);
-        }
-
         /// <summary>
         /// すべての
         /// </summary>
@@ -263,6 +243,5 @@ namespace AnoGame.Application.Steam
         }
 
     }
-    
-    public class PlayerRespawnedEvent { } // Placeholder for actual event class
+    public class PlayerRetriedEvent { } // Placeholder for actual event class
 }
