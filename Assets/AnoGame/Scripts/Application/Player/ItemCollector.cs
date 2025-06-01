@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using AnoGame.Data;
 using AnoGame.Application.Inventory;
 using System.Collections.Generic;
 using VContainer;
+using AnoGame.Application.Input;  // IInputActionProvider の名前空間
 
 namespace AnoGame.Application.Player
 {
@@ -15,27 +17,24 @@ namespace AnoGame.Application.Player
         [SerializeField] private LayerMask itemLayer;
         [SerializeField] private float viewAngle = 90.0f;
 
-        private PlayerInput _playerInput;
-        private InputAction _interactAction;
-        private InventoryManager _inventoryManager;
+        [Inject] private InventoryManager _inventoryManager;
+        [Inject] private IInputActionProvider _inputProvider;
 
-        [Inject]
-        public void Construct(InventoryManager inventoryManager)
-        {
-            _inventoryManager = inventoryManager;
-        }
+        private InputAction _interactAction;
 
         private void Awake()
         {
-            _playerInput = GetComponent<PlayerInput>();
-            if (_playerInput != null)
-            {
-                _interactAction = _playerInput.actions["Interact"];
-            }
+            // (1) まず Player マップを有効化しておく
+            _inputProvider.SwitchToPlayer();
+
+            // (2) Player マップを取得し、"Interact" アクションをキャッシュ
+            var playerMap = _inputProvider.GetPlayerActionMap();
+            _interactAction = playerMap.FindAction("Interact", throwIfNotFound: true);
         }
 
         private void OnEnable()
         {
+            // (3) Interact アクションの登録
             if (_interactAction != null)
             {
                 _interactAction.performed += OnInteract;
@@ -52,6 +51,7 @@ namespace AnoGame.Application.Player
 
         private void OnInteract(InputAction.CallbackContext context)
         {
+            // キーを押した瞬間に CollectItem を呼ぶ
             if (context.performed)
             {
                 CollectItem();
@@ -60,12 +60,14 @@ namespace AnoGame.Application.Player
 
         public void CollectItem()
         {
+            // インベントリがいっぱいなら何もしない
             if (_inventoryManager.IsInventoryFull())
             {
                 Debug.LogWarning("Inventory is full!");
                 return;
             }
 
+            // 周囲にあるアイテムを検出
             Collider[] items = Physics.OverlapSphere(transform.position, collectRadius, itemLayer);
             Collider closestItem = FindClosestItemInViewAngle(items);
 
@@ -111,14 +113,14 @@ namespace AnoGame.Application.Player
 
         private void OnDrawGizmosSelected()
         {
-            // Collection range visualization
+            // Collection 範囲の可視化
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, collectRadius);
 
-            // View angle visualization
+            // 視野角の可視化
             Vector3 rightDirection = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
             Vector3 leftDirection = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward;
-            
+
             Gizmos.color = Color.blue;
             Gizmos.DrawRay(transform.position, rightDirection * collectRadius);
             Gizmos.DrawRay(transform.position, leftDirection * collectRadius);

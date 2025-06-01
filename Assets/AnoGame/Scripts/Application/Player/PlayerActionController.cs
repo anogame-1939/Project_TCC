@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.TinyCharacterController.Control;
 using System.Collections;
+using VContainer;
+using AnoGame.Application.Input;  // IInputActionProvider の名前空間
 
 namespace AnoGame.Application.Player.Control
 {
-    
     /// <summary>
     /// 強制移動の開始・終了を受け取るためのインターフェース
     /// </summary>
@@ -15,7 +17,7 @@ namespace AnoGame.Application.Player.Control
         void StartChasing();
     }
 
-    [RequireComponent(typeof(PlayerInput))]
+    [AddComponentMenu("Player/" + nameof(PlayerActionController))]
     public class PlayerActionController : MonoBehaviour, IForcedMoveController
     {
         [SerializeField] private MoveControl moveControl;
@@ -24,47 +26,65 @@ namespace AnoGame.Application.Player.Control
         // MoveControlの現在速度がこれ以上のとき IsMove を true にする
         [SerializeField] private float moveSpeedThreshold = 0.5f;
 
+        //──────────────────────────────────────────
+        // ① IInputActionProvider を Inject で受け取る
+        //──────────────────────────────────────────
+        [Inject] private IInputActionProvider _inputProvider;
+
         private bool isInputEnabled = true;
         private InputAction moveAction;
         private bool isKeyHeld = false;
 
         private void Awake()
         {
+            //──────────────────────────────────────────
+            // MoveControl / Animator が未設定なら GetComponent で取得
+            //──────────────────────────────────────────
             if (moveControl == null)
             {
                 moveControl = GetComponent<MoveControl>();
+                if (moveControl == null)
+                {
+                    Debug.LogWarning($"[{nameof(PlayerActionController)}] MoveControl がアタッチされていません。");
+                }
             }
 
-            var playerInput = GetComponent<PlayerInput>();
-            moveAction = playerInput.actions["Move"];
-
-            // キーの押下状態管理用のイベント登録
-            moveAction.started += OnMoveStarted;
-            moveAction.canceled += OnMoveCanceled;
-
-            // Animatorが自分の子オブジェクトなどにある場合は、GetComponentInChildren等に変更する
             if (animator == null)
             {
                 animator = GetComponent<Animator>();
                 if (animator == null)
                 {
-                    Debug.LogWarning("Animatorが見つかりません。インスペクターから設定してください。");
+                    Debug.LogWarning($"[{nameof(PlayerActionController)}] Animator がアタッチされていません。");
                 }
             }
+
+            //──────────────────────────────────────────
+            // ② IInputActionProvider 経由で Player マップを有効化し、
+            //     “Move” アクションを取得してキャッシュ
+            //──────────────────────────────────────────
+            _inputProvider.SwitchToPlayer();
+            var playerMap = _inputProvider.GetPlayerActionMap();
+            moveAction = playerMap.FindAction("Move", throwIfNotFound: true);
+
+            //──────────────────────────────────────────
+            // ③ キーの押下状態管理用イベントを登録
+            //──────────────────────────────────────────
+            moveAction.started  += OnMoveStarted;
+            moveAction.canceled += OnMoveCanceled;
         }
 
         private void OnDestroy()
         {
             if (moveAction != null)
             {
-                moveAction.started -= OnMoveStarted;
+                moveAction.started  -= OnMoveStarted;
                 moveAction.canceled -= OnMoveCanceled;
             }
         }
 
         private void Update()
         {
-            // MoveControlの速度を取得し、一定値を超えていれば移動アニメをONに
+            // MoveControlの速度を取得し、閾値を超えていれば移動アニメをONに
             if (animator != null && moveControl != null)
             {
                 float currentSpeed = moveControl.CurrentSpeed;
@@ -75,13 +95,13 @@ namespace AnoGame.Application.Player.Control
 
         private void FixedUpdate()
         {
+            // ゲームがプレイ中でなければ入力を無視
             if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
             {
-                // ゲームがプレイ中でない場合は、入力を無視
                 return;
             }
-            
-            // キーが押されている場合のみ入力値を取得して反映
+
+            // キーが押されており、かつ入力が有効であれば MoveControl に入力値を渡す
             if (isKeyHeld && isInputEnabled)
             {
                 Vector2 inputValue = moveAction.ReadValue<Vector2>();
@@ -102,6 +122,9 @@ namespace AnoGame.Application.Player.Control
             moveControl.Move(Vector2.zero);
         }
 
+        /// <summary>
+        /// 一定時間入力を無効化する
+        /// </summary>
         public void DisableInput(float duration)
         {
             if (gameObject.activeInHierarchy)
@@ -131,118 +154,101 @@ namespace AnoGame.Application.Player.Control
         /// <summary>
         /// ターゲットの方向を向く
         /// </summary>
-        /// <param name="target"></param>
         public void FaceTarget(GameObject target)
         {
-            if (target == null)
-                return;
+            if (target == null) return;
             StartCoroutine(FaceTargetRoutine(target));
         }
 
         private IEnumerator FaceTargetRoutine(GameObject target)
         {
-            // プレイヤーとターゲットの水平な位置を取得
+            // プレイヤーとターゲットの水平な位置を計算
             Vector3 playerPosition = transform.position;
             Vector3 targetPosition = target.transform.position;
-
-            // Y軸は無視して水平な方向ベクトルを計算
             Vector3 desiredDirection = targetPosition - playerPosition;
             desiredDirection.y = 0f;
 
             if (desiredDirection.sqrMagnitude < 0.0001f)
                 yield break;
-            
+
             desiredDirection.Normalize();
 
-            // カメラのY軸回転を取得（見下ろし視点でも、カメラのY軸は有効と仮定）
+            // カメラのY軸回転を取得
             Transform cameraTransform = Camera.main?.transform;
             if (cameraTransform == null)
             {
-                Debug.LogWarning("Camera.mainが見つかりません。");
+                Debug.LogWarning("Camera.main が見つかりません。");
                 yield break;
             }
-            // カメラのY軸回転（水平回転）のみを抽出
             Quaternion cameraYawRotation = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f);
 
-            // MoveControl 内部では
-            //   _moveDirection = cameraYawRotation * (leftStickInput.normalized)
-            // となっているため、desiredDirection になるようにするには
-            //   leftStickInput = Quaternion.Inverse(cameraYawRotation) * desiredDirection
+            // MoveControl 内では leftStickInput をカメラ回転で変換する 前提
             Vector3 leftStickInput3D = Quaternion.Inverse(cameraYawRotation) * desiredDirection;
             Vector2 leftStickInput = new Vector2(leftStickInput3D.x, leftStickInput3D.z);
 
-            // --- ここで “WASD 相当” に丸める ---
+            // 8方向スナップを行う
             Vector2 snappedInput = SnapToKeyboardDirections(leftStickInput, 0.5f);
 
-            // 向き更新用に一時的に入力を送る
+            // 一時的に向かせる入力を送信
             moveControl.Move(snappedInput);
 
-            // 0.01秒待ってから入力をクリア（必要に応じて調整）
+            // 少し待ってから入力をクリア
             yield return new WaitForSeconds(0.1f);
             moveControl.Move(Vector2.zero);
         }
 
         /// <summary>
-        /// アナログ入力ベクトルを 8方向(上下左右＋斜め)にスナップ(0/1化)するヘルパーメソッド
+        /// アナログ入力を8方向(上下左右＋斜め)にスナップするヘルパーメソッド
         /// </summary>
-        /// <param name="input">アナログ入力</param>
-        /// <param name="threshold">しきい値。例:0.5f</param>
-        /// <returns>上下左右斜めいずれかの(-1,0,1)成分を持つ Vector2</returns>
         private Vector2 SnapToKeyboardDirections(Vector2 input, float threshold)
         {
             float x = 0f;
             float y = 0f;
 
-            // X成分が threshold を超えたら ±1、それ以下なら 0
             if (Mathf.Abs(input.x) >= threshold)
             {
                 x = Mathf.Sign(input.x);
             }
-
-            // Y成分が threshold を超えたら ±1、それ以下なら 0
             if (Mathf.Abs(input.y) >= threshold)
             {
                 y = Mathf.Sign(input.y);
             }
 
-            // これで上下左右・斜めのいずれか(8方向)になる
             return new Vector2(x, y);
         }
 
         //========================================================
-        // ↓↓↓ 強制移動(ForecedTransformMover)用の有効/無効メソッドを追加 ↓↓↓
+        // ↓↓↓ 強制移動(ForecedTransformMover)用の有効/無効メソッド ↓↓↓
         //========================================================
 
         /// <summary>
-        /// 強制移動を始める前に呼び出して、PlayerActionControllerを無効化する
+        /// 強制移動を始める前に呼び出して、このコンポーネントを無効化する
         /// </summary>
         public void StopChasing()
         {
-            // ここではスクリプト自体を無効化
+            // スクリプト全体を無効化
             this.enabled = false;
-
-            // または、入力のみ無効化したい場合は以下
+            // あるいは入力だけ無効化する場合:
             // SetInputEnabled(false);
         }
 
         /// <summary>
-        /// 強制移動が完了したら呼び出して、PlayerActionControllerを再有効化する
+        /// 強制移動が完了したら呼び出して、このコンポーネントを再有効化する
         /// </summary>
         public void StartChasing()
         {
             this.enabled = true;
-
-            // あるいは入力のみ再有効化
+            // あるいは入力だけ再有効化する場合:
             // SetInputEnabled(true);
         }
 
+        /// <summary>
+        /// ダミー入力を送りつつ1フレーム待機し、入力をクリアする例
+        /// </summary>
         public IEnumerator InstantMoveUpdate(Vector2 moveInput)
         {
-            // ダミー入力を送る
             moveControl.Move(moveInput);
-            // 1フレーム待機することで、内部の入力処理を更新させる
             yield return new WaitForSeconds(2f);
-            // 入力をクリア
             moveControl.Move(Vector2.zero);
         }
     }

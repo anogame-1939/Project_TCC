@@ -1939,11 +1939,11 @@ Transform:
   m_GameObject: {fileID: 59519977}
   serializedVersion: 2
   m_LocalRotation: {x: 0.03802674, y: 0.3415686, z: -0.013899821, w: 0.9389844}
-  m_LocalPosition: {x: 29.404545, y: 1.762993, z: 47.099747}
+  m_LocalPosition: {x: -36.805454, y: 2.622993, z: -55.900253}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1511756679}
+  m_Father: {fileID: 83760909}
   m_LocalEulerAnglesHint: {x: -2.369, y: 63.026, z: 1.476}
 --- !u!1001 &59556487
 PrefabInstance:
@@ -3033,6 +3033,41 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8258954408556846641, guid: d5b53d9445402d843941acd5ff6c23d2, type: 3}
   m_PrefabInstance: {fileID: 80953674}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &83760908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 83760909}
+  m_Layer: 0
+  m_Name: "\u30D5\u30A3\u30FC\u30EB\u30C9\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &83760909
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 83760908}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1394285241}
+  - {fileID: 1896822906}
+  - {fileID: 59519979}
+  - {fileID: 341391124}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &87530511
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16422,11 +16457,11 @@ Transform:
   m_GameObject: {fileID: 341391121}
   serializedVersion: 2
   m_LocalRotation: {x: -0.16261202, y: 0.9078989, z: -0.3858497, w: -0.019924048}
-  m_LocalPosition: {x: 42.17765, y: 6.207, z: 152.06064}
+  m_LocalPosition: {x: -24.032349, y: 7.067, z: 49.06064}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1511756679}
+  m_Father: {fileID: 83760909}
   m_LocalEulerAnglesHint: {x: 45, y: -1267.256, z: -23.318}
 --- !u!1001 &343877499
 PrefabInstance:
@@ -28283,7 +28318,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6e9c3a2e07769d4095c9931ac4d88b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInput: {fileID: 0}
   uiManager: {fileID: 0}
 --- !u!114 &563514566
 MonoBehaviour:
@@ -57368,7 +57402,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1303263891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57382,7 +57416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: 
+    TypeName: AnoGame.Application.PersistentLifetimeScope
   autoRun: 1
   autoInjectGameObjects:
   - {fileID: 641918981}
@@ -60006,11 +60040,11 @@ Transform:
   m_GameObject: {fileID: 1394285239}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 66.21, y: -0.86, z: 103}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1511756679}
+  m_Father: {fileID: 83760909}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1397015613
 PrefabInstance:
@@ -64477,12 +64511,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1511756679}
   m_Layer: 0
-  m_Name: WiIP
+  m_Name: "WiIP-\u30D5\u30A3\u30FC\u30EB\u30C9\u30AA\u30D6\u30B8\u30A7\u30AF\u30C8\u306E\u6B8B\u9AB8"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1511756679
 Transform:
   m_ObjectHideFlags: 0
@@ -64508,10 +64542,6 @@ Transform:
   - {fileID: 1608684163}
   - {fileID: 746421288}
   - {fileID: 2137911045}
-  - {fileID: 1394285241}
-  - {fileID: 1896822906}
-  - {fileID: 59519979}
-  - {fileID: 341391124}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1512232007
@@ -70031,11 +70061,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: 
+    TypeName: AnoGame.Application.PersistentLifetimeScope
   autoRun: 1
   autoInjectGameObjects:
   - {fileID: 307215275}
   - {fileID: 426863186280237112}
+  - {fileID: 1859354955}
+  - {fileID: 74569087}
   itemDatabase: {fileID: 11400000, guid: 13c4c8cac8a63df4cb2689f3c68522dd, type: 2}
 --- !u!4 &1697523271
 Transform:
@@ -75211,7 +75243,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 266e4336cda2e3747a2abe4406d56dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputActionAsset: {fileID: -944628639613478452, guid: f5756f7f983c6c54cabdfccad787d3c2, type: 3}
   _settingsDisplay: {fileID: 641918982}
 --- !u!114 &1859354961
 MonoBehaviour:
@@ -76549,11 +76580,11 @@ Transform:
   m_GameObject: {fileID: 1896822903}
   serializedVersion: 2
   m_LocalRotation: {x: -0.41765445, y: -0.13849317, z: 0.06457999, w: -0.8956639}
-  m_LocalPosition: {x: -59.971184, y: 3.1474504, z: 95.85525}
+  m_LocalPosition: {x: -126.18118, y: 4.0074506, z: -7.1447525}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1511756679}
+  m_Father: {fileID: 83760909}
   m_LocalEulerAnglesHint: {x: 50, y: -342.42, z: 0}
 --- !u!1 &1897967436
 GameObject:
@@ -85009,7 +85040,8 @@ PrefabInstance:
       propertyPath: moveControl
       value: 
       objectReference: {fileID: 590326479}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6521881240430893036, guid: 456e3607b1d9bf34bba06eadaf89385d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -86597,15 +86629,16 @@ SceneRoots:
   - {fileID: 1588859819}
   - {fileID: 1262837645}
   - {fileID: 1859354959}
+  - {fileID: 83760909}
   - {fileID: 1511756679}
-  - {fileID: 1697523271}
   - {fileID: 1893901968}
   - {fileID: 746845425}
   - {fileID: 1247175356}
   - {fileID: 1668909554}
   - {fileID: 1159805804}
   - {fileID: 74569089}
-  - {fileID: 1303263892}
   - {fileID: 249024473}
   - {fileID: 60498570}
   - {fileID: 835494532}
+  - {fileID: 1697523271}
+  - {fileID: 1303263892}
