@@ -1,11 +1,5 @@
 using VContainer;
 using VContainer.Unity;
-using AnoGame.Domain.Event.Services;
-using AnoGame.Application.Player;
-using AnoGame.Application.Enemy;
-using AnoGame.Infrastructure.Services;
-using UnityEngine;
-using AnoGame.Data;
 using AnoGame.Domain.Data.Services;
 using AnoGame.Infrastructure.SaveData;
 

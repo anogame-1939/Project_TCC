@@ -4,12 +4,15 @@ using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using TMPro;
 using Cysharp.Threading.Tasks;
+using VContainer;
+using AnoGame.Application.Input;
 
 namespace AnoGame.Application.UI
 {
-    [RequireComponent(typeof(PlayerInput))]
     public class SelectionCursorController : MonoBehaviour
     {
+        [Inject] private IInputActionProvider _inputProvider;
+        
         [Header("=== Events ===")]
         [SerializeField] private UnityEvent onSelect;
         [SerializeField] private UnityEvent onConfirm;
@@ -18,7 +21,6 @@ namespace AnoGame.Application.UI
         [SerializeField] private float selectionCooldown = 1f;   // クールタイム（秒）
         private bool isSelectionOnCooldown = false;               // クールタイム中フラグ
 
-        private PlayerInput playerInput;
         private InputAction selectAction;
         private InputAction confirmAction;
         private InputAction cancelAction;
@@ -37,22 +39,21 @@ namespace AnoGame.Application.UI
 
         private void Awake()
         {
-            playerInput = GetComponent<PlayerInput>();
-            playerInput.SwitchCurrentActionMap("UI");
+            // Awake 時に「UI マップを有効化」しておく
+            _inputProvider.SwitchToUI();
 
-            // “Select” アクションを取得
-            selectAction = playerInput.actions.FindAction("Select", throwIfNotFound: true);
-            // 押しっぱなし時に連続呼び出しされるように “performed” を使用
-            selectAction.started += OnSelectPerformed;
+            // UI の ActionMap を取得しておく
+            var uiMap = _inputProvider.GetUIActionMap();
+
+            selectAction  = uiMap.FindAction("Select", throwIfNotFound: true);
+            confirmAction = uiMap.FindAction("Confirm", throwIfNotFound: true);
+            cancelAction  = uiMap.FindAction("Cancel", throwIfNotFound: true);
+
+            // イベント登録（“performed” などはお好みで）
+            selectAction.started   += OnSelectPerformed;
             selectAction.performed += OnSelectPerformed;
-
-            // “Confirm” アクション
-            confirmAction = playerInput.actions.FindAction("Confirm", throwIfNotFound: true);
             confirmAction.performed += OnConfirmPerformed;
-
-            // “Cancel” アクション
-            cancelAction = playerInput.actions.FindAction("Cancel", throwIfNotFound: true);
-            cancelAction.performed += OnCancelPerformed;
+            cancelAction.performed  += OnCancelPerformed;
         }
 
         private void Update()
