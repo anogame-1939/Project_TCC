@@ -1025,7 +1025,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6e9c3a2e07769d4095c9931ac4d88b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInput: {fileID: 950479765}
+  playerInput: {fileID: 0}
   uiManager: {fileID: 950479766}
 --- !u!1 &296459365
 GameObject:
@@ -4092,17 +4092,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ignore: 1
   _originText: 
---- !u!114 &784071819 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2992467602542317519, guid: 63858f6311bab204ea92ea6bc521f09b, type: 3}
-  m_PrefabInstance: {fileID: 772035052940272891}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545679110}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &811839479
 GameObject:
   m_ObjectHideFlags: 0
@@ -4689,7 +4678,6 @@ GameObject:
   - component: {fileID: 950479762}
   - component: {fileID: 950479761}
   - component: {fileID: 950479760}
-  - component: {fileID: 950479765}
   - component: {fileID: 950479764}
   - component: {fileID: 950479766}
   - component: {fileID: 950479767}
@@ -4848,36 +4836,6 @@ MonoBehaviour:
   selectionCooldown: 1
   cursorImage: {fileID: 1496556309}
   scrollIncrement: 0.1
---- !u!114 &950479765
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 950479759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: f5756f7f983c6c54cabdfccad787d3c2, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 784071819}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: UI
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &950479766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8709,7 +8667,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1891792204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9456,9 +9414,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: AnoGame.Application.Title.TitleLifetimeScope
+    TypeName: AnoGame.Application.PersistentLifetimeScope
   autoRun: 1
   autoInjectGameObjects:
+  - {fileID: 950479759}
   - {fileID: 875791590}
   - {fileID: 1364650869}
 --- !u!1 &2087607109
@@ -10141,7 +10100,6 @@ SceneRoots:
   - {fileID: 772035052940272891}
   - {fileID: 950479763}
   - {fileID: 722099902}
-  - {fileID: 2068569886}
   - {fileID: 1364650871}
   - {fileID: 1971326211}
   - {fileID: 1092461860}
@@ -10152,4 +10110,5 @@ SceneRoots:
   - {fileID: 60863901}
   - {fileID: 2110772051}
   - {fileID: 103720743}
+  - {fileID: 2068569886}
   - {fileID: 1891792205}

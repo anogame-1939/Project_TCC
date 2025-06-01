@@ -58,6 +58,7 @@ namespace AnoGame.Application.UI
 
         private void Update()
         {
+            return; 
             // 毎フレーム、現在の入力値を読み取る
             Vector2 inputValue = selectAction.ReadValue<Vector2>();
 
