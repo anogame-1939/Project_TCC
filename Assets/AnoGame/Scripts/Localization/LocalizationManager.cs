@@ -281,6 +281,7 @@ namespace Localizer
         {
             Debug.Log($"LocalizationManager: ロケール変更！{locale.Identifier}, {locale.LocaleName}");
             await ApplyLocalizedTextWithRetry();
+            await ApplyFontWithRetry();
         }
 
         /// <summary>
@@ -319,9 +320,17 @@ namespace Localizer
                     tmpro.text = entry.LocalizedValue;
                     Debug.Log($"テキスト翻訳完了: '{localizeComponent.OriginText}' -> '{entry.LocalizedValue}'");
                 }
+                else
+                {
+                    Debug.LogError($"対応する翻訳がありませんでした。:{tmpro.text}");
+                }
             }
 
+            Debug.Log("翻訳がすべて完了しました。");
+
             await UniTask.Yield(); // 必要に応じて一フレーム待機
+
+            Debug.Log("翻訳がすべて完了しました。2");
         }
 
         /// <summary>
@@ -330,6 +339,7 @@ namespace Localizer
         /// </summary>
         private async UniTask ApplyFont()
         {
+            Debug.Log("ApplyFont:フォントを適用");
             if (_fontTable == null)
             {
                 Debug.LogError("ApplyFont: _fontTable が null です。インスペクターでアサインしてください。");
@@ -345,7 +355,10 @@ namespace Localizer
 
             // 2. UniTask に変換して await
             //    これで AssetTable が完全にロードされるまで待機できる
+            Debug.Log("ApplyFont:tableHandle.ToUniTask()");
             await tableHandle.ToUniTask();
+
+            Debug.Log("ApplyFont:tableHandle.ToUniTask() -OK");
 
             // 3. 実際にロードされた AssetTable を取り出す
             AssetTable assetTable = tableHandle.Result;
