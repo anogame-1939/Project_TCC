@@ -99,6 +99,40 @@ namespace AnoGame.Application.UI
 
         // ------------------------------------------------------------
         /// <summary>
+        /// 指定したインデックスのセクションを「操作不可＋Navigation 無効＋非アクティブ化」する
+        /// </summary>
+        public void HideSection(int index)
+        {
+            if (index < 0 || index >= sections.Count)
+            {
+                Debug.LogWarning("Invalid section index: " + index);
+                return;
+            }
+
+            UISection target = sections[index];
+
+            // ① フォーカスされている Selectable の index を保存しておく（戻るときに使いたい場合）
+            if (currentSectionIndex == index)
+            {
+                SaveCurrentSelectedIndex();
+            }
+
+            // ② 操作不可にする
+            DisableSectionInteraction(target);
+
+            // ③ Navigation を None にする
+            DisableNavigation(target);
+
+            // ④ パネルを非アクティブ化して見た目を消す
+            if (target.panel.activeSelf)
+            {
+                Debug.Log("target.panel.activeSelf:" + target.panel.name);
+                target.panel.SetActive(false);
+            }
+        }
+
+        // ------------------------------------------------------------
+        /// <summary>
         /// 指定した UISection を「操作不可＆レイキャストも受け付けない」状態にする
         /// CanvasGroup を通して実現。見た目はそのまま残る
         /// </summary>
@@ -207,6 +241,33 @@ namespace AnoGame.Application.UI
         public void BackToMain()
         {
             ShowSection(0);
+        }
+
+        // ------------------------------------------------------------
+        /// <summary>
+        /// 現在のセクションに設定された onCancel (UnityEvent) を実行する
+        /// </summary>
+        public void InvokeCurrentSectionOnCancel()
+        {
+            if (currentSectionIndex < 0 || currentSectionIndex >= sections.Count)
+                return;
+
+            var section = sections[currentSectionIndex];
+            if (section != null && section.onCancel != null)
+            {
+                section.onCancel.Invoke();
+            }
+        }
+
+        public void Quit()
+        {
+#if UNITY_EDITOR
+            // エディタ再生を停止
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            // ビルドした実行ファイルを終了
+            Application.Quit();
+#endif
         }
     }
 }

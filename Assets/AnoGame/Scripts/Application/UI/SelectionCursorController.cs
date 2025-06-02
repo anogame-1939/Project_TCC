@@ -12,11 +12,13 @@ namespace AnoGame.Application.UI
     public class SelectionCursorController : MonoBehaviour
     {
         [Inject] private IInputActionProvider _inputProvider;
-        
+
         [Header("=== Events ===")]
         [SerializeField] private UnityEvent onSelect;
         [SerializeField] private UnityEvent onConfirm;
-        [SerializeField] private UnityEvent onCancel;
+        // ※ onCancel はこのクラス内で使わないので削除 or コメントアウト
+        // [SerializeField] private UnityEvent onCancel;
+
         [Header("=== Selection Cooldown ===")]
         [SerializeField] private float selectionCooldown = 1f;   // クールタイム（秒）
         private bool isSelectionOnCooldown = false;               // クールタイム中フラグ
@@ -24,6 +26,9 @@ namespace AnoGame.Application.UI
         private InputAction selectAction;
         private InputAction confirmAction;
         private InputAction cancelAction;
+
+        // **UIManager の参照を保持**
+        [SerializeField] private UIManager uiManager;
 
         // 現在アクティブな UISection
         private UISection currentSection;
@@ -45,34 +50,30 @@ namespace AnoGame.Application.UI
             // UI の ActionMap を取得しておく
             var uiMap = _inputProvider.GetUIActionMap();
 
-            selectAction  = uiMap.FindAction("Select", throwIfNotFound: true);
+            selectAction  = uiMap.FindAction("Select",  throwIfNotFound: true);
             confirmAction = uiMap.FindAction("Confirm", throwIfNotFound: true);
-            cancelAction  = uiMap.FindAction("Cancel", throwIfNotFound: true);
+            cancelAction  = uiMap.FindAction("Cancel",  throwIfNotFound: true);
 
-            // イベント登録（“performed” などはお好みで）
-            selectAction.started   += OnSelectPerformed;
-            selectAction.performed += OnSelectPerformed;
-            confirmAction.performed += OnConfirmPerformed;
-            cancelAction.performed  += OnCancelPerformed;
+            // イベント登録
+            selectAction.started     += OnSelectPerformed;
+            selectAction.performed   += OnSelectPerformed;
+            confirmAction.performed  += OnConfirmPerformed;
+            cancelAction.performed   += OnCancelPerformed;
         }
 
         private void Update()
         {
             return; 
-            // 毎フレーム、現在の入力値を読み取る
+            // 毎フレーム、現在の入力値を読み取る（不要ならコメントアウト）
             Vector2 inputValue = selectAction.ReadValue<Vector2>();
 
             if (Time.time < nextScrollTime)
             {
-                // 他の処理（カーソル移動など）はやる場合はここで分岐
-                // 今回はスクロール部分だけ無視すると仮定
                 return;
             }
 
-            // もし押しっぱなしであれば、ここで連続処理ができる
             if (inputValue.x != 0)
             {
-                // 左右入力の絶対値が大きい場合 → スクロールバーの値を更新
                 if (Mathf.Abs(inputValue.x) > 0.5f)
                 {
                     var currentObj = currentSection.selectables[currentIndex].gameObject;
@@ -84,11 +85,7 @@ namespace AnoGame.Application.UI
                         scrollbar.value = newValue;
 
                         Debug.Log($"Scrollbar moved to {newValue}");
-
-                        // ★ ここでクールダウン開始
-                        // 次にスクロールが可能になる時刻を、現在時刻 + 1秒 とする
                         nextScrollTime = Time.time + coolTime;
-
                         return;
                     }
                 }
@@ -99,7 +96,7 @@ namespace AnoGame.Application.UI
         {
             if (selectAction != null)
             {
-                selectAction.started -= OnSelectPerformed;
+                selectAction.started   -= OnSelectPerformed;
                 selectAction.performed -= OnSelectPerformed;
             }
             if (confirmAction != null)
@@ -139,12 +136,10 @@ namespace AnoGame.Application.UI
             // クールタイム開始
             isSelectionOnCooldown = true;
 
-            // 入力読み取り＆移動
             Vector2 inputValue = context.ReadValue<Vector2>();
             if (inputValue.y > 0f) MoveSelectionUp();
             else if (inputValue.y < 0f) MoveSelectionDown();
 
-            // 指定秒だけ待機
             await UniTask.Delay(System.TimeSpan.FromSeconds(selectionCooldown));
             isSelectionOnCooldown = false;
         }
@@ -160,10 +155,6 @@ namespace AnoGame.Application.UI
             if (currentSection == null || currentSection.selectables.Count == 0) return;
 
             var currentObj = currentSection.selectables[currentIndex].gameObject;
-
-            // Dropdown や Scrollbar を個別に分岐したいならここで判定してもOK
-            // 今回は “左右入力でスクロールバー操作” するので
-            // Confirm押下時は Buttonなど他UIを想定
 
             var button = currentObj.GetComponent<Button>();
             if (button != null)
@@ -194,12 +185,15 @@ namespace AnoGame.Application.UI
 
         private void OnCancelPerformed(InputAction.CallbackContext context)
         {
-            onCancel?.Invoke();
-
-            Debug.Log("Cancel pressed!");
-            if (currentSection != null && currentSection.onCancel != null)
+            // ** UIManager 経由で現在のセクションの onCancel を呼び出す **
+            if (uiManager != null)
             {
-                currentSection.onCancel.Invoke();
+                uiManager.InvokeCurrentSectionOnCancel();
+                Debug.Log("InvokeCurrentSectionOnCancel() called.");
+            }
+            else
+            {
+                Debug.LogWarning("SelectionCursorController: UIManager が参照されていません。");
             }
         }
 
