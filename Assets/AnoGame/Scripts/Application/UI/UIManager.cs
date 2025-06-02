@@ -8,6 +8,7 @@ namespace AnoGame.Application.UI
     {
         // UISectionのリストをインスペクターから設定
         [SerializeField] private List<UISection> sections;
+        [SerializeField] private bool startToShow = false;
         private int currentSectionIndex = 0;
 
         private void Start()
@@ -18,7 +19,7 @@ namespace AnoGame.Application.UI
             }
 
             // 起動時はメインメニュー（例：0番）を表示
-            ShowSection(0);
+            if (startToShow) ShowSection(0);
         }
 
         private void Initialize()

@@ -8942,74 +8942,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 247264035}
   m_CullTransparentMesh: 1
---- !u!1 &249024470
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 249024473}
-  - component: {fileID: 249024472}
-  - component: {fileID: 249024471}
-  m_Layer: 0
-  m_Name: EventSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &249024471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 249024470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
---- !u!114 &249024472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 249024470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 10
---- !u!4 &249024473
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 249024470}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &249819210
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -75244,6 +75176,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settingsDisplay: {fileID: 641918982}
+  showEvents:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1859354961}
+        m_TargetAssemblyTypeName: AnoGame.Application.UI.UIManager, AnoGame.Application
+        m_MethodName: ShowSection
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  hideEvents:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1859354961}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1859354961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75256,7 +75218,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10cd8fca7b8e74b48bba49352950d27a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sections: []
+  sections:
+  - sectionName: "\u8A2D\u5B9A\u753B\u9762"
+    panel: {fileID: 641918981}
+    selectables:
+    - {fileID: 563514568}
+    - {fileID: 815310913}
+    - {fileID: 1413847596}
+    - {fileID: 185547610}
+    - {fileID: 357418012}
+    - {fileID: 451406790}
+    - {fileID: 1996203494}
+    - {fileID: 1201664806}
+    lastIndex: 0
+    cursorOffset: {x: 0, y: 0}
+    onCancel:
+      m_PersistentCalls:
+        m_Calls: []
+  startToShow: 0
 --- !u!114 &1859354962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75285,6 +75264,8 @@ MonoBehaviour:
   titleSceneName: 00.Title
   ignoreObjects:
   - FadeCanvas
+  - PersistLifetimeScope
+  - SteamManager
 --- !u!1001 &1862956421
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -86637,7 +86618,6 @@ SceneRoots:
   - {fileID: 1668909554}
   - {fileID: 1159805804}
   - {fileID: 74569089}
-  - {fileID: 249024473}
   - {fileID: 60498570}
   - {fileID: 835494532}
   - {fileID: 1697523271}

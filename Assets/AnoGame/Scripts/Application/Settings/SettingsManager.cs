@@ -119,6 +119,7 @@ namespace AnoGame.Application.Settings
             {
                 try
                 {
+                    Debug.Log("Settings save now...");
                     await _repository.SaveDataAsync(_settingsData);
                     Debug.Log("Settings saved successfully");
                 }
