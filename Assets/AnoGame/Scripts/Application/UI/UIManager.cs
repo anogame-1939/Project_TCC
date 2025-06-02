@@ -1,46 +1,42 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI; // Navigation を操作するために必要
 using System.Collections.Generic;
 
 namespace AnoGame.Application.UI
 {
     public class UIManager : MonoBehaviour
     {
-        // UISectionのリストをインスペクターから設定
         [SerializeField] private List<UISection> sections;
         [SerializeField] private bool startToShow = false;
         private int currentSectionIndex = 0;
 
+        // 「Navigation を元に戻す」ために、各セクションの Selectable ごとに元の Navigation を保存する辞書
+        private Dictionary<Selectable, Navigation> originalNavigations = new Dictionary<Selectable, Navigation>();
+
+        // ------------------------------------------------------------
         private void Start()
         {
+            // 起動時は、すべてのセクションを「操作不可＆非フォーカス状態」にしておく
             foreach (var section in sections)
             {
-                section.DisableAllSelectables();
+                DisableSectionInteraction(section);
+                section.panel.SetActive(false);
+                section.lastIndex = 0; // 初期化
             }
 
-            // 起動時はメインメニュー（例：0番）を表示
-            if (startToShow) ShowSection(0);
-        }
-
-        private void Initialize()
-        {
-            foreach(var selectable in sections)
+            if (startToShow)
             {
-                if(selectable != null)
-                {
-                    // selectable.DisableAllSelectables();
-                }
+                ShowSection(0);
             }
-            
         }
 
+        // ------------------------------------------------------------
         private GameObject lastSelected = null;
-        void Update()
-        {
-            // 現在 EventSystem が選択しているUIオブジェクト
-            var current = EventSystem.current.currentSelectedGameObject;
 
-            // もし前回と違うオブジェクトを選択していたらログを出す
+        private void Update()
+        {
+            var current = EventSystem.current.currentSelectedGameObject;
             if (current != lastSelected)
             {
                 lastSelected = current;
@@ -51,92 +47,162 @@ namespace AnoGame.Application.UI
             }
         }
 
+        // ------------------------------------------------------------
         /// <summary>
-        /// セクション切り替え時に、前のセクションのSelectableを無効化し、新しいセクションのSelectableを有効化します。
-        /// また、新しいセクションでは前回の選択状態（lastIndex）を利用してフォーカスを設定します。
+        /// セクション切り替えメソッド
         /// </summary>
         /// <param name="index">表示したいセクションのインデックス</param>
         public void ShowSection(int index)
         {
-            if(index < 0 || index >= sections.Count)
+            if (index < 0 || index >= sections.Count)
             {
                 Debug.LogWarning("Invalid section index: " + index);
                 return;
             }
-            SaveCurrentSelectedIndex();
 
-            // 現在のセクションのSelectableを無効化し、パネルを非表示にする
+            // 1) 現在のセクション情報を保存してから操作不可にする
+            SaveCurrentSelectedIndex(); // フォーカスされている Selectable の index を保存
+
             UISection previousSection = sections[currentSectionIndex];
-            SetSelectablesInteractable(previousSection, false);
-            previousSection.panel.SetActive(false);
+            if (previousSection != null)
+            {
+                // ── 操作を受け付けないように CanvasGroup を切り替え ──
+                DisableSectionInteraction(previousSection);
+                // ── Navigation を None にしておく ──
+                DisableNavigation(previousSection);
+                // ── パネルは Active のままにする（見た目だけ残す）
+                // previousSection.panel.SetActive(false); // 削除：非アクティブ化しない
+            }
 
-            // 現在のセクションを更新
+            // 2) 新しいセクションをアクティブ化して操作を許可
             currentSectionIndex = index;
             UISection currentSection = sections[currentSectionIndex];
 
-            // 新しいセクションのパネルを表示し、Selectableを有効化
-            currentSection.panel.SetActive(true);
-            SetSelectablesInteractable(currentSection, true);
+            if (!currentSection.panel.activeSelf)
+                currentSection.panel.SetActive(true);
 
-            // 前回選択していたSelectableがあればそのオブジェクトにフォーカス、
-            // なければリストの先頭を選択
+            EnableSectionInteraction(currentSection);
+            RestoreNavigation(currentSection);
+
+            // 3) フォーカス設定: lastIndex が正しければそのボタンを選択、なければ先頭
             int indexToSelect = currentSection.lastIndex;
-            if(indexToSelect < 0 || indexToSelect >= currentSection.selectables.Count)
-            {
+            if (indexToSelect < 0 || indexToSelect >= currentSection.selectables.Count)
                 indexToSelect = 0;
-            }
-            if(currentSection.selectables.Count > 0 && currentSection.selectables[indexToSelect] != null)
+
+            if (currentSection.selectables.Count > 0 && currentSection.selectables[indexToSelect] != null)
             {
-                currentSection.selectables[indexToSelect].Select();
-                EventSystem.current.SetSelectedGameObject(currentSection.selectables[indexToSelect].gameObject);
+                var toSelect = currentSection.selectables[indexToSelect];
+                toSelect.Select();
+                EventSystem.current.SetSelectedGameObject(toSelect.gameObject);
             }
         }
 
+        // ------------------------------------------------------------
         /// <summary>
-        /// 指定されたUISection内のSelectable群のinteractable状態を切り替えます
+        /// 指定した UISection を「操作不可＆レイキャストも受け付けない」状態にする
+        /// CanvasGroup を通して実現。見た目はそのまま残る
         /// </summary>
-        private void SetSelectablesInteractable(UISection section, bool interactable)
+        private void DisableSectionInteraction(UISection section)
         {
-            foreach(var selectable in section.selectables)
+            if (section.canvasGroup == null)
             {
-                if(selectable != null)
-                {
-                    selectable.interactable = interactable;
-                }
+                Debug.LogWarning($"CanvasGroup が設定されていません: {section.sectionName}");
+                return;
             }
+
+            // すべての子 UI（Selectable を含む）を操作不可にする
+            section.canvasGroup.interactable = false;
+            // クリックやタップ、ポインターが当たらないようにする
+            section.canvasGroup.blocksRaycasts = false;
+            // ※ 念のため alpha は変更しないので、色味はそのまま
         }
 
         /// <summary>
-        /// 現在フォーカスされているSelectableのインデックスを保存します
-        /// （セクション切り替え前に呼び出して、後で戻る際に利用します）
+        /// 指定した UISection を「操作可能＆レイキャストを受け付ける」状態に戻す
+        /// </summary>
+        private void EnableSectionInteraction(UISection section)
+        {
+            if (section.canvasGroup == null)
+            {
+                Debug.LogWarning($"CanvasGroup が設定されていません: {section.sectionName}");
+                return;
+            }
+
+            section.canvasGroup.interactable = true;
+            section.canvasGroup.blocksRaycasts = true;
+        }
+
+        // ------------------------------------------------------------
+        /// <summary>
+        /// 現在フォーカスされている Selectable のインデックスを保存する
         /// </summary>
         private void SaveCurrentSelectedIndex()
         {
             UISection currentSection = sections[currentSectionIndex];
             GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
-            if(currentSelected != null)
+            if (currentSelected == null) return;
+
+            int idx = currentSection.selectables.FindIndex(s => s != null && s.gameObject == currentSelected);
+            if (idx >= 0)
             {
-                int index = currentSection.selectables.FindIndex(s => s.gameObject == currentSelected);
-                if(index >= 0)
+                currentSection.lastIndex = idx;
+            }
+        }
+
+        // ------------------------------------------------------------
+        /// <summary>
+        /// 指定した UISection 内のすべての Selectable の Navigation を None にして
+        /// キーボード/ゲームパッドによるフォーカス移動を止める。元の設定は辞書に保存。
+        /// </summary>
+        private void DisableNavigation(UISection section)
+        {
+            foreach (var selectable in section.selectables)
+            {
+                if (selectable == null) continue;
+
+                // 元の Navigation を保存しておく
+                if (!originalNavigations.ContainsKey(selectable))
                 {
-                    currentSection.lastIndex = index;
+                    originalNavigations[selectable] = selectable.navigation;
                 }
+
+                // Navigation を完全にオフ
+                Navigation nav = selectable.navigation;
+                nav.mode = Navigation.Mode.None;
+                selectable.navigation = nav;
             }
         }
 
         /// <summary>
-        /// メインメニューから設定画面に移動する際の処理例
+        /// 指定した UISection の Selectable について、保存しておいた
+        /// Navigation 設定を復元する
+        /// </summary>
+        private void RestoreNavigation(UISection section)
+        {
+            foreach (var selectable in section.selectables)
+            {
+                if (selectable == null) continue;
+
+                if (originalNavigations.ContainsKey(selectable))
+                {
+                    selectable.navigation = originalNavigations[selectable];
+                }
+                // ※ もし辞書に保存がない場合は、そもそも初期化がされていないので何もしない
+            }
+        }
+
+        // ------------------------------------------------------------
+        /// <summary>
+        /// メインメニューから設定画面に移動する例
         /// </summary>
         public void OpenSettings()
         {
-            // 現在のセクション（メインメニュー）の最後の選択状態を保存
             SaveCurrentSelectedIndex();
-            // 設定画面（例：1番目）へ切り替え
             ShowSection(1);
         }
 
         /// <summary>
-        /// 設定画面などでキャンセルボタンが押されたときの処理例
+        /// 設定画面からメインに戻る例
         /// </summary>
         public void BackToMain()
         {
