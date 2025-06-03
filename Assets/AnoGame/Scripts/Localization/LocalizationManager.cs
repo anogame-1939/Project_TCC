@@ -339,7 +339,9 @@ namespace Localizer
             Debug.Log("ApplyFont: メソッド開始");
 
             // ■ ① LocalizationSettings の初期化完了を待つ
+            Debug.Log("ApplyFont: LocalizationSettings.InitializationOperation を待機します...");
             await LocalizationSettings.InitializationOperation.ToUniTask();
+            Debug.Log("ApplyFont: LocalizationSettings 初期化完了");
 
             // ■ ② TableReference がセットされているかチェック
             if (_fontTable == null || _localizedFontReference == null)
@@ -350,16 +352,19 @@ namespace Localizer
 
             Debug.Log($"ApplyFont: TableCollectionName = {_fontTable.TableReference.TableCollectionName}");
 
-            // ■ ③ (書き換え) テーブルを同期的に取得する
-            AssetTable assetTable = LocalizationSettings.AssetDatabase.GetTable(_fontTable.TableReference);
+            // ■ ③ テーブルをロード
+            Debug.Log("ApplyFont: GetTableAsync を呼び出します...");
+            AsyncOperationHandle<AssetTable> tableHandle =
+                LocalizationSettings.AssetDatabase.GetTableAsync(_fontTable.TableReference);
+            await tableHandle.ToUniTask();
+            Debug.Log("ApplyFont: tableHandle.ToUniTask() が完了しました");
+
+            AssetTable assetTable = tableHandle.Result;
             if (assetTable == null)
             {
-                // もしまだロードされていないなら、非同期で確実にロードする代替コードを走らせるか、
-                // エラー扱いにしてしまっても構いません。
-                Debug.LogError($"ApplyFont: AssetTable がまだロードされていません。TableReference: {_fontTable.TableReference.TableCollectionName}");
+                Debug.LogError($"ApplyFont: AssetTable が null でした。(Table: {_fontTable.TableReference.TableCollectionName})");
                 return;
             }
-
             Debug.Log($"ApplyFont: AssetTable を取得できました: {assetTable.TableCollectionName}");
 
             // ■ ④ キー名を ResolveKeyName で取得 (デバッグ用途)
@@ -376,17 +381,16 @@ namespace Localizer
             AsyncOperationHandle<TMP_FontAsset> fontHandle =
                 assetTable.GetAssetAsync<TMP_FontAsset>(_localizedFontReference.TableEntryReference);
 
-            // ◆ ここを同期処理に置き換え
-            // WaitForCompletion() を呼ぶと、その場でロードが完了するまでブロックします。
-            // （※Editor の “Use Asset Database” モードでは即座に返ってくることが多いです）
-            TMP_FontAsset tmpFontAsset = fontHandle.WaitForCompletion();
+            await fontHandle.ToUniTask();
+            Debug.Log("ApplyFont: fontHandle.ToUniTask() が完了しました");
 
+            TMP_FontAsset tmpFontAsset = fontHandle.Result;
             if (tmpFontAsset == null)
             {
-                Debug.LogError($"ApplyFont: フォントの同期ロードに失敗しました。(EntryReference ID: {_localizedFontReference.TableEntryReference.KeyId})");
+                Debug.LogError($"ApplyFont: フォントのロードに失敗しました。(EntryReference: {entryKey})");
                 return;
             }
-            Debug.Log($"ApplyFont: フォント '{tmpFontAsset.name}' を同期的にロードしました。");
+            Debug.Log($"ApplyFont: フォント '{tmpFontAsset.name}' をロードしました。");
 
             // ■ ⑥ シーン上のすべての TextMeshProUGUI に適用
             var tmpros = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
