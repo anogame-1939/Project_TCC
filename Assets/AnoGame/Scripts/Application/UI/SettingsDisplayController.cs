@@ -35,36 +35,47 @@ namespace AnoGame.Application.UI
             // ② 最初は「Player」アクションマップを有効にしておく
             //──────────────────────────────────────────
             _inputProvider.SwitchToPlayer();
-            var playerMap = _inputProvider.GetPlayerActionMap();
 
-            //──────────────────────────────────────────
-            // ③ Playerマップから "Settings" アクションを探して購読
-            //──────────────────────────────────────────
-            _settingsOpenAction = playerMap.FindAction("Settings", throwIfNotFound: true);
-            _settingsOpenAction.performed += OnSettingsOpenPerformed;
 
-            //──────────────────────────────────────────
-            // ④ CanvasGroup をキャッシュ＆初期非表示
-            //──────────────────────────────────────────
             _canvasGroup = GetComponent<CanvasGroup>();
             if (_canvasGroup == null)
             {
                 Debug.LogError("[SettingsDisplayController] CanvasGroup がアタッチされていません。");
             }
             HideSettings();
+
+            Subscribe();
         }
 
         private void OnDestroy()
         {
-            // Playerマップ上の購読解除
-            if (_settingsOpenAction != null)
-                _settingsOpenAction.performed -= OnSettingsOpenPerformed;
+            Unsubscribe();
+        }
 
-            // UIマップ上の購読解除（両方とも）
-            if (_settingsCloseAction1 != null)
-                _settingsCloseAction1.performed -= OnSettingsClosePerformed;
-            if (_settingsCloseAction2 != null)
-                _settingsCloseAction2.performed -= OnSettingsClosePerformed;
+        private void Subscribe()
+        {
+            var playerMap = _inputProvider.GetPlayerActionMap();
+            _settingsOpenAction = playerMap.FindAction("Settings", throwIfNotFound: true);
+            _settingsOpenAction.performed += OnSettingsOpenPerformed;
+
+            var uiMap = _inputProvider.GetUIActionMap();
+            _settingsCloseAction1 = uiMap.FindAction("Cancel", throwIfNotFound: true);
+            _settingsCloseAction1.performed += OnSettingsClosePerformed;
+            _settingsCloseAction2 = uiMap.FindAction("Settings", throwIfNotFound: false);
+            _settingsCloseAction2.performed += OnSettingsClosePerformed;
+        }
+
+        private void Unsubscribe()
+        {
+            var playerMap = _inputProvider.GetPlayerActionMap();
+            _settingsOpenAction = playerMap.FindAction("Settings", throwIfNotFound: true);
+            _settingsOpenAction.performed -= OnSettingsOpenPerformed;
+
+            var uiMap = _inputProvider.GetUIActionMap();
+            _settingsCloseAction1 = uiMap.FindAction("Cancel", throwIfNotFound: true);
+            _settingsCloseAction1.performed -= OnSettingsClosePerformed;
+            _settingsCloseAction2 = uiMap.FindAction("Settings", throwIfNotFound: false);
+            _settingsCloseAction2.performed -= OnSettingsClosePerformed;
         }
 
         //──────────────────────────────────────────
@@ -113,19 +124,6 @@ namespace AnoGame.Application.UI
             // (1) UIマップへ切り替え
             _inputProvider.SwitchToUI();
 
-            // (2) UIマップ上の "Cancel" と "Settings" アクションをキャッシュして購読
-            var uiMap = _inputProvider.GetUIActionMap();
-
-            _settingsCloseAction1 = uiMap.FindAction("Cancel",   throwIfNotFound: true);
-            _settingsCloseAction1.performed += OnSettingsClosePerformed;
-
-            _settingsCloseAction2 = uiMap.FindAction("Settings", throwIfNotFound: false);
-            if (_settingsCloseAction2 != null)
-            {
-                _settingsCloseAction2.performed += OnSettingsClosePerformed;
-            }
-            // ※もし UI マップに "Settings" アクションが必ず存在するなら throwIfNotFound:true にできます。
-
             // (3) UI 表示＆カーソル開放
             // _settingsDisplay.gameObject.SetActive(true);
             if (_canvasGroup != null)
@@ -137,18 +135,12 @@ namespace AnoGame.Application.UI
             Cursor.visible   = true;
         }
 
-        private void Cancel()
-        {
-            
-        }
-
         //──────────────────────────────────────────
         // 設定画面を閉じる
         //  → UI/Cancel と UI/Settings の購読解除 ＆ Playerマップへ戻す
         //──────────────────────────────────────────
         public void HideSettings()
         {
-            return;
             // (1) UI表示をオフにして、カーソルをロック
             // _settingsDisplay.gameObject.SetActive(false);
             if (_canvasGroup != null)
@@ -157,17 +149,7 @@ namespace AnoGame.Application.UI
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            // (2) UIマップ上の両アクションの購読を解除
-            if (_settingsCloseAction1 != null)
-            {
-                _settingsCloseAction1.performed -= OnSettingsClosePerformed;
-                _settingsCloseAction1 = null;
-            }
-            if (_settingsCloseAction2 != null)
-            {
-                _settingsCloseAction2.performed -= OnSettingsClosePerformed;
-                _settingsCloseAction2 = null;
-            }
+
 
             hideEvents?.Invoke();
 
