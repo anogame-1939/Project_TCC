@@ -148,14 +148,11 @@ namespace AnoGame.Application.UI
         //──────────────────────────────────────────
         public void HideSettings()
         {
-            return;
             // (1) UI表示をオフにして、カーソルをロック
             // _settingsDisplay.gameObject.SetActive(false);
             if (_canvasGroup != null)
                 _canvasGroup.alpha = 0;
 
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
 
             // (2) UIマップ上の両アクションの購読を解除
             if (_settingsCloseAction1 != null)
