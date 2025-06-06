@@ -11,6 +11,7 @@ namespace AnoGame.Application.UI
         [SerializeField] private SettingsDisplay _settingsDisplay; // 設定パネル
         [SerializeField] private UnityEvent showEvents;
         [SerializeField] private UnityEvent hideEvents;
+        [SerializeField] private UnityEvent cancelEvents;
 
         private CanvasGroup _canvasGroup;
         private InputAction _settingsOpenAction;    // Player マップ上の Settings
@@ -126,7 +127,7 @@ namespace AnoGame.Application.UI
             // ※もし UI マップに "Settings" アクションが必ず存在するなら throwIfNotFound:true にできます。
 
             // (3) UI 表示＆カーソル開放
-            _settingsDisplay.gameObject.SetActive(true);
+            // _settingsDisplay.gameObject.SetActive(true);
             if (_canvasGroup != null)
                 _canvasGroup.alpha = 1;
 
@@ -136,19 +137,25 @@ namespace AnoGame.Application.UI
             Cursor.visible   = true;
         }
 
+        private void Cancel()
+        {
+            
+        }
+
         //──────────────────────────────────────────
         // 設定画面を閉じる
         //  → UI/Cancel と UI/Settings の購読解除 ＆ Playerマップへ戻す
         //──────────────────────────────────────────
         public void HideSettings()
         {
+            return;
             // (1) UI表示をオフにして、カーソルをロック
-            _settingsDisplay.gameObject.SetActive(false);
+            // _settingsDisplay.gameObject.SetActive(false);
             if (_canvasGroup != null)
                 _canvasGroup.alpha = 0;
 
             Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible   = false;
+            Cursor.visible = false;
 
             // (2) UIマップ上の両アクションの購読を解除
             if (_settingsCloseAction1 != null)
@@ -175,7 +182,8 @@ namespace AnoGame.Application.UI
         {
             // Settings → Gameplay へ切り替え
             GameStateManager.Instance.SetState(GameState.Gameplay);
-            HideSettings();
+            // HideSettings();
+            cancelEvents?.Invoke();
         }
 
         private void OnApplicationFocus(bool hasFocus)

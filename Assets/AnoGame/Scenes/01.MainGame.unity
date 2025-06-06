@@ -80406,6 +80406,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  cancelEvents:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1859354961}
+        m_TargetAssemblyTypeName: AnoGame.Application.UI.UIManager, AnoGame.Application
+        m_MethodName: InvokeCurrentSectionOnCancel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1859354961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80450,7 +80465,7 @@ MonoBehaviour:
           m_CallState: 2
   - sectionName: "\u8A00\u8A9E\u9078\u629E"
     panel: {fileID: 1798476838}
-    canvasGroup: {fileID: 0}
+    canvasGroup: {fileID: 1798476840}
     selectables:
     - {fileID: 780508703}
     - {fileID: 802076640}
