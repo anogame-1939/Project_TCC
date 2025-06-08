@@ -8,6 +8,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using AnoGame.Domain.Data.Models;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using UnityEngine.EventSystems;
 
 namespace AnoGame.Application.Inventory
 {
@@ -99,6 +100,12 @@ namespace AnoGame.Application.Inventory
                     }
                 }
             }
+
+            var selectable = visibleSlots[0]?.GetComponent<Selectable>();
+            EventSystem.current.SetSelectedGameObject(selectable.gameObject);
+
+            // ２）Selectable の内部状態も更新したい場合は .Select() を呼ぶ
+            selectable.Select();
         }
 
         private void NextPage()
