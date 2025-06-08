@@ -109,6 +109,12 @@ namespace AnoGame.Application.Inventory
             StartCoroutine(EnforceCursorHide());
         }
 
+        public void Close()
+        {
+            GameStateManager.Instance.SetState(GameState.Gameplay);
+            Hide();
+        }
+
         private IEnumerator EnforceCursorHide()
         {
             yield return new WaitForSeconds(5f);

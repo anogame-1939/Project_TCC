@@ -132,8 +132,8 @@ namespace AnoGame.Application.Inventory
         {
             if (nextPageButton != null && prevPageButton != null)
             {
-                prevPageButton.interactable = (currentPage > 0);
-                nextPageButton.interactable = ((currentPage + 1) * maxVisibleSlots < _allItems.Count);
+                prevPageButton.gameObject.SetActive(currentPage > 0);
+                nextPageButton.gameObject.SetActive((currentPage + 1) * maxVisibleSlots < _allItems.Count);
             }
         }
 
