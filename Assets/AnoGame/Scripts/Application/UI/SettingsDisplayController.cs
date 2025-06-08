@@ -63,8 +63,8 @@ namespace AnoGame.Application.UI
             // UIマップ上の購読解除（両方とも）
             if (_settingsCloseAction1 != null)
                 _settingsCloseAction1.performed -= OnSettingsClosePerformed;
-            if (_settingsCloseAction2 != null)
-                _settingsCloseAction2.performed -= OnSettingsClosePerformed;
+            //if (_settingsCloseAction2 != null)
+                // _settingsCloseAction2.performed -= OnSettingsClosePerformed;
         }
 
         //──────────────────────────────────────────
@@ -122,7 +122,7 @@ namespace AnoGame.Application.UI
             _settingsCloseAction2 = uiMap.FindAction("Settings", throwIfNotFound: false);
             if (_settingsCloseAction2 != null)
             {
-                _settingsCloseAction2.performed += OnSettingsClosePerformed;
+                // _settingsCloseAction2.performed += OnSettingsClosePerformed;
             }
             // ※もし UI マップに "Settings" アクションが必ず存在するなら throwIfNotFound:true にできます。
 
