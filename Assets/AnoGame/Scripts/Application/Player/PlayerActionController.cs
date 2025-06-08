@@ -62,7 +62,7 @@ namespace AnoGame.Application.Player.Control
             // ② IInputActionProvider 経由で Player マップを有効化し、
             //     “Move” アクションを取得してキャッシュ
             //──────────────────────────────────────────
-            _inputProvider.SwitchToPlayer();
+            // _inputProvider.SwitchToPlayer();
             var playerMap = _inputProvider.GetPlayerActionMap();
             moveAction = playerMap.FindAction("Move", throwIfNotFound: true);
 

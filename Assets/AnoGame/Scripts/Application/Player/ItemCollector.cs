@@ -25,7 +25,7 @@ namespace AnoGame.Application.Player
         private void Awake()
         {
             // (1) まず Player マップを有効化しておく
-            _inputProvider.SwitchToPlayer();
+            // _inputProvider.SwitchToPlayer();
 
             // (2) Player マップを取得し、"Interact" アクションをキャッシュ
             var playerMap = _inputProvider.GetPlayerActionMap();

@@ -21,12 +21,12 @@ namespace AnoGame.Application.Input
         {
             // 必要に応じて currentMap.Disable() → UIMap.Enable()
             GetPlayerActionMap().Disable();
-            GetUIActionMap().Enable();
+            // GetUIActionMap().Enable();
         }
 
         public void SwitchToPlayer()
         {
-            GetUIActionMap().Disable();
+            // GetUIActionMap().Disable();
             GetPlayerActionMap().Enable();
         }
 

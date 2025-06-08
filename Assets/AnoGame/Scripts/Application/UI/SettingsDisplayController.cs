@@ -34,7 +34,7 @@ namespace AnoGame.Application.UI
             //──────────────────────────────────────────
             // ② 最初は「Player」アクションマップを有効にしておく
             //──────────────────────────────────────────
-            _inputProvider.SwitchToPlayer();
+            // _inputProvider.SwitchToPlayer();
             var playerMap = _inputProvider.GetPlayerActionMap();
 
             //──────────────────────────────────────────
@@ -51,7 +51,7 @@ namespace AnoGame.Application.UI
             {
                 Debug.LogError("[SettingsDisplayController] CanvasGroup がアタッチされていません。");
             }
-            HideSettings();
+            // HideSettings();
         }
 
         private void OnDestroy()
