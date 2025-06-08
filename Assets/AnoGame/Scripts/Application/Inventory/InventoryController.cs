@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
-using AnoGame.Application.Input;  // IInputActionProvider の名前空間
+using AnoGame.Application.Input;
 
 namespace AnoGame.Application.Inventory
 {
@@ -14,20 +14,15 @@ namespace AnoGame.Application.Inventory
         private CanvasGroup _canvasGroup;
         private InventoryManager _inventoryManager;
 
-        // Player マップの Inventory 開閉用アクション
-        private InputAction _inventoryAction;
+        // Player マップの Inventory 開閉用
+        private InputAction _inventoryOpenAction;
+        // UI マップの Cancel（閉じる用）
+        private InputAction _cancelAction;
+        // UI マップの Inventory（閉じる用）
+        private InputAction _inventoryCloseAction;
 
-        //──────────────────────────────────────────
-        // IInputActionProvider を Inject で受け取る
-        //──────────────────────────────────────────
-        [Inject]
-        private IInputActionProvider _inputProvider;
-
-        [Inject]
-        public void Construct(InventoryManager inventoryManager)
-        {
-            _inventoryManager = inventoryManager;
-        }
+        [Inject] private IInputActionProvider _inputProvider;
+        [Inject] public void Construct(InventoryManager inventoryManager) => _inventoryManager = inventoryManager;
 
         void Start()
         {
@@ -37,7 +32,6 @@ namespace AnoGame.Application.Inventory
                 return;
             }
 
-            // CanvasGroup をキャッシュ
             _canvasGroup = GetComponent<CanvasGroup>();
             if (_canvasGroup == null)
             {
@@ -45,63 +39,72 @@ namespace AnoGame.Application.Inventory
                 return;
             }
 
-            // Player マップへ切り替え
+            // Player マップ → Inventory 開閉
             _inputProvider.SwitchToPlayer();
             var playerMap = _inputProvider.GetPlayerActionMap();
             playerMap.Enable();
+            _inventoryOpenAction = playerMap.FindAction("Inventory", throwIfNotFound: true);
+            _inventoryOpenAction.performed += OnInventoryOpenPerformed;
 
-            // Player マップから Inventory アクションを取得して購読
-            _inventoryAction = playerMap.FindAction("Inventory", throwIfNotFound: true);
-            _inventoryAction.performed += OnInventoryPerformed;
-
-            // 初期状態は非表示
             Hide();
         }
 
         void OnDestroy()
         {
-            if (_inventoryAction != null)
-                _inventoryAction.performed -= OnInventoryPerformed;
+            // Player マップ購読解除
+            if (_inventoryOpenAction != null)
+                _inventoryOpenAction.performed -= OnInventoryOpenPerformed;
+            // UI マップ購読解除
+            if (_cancelAction != null)
+                _cancelAction.performed  -= OnCancelPerformed;
+            if (_inventoryCloseAction != null)
+                _inventoryCloseAction.performed -= OnCancelPerformed;
         }
 
-        private void OnInventoryPerformed(InputAction.CallbackContext ctx)
-        {
-            ToggleInventory();
-        }
+        private void OnInventoryOpenPerformed(InputAction.CallbackContext ctx)
+            => ToggleInventory();
 
         void ToggleInventory()
         {
-            var currentState = GameStateManager.Instance.CurrentState;
-            if (currentState == GameState.Gameplay)
+            var state = GameStateManager.Instance.CurrentState;
+            if (state == GameState.Gameplay)
             {
                 GameStateManager.Instance.SetState(GameState.Inventory);
                 Show();
             }
-            else if (currentState == GameState.Inventory)
+            else if (state == GameState.Inventory)
             {
-                GameStateManager.Instance.SetState(GameState.Gameplay);
-                Hide();
+                Close();
             }
         }
 
         public void Show()
         {
-            // 在庫データ更新
+            // データ更新
             var items = _inventoryManager.GetInventory();
             if (items != null)
             {
-                var inventory = new Domain.Data.Models.Inventory();
+                var inv = new Domain.Data.Models.Inventory();
                 foreach (var item in items)
-                    inventory.AddItem(item);
-                _inventoryViewer.UpdateInventory(inventory);
+                    inv.AddItem(item);
+                _inventoryViewer.UpdateInventory(inv);
             }
+
+            // UI マップへ切り替え ＆ Cancel / Inventory（UI） を購読
+            // _inputProvider.SwitchToUI();
+            var uiMap = _inputProvider.GetUIActionMap();
+
+            _cancelAction = uiMap.FindAction("Cancel", throwIfNotFound: true);
+            _cancelAction.performed += OnCancelPerformed;
+
+            _inventoryCloseAction = uiMap.FindAction("Inventory", throwIfNotFound: true);
+            if (_inventoryCloseAction != null)
+                _inventoryCloseAction.performed += OnCancelPerformed;
 
             // 表示＆カーソル解放
             _canvasGroup.alpha      = 1;
             Cursor.lockState        = CursorLockMode.None;
             Cursor.visible          = true;
-
-            // ※ここで UI マップ参照（GetUIActionMap）はまだ行いません
         }
 
         public void Hide()
@@ -111,14 +114,33 @@ namespace AnoGame.Application.Inventory
             Cursor.lockState        = CursorLockMode.Locked;
             Cursor.visible          = false;
 
+            // UI マップ購読解除
+            if (_cancelAction != null)
+            {
+                _cancelAction.performed -= OnCancelPerformed;
+                _cancelAction = null;
+            }
+            if (_inventoryCloseAction != null)
+            {
+                _inventoryCloseAction.performed -= OnCancelPerformed;
+                _inventoryCloseAction = null;
+            }
+
+            // Player マップへ復帰
+            _inputProvider.SwitchToPlayer();
+
             StartCoroutine(EnforceCursorHide());
         }
 
         public void Close()
         {
+            Debug.Log("Close");
             GameStateManager.Instance.SetState(GameState.Gameplay);
             Hide();
         }
+
+        private void OnCancelPerformed(InputAction.CallbackContext ctx)
+            => Close();
 
         private IEnumerator EnforceCursorHide()
         {

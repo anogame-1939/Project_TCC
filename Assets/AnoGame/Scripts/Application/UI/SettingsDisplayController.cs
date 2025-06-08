@@ -13,7 +13,6 @@ namespace AnoGame.Application.UI
         [SerializeField] private UnityEvent hideEvents;
         [SerializeField] private UnityEvent cancelEvents;
 
-        private CanvasGroup _canvasGroup;
         private InputAction _settingsOpenAction;    // Player マップ上の Settings
         private InputAction _settingsCloseAction1;  // UI マップ上の Cancel
         private InputAction _settingsCloseAction2;  // UI マップ上の Settings
@@ -43,15 +42,6 @@ namespace AnoGame.Application.UI
             _settingsOpenAction = playerMap.FindAction("Settings", throwIfNotFound: true);
             _settingsOpenAction.performed += OnSettingsOpenPerformed;
 
-            //──────────────────────────────────────────
-            // ④ CanvasGroup をキャッシュ＆初期非表示
-            //──────────────────────────────────────────
-            _canvasGroup = GetComponent<CanvasGroup>();
-            if (_canvasGroup == null)
-            {
-                Debug.LogError("[SettingsDisplayController] CanvasGroup がアタッチされていません。");
-            }
-            // HideSettings();
         }
 
         private void OnDestroy()
@@ -72,6 +62,7 @@ namespace AnoGame.Application.UI
         //──────────────────────────────────────────
         private void OnSettingsOpenPerformed(InputAction.CallbackContext context)
         {
+            Debug.Log("OnSettingsOpenPerformed");
             ToggleSettings();
         }
 
@@ -111,7 +102,7 @@ namespace AnoGame.Application.UI
         public void ShowSettings()
         {
             // (1) UIマップへ切り替え
-            _inputProvider.SwitchToUI();
+            //_inputProvider.SwitchToUI();
 
             // (2) UIマップ上の "Cancel" と "Settings" アクションをキャッシュして購読
             var uiMap = _inputProvider.GetUIActionMap();
@@ -128,8 +119,7 @@ namespace AnoGame.Application.UI
 
             // (3) UI 表示＆カーソル開放
             // _settingsDisplay.gameObject.SetActive(true);
-            if (_canvasGroup != null)
-                _canvasGroup.alpha = 1;
+            _settingsDisplay.gameObject.SetActive(true);
 
             showEvents?.Invoke();
 
@@ -150,8 +140,7 @@ namespace AnoGame.Application.UI
         {
             // (1) UI表示をオフにして、カーソルをロック
             // _settingsDisplay.gameObject.SetActive(false);
-            if (_canvasGroup != null)
-                _canvasGroup.alpha = 0;
+            _settingsDisplay.gameObject.SetActive(false);
 
 
             // (2) UIマップ上の両アクションの購読を解除
