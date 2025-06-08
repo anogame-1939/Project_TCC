@@ -62,7 +62,6 @@ namespace AnoGame.Application.UI
         //──────────────────────────────────────────
         private void OnSettingsOpenPerformed(InputAction.CallbackContext context)
         {
-            Debug.Log("OnSettingsOpenPerformed");
             ToggleSettings();
         }
 
@@ -102,7 +101,7 @@ namespace AnoGame.Application.UI
         public void ShowSettings()
         {
             // (1) UIマップへ切り替え
-            //_inputProvider.SwitchToUI();
+            _inputProvider.SwitchToUI();
 
             // (2) UIマップ上の "Cancel" と "Settings" アクションをキャッシュして購読
             var uiMap = _inputProvider.GetUIActionMap();
