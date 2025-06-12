@@ -13,77 +13,76 @@ namespace Localizer.UI
 
         [Header("ローカライズ設定")]
         [SerializeField] private LocalizedString localizedLanguageName;             // 言語名用 String TableEntry
-        [SerializeField] private LocalizedAsset<TMP_FontAsset> localizedFontAsset; // フォント用 Asset TableEntry
-        [SerializeField] private LocalizedAsset<Material> localizedMaterialAsset;  // マテリアル用 Asset TableEntry
+        [SerializeField] private LocalizedAsset<TMP_FontAsset> localizedFontAsset;  // フォント用 Asset TableEntry
+        [SerializeField] private LocalizedAsset<Material> localizedMaterialAsset;   // マテリアル用 Asset TableEntry
 
         private void Awake()
         {
-            // ロケール切替時の処理を購読
+            // ロケールが切り替わったら UpdateVisuals() を呼ぶ
             LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
-
-            // フォント／マテリアルは同じまま
-            localizedFontAsset.AssetChanged     += OnFontAssetChanged;
-            localizedMaterialAsset.AssetChanged += OnMaterialAssetChanged;
         }
 
         private void Start()
         {
-            // 初回読み込み
-            UpdateLanguageName();
-            localizedFontAsset.LoadAssetAsync();
-            localizedMaterialAsset.LoadAssetAsync();
+            // 最初の一回
+            UpdateVisuals();
         }
 
         private void OnDestroy()
         {
             LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
-            localizedFontAsset.AssetChanged     -= OnFontAssetChanged;
-            localizedMaterialAsset.AssetChanged -= OnMaterialAssetChanged;
         }
 
         private void OnLocaleChanged(UnityEngine.Localization.Locale _)
         {
-            // ロケールが変わったらテキストもフォントも再読み込み
-            UpdateLanguageName();
-            localizedFontAsset.LoadAssetAsync();
-            localizedMaterialAsset.LoadAssetAsync();
+            // ロケールごとにテキスト／フォント／マテリアルを再読み込み
+            UpdateVisuals();
         }
 
-        // ★SelectedLocaleChanged のタイミングで取得・反映する
-        private void UpdateLanguageName()
+        private void UpdateVisuals()
         {
-            // 非同期でローカライズ文字列を取得
-            AsyncOperationHandle<string> handle = localizedLanguageName.GetLocalizedStringAsync();
-            handle.Completed += OnLanguageNameLoaded;
-        }
+            // 1) 言語名テキスト
+            var textHandle = localizedLanguageName.GetLocalizedStringAsync();
+            textHandle.Completed += handle =>
+            {
+                if (handle.Status == AsyncOperationStatus.Succeeded)
+                {
+                    buttonTxt.text = handle.Result;
+                }
+                else
+                {
+                    Debug.LogWarning($"言語名取得失敗: {handle.OperationException}");
+                }
+            };
 
-        private void OnLanguageNameLoaded(AsyncOperationHandle<string> handle)
-        {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            // 2) フォント
+            var fontHandle = localizedFontAsset.LoadAssetAsync();
+            fontHandle.Completed += handle =>
             {
-                buttonTxt.text = handle.Result;
-            }
-            else
-            {
-                Debug.LogWarning($"言語名の取得に失敗しました: {handle.OperationException}");
-            }
-        }
+                if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null)
+                {
+                    buttonTxt.font = handle.Result;
+                    buttonTxt.SetAllDirty();  // レイアウト再計算
+                }
+                else
+                {
+                    Debug.LogWarning($"フォント読み込み失敗: {handle.OperationException}");
+                }
+            };
 
-        private void OnFontAssetChanged(TMP_FontAsset fontAsset)
-        {
-            if (fontAsset != null)
+            // 3) マテリアル
+            var matHandle = localizedMaterialAsset.LoadAssetAsync();
+            matHandle.Completed += handle =>
             {
-                buttonTxt.font = fontAsset;
-                buttonTxt.SetAllDirty();
-            }
-        }
-
-        private void OnMaterialAssetChanged(Material mat)
-        {
-            if (mat != null)
-            {
-                buttonTxt.fontMaterial = mat;
-            }
+                if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null)
+                {
+                    buttonTxt.fontMaterial = handle.Result;
+                }
+                else
+                {
+                    Debug.LogWarning($"マテリアル読み込み失敗: {handle.OperationException}");
+                }
+            };
         }
     }
 }
