@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Localizer.UI
 {
@@ -11,67 +12,78 @@ namespace Localizer.UI
         [SerializeField] private TMP_Text buttonTxt;
 
         [Header("ローカライズ設定")]
-        [SerializeField] private LocalizedString localizedLanguageName;               // 言語名用 String TableEntry
-        [SerializeField] private LocalizedAsset<TMP_FontAsset> localizedFontAsset;   // フォント用 Asset TableEntry
-        [SerializeField] private LocalizedAsset<Material> localizedMaterialAsset;    // （必要なら）マテリアル用 Asset TableEntry
+        [SerializeField] private LocalizedString localizedLanguageName;             // 言語名用 String TableEntry
+        [SerializeField] private LocalizedAsset<TMP_FontAsset> localizedFontAsset; // フォント用 Asset TableEntry
+        [SerializeField] private LocalizedAsset<Material> localizedMaterialAsset;  // マテリアル用 Asset TableEntry
 
         private void Awake()
         {
-            // イベント購読
+            // ロケール切替時の処理を購読
             LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
 
-            localizedLanguageName.StringChanged += OnLanguageNameChanged;       // 文字列更新
-            localizedFontAsset.AssetChanged   += OnFontAssetChanged;           // フォント更新 :contentReference[oaicite:0]{index=0}
-            localizedMaterialAsset.AssetChanged += OnMaterialAssetChanged;     // マテリアル更新
+            // フォント／マテリアルは同じまま
+            localizedFontAsset.AssetChanged     += OnFontAssetChanged;
+            localizedMaterialAsset.AssetChanged += OnMaterialAssetChanged;
         }
 
         private void Start()
         {
-            // 最初の読み込みをトリガー
-            localizedLanguageName.RefreshString();    // StringChanged が呼ばれる
-            localizedFontAsset.LoadAssetAsync();      // AssetChanged が呼ばれる :contentReference[oaicite:1]{index=1}
-            localizedMaterialAsset.LoadAssetAsync();  // 同様
+            // 初回読み込み
+            UpdateLanguageName();
+            localizedFontAsset.LoadAssetAsync();
+            localizedMaterialAsset.LoadAssetAsync();
         }
 
         private void OnDestroy()
         {
-            // 購読解除
             LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
-
-            localizedLanguageName.StringChanged -= OnLanguageNameChanged;
-            localizedFontAsset.AssetChanged   -= OnFontAssetChanged;
+            localizedFontAsset.AssetChanged     -= OnFontAssetChanged;
             localizedMaterialAsset.AssetChanged -= OnMaterialAssetChanged;
         }
 
         private void OnLocaleChanged(UnityEngine.Localization.Locale _)
         {
-            // ロケール変更時も再読み込み
-            localizedLanguageName.RefreshString();
+            // ロケールが変わったらテキストもフォントも再読み込み
+            UpdateLanguageName();
             localizedFontAsset.LoadAssetAsync();
             localizedMaterialAsset.LoadAssetAsync();
         }
 
-        // ローカライズ済み言語名を受け取ってテキストを書き換え
-        private void OnLanguageNameChanged(string localizedValue)
+        // ★SelectedLocaleChanged のタイミングで取得・反映する
+        private void UpdateLanguageName()
         {
-            buttonTxt.text = localizedValue;
+            // 非同期でローカライズ文字列を取得
+            AsyncOperationHandle<string> handle = localizedLanguageName.GetLocalizedStringAsync();
+            handle.Completed += OnLanguageNameLoaded;
         }
 
-        // ローカライズ済みフォントを受け取ってフォントを差し替え
+        private void OnLanguageNameLoaded(AsyncOperationHandle<string> handle)
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                buttonTxt.text = handle.Result;
+            }
+            else
+            {
+                Debug.LogWarning($"言語名の取得に失敗しました: {handle.OperationException}");
+            }
+        }
+
         private void OnFontAssetChanged(TMP_FontAsset fontAsset)
         {
             if (fontAsset != null)
             {
                 buttonTxt.font = fontAsset;
-                buttonTxt.SetAllDirty();  // レイアウト再計算
+                buttonTxt.SetAllDirty();
             }
         }
 
-        // （必要なら）ローカライズ済みマテリアルを受け取ってマテリアルを差し替え
         private void OnMaterialAssetChanged(Material mat)
         {
             if (mat != null)
+            {
                 buttonTxt.fontMaterial = mat;
+            }
         }
     }
 }
