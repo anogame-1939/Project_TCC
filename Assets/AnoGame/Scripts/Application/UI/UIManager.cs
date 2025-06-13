@@ -266,7 +266,7 @@ namespace AnoGame.Application.UI
             UnityEditor.EditorApplication.isPlaying = false;
 #else
             // ビルドした実行ファイルを終了
-            Application.Quit();
+            UnityEngine.Application.Quit();
 #endif
         }
     }

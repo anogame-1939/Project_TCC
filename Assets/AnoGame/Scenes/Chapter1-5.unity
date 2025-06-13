@@ -857,7 +857,7 @@ AudioSource:
   m_GameObject: {fileID: 168223069}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -3493884477394069323, guid: 12ac8864d85cf43dfa690ac968b839fb, type: 2}
   m_audioClip: {fileID: 8300000, guid: 8b9eceaed063a41bba06b109e9299d5c, type: 3}
   m_Resource: {fileID: 8300000, guid: 8b9eceaed063a41bba06b109e9299d5c, type: 3}
   m_PlayOnAwake: 0
@@ -32590,7 +32590,19 @@ MonoBehaviour:
   conversationEvents:
     onConversationStart:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 168223072}
+          m_TargetAssemblyTypeName: AnoGame.Application.Audio.AudioController, AnoGame.Application
+          m_MethodName: Play
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     onConversationEnd:
       m_PersistentCalls:
         m_Calls:
@@ -43498,7 +43510,7 @@ AudioSource:
   m_GameObject: {fileID: 2132113158}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 6575632845682594243, guid: 12ac8864d85cf43dfa690ac968b839fb, type: 2}
   m_audioClip: {fileID: 8300000, guid: 909f715d22682284cb792cc458e43893, type: 3}
   m_Resource: {fileID: 8300000, guid: 909f715d22682284cb792cc458e43893, type: 3}
   m_PlayOnAwake: 0
@@ -43684,7 +43696,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4208349406408657136}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.005154927, y: -0.84235054, z: 0.008058446, w: 0.5388452}
+  m_LocalRotation: {x: 0.0021766927, y: 0.9525308, z: 0.0068122577, w: -0.30435827}
   m_LocalPosition: {x: 0.81, y: 2.62, z: 1.93}
   m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 1
