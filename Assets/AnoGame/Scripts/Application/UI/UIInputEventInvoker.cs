@@ -67,27 +67,43 @@ namespace AnoGame.Application.UI
             }
         }
 
+        private bool CanPlaySE()
+        {
+            if (GameStateManager.Instance == null)
+            {
+                return true;
+            }
+            else
+            {
+                return GameStateManager.Instance.CurrentState != GameState.Gameplay;
+            }
+        }
+
         // Moveアクション開始時のコールバック
         private void OnMove(InputAction.CallbackContext context)
         {
+            if (!CanPlaySE()) return;
             onMove?.Invoke();
         }
 
         // Submitアクション開始時のコールバック
         private void OnSubmit(InputAction.CallbackContext context)
         {
+            if (!CanPlaySE()) return;
             onSubmit?.Invoke();
         }
 
         // Cancelアクション開始時のコールバック
         private void OnCancel(InputAction.CallbackContext context)
         {
+            if (!CanPlaySE()) return;
             onCancel?.Invoke();
         }
 
         // Left Clickアクション開始時のコールバック
         private void OnLeftClick(InputAction.CallbackContext context)
         {
+            if (!CanPlaySE()) return;
             onLeftClick?.Invoke();
         }
     }
