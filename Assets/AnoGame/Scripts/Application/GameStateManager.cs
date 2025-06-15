@@ -13,7 +13,9 @@ namespace AnoGame.Application
         public GameSubState CurrentSubState { get; private set; } = GameSubState.None;
 
         // ゲーム状態変更時に通知するためのイベント
-        public event Action<GameState> OnStateChanged;
+        public event Action<GameState>      OnStateChanged;
+        // サブステート変更時に通知するためのイベント
+        public event Action<GameSubState>   OnSubStateChanged;
 
         [SerializeField] private bool isDebug = false;
 
@@ -26,23 +28,20 @@ namespace AnoGame.Application
                 return;
             }
             Instance = this;
-            // シーン遷移しても破棄されないようにする
             DontDestroyOnLoad(gameObject);
         }
 
-        void Update()
+        private void Update()
         {
             if (isDebug)
             {
-                Debug.Log(CurrentState);
+                Debug.Log($"State: {CurrentState}, SubState: {CurrentSubState}");
             }
-
         }
 
         /// <summary>
-        /// ゲーム状態を変更し、変更時にイベントで通知します。
+        /// ゲーム状態を変更し、OnStateChanged を発火
         /// </summary>
-        /// <param name="newState">新しいゲーム状態</param>
         public void SetState(GameState newState)
         {
             if (CurrentState == newState) return;
@@ -50,13 +49,16 @@ namespace AnoGame.Application
             CurrentState = newState;
             OnStateChanged?.Invoke(newState);
         }
-        
-        public void SetSubState(GameSubState newState)
-        {
-            if (CurrentSubState == newState) return;
 
-            CurrentSubState = newState;
-            // OnStateChanged?.Invoke(newState);
+        /// <summary>
+        /// サブステートを変更し、OnSubStateChanged を発火
+        /// </summary>
+        public void SetSubState(GameSubState newSubState)
+        {
+            if (CurrentSubState == newSubState) return;
+
+            CurrentSubState = newSubState;
+            OnSubStateChanged?.Invoke(newSubState);
         }
     }
 }
