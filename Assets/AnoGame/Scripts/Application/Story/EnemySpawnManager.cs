@@ -309,13 +309,13 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        public void EnableChaising()
+        public void EnableChasing()
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
             con.SetChasing(true);
         }
 
-        public void DisableChashing()
+        public void DisableChasing()
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
             con.SetChasing(false);
@@ -408,7 +408,7 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        public void DeactivateEemy()
+        public void DeactivateEnemy()
         {
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().Deactivate();
