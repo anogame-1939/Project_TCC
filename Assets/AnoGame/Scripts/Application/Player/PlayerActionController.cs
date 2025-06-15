@@ -84,6 +84,11 @@ namespace AnoGame.Application.Player.Control
 
         private void Update()
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
+            {
+                animator.SetBool("IsMove", false);
+                return;
+            }
             // MoveControlの速度を取得し、閾値を超えていれば移動アニメをONに
             if (animator != null && moveControl != null)
             {
@@ -227,6 +232,7 @@ namespace AnoGame.Application.Player.Control
         public void StopChasing()
         {
             // スクリプト全体を無効化
+            animator.SetBool("IsMove", false);
             this.enabled = false;
             // あるいは入力だけ無効化する場合:
             // SetInputEnabled(false);
