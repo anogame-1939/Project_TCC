@@ -5,6 +5,9 @@ using UnityEngine.InputSystem.UI;
 
 namespace AnoGame.Application.UI
 {
+    /// <summary>
+    /// NOTE:CanPlaySEは苦しい実装
+    /// </summary>
     public class UIInputEventInvoker : MonoBehaviour
     {
         // InputSystemUIInputModuleの参照をInspectorから設定
