@@ -6248,7 +6248,7 @@ Transform:
   m_GameObject: {fileID: 808774680}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -19.571058, y: 0.5, z: -78.91}
+  m_LocalPosition: {x: -19.571058, y: 0.5, z: -80.02}
   m_LocalScale: {x: 20, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16260,7 +16260,7 @@ Transform:
   m_GameObject: {fileID: 1188035237}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -19.571058, y: 0.5, z: -78.590004}
+  m_LocalPosition: {x: -19.571058, y: 0.5, z: -79.7}
   m_LocalScale: {x: 20, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26128,6 +26128,7 @@ MonoBehaviour:
   m_Events:
     m_Signals:
     - {fileID: 11400000, guid: 72b7c59427c543141b61b02a765f4d42, type: 2}
+    - {fileID: 11400000, guid: fbf6abe8e579e0149950fda211ad774c, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -26140,15 +26141,14 @@ MonoBehaviour:
             m_ObjectArgument: {fileID: 1188035237}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
             m_IntArgument: 0
-            m_FloatArgument: 0
+            m_FloatArgument: 135
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 0
-        - m_Target: {fileID: 1078756859}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
-            AnoGame.Application
-          m_MethodName: DisableForceMode
-          m_Mode: 1
+          m_CallState: 2
+        - m_Target: {fileID: 1234625454}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -26157,10 +26157,13 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 1234625454}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
-          m_Mode: 6
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1078756859}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.PlayerMoveHandler,
+            AnoGame.Application
+          m_MethodName: DisableForceMode
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -41216,7 +41219,7 @@ MonoBehaviour:
             m_FloatArgument: 1
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 2
+          m_CallState: 0
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1509391777}
@@ -41230,7 +41233,7 @@ MonoBehaviour:
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 2
+          m_CallState: 0
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1078756858}
