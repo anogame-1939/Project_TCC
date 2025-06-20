@@ -12,7 +12,7 @@ namespace AnoGame.Application.Enemy
 
         private void Start()
         {
-            Deactivate();
+            // Deactivate();
         }
 
         public void Activate()
