@@ -76,6 +76,7 @@ namespace AnoGame.Application.Player
                 CollectableItem collectableItem = closestItem.GetComponent<CollectableItem>();
                 if (collectableItem != null && _inventoryManager.AddItem(collectableItem))
                 {
+                    GetComponent<AudioSource>()?.Play();
                     collectableItem.OnCollected();
                     closestItem.gameObject.SetActive(false);
                 }
