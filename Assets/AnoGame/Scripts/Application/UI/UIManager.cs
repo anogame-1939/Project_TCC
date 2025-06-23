@@ -18,16 +18,29 @@ namespace AnoGame.Application.UI
         private void Start()
         {
             // 起動時は、すべてのセクションを「操作不可＆非フォーカス状態」にしておく
+            HideAllSections();
+
+            if (startToShow)
+            {
+                ShowSection(0);
+            }
+
+            GameStateManager.Instance.OnStateChanged += state =>
+            {
+                if (state == GameState.GameOver)
+                {
+                    HideAllSections();
+                }
+            };
+        }
+
+        private void HideAllSections()
+        {
             foreach (var section in sections)
             {
                 DisableSectionInteraction(section);
                 section.panel.SetActive(false);
                 section.lastIndex = 0; // 初期化
-            }
-
-            if (startToShow)
-            {
-                ShowSection(0);
             }
         }
 

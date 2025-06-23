@@ -47,6 +47,14 @@ namespace AnoGame.Application.Inventory
             _inventoryOpenAction.performed += OnInventoryOpenPerformed;
 
             Hide();
+
+            GameStateManager.Instance.OnStateChanged += state =>
+            {
+                if (state == GameState.GameOver)
+                {
+                    Hide();
+                }
+            };
         }
 
         void OnDestroy()
