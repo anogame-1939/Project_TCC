@@ -71,6 +71,7 @@ namespace Localizer.UI
             };
 
             // 3) マテリアル
+            /* NOTE:現状使ってない
             var matHandle = localizedMaterialAsset.LoadAssetAsync();
             matHandle.Completed += handle =>
             {
@@ -83,6 +84,7 @@ namespace Localizer.UI
                     Debug.LogWarning($"マテリアル読み込み失敗: {handle.OperationException}");
                 }
             };
+            */
         }
     }
 }
