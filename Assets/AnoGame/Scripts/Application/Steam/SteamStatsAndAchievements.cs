@@ -128,21 +128,21 @@ namespace AnoGame.Application.Steam
                         if (m_nTotalNumWins > 0)
                             UnlockAchievement(ach);
                         break;
-                    /*
-                    case Achievement.ACH_WIN_100_GAMES:
-                        if (m_nTotalNumWins >= 100)
-                            UnlockAchievement(ach);
-                        break;
-                    case Achievement.ACH_TRAVEL_FAR_ACCUM:
-                        if (m_flTotalFeetTraveled >= 5280f)
-                            UnlockAchievement(ach);
-                        break;
-                    case Achievement.ACH_TRAVEL_FAR_SINGLE:
-                        if (m_flGameFeetTraveled >= 500f)
-                            UnlockAchievement(ach);
-                        break;
-                        }
-                    */
+                        /*
+                        case Achievement.ACH_WIN_100_GAMES:
+                            if (m_nTotalNumWins >= 100)
+                                UnlockAchievement(ach);
+                            break;
+                        case Achievement.ACH_TRAVEL_FAR_ACCUM:
+                            if (m_flTotalFeetTraveled >= 5280f)
+                                UnlockAchievement(ach);
+                            break;
+                        case Achievement.ACH_TRAVEL_FAR_SINGLE:
+                            if (m_flGameFeetTraveled >= 500f)
+                                UnlockAchievement(ach);
+                            break;
+                            }
+                        */
                 }
             }
         }
@@ -244,4 +244,5 @@ namespace AnoGame.Application.Steam
 
     }
     public class PlayerRetriedEvent { } // Placeholder for actual event class
+    public class GetAllLore { }
 }

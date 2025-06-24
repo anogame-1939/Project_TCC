@@ -2,9 +2,10 @@ using UnityEngine;
 using VContainer;
 using System.Collections.Generic;
 using System.Linq;
-using AnoGame.Domain.Data.Models;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Data;
+using AnoGame.Application.Steam;
+using UniRx;
 
 namespace AnoGame.Application.Inventory
 {
@@ -117,6 +118,19 @@ namespace AnoGame.Application.Inventory
 
             _gameManager.UpdateGameState(_gameManager.CurrentGameData);
             _inventoryService.NotifyItemAdded(itemData.ItemName);
+
+
+            // NOTE:雑だがここにSteam実績発火処理
+            int loreCount = _gameManager.CurrentGameData.Inventory.Items
+                .Count(item => item.ItemName.StartsWith("古い手記"));
+            Debug.Log($"Lore count: {loreCount}");
+            if (loreCount >= 11)
+            {
+
+                MessageBroker.Default.Publish(new GetAllLore());
+            }
+
+
             return true;
         }
 

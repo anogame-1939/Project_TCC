@@ -5,7 +5,9 @@ using AnoGame.Data;
 using AnoGame.Application.Inventory;
 using System.Collections.Generic;
 using VContainer;
-using AnoGame.Application.Input;  // IInputActionProvider の名前空間
+using AnoGame.Application.Input;
+using UniRx;
+using AnoGame.Application.Steam;  // IInputActionProvider の名前空間
 
 namespace AnoGame.Application.Player
 {
@@ -79,6 +81,9 @@ namespace AnoGame.Application.Player
                     GetComponent<AudioSource>()?.Play();
                     collectableItem.OnCollected();
                     closestItem.gameObject.SetActive(false);
+
+                    // NOTE:雑だがここにSteam実績発火処理
+                    MessageBroker.Default.Publish(new GetAllLore());
                 }
             }
         }
