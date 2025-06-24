@@ -173,11 +173,14 @@ namespace AnoGame.Application.Steam
         /// </summary>
         public void ForceUnlockAchievement(Achievement achievementID)
         {
+            SteamUserStats.SetAchievement(achievementID.ToString());
+            /* NOTE:多分いらない
             var entry = Array.Find(m_Achievements, a => a.m_eAchievementID == achievementID);
             if (entry != null && !entry.m_bAchieved)
             {
                 UnlockAchievement(entry);
             }
+            */
         }
 
         private void UnlockAchievement(Achievement_t achievement)

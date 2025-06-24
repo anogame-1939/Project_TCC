@@ -81,9 +81,6 @@ namespace AnoGame.Application.Player
                     GetComponent<AudioSource>()?.Play();
                     collectableItem.OnCollected();
                     closestItem.gameObject.SetActive(false);
-
-                    // NOTE:雑だがここにSteam実績発火処理
-                    MessageBroker.Default.Publish(new GetAllLore());
                 }
             }
         }
