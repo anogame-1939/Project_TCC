@@ -31,7 +31,8 @@ namespace AnoGame.Application.Steam
             TAIKAN,
             SHASHIN,
             JOJU,
-            NIRVANA
+            NIRVANA,
+            COMPLETE_ALL
         }
 
         /// <summary>
@@ -173,6 +174,7 @@ namespace AnoGame.Application.Steam
         /// </summary>
         public void ForceUnlockAchievement(Achievement achievementID)
         {
+            UnityEngine.Debug.Log($"Force unlocking achievement: {achievementID}");
             SteamUserStats.SetAchievement(achievementID.ToString());
             /* NOTE:多分いらない
             var entry = Array.Find(m_Achievements, a => a.m_eAchievementID == achievementID);
@@ -244,6 +246,38 @@ namespace AnoGame.Application.Steam
             }
             return true;
         }
+
+        /// <summary>
+        /// 全実績数を取得し、「現在の達成数 == 全実績数 - 1」なら
+        /// 残りメタ実績 COMPLETE_ALL を解除する。
+        /// </summary>
+        public void CheckAndUnlockMetaAchievement()
+        {
+            // Steam から全実績の総数を取得 :contentReference[oaicite:0]{index=0}
+            uint total = SteamUserStats.GetNumAchievements();
+            uint achievedCount = 0;
+
+            for (uint i = 0; i < total; i++)
+            {
+                string name = SteamUserStats.GetAchievementName(i);
+                bool unlocked;
+                SteamUserStats.GetAchievement(name, out unlocked);
+                if (unlocked) achievedCount++;
+            }
+
+            // 取得結果をログに出力
+            UnityEngine.Debug.Log(
+                $"[Achievements] Total: {total}, Unlocked: {achievedCount}"
+            ); // UnityEngine.Debug.Log でコンソールにメッセージを出力 :contentReference[oaicite:1]{index=1}
+
+
+            // 「残りメタ実績 1 つ」になったらアンロック
+            if (achievedCount == total - 1)
+            {
+                SteamUserStats.SetAchievement(Achievement.COMPLETE_ALL.ToString());
+            }
+        }
+
 
     }
     public class PlayerRetriedEvent { } // Placeholder for actual event class

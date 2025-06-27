@@ -20,12 +20,11 @@ namespace AnoGame.Application.Steam
         public void UnlockShashin() => SteamStatsAndAchievements.Instance.ForceUnlockAchievement(SteamStatsAndAchievements.Achievement.SHASHIN);
         public void UnlockJoju() => SteamStatsAndAchievements.Instance.ForceUnlockAchievement(SteamStatsAndAchievements.Achievement.JOJU);
         public void UnlockNirvana() => SteamStatsAndAchievements.Instance.ForceUnlockAchievement(SteamStatsAndAchievements.Achievement.NIRVANA);
-        
 
-        public void AllClear()
+
+        public void CheckAllClear()
         {
-
-
+            SteamStatsAndAchievements.Instance.CheckAndUnlockMetaAchievement();
         }
     }
 }
