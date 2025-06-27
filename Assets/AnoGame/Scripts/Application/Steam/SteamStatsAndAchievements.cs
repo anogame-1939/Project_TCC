@@ -31,8 +31,7 @@ namespace AnoGame.Application.Steam
             TAIKAN,
             SHASHIN,
             JOJU,
-            NIRVANA,
-            COMPLETE_ALL
+            NIRVANA
         }
 
         /// <summary>
@@ -274,7 +273,7 @@ namespace AnoGame.Application.Steam
             // 「残りメタ実績 1 つ」になったらアンロック
             if (achievedCount == total - 1)
             {
-                SteamUserStats.SetAchievement(Achievement.COMPLETE_ALL.ToString());
+                SteamUserStats.SetAchievement(Achievement.NIRVANA.ToString());
             }
         }
 
