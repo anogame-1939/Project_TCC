@@ -280,5 +280,6 @@ namespace AnoGame.Application.Steam
 
     }
     public class PlayerRetriedEvent { } // Placeholder for actual event class
+    public class GetSevenTalismans { }
     public class GetAllLore { }
 }

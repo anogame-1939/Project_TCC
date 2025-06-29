@@ -121,12 +121,18 @@ namespace AnoGame.Application.Inventory
 
 
             // NOTE:雑だがここにSteam実績発火処理
+            int talismanCount = _gameManager.CurrentGameData.Inventory.Items
+                .Count(item => item.ItemName.EndsWith("お札"));
+            Debug.Log($"talisman count: {talismanCount}");
+            if (talismanCount >= 7)
+            {
+                MessageBroker.Default.Publish(new GetSevenTalismans());
+            }
             int loreCount = _gameManager.CurrentGameData.Inventory.Items
                 .Count(item => item.ItemName.StartsWith("古い手記"));
             Debug.Log($"Lore count: {loreCount}");
             if (loreCount >= 11)
             {
-
                 MessageBroker.Default.Publish(new GetAllLore());
             }
 

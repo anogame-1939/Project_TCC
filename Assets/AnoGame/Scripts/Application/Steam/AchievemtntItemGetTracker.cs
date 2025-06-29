@@ -13,11 +13,20 @@ namespace AnoGame.Application.Steam
         void OnEnable()
         {
             MessageBroker.Default
+                .Receive<GetSevenTalismans>()
+                .Subscribe(_ => EntrySevenTalismans())
+                .AddTo(this);
+            MessageBroker.Default
                 .Receive<GetAllLore>()
                 .Subscribe(_ => EntryLore())
                 .AddTo(this);
         }
 
+        private void EntrySevenTalismans()
+        {
+            Debug.Log("EntrySEVEN_TALISMANS");
+            SteamStatsAndAchievements.Instance.ForceUnlockAchievement(Achievement.SEVEN_TALISMANS);
+        }
         private void EntryLore()
         {
             Debug.Log("EntryLore");
