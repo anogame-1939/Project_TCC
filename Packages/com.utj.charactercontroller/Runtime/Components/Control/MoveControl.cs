@@ -224,6 +224,13 @@ namespace Unity.TinyCharacterController.Control
             _hasInput = leftStick.sqrMagnitude > 0;
         }
 
+        // HACK:期初行けど強制的に_hasInptを解除する
+        public void ClearInput()
+        {
+            _hasInput = false;
+            _inputValue = Vector2.zero;
+        }
+
         private IGroundContact _groundCheck;               
         private bool _hasGroundCheck;                    
         private Transform _transform; 
@@ -296,6 +303,9 @@ namespace Unity.TinyCharacterController.Control
 
         void IUpdateComponent.OnUpdate(float deltaTime)
         {
+            
+            Debug.Log($"[MoveControl] OnUpdate called with _hasInput: {_hasInput}");
+
             using var profiler = new ProfilerScope(nameof(MoveControl));
 
             if (_hasInput)

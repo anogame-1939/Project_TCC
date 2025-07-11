@@ -103,8 +103,13 @@ namespace AnoGame.Application.Player.Control
             // ゲームがプレイ中でなければ入力を無視
             if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
             {
+                moveControl.ClearInput();
                 return;
             }
+
+            Debug.Log($"[PlayerActionController] FixedUpdate called");
+            Debug.Log($"[PlayerActionController] GameStateManager.Instance.CurrentState: {GameStateManager.Instance.CurrentState}");
+            Debug.Log($"[PlayerActionController] isKeyHeld: {isKeyHeld}, isInputEnabled: {isInputEnabled}");
 
             // キーが押されており、かつ入力が有効であれば MoveControl に入力値を渡す
             if (isKeyHeld && isInputEnabled)
