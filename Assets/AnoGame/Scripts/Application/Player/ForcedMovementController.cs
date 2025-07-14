@@ -53,7 +53,8 @@ namespace AnoGame.Application.Player.Control
                 // バックステップの場合は角度を反転
                 if (doBackstep)
                 {
-                    relativeAngle = relativeAngle - 180f;
+                    // ①180° 反転 → ②-180〜180°に正規化
+                    relativeAngle = Mathf.DeltaAngle(0f, relativeAngle - 180f);
                 }
                 relativeAngle = RoundAngleTo45(relativeAngle);
                 animator.SetFloat("Angle", relativeAngle);
