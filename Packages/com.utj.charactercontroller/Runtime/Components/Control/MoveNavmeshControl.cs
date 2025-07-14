@@ -85,8 +85,9 @@ namespace Unity.TinyCharacterController.Control
 
             if (_agent == null)
             {
-                var agent = new GameObject("agent", typeof(NavMeshAgent));
-                agent.transform.SetParent(transform);
+                // var agent = new GameObject("agent", typeof(NavMeshAgent));
+                var agent = gameObject.AddComponent<NavMeshAgent>();
+                // agent.transform.SetParent(transform);
                 agent.TryGetComponent(out _agent);
             }
 
