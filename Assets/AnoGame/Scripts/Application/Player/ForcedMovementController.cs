@@ -63,6 +63,7 @@ namespace AnoGame.Application.Player.Control
             // 移動中は回転は固定し、位置だけ更新
             while (Vector3.Distance(transform.position, targetPosition) > 1f)
             {
+                animator.SetBool("IsMove", true);
                 Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
                 characterBrain.ForceSetPosition(newPosition);
                 yield return null;
