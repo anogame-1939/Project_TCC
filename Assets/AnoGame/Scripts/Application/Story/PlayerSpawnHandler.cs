@@ -8,5 +8,10 @@ namespace AnoGame.Application.Story
         {
             PlayerSpawnManager.Instance.SpawnPlayerAtStart();
         }
+
+        public void SpawnToPosition(Transform point)
+        {
+            PlayerSpawnManager.Instance.SpawnToPosition(point);
+        }
     }
 }
