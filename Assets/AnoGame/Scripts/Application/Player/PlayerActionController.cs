@@ -69,15 +69,34 @@ namespace AnoGame.Application.Player.Control
             //──────────────────────────────────────────
             // ③ キーの押下状態管理用イベントを登録
             //──────────────────────────────────────────
-            moveAction.started  += OnMoveStarted;
+            moveAction.started += OnMoveStarted;
             moveAction.canceled += OnMoveCanceled;
+        }
+
+        private void Start()
+        {
+            GameStateManager.Instance.OnStateChanged += (state) =>
+            {
+                Debug.Log($"[PlayerActionController] GameStateManager.OnStateChanged: {state}");
+                // ゲーム状態が Gameplay でない場合は入力を無効化
+                if (state == GameState.Gameplay)
+                {
+                    moveControl.IsGamePlay = true;
+                }
+                else
+                {
+                    moveControl.IsGamePlay = false;
+                }
+            };
+            GameStateManager.Instance.SetState(GameState.Gameplay);
+            moveControl.IsGamePlay = true;
         }
 
         private void OnDestroy()
         {
             if (moveAction != null)
             {
-                moveAction.started  -= OnMoveStarted;
+                moveAction.started -= OnMoveStarted;
                 moveAction.canceled -= OnMoveCanceled;
             }
         }
@@ -100,12 +119,9 @@ namespace AnoGame.Application.Player.Control
 
         private void FixedUpdate()
         {
+            Debug.Log($"[PlayerActionController] FixedUpdate called ... GameStateManager.Instance.CurrentState-{GameStateManager.Instance.CurrentState}");
             // ゲームがプレイ中でなければ入力を無視
-            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
-            {
-                moveControl.ClearInput();
-                return;
-            }
+
 
             Debug.Log($"[PlayerActionController] FixedUpdate called");
             Debug.Log($"[PlayerActionController] GameStateManager.Instance.CurrentState: {GameStateManager.Instance.CurrentState}");
