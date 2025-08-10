@@ -282,6 +282,14 @@ namespace AnoGame.Application.Enemy
                     if (player == null) continue;
                     await spawnManager.SetPositionNearPlayerAsync(player.transform.position, token);
 
+                    // インゲーム、インベントリ/オプション開いているときはスポーンをスキップ
+                    if (GameStateManager.Instance.CurrentState == GameState.InGameEvent
+                        || GameStateManager.Instance.CurrentState == GameState.Inventory
+                        || GameStateManager.Instance.CurrentState == GameState.Settings)
+                    {
+                        continue;
+                    }
+
                     // 出現演出
                     await spawnManager.PlaySpawnedEffectAsync(token);
 
