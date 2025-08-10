@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Rotation : MonoBehaviour
 {
-    public int x, y, z;
+    public float x, y, z;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
