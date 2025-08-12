@@ -4,7 +4,8 @@ using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Localization.Tables;
-using System.Collections;
+using System;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Localizer
 {
@@ -15,7 +16,7 @@ namespace Localizer
     {
         // リトライ回数
         private const int retryCount = 3;
-        // リトライ間隔
+        // リトライ間隔（ミリ秒）
         private const int retryDuration = 1000;
 
         public delegate void LocaleIndexChanged(int localeIndex);
@@ -26,9 +27,6 @@ namespace Localizer
 
         [SerializeField] private LocalizedAssetTable _fontTable;
         public LocalizedAssetTable FontTable => _fontTable;
-
-        [SerializeField] private string _fontTableKey = "Font";
-        public string FontTableKey => _fontTableKey;
 
         [SerializeField] private LocalizedTmpFont _localizedFontReference;
         public LocalizedTmpFont LocalizedFontReference => _localizedFontReference;
@@ -55,9 +53,11 @@ namespace Localizer
             else if (singleInstance != this)
             {
                 Destroy(gameObject);
+                return;
             }
-            StartCoroutine(DebugCor());
 
+            // コルーチンの代わりに UniTask で非同期処理を呼び出す
+            DebugAsync().Forget();
         }
 
         public static LocalizationManager GetInstance()
@@ -65,40 +65,45 @@ namespace Localizer
             return singleInstance;
         }
 
-        private IEnumerator DebugCor()
+        /// <summary>
+        /// デバッグ用ユーティリティ。_localizedStringTable.TableReference が設定されるまで 1 秒ごとに待機し、
+        /// 設定されたら翻訳処理・フォント適用を呼び出す。
+        /// </summary>
+        private async UniTaskVoid DebugAsync()
         {
+            Debug.Log("DebugAsync Start");
 
-            Debug.Log("DebugCor Start");
+            // _localizedStringTable とその TableReference.TableCollectionName が null でないまで待機
             while (true)
             {
-                Debug.Log($"DebugCor Loop _localizedStringTable:{_localizedStringTable}");
-                Debug.Log($"DebugCor Loop _fontTable:{_fontTable}");
-                Debug.Log($"DebugCor Loop _localizedFontReference:{_localizedFontReference}");
-                yield return new WaitForSeconds(1f);
-
-
                 if (_localizedStringTable != null
                     && _localizedStringTable.TableReference != null
-                    && _localizedStringTable.TableReference.TableCollectionName != null)
+                    && !string.IsNullOrEmpty(_localizedStringTable.TableReference.TableCollectionName))
                 {
-                    Debug.Log($"DebugCor Loop _localizedStringTable.TableReference.TableCollectionName:{_localizedStringTable.TableReference.TableCollectionName}");
+                    Debug.Log($"DebugAsync: TableReference.TableCollectionName = {_localizedStringTable.TableReference.TableCollectionName}");
                     break;
                 }
                 else
                 {
-                    Debug.LogError("DebugCor Loop: _localizedStringTableがnullまたはTableReferenceがnullです。");
+                    Debug.LogError("DebugAsync: _localizedStringTable または TableReference が null です。1秒待機して再チェックします。");
                 }
+                await UniTask.Delay(TimeSpan.FromSeconds(1));
             }
 
-            Debug.Log("DebugCor End");
+            Debug.Log("DebugAsync End: ローカライズ呼び出し開始");
 
-            Debug.Log("DebugCor End ローカライズ呼び出し開始");
+            // 翻訳テキスト適用・フォント適用を実行（例外は無視して続行）
+            try
+            {
+                await ApplyLocalizedTextWithRetry();
+                await ApplyFontWithRetry();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"DebugAsync: 翻訳適用またはフォント適用中に例外が発生しました: {e.Message}");
+            }
 
-            ApplyLoclizedText().Forget();
-            ApplyFont().Forget();
-
-            Debug.Log("DebugCor End ローカライズ呼び出し完了");
-
+            Debug.Log("DebugAsync End: ローカライズ呼び出し完了");
         }
 
         async void Start()
@@ -106,25 +111,25 @@ namespace Localizer
             // テーブル参照のチェック
             if (_localizedStringTable == null)
             {
-                Debug.LogError("LocalizedStringTableがインスペクターにアサインされていません。");
+                Debug.LogError("LocalizedStringTable がインスペクターにアサインされていません。");
             }
             else if (string.IsNullOrEmpty(_localizedStringTable.TableReference.TableCollectionName))
             {
-                Debug.LogError("LocalizedStringTableのTableReferenceが空です。インスペクターで確認してください。");
+                Debug.LogError("LocalizedStringTable の TableReference が空です。インスペクターで確認してください。");
             }
 
             if (_fontTable == null)
             {
-                Debug.LogError("FontTableがインスペクターにアサインされていません。");
+                Debug.LogError("FontTable がインスペクターにアサインされていません。");
             }
             else if (string.IsNullOrEmpty(_fontTable.TableReference.TableCollectionName))
             {
-                Debug.LogError("FontTableのTableReferenceが空です。インスペクターで確認してください。");
+                Debug.LogError("FontTable の TableReference が空です。インスペクターで確認してください。");
             }
 
             // ロケール変更時の処理を追加
             LocalizationSettings.SelectedLocaleChanged += SelectedLocaleChanged;
-            
+
             _localizedStringTable.TableChanged += ChangeText;
             if (_fontTable != null)
             {
@@ -134,22 +139,58 @@ namespace Localizer
             TextChangedEvent += OnTextChangedEvent;
             FontChangedEvent += OnFontChangedEvent;
 
-            // リトライ処理
+            // Start メソッドでも翻訳・フォント適用を最初に試行（リトライ付き）
+            try
+            {
+                await ApplyLocalizedTextWithRetry();
+                await ApplyFontWithRetry();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Start: 初回翻訳適用またはフォント適用中に例外が発生しました: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 翻訳テキスト適用をリトライ付きで呼び出すヘルパー
+        /// </summary>
+        private async UniTask ApplyLocalizedTextWithRetry()
+        {
             for (int i = 0; i < retryCount; i++)
             {
                 try
                 {
-                    ApplyLoclizedText().Forget();
-                    ApplyFont().Forget();
-                    break;
+                    await ApplyLocalizedText();
+                    return;
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
-                    Debug.Log($"エラーが発生したため、リトライします。:{e.Message}");
+                    Debug.LogWarning($"ApplyLocalizedTextWithRetry: エラーが発生したためリトライします({i + 1}/{retryCount})。: {e.Message}");
                     await UniTask.Delay(retryDuration);
-                    continue;
                 }
             }
+            Debug.LogError("ApplyLocalizedTextWithRetry: 最大リトライ回数に到達しました。");
+        }
+
+        /// <summary>
+        /// フォント適用をリトライ付きで呼び出すヘルパー
+        /// </summary>
+        private async UniTask ApplyFontWithRetry()
+        {
+            for (int i = 0; i < retryCount; i++)
+            {
+                try
+                {
+                    await ApplyFont();
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"ApplyFontWithRetry: エラーが発生したためリトライします({i + 1}/{retryCount})。: {e.Message}");
+                    await UniTask.Delay(retryDuration);
+                }
+            }
+            Debug.LogError("ApplyFontWithRetry: 最大リトライ回数に到達しました。");
         }
 
         public async void ApplyLocalize()
@@ -159,15 +200,14 @@ namespace Localizer
             {
                 try
                 {
-                    ApplyLoclizedText().Forget();
-                    ApplyFont().Forget();
+                    await ApplyLocalizedText();
+                    await ApplyFont();
                     break;
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
-                    Debug.Log($"エラーが発生したため、リトライします。:{e.Message}");
+                    Debug.LogWarning($"ApplyLocalize: エラーが発生したためリトライします({i + 1}/{retryCount})。: {e.Message}");
                     await UniTask.Delay(retryDuration);
-                    continue;
                 }
             }
         }
@@ -179,13 +219,13 @@ namespace Localizer
 
         private void OnFontChangedEvent(TMP_FontAsset fontAsset)
         {
-            ApplyFont(fontAsset);
+            ApplyFont(fontAsset).Forget();
             Debug.Log($"フォントテーブルが変更されました。{fontAsset.name}");
         }
-        
+
         async void ChangeText(StringTable stringTable)
         {
-            // 例：テーブル変更時の処理（必要に応じて実装）
+            // 必要に応じて実装
         }
 
         void ChangeFont(AssetTable assetTable)
@@ -236,22 +276,24 @@ namespace Localizer
 
         private async void SelectedLocaleChanged(Locale locale)
         {
-            Debug.Log($"LocalizationManager:ロケール変更！{locale.Identifier}, {locale.LocaleName}");
-            UniTask.Void(async () =>
-            {
-                await ApplyLoclizedText();
-            });
+            Debug.Log($"LocalizationManager: ロケール変更！{locale.Identifier}, {locale.LocaleName}");
+            await ApplyLocalizedTextWithRetry();
+            await ApplyFontWithRetry();
         }
 
-        private async UniTask ApplyLoclizedText()
+        /// <summary>
+        /// すべての TMP_Text に対して、ローカライズされたテキストを適用する
+        /// </summary>
+        private async UniTask ApplyLocalizedText()
         {
+            // Scene 上にあるすべての TMP_Text を検索
             var tmpros = Resources.FindObjectsOfTypeAll(typeof(TMP_Text)) as TMP_Text[];
-            foreach(var tmpro in tmpros)
+            foreach (var tmpro in tmpros)
             {
-                Debug.Log($"テキスト翻訳中:{tmpro.name}-{tmpro.text}");
+                Debug.Log($"テキスト翻訳中: {tmpro.name} - {tmpro.text}");
                 LocalizeComponent localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
 
-                if(localizeComponent == null)
+                if (localizeComponent == null)
                 {
                     tmpro.gameObject.AddComponent<LocalizeComponent>();
                     localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
@@ -264,23 +306,132 @@ namespace Localizer
                 }
                 else if (localizeComponent.Ignore)
                 {
-                    Debug.Log($"テキスト翻訳スキップ:{tmpro.text}");
+                    Debug.Log($"テキスト翻訳スキップ: {tmpro.text}");
                     continue;
                 }
-                Debug.Log($"おそらくここでエラー:{_localizedStringTable}");
-                Debug.Log($"おそらくここでエラー:{_localizedStringTable.TableReference}");
-                Debug.Log($"おそらくここでエラー:{_localizedStringTable.TableReference.TableCollectionName}");
+
                 string tableName = _localizedStringTable.TableReference.TableCollectionName;
                 var entry = LocalizationSettings.StringDatabase.GetTableEntry(tableName, localizeComponent.OriginText).Entry;
                 if (entry != null)
                 {
-                    Debug.Log($"テキスト翻訳完了:{tmpro.text} -> {entry.LocalizedValue}");
                     tmpro.text = entry.LocalizedValue;
+                    Debug.Log($"テキスト翻訳完了: '{localizeComponent.OriginText}' -> '{entry.LocalizedValue}'");
                 }
-                
+                else
+                {
+                    Debug.LogError($"対応する翻訳がありませんでした。:{tmpro.text}");
+                }
             }
+
+            Debug.Log("翻訳がすべて完了しました。");
+
+            await UniTask.Yield(); // 必要に応じて一フレーム待機
+
+            Debug.Log("翻訳がすべて完了しました。2");
         }
 
+        /// <summary>
+        /// システム設定からフォントテーブルを取得し、テキストに適用する（キーは _fontTableKey）。  
+        /// 例では未実装ですので、必要に応じて TableEntryReference の選択ロジックを追加してください。
+        /// </summary>
+        private async UniTask ApplyFont()
+        {
+            Debug.Log("ApplyFont: メソッド開始");
+
+            // ■ ① LocalizationSettings の初期化完了を待つ
+            Debug.Log("ApplyFont: LocalizationSettings.InitializationOperation を待機します...");
+            await LocalizationSettings.InitializationOperation.ToUniTask();
+            Debug.Log("ApplyFont: LocalizationSettings 初期化完了");
+
+            // ■ ② TableReference がセットされているかチェック
+            if (_fontTable == null || _localizedFontReference == null)
+            {
+                Debug.LogError("ApplyFont: _fontTable か _localizedFontReference が null です。Inspector を確認してください。");
+                return;
+            }
+
+            Debug.Log($"ApplyFont: TableCollectionName = {_fontTable.TableReference.TableCollectionName}");
+
+            // ■ ③ テーブルをロード
+            Debug.Log("ApplyFont: GetTableAsync を呼び出します...");
+            AsyncOperationHandle<AssetTable> tableHandle =
+                LocalizationSettings.AssetDatabase.GetTableAsync(_fontTable.TableReference);
+            await tableHandle.ToUniTask();
+            Debug.Log("ApplyFont: tableHandle.ToUniTask() が完了しました");
+
+            AssetTable assetTable = tableHandle.Result;
+            if (assetTable == null)
+            {
+                Debug.LogError($"ApplyFont: AssetTable が null でした。(Table: {_fontTable.TableReference.TableCollectionName})");
+                return;
+            }
+            Debug.Log($"ApplyFont: AssetTable を取得できました: {assetTable.TableCollectionName}");
+
+            // ■ ④ キー名を ResolveKeyName で取得 (デバッグ用途)
+            string entryKey = _localizedFontReference.TableEntryReference.ResolveKeyName(assetTable.SharedData);
+            if (string.IsNullOrEmpty(entryKey))
+            {
+                Debug.LogError($"ApplyFont: ResolveKeyName でエントリ名を解決できませんでした。(KeyId: {_localizedFontReference.TableEntryReference.KeyId})");
+                return;
+            }
+            Debug.Log($"ApplyFont: (ResolveKeyName) Entry 名 = {entryKey}");
+
+            // ■ ⑤ 取得した TableEntryReference をそのまま使ってフォントをロード
+            Debug.Log($"ApplyFont: GetAssetAsync を呼び出します: KeyId={_localizedFontReference.TableEntryReference.KeyId}");
+            AsyncOperationHandle<TMP_FontAsset> fontHandle =
+                assetTable.GetAssetAsync<TMP_FontAsset>(_localizedFontReference.TableEntryReference);
+
+            await fontHandle.ToUniTask();
+            Debug.Log("ApplyFont: fontHandle.ToUniTask() が完了しました");
+
+            TMP_FontAsset tmpFontAsset = fontHandle.Result;
+            if (tmpFontAsset == null)
+            {
+                Debug.LogError($"ApplyFont: フォントのロードに失敗しました。(EntryReference: {entryKey})");
+                return;
+            }
+            Debug.Log($"ApplyFont: フォント '{tmpFontAsset.name}' をロードしました。");
+
+            // ■ ⑥ シーン上のすべての TextMeshProUGUI に適用
+            var tmpros = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
+            foreach (var tmpro in tmpros)
+            {
+                var localizeComponent = tmpro.GetComponent<LocalizeComponent>();
+                if (localizeComponent != null && localizeComponent.Ignore)
+                    continue;
+                tmpro.font = tmpFontAsset;
+            }
+            Debug.Log($"ApplyFont: 全 TextMeshProUGUI にフォント '{tmpFontAsset.name}' を適用しました");
+        }
+
+
+        private async UniTaskVoid ApplyFont(TMP_FontAsset fontAsset)
+        {
+            if (fontAsset == null)
+            {
+                Debug.LogError("ApplyFont(TMP_FontAsset): 渡されたフォントアセットが null です。");
+                return;
+            }
+
+            // シーンにあるすべての TextMeshProUGUI を取得し、フォントを置き換え
+            var tmpros = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
+            foreach (var tmpro in tmpros)
+            {
+                var localizeComponent = tmpro.GetComponent<LocalizeComponent>();
+                if (localizeComponent != null && localizeComponent.Ignore)
+                {
+                    continue;
+                }
+                tmpro.font = fontAsset;
+            }
+
+            // 必要であれば一フレーム待つ 
+            await UniTask.Yield();
+        }
+
+        /// <summary>
+        /// 特定のキーに対応する翻訳テキストを取得する
+        /// </summary>
         public async UniTask<string> GetLocalizedText(string key)
         {
             string tableName = _localizedStringTable.TableReference.TableCollectionName;
@@ -288,7 +439,7 @@ namespace Localizer
 
             if (entry == null)
             {
-                Debug.LogError($"翻訳対象のテキストが翻訳テーブルのキーに登録されていません。テーブル:{tableName}, キー:{key}");
+                Debug.LogError($"翻訳対象のテキストが翻訳テーブルのキーに登録されていません。テーブル: {tableName}, キー: {key}");
                 return key;
             }
             return entry.Value;
@@ -297,23 +448,7 @@ namespace Localizer
         private async UniTask Preload()
         {
             // 必要に応じたプリロード処理
-        }
-
-        private async UniTask ApplyFont()
-        {
-            string tableName = _fontTable.TableReference.TableCollectionName;
-            var entry = LocalizationSettings.AssetDatabase.GetTableEntry(tableName, FontTableKey).Entry;
-            int currentLocaleIndex = LocalizationManager.GetInstance().GetCurrentLocaleIndex();
-            // TODO: _fontTable のインデックス指定などの処理を実装する
-        }
-
-        private async UniTask ApplyFont(TMP_FontAsset tmpFontAsset)
-        {
-            var tmpros = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI)) as TextMeshProUGUI[];
-            foreach(var tmpro in tmpros)
-            {
-                tmpro.font = tmpFontAsset;
-            }
+            await UniTask.CompletedTask;
         }
     }
 }

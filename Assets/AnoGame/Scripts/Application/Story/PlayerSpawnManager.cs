@@ -83,6 +83,11 @@ namespace AnoGame.Application.Story
             WarpPlayerTo(startPoint.position, startPoint.rotation);
         }
 
+        public void SpawnToPosition(Transform point)
+        {
+            WarpPlayerTo(point.position, point.rotation);
+        }
+
         // 外部から呼び出し専用のリトライポイントワープ
         public void SpawnPlayerAtRetryPoint()
         {

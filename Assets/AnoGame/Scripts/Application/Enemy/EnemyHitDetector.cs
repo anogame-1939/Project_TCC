@@ -1,5 +1,6 @@
 using UnityEngine;
 using AnoGame.Application.Damage;
+using System.Collections;
 
 namespace AnoGame.Application.Enemy
 {
@@ -7,18 +8,18 @@ namespace AnoGame.Application.Enemy
     {
         [SerializeField] bool _isActive = true;
         [SerializeField] private int damage = 1;
-        
+
         // イベント追加
 
-        private void Start()
+        private void Awake()
         {
             Deactivate();
         }
-
+        
         public void Activate()
         {
             _isActive = true;
-            Physics.IgnoreLayerCollision( LayerMask.NameToLayer("Player"),
+            Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"),
                                           LayerMask.NameToLayer("Enemy"),
                                           false);
         }
@@ -34,13 +35,15 @@ namespace AnoGame.Application.Enemy
         private void OnTriggerEnter(Collider other)
         {
             if (!_isActive) return;
-            Debug.Log($"enable:{enabled} - hit");
             if (!other.CompareTag("Player")) return;
+
+            if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
+            if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
+            
 
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
-                Debug.Log("Player");
                 damageable.TakeDamage(damage);
                 // OnPlayerHit?.Invoke();  // これ自体はちゃんと使わてない
             }

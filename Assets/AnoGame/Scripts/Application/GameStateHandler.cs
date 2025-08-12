@@ -43,5 +43,15 @@ namespace AnoGame.Application
         {
             GameStateManager.Instance.SetState(GameState.InGameEvent);
         }
+
+        public void SetSubState(GameSubState subState)
+        {
+            GameStateManager.Instance.SetSubState(subState);
+        }
+
+        public void SetSubStateNone()
+        {
+            GameStateManager.Instance.SetSubState(GameSubState.None);
+        }
     }
 }

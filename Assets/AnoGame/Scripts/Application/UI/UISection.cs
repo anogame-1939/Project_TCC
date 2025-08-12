@@ -1,41 +1,23 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 namespace AnoGame.Application.UI
 {
-    /// <summary>
-    /// 1つの画面(UI)に関する情報をまとめるクラス
-    /// </summary>
     [System.Serializable]
     public class UISection
     {
-        public string sectionName;              // 画面名(メインメニュー, Settingsなど)
-        public GameObject panel;                // その画面全体のパネルオブジェクト
-        public List<Selectable> selectables;    // その画面内のボタン等
+        public string sectionName;              // 画面名 (例：MainMenu, Settings など)
+        public GameObject panel;                // 画面全体のパネル
+        public CanvasGroup canvasGroup;         // ← 追加: パネルにアタッチした CanvasGroup をセット
+        public List<Selectable> selectables;    // 画面内のボタンなど
         [HideInInspector] public int lastIndex; // 前回選択していたインデックス
 
         // 画面ごとのカーソルオフセット
         public Vector2 cursorOffset;
 
-        // ★ キャンセル時に呼びたい処理を自由に設定できる
+        // キャンセル時に呼びたい処理を自由に設定できる
         public UnityEvent onCancel;
-
-        public void EnableAllSelectables()
-        {
-            foreach (var selectable in selectables)
-            {
-                selectable.interactable = true;
-            }
-        }
-        
-        public void DisableAllSelectables()
-        {
-            foreach (var selectable in selectables)
-            {
-                selectable.interactable = false;
-            }
-        }
     }
 }

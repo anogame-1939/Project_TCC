@@ -53,7 +53,7 @@ namespace AnoGame.Application.Audio
             float elapsedTime = 0;
             while (elapsedTime < _fadeOutDuration)
             {
-                _audioSource.volume = Mathf.Lerp(_maxVolume, 0, elapsedTime / _fadeInDuration);
+                _audioSource.volume = Mathf.Lerp(_maxVolume, 0, elapsedTime / _fadeOutDuration);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }

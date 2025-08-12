@@ -94,11 +94,9 @@ namespace AnoGame.Application.Enmemy.Control
                 // ストーリーモードの場合は、プレイヤーを追いかけない
                 return;
             }
-            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
-            {
-                // ゲームがプレイ中でない場合は、入力を無視
-                return;
-            }
+            if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
+            if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
+            
             if (!isChasing) return;
 
             // 2. タグからプレイヤーを探して、その位置を目標地点に設定

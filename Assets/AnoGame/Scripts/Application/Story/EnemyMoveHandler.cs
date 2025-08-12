@@ -39,8 +39,8 @@ namespace AnoGame.Application.Story
 
         public void EnableForceMode()
         {
-            ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
-            if (enemyForcedMover == null) return;
+            // ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
+            // if (enemyForcedMover == null) return;
 
             // enemyForcedMover.EnableForceMode();
             // enemyForcedMover.enabled = false;

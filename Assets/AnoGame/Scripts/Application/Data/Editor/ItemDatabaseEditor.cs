@@ -1,3 +1,4 @@
+#if UNITY_EDITOR 
 using UnityEngine;
 using UnityEditor;
 using System.Text;
@@ -31,7 +32,7 @@ namespace AnoGame.Data.Editor
                       .AppendLine();
                 }
 
-                var tsv = sb.ToString().TrimEnd('\r','\n');
+                var tsv = sb.ToString().TrimEnd('\r', '\n');
                 // クリップボードにコピー
                 EditorGUIUtility.systemCopyBuffer = tsv;
                 Debug.Log($"[ItemDatabase] {db.Items.Count} 件の TSV をクリップボードにコピーしました。\n{tsv}");
@@ -39,3 +40,4 @@ namespace AnoGame.Data.Editor
         }
     }
 }
+#endif

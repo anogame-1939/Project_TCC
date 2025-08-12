@@ -53,7 +53,8 @@ namespace AnoGame.Application.Player.Control
                 // バックステップの場合は角度を反転
                 if (doBackstep)
                 {
-                    relativeAngle = relativeAngle - 180f;
+                    // ①180° 反転 → ②-180〜180°に正規化
+                    relativeAngle = Mathf.DeltaAngle(0f, relativeAngle - 180f);
                 }
                 relativeAngle = RoundAngleTo45(relativeAngle);
                 animator.SetFloat("Angle", relativeAngle);
@@ -62,6 +63,7 @@ namespace AnoGame.Application.Player.Control
             // 移動中は回転は固定し、位置だけ更新
             while (Vector3.Distance(transform.position, targetPosition) > 1f)
             {
+                animator.SetBool("IsMove", true);
                 Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
                 characterBrain.ForceSetPosition(newPosition);
                 yield return null;

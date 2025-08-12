@@ -220,8 +220,19 @@ namespace Unity.TinyCharacterController.Control
         /// <param name="leftStick">Direction of movement.</param>
         public void Move(Vector2 leftStick)
         {
+            Debug.Log($"[MoveControl] Move called with leftStick: {leftStick}");
             _inputValue = leftStick;
             _hasInput = leftStick.sqrMagnitude > 0;
+        }
+
+        // HACK:ゲームプレイ中だけ操作できるようにする
+        public bool IsGamePlay { get; set; } = false;
+
+        // HACK:期初行けど強制的に_hasInptを解除する
+        public void ClearInput()
+        {
+            _hasInput = false;
+            _inputValue = Vector2.zero;
         }
 
         private IGroundContact _groundCheck;               
@@ -296,9 +307,12 @@ namespace Unity.TinyCharacterController.Control
 
         void IUpdateComponent.OnUpdate(float deltaTime)
         {
+            
+            Debug.Log($"[MoveControl] OnUpdate called with _hasInput: {_hasInput}, {IsGamePlay} ");
+
             using var profiler = new ProfilerScope(nameof(MoveControl));
 
-            if (_hasInput)
+            if (_hasInput && IsGamePlay)
             {
                 var preDirection = _moveDirection;
                 var cameraYawRotation = Quaternion.AngleAxis(_characterSettings.CameraTransform.rotation.eulerAngles.y, Vector3.up);

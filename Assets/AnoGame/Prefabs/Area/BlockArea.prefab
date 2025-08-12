@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7157458673447692951}
   - component: {fileID: 757644404775586215}
   - component: {fileID: 3177266457749101509}
-  - component: {fileID: 9078755654580698371}
   - component: {fileID: 275306954619249069}
   m_Layer: 0
   m_Name: BlockArea
@@ -136,31 +135,6 @@ MonoBehaviour:
   useBarkTitlePicker: 1
   useQuestNamePicker: 1
   selectedDatabase: {fileID: 11400000, guid: 6d71bf6774ada0c4395d954ae35774b1, type: 2}
---- !u!114 &9078755654580698371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4543295700918047375}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274b80ab5b659c646ba9338870d14625, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_overrideName: 
-  m_overrideUseMessage: 
-  maxUseDistance: 30000
-  events:
-    onSelect:
-      m_PersistentCalls:
-        m_Calls: []
-    onDeselect:
-      m_PersistentCalls:
-        m_Calls: []
-    onUse:
-      m_PersistentCalls:
-        m_Calls: []
 --- !u!114 &275306954619249069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,7 +148,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   returnPosition: {fileID: 1047539817073846485}
-  returnDelay: 0.5
+  returnDuration: 1
+  returnEase: 7
 --- !u!1 &6053618899049777372
 GameObject:
   m_ObjectHideFlags: 0

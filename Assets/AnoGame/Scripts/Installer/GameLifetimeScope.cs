@@ -12,6 +12,7 @@ using AnoGame.Infrastructure.SaveData;
 using AnoGame.Application.Inventory;
 using AnoGame.Application.Event;
 using AnoGame.Domain.Inventory.Services;
+using AnoGame.Application.Settings;
 
 namespace AnoGame.Application.Core
 {
@@ -41,7 +42,9 @@ namespace AnoGame.Application.Core
             // 
             // builder.RegisterComponent(inventoryManager);
 
-
+            // セッティング系
+            builder.Register<ISettingsDataRepository, SettingsDataRepository>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<SettingsManager>();
 
             // シングルトンへの注入を有効にする
             // builder.RegisterComponentInHierarchy<GameManager>();

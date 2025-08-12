@@ -4,7 +4,6 @@ using AnoGame.Data;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using System;
-using UnityEditor.Search;
 
 namespace AnoGame.Application.Enemy
 {
@@ -40,6 +39,10 @@ namespace AnoGame.Application.Enemy
         [Header("チェイス時間")]
         [SerializeField, Min(3f)]  private float minChaseTime = 5f;
         [SerializeField, Min(5f)]  private float maxChaseTime = 20f;
+
+        /// <summary>
+        // エントリ（状態監視）用 CTS
+        private CancellationTokenSource _spawnEntryCts;
 
         // 非同期ループを止めるための CTS
         private CancellationTokenSource _spawnLoopCts;
@@ -101,7 +104,7 @@ namespace AnoGame.Application.Enemy
         public async void SpawnfixedPsition(Transform position)
         {
             await spawnManager.SpawnfixedPsition(position.position, position.localRotation);
-            spawnManager.EnableChaising();
+            spawnManager.EnableChasing();
         }
 
         public async void SpawnfixedPsition_Story(Transform position)
@@ -143,7 +146,7 @@ namespace AnoGame.Application.Enemy
                 await UniTask.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: token);
 
                 // ここでチェイス停止
-                spawnManager.DisableChashing();
+                spawnManager.DisableChasing();
                 Debug.Log("逃げ切り成功");
 
                 // 敵がまだ生きているか確認
@@ -156,7 +159,7 @@ namespace AnoGame.Application.Enemy
                 UniTask.Void(async () =>
                 {
                     await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
-                    spawnManager.DeactivateEemy();
+                    spawnManager.DeactivateEnemy();
                 });
 
                 // エフェクト完了を待つ
@@ -164,7 +167,7 @@ namespace AnoGame.Application.Enemy
 
                 // 念のため Deactivate
                 
-                spawnManager.DeactivateEemy();
+                spawnManager.DeactivateEnemy();
 
                 // EventDataを成功とする
                 spawnManager.ScuccesEvent();
@@ -177,18 +180,6 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-
-
-
-
-        public void RandomSpawnLoop()
-        {
-            spawnManager.SetupToRamdomMode();
-            _spawnLoopCts = new CancellationTokenSource();
-            RandomSpawnLoopAsync(_spawnLoopCts.Token).Forget();
-        }
-
-
         /// <summary>
         /// 外部から呼び出す敵生成開始メソッド
         /// </summary>
@@ -198,84 +189,184 @@ namespace AnoGame.Application.Enemy
         }
 
         /// <summary>
-        /// Gameplay 中のみランダムに敵をスポーンし、
-        /// さらにランダム時間だけチェイスさせたら Deactivate する非同期ループ
+        /// エントリ：常に「スポーン可能になるのを待って → SpawnLoop 起動 → 不可能になったらキャンセル → 待機…」を繰り返す
         /// </summary>
-        private async UniTaskVoid RandomSpawnLoopAsync(CancellationToken token)
+        public void RandomSpawnLoop()
         {
+            _spawnEntryCts?.Cancel();
+            _spawnEntryCts?.Dispose();
+            _spawnLoopCts?.Cancel();
+            _spawnLoopCts?.Dispose();
+
+            _spawnEntryCts = new CancellationTokenSource();
+            _ = RandomSpawnEntryAsync(_spawnEntryCts.Token);
+        }
+
+        private async UniTaskVoid RandomSpawnEntryAsync(CancellationToken entryToken)
+        {
+            try
+            {
+                while (!entryToken.IsCancellationRequested)
+                {
+                    // —— スポーン可能状態になるまで待機 —— 
+                    await UniTask.WaitUntil(
+                        () => IsSpawnableState(),
+                        cancellationToken: entryToken
+                    );
+
+                    // SpawnLoop 用 CTS を作り直し（EntryToken とリンク）
+                    _spawnLoopCts?.Cancel();
+                    _spawnLoopCts?.Dispose();
+                    _spawnLoopCts = CancellationTokenSource
+                        .CreateLinkedTokenSource(entryToken);
+
+                    try
+                    {
+                        // —— 実際の敵生成ループを起動 —— 
+                        await RandomSpawnLoopAsync(_spawnLoopCts.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Debug.Log("▶ SpawnLoop がキャンセルされました");
+                    }
+                    // スポーン不可能になったらここに戻り、再び待機
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("▶ EntryLoop がキャンセルされました");
+            }
+        }
+
+        /// <summary>
+        /// 実際のスポーン処理：内部の continue チェックは不要に。
+        /// 不可能状態への遷移は OnStateChanged/OnSubStateChanged で検知してキャンセルします。
+        /// </summary>
+        private async UniTask RandomSpawnLoopAsync(CancellationToken token)
+        {
+            // GameState の変化でキャンセル
             void OnStateChanged(GameState s)
             {
-                // TODO:ゲームオーバーではなく会話シーンに突入したときにする。ゲームオーバー時の敵削除は別でやる
-                if (s == GameState.GameOver) _spawnLoopCts?.Cancel();
+                if (s == GameState.InGameEvent || s == GameState.GameOver)
+                {
+                    _spawnLoopCts?.Cancel();
+                }
             }
+            // GameSubState の変化でキャンセル
+            void OnSubStateChanged(GameSubState ss)
+            {
+                if (ss == GameSubState.Safety)
+                {
+                    _spawnLoopCts?.Cancel();
+                }
+            }
+
             GameStateManager.Instance.OnStateChanged += OnStateChanged;
+            GameStateManager.Instance.OnSubStateChanged += OnSubStateChanged;
 
             try
             {
                 while (!token.IsCancellationRequested)
                 {
-                    Debug.Log($"RandomSpawnLoopAsync-GameStateManager.Instance:{GameStateManager.Instance.CurrentState}");
-                    // ゲームプレイ外なら 1 フレーム待機
-                    await UniTask.Yield(PlayerLoopTiming.Update, token);
-                    if (GameStateManager.Instance.CurrentState != GameState.Gameplay) continue;
-                    if (GameStateManager.Instance.CurrentSubState == GameSubState.Safety) continue;
+                    // —— ここから元のランダムスポーン処理をそのまま —— 
 
+                    // 1 フレーム待って
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+
+                    // 待機時間ランダム
                     float waitTime = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
-                    // HACK:
-                    waitTime = 3.0f;
                     await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
 
-                    GameObject player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
+                    // プレイヤー付近にセット
+                    var player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
                     if (player == null) continue;
-
-                    // 1. 位置決め
                     await spawnManager.SetPositionNearPlayerAsync(player.transform.position, token);
 
-                    // 2. 出現エフェクト
+                    // インゲーム、インベントリ/オプション開いているときはスポーンをスキップ
+                    if (GameStateManager.Instance.CurrentState == GameState.InGameEvent
+                        || GameStateManager.Instance.CurrentState == GameState.Inventory
+                        || GameStateManager.Instance.CurrentState == GameState.Settings)
+                    {
+                        continue;
+                    }
+
+                    // 出現演出
                     await spawnManager.PlaySpawnedEffectAsync(token);
 
-                    // 3. 本体アクティベート
+                    // 本体出現＆チェイス
                     spawnManager.ActivateEnemy();
-                    spawnManager.EnableChaising();
+                    spawnManager.EnableChasing();
 
-                    // 4. ランダム追跡
+                    // チェイス時間ランダム
                     float chaseTime = UnityEngine.Random.Range(minChaseTime, maxChaseTime);
-                    // HACK:
-                    chaseTime = 3.0f;
                     await UniTask.Delay(TimeSpan.FromSeconds(chaseTime), cancellationToken: token);
 
+                    // 退場演出
                     var playTask = spawnManager.PlayDespawnedEffectAsync(token);
-
-                    // １秒後に DeactivateEemy() を実行する fire-and-forget タスク
                     UniTask.Void(async () =>
                     {
                         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
-                        spawnManager.DeactivateEemy();
+                        spawnManager.DeactivateEnemy();
                     });
-
-                    // PlayDespawnedEffectAsync の完了を待ってから DisableChashing()
                     await playTask;
-                    spawnManager.DisableChashing();
-                    spawnManager.DeactivateEemy();
+
+                    // 後片付け
+                    spawnManager.DisableChasing();
+                    spawnManager.DeactivateEnemy();
                 }
             }
             catch (OperationCanceledException)
             {
-                // TODO:キャンセル処理
-                Debug.Log("RandomSpawnLoopAsync-キャンセル");
-                Debug.Log($"RandomSpawnLoopAsync-GameStateManager.Instance:{GameStateManager.Instance.CurrentState}");
+                Debug.Log("▶ RandomSpawnLoopAsync: キャンセル検知");
 
-                // spawnManager.DestroyCurrentEnemyInstance();
+                // ── 退場演出を再生 ──
+                var effectToken = CancellationToken.None;
+                try
+                {
+                    await spawnManager.PlayDespawnedEffectAsync(effectToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    // ここは基本通らないはずです
+                }
 
-                Debug.Log("RandomSpawnLoopAsync-おわた");
-
-
-
+                // ── 演出後に後処理 ──
+                spawnManager.DisableChasing();
+                spawnManager.DeactivateEnemy();
             }
             finally
             {
-                GameStateManager.Instance.OnStateChanged -= OnStateChanged;
+                GameStateManager.Instance.OnStateChanged   -= OnStateChanged;
+                GameStateManager.Instance.OnSubStateChanged -= OnSubStateChanged;
             }
+        }
+
+        /// <summary>
+        /// スポーン可能かどうかを判定する共通ロジック
+        /// </summary>
+        private bool IsSpawnableState()
+        {
+            var state    = GameStateManager.Instance.CurrentState;
+            var subState = GameStateManager.Instance.CurrentSubState;
+            bool okState = state == GameState.Gameplay
+                        || state == GameState.Inventory
+                        || state == GameState.Settings;
+            return okState && subState != GameSubState.Safety;
+        }
+
+        /// <summary>
+        /// 外部から完全に止めるとき
+        /// </summary>
+        public async void CancelRandomSpawnLoop()
+        {
+            _spawnLoopCts?.Cancel();
+            _spawnEntryCts?.Cancel();
+
+            spawnManager.DisableChasing();
+            await spawnManager.PlayDespawnedEffectAsync(
+                _spawnLoopCts?.Token ?? CancellationToken.None
+            );
+            spawnManager.DeactivateEnemy();
         }
 
         /// <summary>

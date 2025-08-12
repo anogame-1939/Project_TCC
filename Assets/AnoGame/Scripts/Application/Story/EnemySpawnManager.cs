@@ -126,11 +126,12 @@ namespace AnoGame.Application.Enemy
 
         // NOTE:セットアップというよりは初期化かも
         // ここではAI、当たり判定を無効化して、後のアクティベートで有効化しているので
+        // NOTE:なんで無効化してるのかわからないのでアクティベートするように変更
         public void SetupToRamdomMode()
         {
             _currentEnemyInstance.GetComponent<EnemyAIController>().SetStoryMode(false);
             // _currentEnemyInstance.GetComponent<EnemyAIController>().enabled = false;
-            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Deactivate();
+            _currentEnemyInstance.GetComponent<EnemyHitDetector>().Activate();
             _currentEnemyInstance.GetComponent<ForcedMovementController>().enabled = false;
             _currentEnemyInstance.GetComponent<ForcedMovementController>().DisableForceMode();
         }
@@ -309,13 +310,13 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        public void EnableChaising()
+        public void EnableChasing()
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
             con.SetChasing(true);
         }
 
-        public void DisableChashing()
+        public void DisableChasing()
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
             con.SetChasing(false);
@@ -408,7 +409,7 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        public void DeactivateEemy()
+        public void DeactivateEnemy()
         {
             // _currentEnemyInstance.GetComponent<BrainBase>().enabled = true;
             _currentEnemyInstance.GetComponent<EnemyLifespan>().Deactivate();

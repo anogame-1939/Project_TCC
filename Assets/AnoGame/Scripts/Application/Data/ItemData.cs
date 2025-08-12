@@ -20,6 +20,17 @@ namespace AnoGame.Data
         public ItemType ItemType => itemType;
         public bool IsStackable => isStackable;
         public int MaxStackSize => maxStackSize;
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            // 先頭と末尾に付いたダブルクォートを削除
+            if (!string.IsNullOrEmpty(description))
+            {
+                description = description.Trim('"');
+            }
+        }
+#endif
     }
 
     public enum ItemType

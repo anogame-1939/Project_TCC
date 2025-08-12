@@ -8,40 +8,54 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using AnoGame.Domain.Data.Models;
 using VContainer;
 using Cysharp.Threading.Tasks;
+using UnityEngine.EventSystems;
 
 namespace AnoGame.Application.Inventory
 {
     public class InventoryViewer : MonoBehaviour
     {
         [SerializeField] private AnoGame.Data.ItemDatabase itemDatabase;
-        private Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
-        private Dictionary<string, AsyncOperationHandle<Sprite>> loadOperations = new Dictionary<string, AsyncOperationHandle<Sprite>>();
-
         [SerializeField] private InventorySlot slotPrefab;
-        [SerializeField] private Transform contentParent;
+        [Tooltip("ページごとのコンテント用 Transform をインスペクターで設定してください")]
+        [SerializeField] private List<Transform> contentParents;  // ①
         [SerializeField] private int maxVisibleSlots = 16; // 4x4
         [SerializeField] private Button nextPageButton;
         [SerializeField] private Button prevPageButton;
 
         private IReadOnlyList<InventoryItem> _allItems = new List<InventoryItem>();
-        private List<InventorySlot> visibleSlots = new List<InventorySlot>();
+        private Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
+        private Dictionary<string, AsyncOperationHandle<Sprite>> loadOperations = new Dictionary<string, AsyncOperationHandle<Sprite>>();
+
+        private List<List<InventorySlot>> pageSlots = new List<List<InventorySlot>>();  // ②
         private int currentPage = 0;
 
         private void Start()
         {
-            InitializeVisibleSlots();
-            if (nextPageButton != null) nextPageButton.onClick.AddListener(NextPage);
-            if (prevPageButton != null) prevPageButton.onClick.AddListener(PreviousPage);
+            InitializePages();  // ③
+            if (nextPageButton != null) nextPageButton.onClick.AddListener(GoToNextPage);
+            if (prevPageButton != null) prevPageButton.onClick.AddListener(GoToPreviousPage);
             UpdatePageButtonsVisibility();
+            UpdateVisibleItems();
         }
 
-        private void InitializeVisibleSlots()
+        /// <summary>
+        /// ページ数分のスロットを生成し、最初は 0 ページのみ表示。
+        /// </summary>
+        private void InitializePages()
         {
-            for (int i = 0; i < maxVisibleSlots; i++)
+            int pageCount = contentParents.Count;
+            for (int page = 0; page < pageCount; page++)
             {
-                InventorySlot slot = Instantiate(slotPrefab, contentParent);
-                visibleSlots.Add(slot);
-                slot.Clear();
+                var slots = new List<InventorySlot>();
+                for (int i = 0; i < maxVisibleSlots; i++)
+                {
+                    var slot = Instantiate(slotPrefab, contentParents[page]);  // :contentReference[oaicite:0]{index=0}
+                    slot.Clear();
+                    slots.Add(slot);
+                }
+                pageSlots.Add(slots);
+                // 最初は 0 ページだけアクティブ、それ以外は非表示
+                contentParents[page].gameObject.SetActive(page == currentPage);
             }
         }
 
@@ -49,35 +63,31 @@ namespace AnoGame.Application.Inventory
         {
             if (inventory == null) return;
 
-            // アイテムリストを更新
             _allItems = inventory.Items;
 
             // 必要なスプライトをロード
-            foreach (var item in inventory.Items)
+            foreach (var item in _allItems)
             {
                 if (!spriteCache.ContainsKey(item.ItemName))
-                {
                     LoadSprite(item.ItemName);
-                }
             }
 
-            // 表示を更新
             UpdateVisibleItems();
             UpdatePageButtonsVisibility();
         }
 
+        /// <summary>
+        /// 現在ページのスロットだけにアイテムをセット
+        /// </summary>
         private void UpdateVisibleItems()
         {
+            var slots = pageSlots[currentPage];
             int startIndex = currentPage * maxVisibleSlots;
 
-            // すべてのスロットをクリア
-            foreach (var slot in visibleSlots)
-            {
-                slot.Clear();
-            }
+            // 全スロットクリア
+            foreach (var slot in slots) slot.Clear();
 
-            // 現在のページのアイテムを表示
-            for (int i = 0; i < maxVisibleSlots; i++)
+            for (int i = 0; i < slots.Count; i++)
             {
                 int itemIndex = startIndex + i;
                 if (itemIndex < _allItems.Count)
@@ -85,89 +95,78 @@ namespace AnoGame.Application.Inventory
                     var item = _allItems[itemIndex];
                     if (spriteCache.TryGetValue(item.ItemName, out var sprite))
                     {
-                        UniTask.Void(async () =>
-                        {
-                            await visibleSlots[i].SetItemAsync(item, sprite);
-                        });
+                        UniTask.Void(async () => await slots[i].SetItemAsync(item, sprite));
                     }
                     else
                     {
-                        UniTask.Void(async () =>
-                        {
-                            await visibleSlots[i].SetItemAsync(item, null);
-                        });
+                        UniTask.Void(async () => await slots[i].SetItemAsync(item, null));
                     }
                 }
             }
+
+            // フォーカス更新
+            var sel = slots.FirstOrDefault()?.GetComponent<Selectable>();
+            if (sel != null)
+            {
+                EventSystem.current.SetSelectedGameObject(sel.gameObject);
+                sel.Select();
+            }
         }
 
-        private void NextPage()
+        private void GoToNextPage()
         {
             if ((currentPage + 1) * maxVisibleSlots < _allItems.Count)
-            {
-                currentPage++;
-                UpdateVisibleItems();
-                UpdatePageButtonsVisibility();
-            }
+                SwitchPage(currentPage + 1);
         }
 
-        private void PreviousPage()
+        private void GoToPreviousPage()
         {
             if (currentPage > 0)
-            {
-                currentPage--;
-                UpdateVisibleItems();
-                UpdatePageButtonsVisibility();
-            }
+                SwitchPage(currentPage - 1);
+        }
+
+        /// <summary>
+        /// ページ切り替え時に表示／非表示をトグル
+        /// </summary>
+        private void SwitchPage(int newPage)
+        {
+            contentParents[currentPage].gameObject.SetActive(false);
+            currentPage = newPage;
+            contentParents[currentPage].gameObject.SetActive(true);
+            UpdateVisibleItems();
+            UpdatePageButtonsVisibility();
         }
 
         private void UpdatePageButtonsVisibility()
         {
-            if (nextPageButton != null && prevPageButton != null)
-            {
-                prevPageButton.interactable = (currentPage > 0);
-                nextPageButton.interactable = ((currentPage + 1) * maxVisibleSlots < _allItems.Count);
-            }
+            if (nextPageButton == null || prevPageButton == null) return;
+            prevPageButton.gameObject.SetActive(currentPage > 0);
+            nextPageButton.gameObject.SetActive((currentPage + 1) * maxVisibleSlots < _allItems.Count);
         }
 
         private async void LoadSprite(string itemName)
         {
-            // すでにキャッシュにある場合は何もしない
-            if (spriteCache.ContainsKey(itemName)) return;
-            // 既にロード中の場合も処理しない
-            if (loadOperations.ContainsKey(itemName)) return;
+            if (spriteCache.ContainsKey(itemName) || loadOperations.ContainsKey(itemName)) return;
 
             var itemData = itemDatabase.GetItemById(itemName);
-            if (itemData == null) return;
+            if (itemData?.AssetReference == null) return;
 
             try
             {
-                // 既にAssetReferenceがロード済みなら、そのハンドルを利用する
-                if (itemData.AssetReference.OperationHandle.IsValid())
-                {
-                    var loadedSprite = (Sprite)itemData.AssetReference.OperationHandle.Result;
-                    if (loadedSprite != null)
-                    {
-                        spriteCache[itemName] = loadedSprite;
-                        UpdateSlotsWithItem(itemName);
-                        return;
-                    }
-                }
-
-                // ロード中でなければ、新たにロードする
-                var operation = itemData.AssetReference.LoadAssetAsync<Sprite>();
-                loadOperations[itemName] = operation;
-                        
-                var sprite = await operation.Task;
+                // AssetReference からロード
+                var handle = itemData.AssetReference.LoadAssetAsync<Sprite>();  // :contentReference[oaicite:1]{index=1}
+                loadOperations[itemName] = handle;
+                var sprite = await handle.Task;
                 if (sprite != null)
                 {
                     spriteCache[itemName] = sprite;
+                    // 既存スロットに反映
                     UpdateSlotsWithItem(itemName);
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to load sprite for {itemName}: {e.Message}");
+                Debug.LogError($"Failed to load sprite for {itemName}: {e}");
             }
             finally
             {
@@ -175,32 +174,26 @@ namespace AnoGame.Application.Inventory
             }
         }
 
-
         private void UpdateSlotsWithItem(string itemName)
         {
-            foreach (var slot in visibleSlots)
+            foreach (var slots in pageSlots)
             {
-                if (slot.CurrentItem?.ItemName == itemName && spriteCache.TryGetValue(itemName, out var sprite))
+                foreach (var slot in slots)
                 {
-                    slot.UpdateSprite(sprite);
+                    if (slot.CurrentItem?.ItemName == itemName && spriteCache.TryGetValue(itemName, out var sprite))
+                        slot.UpdateSprite(sprite);
                 }
             }
         }
 
         private void OnDestroy()
         {
-            Debug.Log("キャッシュのクリーンアップ");
-            if (nextPageButton != null) nextPageButton.onClick.RemoveListener(NextPage);
-            if (prevPageButton != null) prevPageButton.onClick.RemoveListener(PreviousPage);
+            if (nextPageButton != null) nextPageButton.onClick.RemoveListener(GoToNextPage);
+            if (prevPageButton != null) prevPageButton.onClick.RemoveListener(GoToPreviousPage);
 
-            // キャッシュのクリーンアップ
-            foreach (var operation in loadOperations.Values)
-            {
-                if (operation.IsValid())
-                {
-                    Addressables.Release(operation);
-                }
-            }
+            Debug.Log("キャッシュのクリーンアップ");
+            foreach (var op in loadOperations.Values)
+                if (op.IsValid()) Addressables.Release(op);
         }
     }
 }

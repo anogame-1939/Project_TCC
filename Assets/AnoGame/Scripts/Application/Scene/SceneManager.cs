@@ -46,6 +46,10 @@ namespace AnoGame.Application.Scene
 
                 await SceneLoadExtensions.LoadSceneAsyncStandard(sceneName, LoadSceneMode.Single);
 
+                // NOTE:Steam向けの言語設定処理
+                var lang = GetCurrentSceneIndex();
+                Localizer.LocalizationManager.GetInstance().ChangeLocale(lang); 
+
                 // シーン読み込み完了時に、無視対象＋新規シーン以外をアンロード
                 // await UnloadOtherScenesAsync(sceneName, ct);
 
@@ -53,6 +57,88 @@ namespace AnoGame.Application.Scene
 
                 FadeManager.Instance.FadeIn(_fadeOutSpeed);
             });
+        }
+
+        public int GetCurrentSceneIndex()
+        {
+            const int EN = 3; // 失敗時フォールバック（英語）
+
+            string lang;
+            try
+            {
+                lang = Steamworks.SteamApps.GetCurrentGameLanguage();
+                if (string.IsNullOrWhiteSpace(lang)) return EN;
+            }
+            catch
+            {
+                return EN;
+            }
+
+            switch (lang.ToLowerInvariant())
+            {
+                // ---- ここから：あなたの14言語に直結させるケース ----
+
+                case "schinese":         return 0;
+
+                case "tchinese":         return 1;
+
+                // English
+                case "english":          return 2;
+
+                // Finnish
+                case "finnish":          return 3;
+
+                // French
+                case "french":           return 4;
+
+                // German
+                case "german":           return 5;
+
+                // Indonesian
+                case "indonesian":       return 7;
+
+                // Italian
+                case "italian":          return 8;
+
+                // Japanese
+                case "japanese":         return 9;
+
+                // Korean（APIは "koreana"）
+                case "koreana":          return 10;
+
+                // Portuguese（どちらでも pt 扱いに寄せる）
+                case "portuguese":
+                case "brazilian":        return 11;
+
+                // Russian
+                case "russian":          return 12;
+
+                // Spanish（LATAM も同じスロットへ寄せる）
+                case "spanish":
+                case "latam":            return 13;
+
+                // ---- ここまで：14言語の直接対応 ----
+                // 以降：API が返し得る他言語（未対応は英語へフォールバック）
+
+                case "arabic":           return EN;
+                case "bulgarian":        return EN;
+                case "czech":            return EN;
+                case "danish":           return EN;
+                case "dutch":            return EN;
+                case "greek":            return EN;
+                case "hungarian":        return EN;
+                case "norwegian":        return EN;
+                case "polish":           return EN;
+                case "romanian":         return EN;
+                case "swedish":          return EN;
+                case "thai":             return EN; // 必要なら 14言語に昇格させてOK
+                case "turkish":          return EN;
+                case "ukrainian":        return EN;
+                case "vietnamese":       return EN;
+
+                default:
+                    return EN;
+            }
         }
 
         /// <summary>

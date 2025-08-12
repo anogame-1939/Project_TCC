@@ -14,17 +14,24 @@ namespace AnoGame.Application.Inventory
         [SerializeField] private TextMeshProUGUI itemNameText;
         [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private TextMeshProUGUI quantityText;
+        // ← ここでハイライト用の Image を追加
+        [SerializeField] private Image highlightImage;
 
         public InventoryItem CurrentItem { get; private set; }
 
         public string LocalizedName = "no data";
         public string LocalizedDescription = "no data";
 
+        void Awake()
+        {
+            // 最初は必ず非表示に
+            if (highlightImage != null)
+                highlightImage.enabled = false;
+        }
+
         public void SetItem(InventoryItem item, Sprite sprite)
         {
             CurrentItem = item;
-
-            // LocalizationManager.GetInstance().ApplyLocalize();
 
             itemNameText.text = item.ItemName;
             descriptionText.text = item.Description;
@@ -32,6 +39,9 @@ namespace AnoGame.Application.Inventory
 
             UpdateSprite(sprite);
             gameObject.SetActive(true);
+
+            // ハイライトは解除
+            HideHighlight();
         }
 
         public async UniTask SetItemAsync(InventoryItem item, Sprite sprite)
@@ -39,7 +49,6 @@ namespace AnoGame.Application.Inventory
             Debug.Log("InventorySlot-SetItemAsync");
             CurrentItem = item;
 
-            // LocalizationManager を経由して、キーから文字列を取得
             var manager = LocalizationManager.GetInstance();
             try
             {
@@ -51,14 +60,11 @@ namespace AnoGame.Application.Inventory
                 Debug.LogError($"ローカライズテキストの取得に失敗しました。...{item.ItemName}:{e.StackTrace}");
             }
 
-            // 意味ない
-            // itemNameText.text    = localizedName;
-            // descriptionText.text = localizedDesc;
-
-            quantityText.text    = item.Quantity > 1 ? item.Quantity.ToString() : string.Empty;
-
+            quantityText.text = item.Quantity > 1 ? item.Quantity.ToString() : string.Empty;
             UpdateSprite(sprite);
             gameObject.SetActive(true);
+
+            HideHighlight();
         }
 
         public void UpdateSprite(Sprite sprite)
@@ -76,6 +82,22 @@ namespace AnoGame.Application.Inventory
             descriptionText.text = string.Empty;
             quantityText.text = string.Empty;
             gameObject.SetActive(false);
+
+            HideHighlight();
+        }
+
+        // ハイライトを表示
+        public void ShowHighlight()
+        {
+            if (highlightImage != null)
+                highlightImage.enabled = true;
+        }
+
+        // ハイライトを非表示
+        public void HideHighlight()
+        {
+            if (highlightImage != null)
+                highlightImage.enabled = false;
         }
     }
 }

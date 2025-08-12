@@ -1236,7 +1236,6 @@ GameObject:
   - component: {fileID: 1190557266045678637}
   - component: {fileID: -2493535432171837609}
   - component: {fileID: -1196809923107977167}
-  - component: {fileID: 5931228778417601929}
   - component: {fileID: 1203700633988673674}
   - component: {fileID: 7179800872246753123}
   - component: {fileID: 5410025904601978029}
@@ -1309,7 +1308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _environmentLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 4294967295
   _mass: 1
   _height: 0.5
   _radius: 0.2
@@ -1344,7 +1343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _agent: {fileID: 0}
-  _speed: 4
+  _speed: 3.8
   TurnSpeed: 8
   MovePriority: 1
   TurnPriority: 1
@@ -1632,19 +1631,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &5931228778417601929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85a16210db2e7514c897584522e43e4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  threshold: 0.1
 --- !u!114 &1203700633988673674
 MonoBehaviour:
   m_ObjectHideFlags: 0

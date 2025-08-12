@@ -23,9 +23,10 @@ namespace AnoGame.Application.Event
 
         protected override void Start()
         {
+            base.Start();
             if (_onStart)
             {
-                base.Start();
+                // イベント開始をトリガーする
                 base._eventService.TriggerEventStart(eventData.EventId);
             }
         }
@@ -35,9 +36,12 @@ namespace AnoGame.Application.Event
             base.OnStartEvent();
             Debug.Log($"InstantEventTrigger-OnStartEvent:{name}");
 
-            // スタートと同時にイベントをクリアする
-            _eventService.TriggerEventComplete(eventData.EventId);
-            _eventManager.AddClearedEvent(eventData.EventId);
+            if (CheckConditions())
+            {
+                // スタートと同時にイベントをクリアする
+                _eventService.TriggerEventComplete(eventData.EventId);
+                _eventManager.AddClearedEvent(eventData.EventId);
+            }
 
         }
 

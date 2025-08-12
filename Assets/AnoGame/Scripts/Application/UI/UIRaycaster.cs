@@ -35,7 +35,7 @@ namespace AnoGame.Application.UI
         {
             // マウスの現在位置を取得
             pointerEventData = new PointerEventData(eventSystem);
-            pointerEventData.position = Input.mousePosition;
+            pointerEventData.position = UnityEngine.Input.mousePosition;
 
             // レイキャストの結果を格納するリスト
             List<RaycastResult> results = new List<RaycastResult>();
