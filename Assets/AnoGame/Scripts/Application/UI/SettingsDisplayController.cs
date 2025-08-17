@@ -158,6 +158,9 @@ namespace AnoGame.Application.UI
 
             // (3) Playerマップへ切り替え
             _inputProvider.SwitchToPlayer();
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible   = false;
         }
 
         //──────────────────────────────────────────
@@ -171,10 +174,5 @@ namespace AnoGame.Application.UI
             cancelEvents?.Invoke();
         }
 
-        private void OnApplicationFocus(bool hasFocus)
-        {
-            // フォーカス制御は不要ならそのまま
-            return;
-        }
     }
 }
