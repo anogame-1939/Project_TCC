@@ -38844,62 +38844,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8258954408556846641, guid: f5d1bf62541cc1645b32a7c19c85e29f, type: 3}
   m_PrefabInstance: {fileID: 1826966014}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1827616088
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1827616090}
-  - component: {fileID: 1827616089}
-  m_Layer: 0
-  m_Name: "\u6F14\u51FA-\u5927\u7537\u51FA\u73FE_1"
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!320 &1827616089
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1827616088}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 7d46d4457fc54da469afdc9c568a2d1c, type: 2}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings:
-  - key: {fileID: 3589873377409053477, guid: 477f5b35089654c4fb74a1dfdf5ba447, type: 2}
-    value: {fileID: 0}
-  - key: {fileID: -2211723147876122344, guid: 7d46d4457fc54da469afdc9c568a2d1c, type: 2}
-    value: {fileID: 1916187285}
-  m_ExposedReferences:
-    m_References:
-    - 4898dc373289f1f41adf81b79c254790: {fileID: 621707323}
-    - 7c430b73b12dc314c8c8c7476176c537: {fileID: 621707323}
-    - 2a9159c12d5b7d34696b6d4a01c6a5fe: {fileID: 621707323}
---- !u!4 &1827616090
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1827616088}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.1, y: -0.1, z: 0.1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2044176827}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1837765802
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40727,6 +40671,18 @@ MonoBehaviour:
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
+        - m_Target: {fileID: 2020212882}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: EnableForceMode
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
         - m_Target: {fileID: 606505075}
           m_TargetAssemblyTypeName: AnoGame.Application.Enemy.UnifiedEnemySpawner,
             AnoGame.Application
@@ -40744,13 +40700,13 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 2020212882}
           m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
-          m_MethodName: FaceToTarget
-          m_Mode: 2
+          m_MethodName: SetAngle
+          m_Mode: 4
           m_Arguments:
-            m_ObjectArgument: {fileID: 1827616088}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
-            m_FloatArgument: -135
+            m_FloatArgument: 135
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
@@ -44181,9 +44137,6 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 3735792761940572698, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6668128177902679504, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
-      insertIndex: 6
-      addedObject: {fileID: 1827616090}
     - targetCorrespondingSourceObject: {fileID: 6668128177902679504, guid: 8f1972b7999ce2542b51221b0239a01e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1245684878}
