@@ -61,36 +61,22 @@ namespace AnoGame.Application.UI
             cancelAction.performed   += OnCancelPerformed;
         }
 
-        private void Update()
+        public void DisableInput()
         {
-            return; 
-            // 毎フレーム、現在の入力値を読み取る（不要ならコメントアウト）
-            Vector2 inputValue = selectAction.ReadValue<Vector2>();
-
-            if (Time.time < nextScrollTime)
+            if (selectAction != null)
             {
-                return;
+                selectAction.Disable();
             }
-
-            if (inputValue.x != 0)
+            if (confirmAction != null)
             {
-                if (Mathf.Abs(inputValue.x) > 0.5f)
-                {
-                    var currentObj = currentSection.selectables[currentIndex].gameObject;
-                    var scrollbar = currentObj.GetComponent<Scrollbar>();
-                    if (scrollbar != null)
-                    {
-                        float sign = (inputValue.x > 0) ? 1f : -1f;
-                        float newValue = Mathf.Clamp01(scrollbar.value + sign * scrollIncrement);
-                        scrollbar.value = newValue;
-
-                        Debug.Log($"Scrollbar moved to {newValue}");
-                        nextScrollTime = Time.time + coolTime;
-                        return;
-                    }
-                }
+                confirmAction.Disable();
+            }
+            if (cancelAction != null)
+            {
+                cancelAction.Disable();
             }
         }
+        
 
         private void OnDestroy()
         {
