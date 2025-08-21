@@ -16,6 +16,10 @@ namespace AnoGame.Application.UI
         [SerializeField] private ScrollRect scrollRect;         // ScrollRect 参照
         [SerializeField] private float scrollSpeed = 0.08f;      // スクロール速度
 
+        [Header("スクロール開始")]
+        [SerializeField, Tooltip("シーンスタート後、何秒後にスクロールを開始するか")]
+        private float delayStart = 1.5f;
+
         [Header("完了通知設定")]
         [SerializeField, Tooltip("スクロール完了後、何秒待ってから通知するか")]
         private float delayAfterScroll = 1f;                  // スクロール完了後の待機時間
@@ -30,6 +34,8 @@ namespace AnoGame.Application.UI
 
         private async UniTaskVoid ScrollToEndAsync()
         {
+            await UniTask.Delay(TimeSpan.FromSeconds(delayStart));
+
             // MonoBehaviour が破棄されたら自動キャンセル
             var cancellation = this.GetCancellationTokenOnDestroy();
 
