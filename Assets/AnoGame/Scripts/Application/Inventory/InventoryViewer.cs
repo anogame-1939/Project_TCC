@@ -170,7 +170,7 @@ namespace AnoGame.Application.Inventory
             }
             finally
             {
-                loadOperations.Remove(itemName);
+                // loadOperations.Remove(itemName);
             }
         }
 
@@ -194,6 +194,8 @@ namespace AnoGame.Application.Inventory
             Debug.Log("キャッシュのクリーンアップ");
             foreach (var op in loadOperations.Values)
                 if (op.IsValid()) Addressables.Release(op);
+
+            Debug.Log("キャッシュのクリーンアップ完了");
         }
     }
 }
