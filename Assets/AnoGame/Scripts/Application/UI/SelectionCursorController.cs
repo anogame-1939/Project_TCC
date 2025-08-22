@@ -61,6 +61,13 @@ namespace AnoGame.Application.UI
             cancelAction.performed   += OnCancelPerformed;
         }
 
+        public async void TemporarilyDisable()
+        {
+            DisableInput();
+            await UniTask.Delay(System.TimeSpan.FromSeconds(3f));
+            EnableInput();
+        }
+
         public void DisableInput()
         {
             if (selectAction != null)
@@ -77,12 +84,28 @@ namespace AnoGame.Application.UI
             }
         }
         
+        public void EnableInput()
+        {
+            if (selectAction != null)
+            {
+                selectAction.Enable();
+            }
+            if (confirmAction != null)
+            {
+                confirmAction.Enable();
+            }
+            if (cancelAction != null)
+            {
+                cancelAction.Enable();
+            }
+        }
+        
 
         private void OnDestroy()
         {
             if (selectAction != null)
             {
-                selectAction.started   -= OnSelectPerformed;
+                selectAction.started -= OnSelectPerformed;
                 selectAction.performed -= OnSelectPerformed;
             }
             if (confirmAction != null)
