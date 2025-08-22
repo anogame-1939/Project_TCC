@@ -191,11 +191,8 @@ namespace AnoGame.Application.Inventory
             if (nextPageButton != null) nextPageButton.onClick.RemoveListener(GoToNextPage);
             if (prevPageButton != null) prevPageButton.onClick.RemoveListener(GoToPreviousPage);
 
-            Debug.Log("キャッシュのクリーンアップ");
             foreach (var op in loadOperations.Values)
                 if (op.IsValid()) Addressables.Release(op);
-
-            Debug.Log("キャッシュのクリーンアップ完了");
         }
     }
 }
