@@ -67,7 +67,7 @@ namespace AnoGame.Application
 
         private GameData CreateNewGameData()
         {
-            var position = new Position3D(21.401f, 0, -65.332f); // 初期位置
+            var position = new Position3D(20.2f, 0, -65.332f); // 初期位置
             var rotation = new Rotation3D(0, 225.071f, 0, 1); // デフォルトの回転
             var playerPosition = new PlayerPosition(
                 position,
