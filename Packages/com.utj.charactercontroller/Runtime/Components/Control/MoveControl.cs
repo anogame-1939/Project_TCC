@@ -220,7 +220,6 @@ namespace Unity.TinyCharacterController.Control
         /// <param name="leftStick">Direction of movement.</param>
         public void Move(Vector2 leftStick)
         {
-            Debug.Log($"[MoveControl] Move called with leftStick: {leftStick}");
             _inputValue = leftStick;
             _hasInput = leftStick.sqrMagnitude > 0;
         }
@@ -307,11 +306,6 @@ namespace Unity.TinyCharacterController.Control
 
         void IUpdateComponent.OnUpdate(float deltaTime)
         {
-            
-            Debug.Log($"[MoveControl] OnUpdate called with _hasInput: {_hasInput}, {IsGamePlay} ");
-
-            using var profiler = new ProfilerScope(nameof(MoveControl));
-
             if (_hasInput && IsGamePlay)
             {
                 var preDirection = _moveDirection;

@@ -119,14 +119,6 @@ namespace AnoGame.Application.Player.Control
 
         private void FixedUpdate()
         {
-            Debug.Log($"[PlayerActionController] FixedUpdate called ... GameStateManager.Instance.CurrentState-{GameStateManager.Instance.CurrentState}");
-            // ゲームがプレイ中でなければ入力を無視
-
-
-            Debug.Log($"[PlayerActionController] FixedUpdate called");
-            Debug.Log($"[PlayerActionController] GameStateManager.Instance.CurrentState: {GameStateManager.Instance.CurrentState}");
-            Debug.Log($"[PlayerActionController] isKeyHeld: {isKeyHeld}, isInputEnabled: {isInputEnabled}");
-
             // キーが押されており、かつ入力が有効であれば MoveControl に入力値を渡す
             if (isKeyHeld && isInputEnabled)
             {
