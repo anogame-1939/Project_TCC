@@ -25150,6 +25150,7 @@ GameObject:
   - component: {fileID: 413419027}
   - component: {fileID: 413419029}
   - component: {fileID: 413419028}
+  - component: {fileID: 413419030}
   m_Layer: 5
   m_Name: Pad
   m_TagString: Untagged
@@ -25214,6 +25215,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 413419026}
   m_CullTransparentMesh: 1
+--- !u!225 &413419030
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 413419026}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &413524181
 GameObject:
   m_ObjectHideFlags: 0
@@ -61742,6 +61755,7 @@ GameObject:
   - component: {fileID: 1127361900}
   - component: {fileID: 1127361902}
   - component: {fileID: 1127361901}
+  - component: {fileID: 1127361903}
   m_Layer: 5
   m_Name: Keyboard
   m_TagString: Untagged
@@ -61806,6 +61820,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127361899}
   m_CullTransparentMesh: 1
+--- !u!225 &1127361903
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127361899}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1128039479
 GameObject:
   m_ObjectHideFlags: 0
@@ -92854,7 +92880,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   padImage: {fileID: 413419028}
   keyboardImage: {fileID: 1127361901}
-  hintGroup: {fileID: 766970156}
   fadeInDuration: 0.25
   defaultHoldSeconds: 5
   fadeOutDuration: 0.25
