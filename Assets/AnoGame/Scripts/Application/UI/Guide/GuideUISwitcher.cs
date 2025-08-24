@@ -5,349 +5,228 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using System;
-using AnoGame.Application; // ★ 直接参照
+using AnoGame.Application; // GameStateManager 参照
 
 namespace AnoGame.UI.Guide
 {
-    public class GuideUISwitcher : MonoBehaviour
+    public sealed class GuideUISwitcher : MonoBehaviour
     {
-        [Header("UI Images")]
-        [SerializeField] private Image padImage;
-        [SerializeField] private Image keyboardImage;
+        [Header("Base UI")]
+        [SerializeField] private Image baseImage;         // ← ベースとなる1枚だけ
+        [SerializeField] private Sprite padSprite;        // パッド用スプライト
+        [SerializeField] private Sprite keyboardSprite;   // キーボード用スプライト
 
-        [Header("Timings (seconds)")]
-        [SerializeField] private float fadeInDuration = 0.25f;
-        [SerializeField] private float defaultHoldSeconds = 5f;
+        [Header("Fade")]
+        [SerializeField] private float fadeInDuration  = 0.25f;
         [SerializeField] private float fadeOutDuration = 0.25f;
+        [SerializeField] private bool  useUnscaledTime = true;
 
-        [Header("Options")]
-        [SerializeField] private bool useUnscaledTime = true; // 一時停止中も動かすなら true
+        [Header("Rules")]
+        [SerializeField] private bool showOnlyInGameplay = true; // Gameplay 中のみ表示
 
         private PlayerInput _playerInput;
-        private string _lastScheme;
+        private CanvasGroup _group;
 
-        private CanvasGroup _padGroup;
-        private CanvasGroup _keyboardGroup;
+        private CancellationTokenSource _lifeCts;   // Destroy まで
+        private CancellationTokenSource _fadeCts;   // 進行中フェード
 
-        private CancellationTokenSource _lifetimeCts;  // Destroyまで有効
-        private CancellationTokenSource _sequenceCts;  // 通常ヒント（タイマーあり）
-        private CancellationTokenSource _stickyCts;    // AFK中のSticky（出しっぱなし）
-        private UniTask _stickyTask;
-
-        private bool SequenceActive => _sequenceCts != null && !_sequenceCts.IsCancellationRequested;
-        private bool StickyActive   => _stickyCts   != null && !_stickyCts.IsCancellationRequested;
-
-        void Awake()
+        private void Awake()
         {
-            _lifetimeCts = new CancellationTokenSource();
+            _lifeCts = new CancellationTokenSource();
         }
 
-        void Start()
+        private void Start()
         {
-            // PlayerInput 取得
+            // 依存チェック
+            if (baseImage == null)
+            {
+                Debug.LogError("[GuideUISwitcher] baseImage が未設定です。");
+                enabled = false; return;
+            }
+            if (padSprite == null || keyboardSprite == null)
+            {
+                Debug.LogWarning("[GuideUISwitcher] padSprite / keyboardSprite のいずれかが未設定です。");
+            }
+
             _playerInput = FindObjectOfType<PlayerInput>();
             if (_playerInput == null)
             {
-                Debug.LogError("PlayerInput がシーンに見つかりません。");
-                enabled = false;
-                return;
+                Debug.LogError("[GuideUISwitcher] PlayerInput が見つかりません。");
+                enabled = false; return;
             }
 
-            _lastScheme = _playerInput.currentControlScheme;
+            _group = EnsureCanvasGroup(baseImage);
+            _group.blocksRaycasts = false;
+            _group.interactable  = false;
 
-            // CanvasGroup 準備
-            _padGroup = EnsureCanvasGroup(padImage);
-            _keyboardGroup = EnsureCanvasGroup(keyboardImage);
-            _padGroup.blocksRaycasts = false;
-            _padGroup.interactable = false;
-            _keyboardGroup.blocksRaycasts = false;
-            _keyboardGroup.interactable = false;
-
-            // 初期は非表示
-            HideImmediate(_padGroup);
-            HideImmediate(_keyboardGroup);
-
-            // 起動時に現在のデバイスガイドを5秒表示（Gameplay中のみ）
-            // ShowHint(defaultHoldSeconds).Forget();
+            HideImmediate(); // 初期は非表示
         }
 
-        void Update()
+        private void OnEnable()
         {
-            if (_playerInput == null) return;
+            if (_playerInput == null) _playerInput = FindObjectOfType<PlayerInput>();
+            if (_playerInput != null)
+                _playerInput.onControlsChanged += OnControlsChanged;
+        }
 
-            // ★ Gameplay外に出たら、進行中の表示を全て中断＆即非表示
-            if (!IsGameplayNow() && (SequenceActive || StickyActive))
+        private void OnDisable()
+        {
+            if (_playerInput != null)
+                _playerInput.onControlsChanged -= OnControlsChanged;
+        }
+
+        private void OnDestroy()
+        {
+            _fadeCts?.Cancel(); _fadeCts?.Dispose(); _fadeCts = null;
+            _lifeCts?.Cancel(); _lifeCts?.Dispose(); _lifeCts = null;
+        }
+
+        // ===== Public API =====
+
+        /// <summary>AFKになったら呼ぶ：現在スキームのスプライトで表示（フェードイン）。</summary>
+        public void Show()
+        {
+            if (!CanShowNow()) return;
+
+            // 表示中でも“即”スプライト差し替え（フェード状態は維持）
+            ApplySpriteForCurrentScheme();
+
+            // 既にフル表示なら何もしない
+            if (_group.gameObject.activeSelf && _group.alpha >= 1f) return;
+
+            // フェードイン
+            StartFade(toVisible: true);
+        }
+
+        /// <summary>AFK解除で呼ぶ：フェードアウトして非表示。</summary>
+        public void Hide()
+        {
+            // 非表示済みなら何もしない
+            if (!_group.gameObject.activeSelf && _group.alpha <= 0f) return;
+
+            StartFade(toVisible: false);
+        }
+
+        /// <summary>即時に完全非表示。</summary>
+        public void HideImmediate()
+        {
+            _fadeCts?.Cancel(); // 進行中のフェード停止
+            _group.alpha = 0f;
+            if (_group.gameObject.activeSelf) _group.gameObject.SetActive(false);
+        }
+
+        // ===== Internals =====
+
+        private void OnControlsChanged(PlayerInput pi)
+        {
+            if (pi != _playerInput) return;
+
+            // 「表示中なら」スプライトを即差し替え（フェードは触らない）
+            if (_group != null && (_group.gameObject.activeSelf || _group.alpha > 0f))
             {
-                CancelAndHideAll();
-                return;
+                ApplySpriteForCurrentScheme();
             }
+            // 非表示時は何もしない（次回 Show で反映）
+        }
 
-            // スキーム変化を監視
-            var currentScheme = _playerInput.currentControlScheme;
-            if (currentScheme != _lastScheme)
+        private void StartFade(bool toVisible)
+        {
+            // Gameplay から外れたら出さない
+            if (toVisible && !CanShowNow()) return;
+
+            _fadeCts?.Cancel();
+            _fadeCts?.Dispose();
+            _fadeCts = CancellationTokenSource.CreateLinkedTokenSource(_lifeCts.Token);
+            var ct = _fadeCts.Token;
+
+            if (toVisible)
             {
-                _lastScheme = currentScheme;
-
-                if (StickyActive)
-                {
-                    // ★ Sticky中はフェードせずに表示内容だけ差し替え（チラつき防止）
-                    ForceMatchStickyGroupToScheme();
-                }
-                else
-                {
-                    // 通常ヒント（内部でGameplayチェック）
-                    ShowHint(defaultHoldSeconds).Forget();
-                }
+                // 表示用セットアップ
+                ApplySpriteForCurrentScheme(); // 念のため再適用
+                _group.gameObject.SetActive(true);
+                FadeRoutine(_group, _group.alpha, 1f, fadeInDuration, ct).Forget();
             }
-        }
-
-        void OnDestroy()
-        {
-            _sequenceCts?.Cancel();
-            _sequenceCts?.Dispose();
-            _stickyCts?.Cancel();
-            _stickyCts?.Dispose();
-            _lifetimeCts?.Cancel();
-            _lifetimeCts?.Dispose();
-        }
-
-        /// <summary>外部から即座に消したい場合</summary>
-        public void HideHintImmediate()
-        {
-            CancelAndHideAll();
-        }
-
-        // === 公開API：外部（AFK検知など）から呼べる ===
-
-        /// <summary>通常ヒント（フェードイン→保持→フェードアウト）。Gameplay外 or Sticky中はスキップ。</summary>
-        public UniTask ShowHint(float seconds = 5f)
-        {
-            if (!IsGameplayNow()) return UniTask.CompletedTask;
-            if (StickyActive)     return UniTask.CompletedTask; // AFK中は通常ヒントを出さない
-            return ShowCurrentDeviceHintSequenceAsync(seconds, _lifetimeCts.Token);
-        }
-
-        public void ShowSticky()
-        {
-            if (!IsGameplayNow()) return;
-
-            // 進行中の通常ヒントは中断
-            _sequenceCts?.Cancel();
-            _sequenceCts?.Dispose();
-            _sequenceCts = null;
-
-            // 既にStickyなら表示内容だけ合わせ直して終了
-            if (StickyActive)
+            else
             {
-                ForceMatchStickyGroupToScheme();
-                return;
-            }
-
-            _stickyCts?.Cancel();
-            _stickyCts?.Dispose();
-            _stickyCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
-
-            // fire-and-forget（ここだけで Forget する。呼び出し側は Forget 禁止）
-            _stickyTask = StickySequenceAsync(_stickyCts.Token);
-            _stickyTask.Forget();
-        }
-
-        // もともと: public UniTask HideSticky()
-        public void HideSticky()
-        {
-            if (!StickyActive) return;
-            // StickySequenceAsync の finally でフェードアウト → 非表示
-            _stickyCts?.Cancel();
-        }
-
-
-        // ===== 実装詳細 =====
-
-        private async UniTask ShowCurrentDeviceHintSequenceAsync(float holdSeconds, CancellationToken lifeToken)
-        {
-            // ★ ここで直接 GameState を参照
-            if (GameStateManager.Instance == null || GameStateManager.Instance.CurrentState != GameState.Gameplay)
-                return;
-
-            // 前回シーケンスを中断
-            _sequenceCts?.Cancel();
-            _sequenceCts?.Dispose();
-            _sequenceCts = CancellationTokenSource.CreateLinkedTokenSource(lifeToken);
-            var ct = _sequenceCts.Token;
-
-            // どちらを表示するか決定
-            bool showPad = ShouldPreferPad(_playerInput);
-            var show = showPad ? _padGroup : _keyboardGroup;
-            var hide = showPad ? _keyboardGroup : _padGroup;
-
-            // 反対側は即座に消す
-            HideImmediate(hide);
-
-            // フェードイン → 待機 → フェードアウト
-            try
-            {
-                await FadeInAsync(show, fadeInDuration, ct);
-                await DelaySeconds(holdSeconds, ct);
-                await FadeOutAsync(show, fadeOutDuration, ct);
-                HideImmediate(show);
-            }
-            catch (OperationCanceledException)
-            {
-                HideImmediate(show);
+                FadeRoutine(_group, _group.alpha, 0f, fadeOutDuration, ct).Forget();
             }
         }
 
-        private async UniTask StickySequenceAsync(CancellationToken ct)
+        private async UniTask FadeRoutine(CanvasGroup g, float from, float to, float duration, CancellationToken ct)
         {
-            // GamePlay中のみ
-            if (!IsGameplayNow()) return;
-
-            // 現在スキームでどちらを見せるか
-            bool showPad = ShouldPreferPad(_playerInput);
-            var show = showPad ? _padGroup : _keyboardGroup;
-            var hide = showPad ? _keyboardGroup : _padGroup;
-
-            HideImmediate(hide);
-
-            try
-            {
-                await FadeInAsync(show, fadeInDuration, ct);
-                // ★ AFK中は出しっぱなし（キャンセルされるまで待機）
-                await UniTask.WaitUntilCanceled(ct);
-            }
-            catch (OperationCanceledException)
-            {
-                // expected
-            }
-            finally
-            {
-                // 解除時は通常通りフェードアウト
-                try
-                {
-                    await FadeOutAsync(show, fadeOutDuration, CancellationToken.None);
-                }
-                finally
-                {
-                    HideImmediate(show);
-                }
-            }
-        }
-
-        private bool ShouldPreferPad(PlayerInput playerInput)
-        {
-            string scheme = playerInput.currentControlScheme ?? "";
-            bool preferPadByName = scheme.Contains("Gamepad") || scheme.Contains("Controller");
-
-            bool hasGamepad = false;
-            bool hasKeyboardOrMouse = false;
-            IReadOnlyList<InputDevice> devices = playerInput.devices;
-            foreach (var d in devices)
-            {
-                if (d is Gamepad) hasGamepad = true;
-                if (d is Keyboard || d is Mouse) hasKeyboardOrMouse = true;
-            }
-
-            return preferPadByName || (hasGamepad && !hasKeyboardOrMouse);
-        }
-
-        private bool IsGameplayNow()
-        {
-            return GameStateManager.Instance != null
-                   && GameStateManager.Instance.CurrentState == GameState.Gameplay;
-        }
-
-        private void CancelAndHideAll()
-        {
-            _sequenceCts?.Cancel();
-            _stickyCts?.Cancel();
-            HideImmediate(_padGroup);
-            HideImmediate(_keyboardGroup);
-        }
-
-        // ===== フェード系ユーティリティ（UniTaskで実装） =====
-
-        private async UniTask FadeInAsync(CanvasGroup group, float duration, CancellationToken ct)
-        {
-            if (group == null) return;
-            group.gameObject.SetActive(true);
-            group.alpha = 0f;
-            await LerpAlphaAsync(group, 0f, 1f, duration, ct);
-        }
-
-        private async UniTask FadeOutAsync(CanvasGroup group, float duration, CancellationToken ct)
-        {
-            if (group == null) return;
-            float from = group.alpha;
-            await LerpAlphaAsync(group, from, 0f, duration, ct);
-        }
-
-        private async UniTask LerpAlphaAsync(CanvasGroup group, float from, float to, float duration, CancellationToken ct)
-        {
-            if (group == null) return;
+            if (g == null) return;
 
             if (duration <= 0f)
             {
-                group.alpha = to;
+                g.alpha = to;
+                if (to <= 0f && g.gameObject.activeSelf) g.gameObject.SetActive(false);
                 return;
             }
 
             float elapsed = 0f;
-            group.gameObject.SetActive(true);
-            group.alpha = from;
+            g.alpha = from;
+            g.gameObject.SetActive(true);
 
-            // Updateループでアルファを補間
             while (elapsed < duration)
             {
                 ct.ThrowIfCancellationRequested();
                 await UniTask.Yield(PlayerLoopTiming.Update, ct);
                 float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                 elapsed += dt;
-                float t = Mathf.Clamp01(elapsed / duration);
-                group.alpha = Mathf.Lerp(from, to, t);
+                g.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration));
             }
 
-            group.alpha = to;
+            g.alpha = to;
+            if (to <= 0f && g.gameObject.activeSelf) g.gameObject.SetActive(false);
         }
 
-        private async UniTask DelaySeconds(float seconds, CancellationToken ct)
+        private void ApplySpriteForCurrentScheme()
         {
-            if (seconds <= 0f) return;
-            var timing = useUnscaledTime ? DelayType.UnscaledDeltaTime : DelayType.DeltaTime;
-            await UniTask.Delay(TimeSpan.FromSeconds(seconds), timing, PlayerLoopTiming.Update, ct);
+            if (baseImage == null) return;
+
+            bool isPad = ShouldPreferPad(_playerInput);
+            var next = isPad ? padSprite : keyboardSprite;
+
+            // スプライトが同一なら触らない（不要な再描画回避）
+            if (baseImage.sprite == next) return;
+
+            baseImage.sprite = next;
+            baseImage.SetNativeSize(); // 必要ならON。固定サイズ運用なら削除OK
         }
 
-        // ===== 表示/非表示の即時切替 =====
-
-        private static void HideImmediate(CanvasGroup group)
-        {
-            if (group == null) return;
-            group.alpha = 0f;
-            if (group.gameObject.activeSelf)
-                group.gameObject.SetActive(false);
-        }
-
-        // ImageにCanvasGroupが無ければ追加して返す
         private static CanvasGroup EnsureCanvasGroup(Image img)
         {
-            if (img == null) return null;
             var cg = img.GetComponent<CanvasGroup>();
             if (cg == null) cg = img.gameObject.AddComponent<CanvasGroup>();
             return cg;
         }
 
-        /// <summary>Sticky中にデバイスが変わった場合、即座に表示対象を切替（無フェード）</summary>
-        private void ForceMatchStickyGroupToScheme()
+        private bool CanShowNow()
         {
-            bool showPad = ShouldPreferPad(_playerInput);
-            var show = showPad ? _padGroup : _keyboardGroup;
-            var hide = showPad ? _keyboardGroup : _padGroup;
+            if (!showOnlyInGameplay) return true;
 
-            if (show != null)
+            return GameStateManager.Instance != null
+                && GameStateManager.Instance.CurrentState == GameState.Gameplay;
+        }
+
+        private static bool ShouldPreferPad(PlayerInput playerInput)
+        {
+            if (playerInput == null) return false;
+
+            // 1) スキーム名で判定
+            string scheme = playerInput.currentControlScheme ?? string.Empty;
+            if (scheme.Contains("Gamepad") || scheme.Contains("Controller"))
+                return true;
+
+            // 2) デバイス列挙の保険
+            bool hasPad = false, hasKM = false;
+            IReadOnlyList<InputDevice> devices = playerInput.devices;
+            foreach (var d in devices)
             {
-                show.gameObject.SetActive(true);
-                show.alpha = 1f;
+                if (d is Gamepad) hasPad = true;
+                if (d is Keyboard || d is Mouse) hasKM = true;
             }
-            HideImmediate(hide);
+            return hasPad && !hasKM;
         }
     }
 }

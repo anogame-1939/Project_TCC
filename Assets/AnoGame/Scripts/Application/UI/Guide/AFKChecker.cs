@@ -6,14 +6,11 @@ using Unity.TinyCharacterController.Control; // MoveControl
 
 namespace AnoGame.UI.Guide
 {
-    /// <summary>
-    /// MoveControl.CurrentSpeed を監視してAFK判定する
-    /// </summary>
-    public class AFKChecker : MonoBehaviour
+    public sealed class AFKChecker : MonoBehaviour
     {
         [Header("Targets")]
-        [SerializeField] private MoveControl moveControl;         // プレイヤーに付いている MoveControl
-        [SerializeField] private GuideUISwitcher guideUISwitcher; // ガイド制御
+        [SerializeField] private MoveControl moveControl;
+        [SerializeField] private GuideUISwitcher guide;
 
         [Header("AFK 判定")]
         [SerializeField, Tooltip("この速度未満が続いたらAFK扱い")]
@@ -25,7 +22,7 @@ namespace AnoGame.UI.Guide
         [Header("Events")]
         public UnityEvent OnBecomeAFK;
         public UnityEvent OnReturnFromAFK;
-        public UnityEvent<bool> OnAFKStateChanged; // 引数: true=AFK, false=復帰
+        public UnityEvent<bool> OnAFKStateChanged;
 
         public bool IsAFK { get; private set; }
         public float InactiveElapsed { get; private set; }
@@ -35,8 +32,7 @@ namespace AnoGame.UI.Guide
         private void Reset()
         {
             moveControl = FindObjectOfType<MoveControl>();
-            if (guideUISwitcher == null)
-                guideUISwitcher = FindObjectOfType<GuideUISwitcher>();
+            guide = FindObjectOfType<GuideUISwitcher>();
         }
 
         private void OnEnable()
@@ -47,21 +43,16 @@ namespace AnoGame.UI.Guide
 
         private void OnDisable()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
+            _cts?.Cancel(); _cts?.Dispose(); _cts = null;
         }
 
-        /// <summary>
-        /// 外部から「何か操作があった」と知らせてAFK解除/タイマーリセット
-        /// </summary>
         public void MarkActive()
         {
             InactiveElapsed = 0f;
             if (IsAFK)
             {
                 SetAFK(false);
-                guideUISwitcher?.HideSticky(); // ★ 解除でフェードアウト
+                guide?.Hide();
             }
         }
 
@@ -72,22 +63,19 @@ namespace AnoGame.UI.Guide
                 moveControl = FindObjectOfType<MoveControl>();
                 if (moveControl == null)
                 {
-                    Debug.LogError("[AFKChecker] MoveControl を見つけられません。");
-                    enabled = false;
-                    return;
+                    Debug.LogError("[AFKChecker] MoveControl が見つかりません。");
+                    enabled = false; return;
                 }
             }
 
-            InactiveElapsed = 0f;
             IsAFK = false;
+            InactiveElapsed = 0f;
 
             while (!ct.IsCancellationRequested)
             {
                 await UniTask.Yield(PlayerLoopTiming.Update, ct);
 
                 float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
-
-                // MoveControl.CurrentSpeed は MovePriority の影響を反映した「実効速度」
                 float speed = moveControl.CurrentSpeed;
                 bool isMoving = speed > speedThreshold;
 
@@ -96,7 +84,7 @@ namespace AnoGame.UI.Guide
                     if (IsAFK)
                     {
                         SetAFK(false);
-                        guideUISwitcher?.HideSticky(); // ★ 解除でフェードアウト
+                        guide?.Hide();
                     }
                     InactiveElapsed = 0f;
                 }
@@ -106,7 +94,7 @@ namespace AnoGame.UI.Guide
                     if (!IsAFK && InactiveElapsed >= afkSeconds)
                     {
                         SetAFK(true);
-                        guideUISwitcher?.ShowSticky(); // ★ AFK中は表示しっぱなし
+                        guide?.Show();
                     }
                 }
             }
