@@ -7,27 +7,27 @@ namespace AnoGame.Application.Animation.Gmmicks
     public class TrapController : MonoBehaviour
     {
         [SerializeField] GameObject _trapObject;
+        [SerializeField] Animator _animator;
         [SerializeField] ParticleSystem _particleObject;
         [SerializeField] Vector3 _offsetPosition;
         [SerializeField] float _stopDuration = 1.0f;
 
         private Vector3 _initializePos;
 
-        private Camera _mainCamera;
+        private const string ANIM_IS_APPEAR = "IsAppear";
 
         void Start()
         {
             _initializePos = _trapObject.transform.position;
-            _trapObject.SetActive(false);
+            // _trapObject.SetActive(false);
             if (_particleObject != null) _particleObject.Stop();
-            _mainCamera = Camera.main; // メインカメラの参照を取得
         }
 
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag(SLFBRules.TAG_PLAYER))
             {
-                _trapObject.SetActive(true);
+                _animator.SetBool(ANIM_IS_APPEAR, true);
 
                 // 階層構造を確認
                 Debug.Log($"Parent: {_trapObject.transform.parent?.name ?? "No parent"}");
@@ -59,6 +59,8 @@ namespace AnoGame.Application.Animation.Gmmicks
         {
             _trapObject.transform.position = _initializePos;
             yield return new WaitForSeconds(_stopDuration);
+
+            _animator.SetBool(ANIM_IS_APPEAR, false);
             if (_particleObject != null) _particleObject.Stop();
         }
 
