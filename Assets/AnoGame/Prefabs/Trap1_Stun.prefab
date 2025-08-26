@@ -190,6 +190,7 @@ GameObject:
   - component: {fileID: 2151125954960022750}
   - component: {fileID: 6874227615926707864}
   - component: {fileID: 4595230908014056480}
+  - component: {fileID: 715284875699758824}
   m_Layer: 0
   m_Name: Trap1_Stun
   m_TagString: Untagged
@@ -309,6 +310,12 @@ MonoBehaviour:
   _particleObject: {fileID: 0}
   _offsetPosition: {x: 0, y: 0, z: 0}
   _stopDuration: 1.5
+  _disappearDuration: 0.35
+  _fadeIn: 0.2
+  _fadeOut: 0.25
+  _fader: {fileID: 715284875699758824}
+  _hideBySetActive: 0
+  _resetToInitialAfterHide: 1
 --- !u!135 &4595230908014056480
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -330,6 +337,21 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.35
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &715284875699758824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8131568310775765259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b69e9a7057bb4e4e93d4d410bb16b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  includeChildren: 1
+  defaultDuration: 0.25
+  useUnscaledTime: 0
 --- !u!1 &8292461899605401647
 GameObject:
   m_ObjectHideFlags: 0

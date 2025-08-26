@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6941500005354690903}
   - component: {fileID: 5722845425048485072}
   - component: {fileID: 1273393191731208287}
+  - component: {fileID: 1095570975260470918}
   m_Layer: 0
   m_Name: Trap2_Slow
   m_TagString: Untagged
@@ -135,6 +136,12 @@ MonoBehaviour:
   _particleObject: {fileID: 8888316876497031289}
   _offsetPosition: {x: 0, y: 0, z: 0}
   _stopDuration: 1
+  _disappearDuration: 0.35
+  _fadeIn: 0.2
+  _fadeOut: 0.25
+  _fader: {fileID: 1095570975260470918}
+  _hideBySetActive: 0
+  _resetToInitialAfterHide: 1
 --- !u!135 &1273393191731208287
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -156,6 +163,21 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.35
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1095570975260470918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1592035060180995000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b69e9a7057bb4e4e93d4d410bb16b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  includeChildren: 1
+  defaultDuration: 0.25
+  useUnscaledTime: 0
 --- !u!1 &2987582555625499193
 GameObject:
   m_ObjectHideFlags: 0

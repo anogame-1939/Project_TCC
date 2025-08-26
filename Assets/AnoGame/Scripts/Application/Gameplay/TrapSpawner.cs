@@ -311,7 +311,16 @@ namespace AnoGame.Application.Gameplay
         {
             foreach (var go in pool)
             {
-                if (go != null && go.activeSelf != active)
+                if (go == null) continue;
+
+                // OFFにする時だけ、再生中は残す
+                if (!active && go.TryGetComponent(
+                    out AnoGame.Application.Animation.Gmmicks.TrapController trap) && trap.IsBusy)
+                {
+                    continue;
+                }
+
+                if (go.activeSelf != active)
                     go.SetActive(active);
             }
         }
