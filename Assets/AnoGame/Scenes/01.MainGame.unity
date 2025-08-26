@@ -81233,11 +81233,21 @@ MonoBehaviour:
   _trapObject: {fileID: 5781472986438907130}
   _animator: {fileID: 0}
   _particleObject: {fileID: 0}
+  _audioSource: {fileID: 0}
+  _sfxOnFire: {fileID: 0}
+  _moveToTargetOnFire: 0
   _offsetPosition: {x: 0, y: 0, z: 0}
   _stopDuration: 0
   _disappearDuration: 0.35
+  _fadeIn: 0.2
+  _fadeOut: 0.25
+  _fader: {fileID: 0}
   _hideBySetActive: 0
   _resetToInitialAfterHide: 1
+  _startVisible: 0
+  _autoReappear: 0
+  _reappearCooldown: 2
+  _reappearAtInitialPosition: 1
 --- !u!114 &1701899152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82329,11 +82339,21 @@ MonoBehaviour:
   _trapObject: {fileID: 1461562119}
   _animator: {fileID: 0}
   _particleObject: {fileID: 321871271}
+  _audioSource: {fileID: 0}
+  _sfxOnFire: {fileID: 0}
+  _moveToTargetOnFire: 0
   _offsetPosition: {x: 0, y: 0, z: 0}
   _stopDuration: 1
   _disappearDuration: 0.35
+  _fadeIn: 0.2
+  _fadeOut: 0.25
+  _fader: {fileID: 0}
   _hideBySetActive: 0
   _resetToInitialAfterHide: 1
+  _startVisible: 0
+  _autoReappear: 0
+  _reappearCooldown: 2
+  _reappearAtInitialPosition: 1
 --- !u!114 &1724992790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92761,7 +92781,7 @@ MonoBehaviour:
   moveControl: {fileID: 590326479}
   guide: {fileID: 2008201774}
   speedThreshold: 0
-  afkSeconds: 5
+  afkSeconds: 3
   useUnscaledTime: 1
   OnBecomeAFK:
     m_PersistentCalls:
