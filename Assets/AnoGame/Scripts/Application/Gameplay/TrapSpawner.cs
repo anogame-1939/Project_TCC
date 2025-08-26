@@ -235,7 +235,6 @@ namespace AnoGame.Application.Gameplay
                 var go = pool[idx];
                 if (go == null)
                 {
-                    // 破棄されていた場合の補充
                     var prefab = trapPrefabs[Random.Range(0, trapPrefabs.Length)];
                     go = Instantiate(prefab, parentUnderThis ? transform : null);
                     pool[idx] = go;
@@ -243,7 +242,17 @@ namespace AnoGame.Application.Gameplay
 
                 go.transform.position = positions[i];
                 go.transform.rotation = Quaternion.identity;
-                go.SetActive(true);
+
+                var trap = go.GetComponent<AnoGame.Application.Animation.Gmmicks.TrapController>();
+                if (trap != null)
+                {
+                    trap.AppearAt(positions[i]);  // フェードインで出現（子の有効化＆フェード）
+                }
+                else
+                {
+                    // TrapController なしの保険
+                    go.SetActive(true);
+                }
             }
         }
 
@@ -313,15 +322,29 @@ namespace AnoGame.Application.Gameplay
             {
                 if (go == null) continue;
 
-                // OFFにする時だけ、再生中は残す
-                if (!active && go.TryGetComponent(
-                    out AnoGame.Application.Animation.Gmmicks.TrapController trap) && trap.IsBusy)
+                var trap = go.GetComponent<Animation.Gmmicks.TrapController>();
+
+                if (active)
                 {
+                    // 今回のスポーンで個別に AppearAt するので、ここで true にしない
+                    // （全ONが必要なケースだけ下の1行を使う）
+                    // if (trap == null && !go.activeSelf) go.SetActive(true);
                     continue;
                 }
-
-                if (go.activeSelf != active)
-                    go.SetActive(active);
+                else
+                {
+                    // OFF にする時はフェードアウトを依頼
+                    if (trap != null)
+                    {
+                        // 罠アクション中は残したいならスキップ
+                        if (trap.IsBusy) continue;
+                        trap.Disappear();              // フェードアウト→非表示
+                    }
+                    else
+                    {
+                        if (go.activeSelf) go.SetActive(false);
+                    }
+                }
             }
         }
 
