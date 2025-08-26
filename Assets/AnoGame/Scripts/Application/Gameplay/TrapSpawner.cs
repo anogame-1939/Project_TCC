@@ -54,6 +54,20 @@ namespace AnoGame.Application.Gameplay
         [Tooltip("生成物をこのオブジェクトの子にします。false ならワールド直下。")]
         [SerializeField] private bool parentUnderThis = true;
 
+        [Header("同時スポーン（バースト）")]
+        [Tooltip("1回のスポーンで同時に出す最小個数")]
+        [SerializeField] private int minSpawnPerBurst = 2;
+
+        [Tooltip("1回のスポーンで同時に出す最大個数（min <= max）")]
+        [SerializeField] private int maxSpawnPerBurst = 4;
+
+        [Tooltip("同一フレームに湧かせる位置同士の最小距離。0 で無効。")]
+        [SerializeField] private float minDistanceBetweenSpawns = 1.5f;
+
+        [Tooltip("onlyLatestActive=false のとき、非表示(未使用)個体を優先して使う")]
+        [SerializeField] private bool preferInactive = true;
+
+
         // 内部
         private readonly List<GameObject> pool = new List<GameObject>();
         private int nextIndex = 0;
@@ -73,6 +87,11 @@ namespace AnoGame.Application.Gameplay
             if (spawnRadius < 0f) spawnRadius = 0f;
             if (navMeshMaxDistance < 0.1f) navMeshMaxDistance = 0.1f;
             if (sampleAttempts < 1) sampleAttempts = 1;
+
+            if (minSpawnPerBurst < 1) minSpawnPerBurst = 1;
+            if (maxSpawnPerBurst < 1) maxSpawnPerBurst = 1;
+            if (minSpawnPerBurst > maxSpawnPerBurst) minSpawnPerBurst = maxSpawnPerBurst;
+            if (minDistanceBetweenSpawns < 0f) minDistanceBetweenSpawns = 0f;
         }
 
         private void Start()
@@ -175,35 +194,98 @@ namespace AnoGame.Application.Gameplay
         {
             if (pool.Count == 0) return;
 
-            // 配置位置を決める
+            // 配置の基準点
             Vector3 center = (target != null) ? target.position : transform.position;
 
-            if (!TryGetRandomNavMeshPoint(center, spawnRadius, out var hitPos))
-            {
-                // NavMesh 上に見つからない場合はスキップ（次のタイミングに再トライ）
-                return;
-            }
-
-            // 直前までの表示をオフ（「最新のみ表示」の要件）
+            // 「最新のみ表示」なら先に全消灯
             if (onlyLatestActive) SetAllActive(false);
 
-            // 次のオブジェクトを取得
-            var go = pool[nextIndex];
-            if (go == null)
+            // このフレームで出す個数をランダム決定
+            int want = Random.Range(minSpawnPerBurst, maxSpawnPerBurst + 1);
+
+            // 候補インデックスを作成
+            // ・onlyLatestActive=true → 全部候補
+            // ・false かつ preferInactive=true → 非表示のものだけ
+            List<int> candidates = new List<int>(pool.Count);
+            for (int i = 0; i < pool.Count; i++)
             {
-                // 何らかの理由で破棄されていたら補充
-                var prefab = trapPrefabs[Random.Range(0, trapPrefabs.Length)];
-                go = Instantiate(prefab, parentUnderThis ? transform : null);
-                pool[nextIndex] = go;
+                if (onlyLatestActive) { candidates.Add(i); }
+                else
+                {
+                    if (!preferInactive || !pool[i].activeSelf)
+                        candidates.Add(i);
+                }
+            }
+            if (candidates.Count == 0) return;
+
+            // 実際に出せる個数 = 候補数まで
+            int countToSpawn = Mathf.Min(want, candidates.Count);
+
+            // 位置をまとめてサンプリング（近接しすぎ防止オプション付き）
+            var positions = GetSpawnPositions(center, countToSpawn);
+            if (positions.Count == 0) return;
+
+            // 候補をシャッフルしてランダムな個体を選ぶ
+            Shuffle(candidates);
+
+            int count = Mathf.Min(countToSpawn, positions.Count);
+            for (int i = 0; i < count; i++)
+            {
+                int idx = candidates[i];
+                var go = pool[idx];
+                if (go == null)
+                {
+                    // 破棄されていた場合の補充
+                    var prefab = trapPrefabs[Random.Range(0, trapPrefabs.Length)];
+                    go = Instantiate(prefab, parentUnderThis ? transform : null);
+                    pool[idx] = go;
+                }
+
+                go.transform.position = positions[i];
+                go.transform.rotation = Quaternion.identity;
+                go.SetActive(true);
+            }
+        }
+
+        private List<Vector3> GetSpawnPositions(Vector3 center, int count)
+        {
+            List<Vector3> list = new List<Vector3>(count);
+            int guard = Mathf.Max(16, sampleAttempts * count * 3); // 過剰ループ防止
+
+            int tries = 0;
+            float minSqr = minDistanceBetweenSpawns * minDistanceBetweenSpawns;
+
+            while (list.Count < count && tries++ < guard)
+            {
+                if (!TryGetRandomNavMeshPoint(center, spawnRadius, out var p)) continue;
+
+                if (minDistanceBetweenSpawns > 0f)
+                {
+                    bool farEnough = true;
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if ((list[i] - p).sqrMagnitude < minSqr)
+                        {
+                            farEnough = false;
+                            break;
+                        }
+                    }
+                    if (!farEnough) continue;
+                }
+
+                list.Add(p);
             }
 
-            // 配置＆有効化
-            go.transform.position = hitPos;
-            go.transform.rotation = Quaternion.identity; // 必要なら向き制御
-            go.SetActive(true);
+            return list; // NavMeshや距離条件で不足する場合、少ない個数で返ることがあります
+        }
 
-            // 次のインデックスへ（ラウンドロビン）
-            nextIndex = (nextIndex + 1) % pool.Count;
+        private static void Shuffle<T>(List<T> list)
+        {
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                T tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+            }
         }
 
         private bool TryGetRandomNavMeshPoint(Vector3 center, float radius, out Vector3 result)
