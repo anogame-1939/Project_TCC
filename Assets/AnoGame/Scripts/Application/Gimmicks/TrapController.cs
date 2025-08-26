@@ -13,6 +13,14 @@ namespace AnoGame.Application.Animation.Gmmicks
         [SerializeField] GameObject _trapObject;
         [SerializeField] Animator _animator;
         [SerializeField] ParticleSystem _particleObject;
+        [Header("サウンド（発火時のみ）")]
+        [SerializeField] AudioSource _audioSource;   // シーン上で1つアタッチして割り当て
+        [SerializeField] AudioClip _sfxOnFire;       // 発火SE
+
+        [Header("挙動切替")]
+        [Tooltip("発火時にプレイヤー位置へ移動させる（捕縛系トラップ用）")]
+        [SerializeField] bool _moveToTargetOnFire = false;
+
         [SerializeField] Vector3 _offsetPosition;
 
         [Header("タイミング")]
@@ -54,6 +62,7 @@ namespace AnoGame.Application.Animation.Gmmicks
             if (_trapObject == null) _trapObject = gameObject;
             if (_animator == null) _animator = GetComponentInChildren<Animator>(true);
             if (_fader == null) _fader = GetComponentInChildren<SpriteFader2D>(true);
+            if (_audioSource != null) _audioSource.playOnAwake = false; // 念のため
 
             // 初期は透明（Startで _startVisible を反映）
             _fader?.SetAlphaImmediate(0f);
@@ -173,9 +182,8 @@ namespace AnoGame.Application.Animation.Gmmicks
             _reappearCts = new CancellationTokenSource();
             var ct = _reappearCts.Token;
 
-            BusyEnter();                        // クールダウン待ちも Busy に
-            _ = ReappearAfterCooldown(ct).ContinueWith(() => BusyExit());
-            _ = ReappearAfterCooldown(ct);      // 後始末は中で finally がやる
+            BusyEnter();
+            _ = ReappearAfterCooldown(ct); // 後始末は ReappearAfterCooldown 内の finally で BusyExit
         }
 
         private async UniTask ReappearAfterCooldown(CancellationToken ct)
@@ -228,16 +236,23 @@ namespace AnoGame.Application.Animation.Gmmicks
                 _fadeCts?.Cancel();
                 CancelReappear();
 
-                _fader?.SetAlphaImmediate(0f); // パッと出ない
+                _fader?.SetAlphaImmediate(0f);
 
                 if (!gameObject.activeSelf) gameObject.SetActive(true);
                 if (!_trapObject.activeSelf) _trapObject.SetActive(true);
 
-                _trapObject.transform.position = target.position + _offsetPosition;
+                // ★ フラグに応じて移動する/しないを切り替え
+                if (_moveToTargetOnFire)
+                    _trapObject.transform.position = target.position + _offsetPosition;
+
                 _lastAppearPos = _trapObject.transform.position;
 
                 _animator?.SetBool(ANIM_IS_APPEAR, true);
-                if (_particleObject != null )_particleObject.Play();
+                if (_particleObject != null ) _particleObject.Play();
+
+                // ★ 発火SE（AudioSource と Clip が両方設定されていれば再生）
+                if (_audioSource != null && _sfxOnFire != null)
+                    _audioSource.PlayOneShot(_sfxOnFire);
 
                 if (_fader != null) await _fader.FadeIn(_fadeIn, ct);
 
@@ -256,7 +271,7 @@ namespace AnoGame.Application.Animation.Gmmicks
             {
                 BusyExit();
                 _actionRunning = false;
-                MaybeScheduleReappear(); // 本編終了後の自動再出現
+                MaybeScheduleReappear();
             }
         }
     }
