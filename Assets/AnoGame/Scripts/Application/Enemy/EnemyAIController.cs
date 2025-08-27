@@ -455,7 +455,9 @@ namespace AnoGame.Application.Enmemy.Control
                 agent.updateRotation = false;
 
                 // 実ダッシュ（内部で pre/post wait、ForceSetPosition による直線移動）
+                GetComponent<CameraAngleToAnimatorAndSprite>()?.OnForcedMoveBegin();
                 await DashOnceAsync(token);
+                GetComponent<CameraAngleToAnimatorAndSprite>()?.OnForcedMoveEnd();
             }
             finally
             {
