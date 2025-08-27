@@ -333,7 +333,7 @@ namespace AnoGame.Application.Enemy
         public async UniTask SetPositionNearPlayerAsync(Vector3 playerPos, CancellationToken token)
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
-            await con.SpawnNearPlayer(playerPos);   // ★IEnumerator → UniTask 化
+            await con.SpawnNearPlayerAsync(playerPos);   // ★IEnumerator → UniTask 化
         }
 
         public void PlaySpawnedSound()

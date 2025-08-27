@@ -8,12 +8,16 @@ namespace AnoGame.Application.Player.Control
     {
         [Header("移動設定")]
         [SerializeField] private float moveSpeed = 5f;
-        
+
         [Header("参照コンポーネント")]
         [SerializeField] private Animator animator;
         [SerializeField] private CharacterBrain characterBrain;
         [SerializeField] private IForcedMoveController actionController;
         [SerializeField] private CameraAngleToAnimatorAndSprite cameraAngleController;
+
+
+        [Header("テスト用")]
+        [SerializeField] private Transform testTarget; // ★ 追加: テスト用ターゲット
 
         void Start()
         {
@@ -105,6 +109,20 @@ namespace AnoGame.Application.Player.Control
                 actionController.StartChasing();
             if (cameraAngleController != null)
                 cameraAngleController.OnForcedMoveEnd();
+        }
+        
+        // ★ 追加: コンテキストメニューから実行できるテスト用メソッド
+        [ContextMenu("Test Force Move (doBackstep = false)")]
+        private void TestForceMove()
+        {
+            if (testTarget != null)
+            {
+                ForceMoveTo(testTarget.position, false);
+            }
+            else
+            {
+                Debug.LogWarning("Test target is not assigned.");
+            }
         }
     }
 }
