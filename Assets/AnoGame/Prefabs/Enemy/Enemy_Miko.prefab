@@ -1664,13 +1664,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d021daeb50ad3c4581d6e25b0d55562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterBrain: {fileID: 0}
   moveControl: {fileID: 0}
   playerTag: Player
   speedThreshold: 0.1
   animatorChildIndex: 0
   animatorBoolParam: IsMove
+  locomotionSpeedParam: LocomotionSpeed
+  chaseAnimSpeedMult: 1
+  dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
+  enableDash: 0
+  dashPreWaitSeconds: 2
+  dashPostWaitSeconds: 3
+  dashDistance: 10
+  dashSpeed: 8
+  dashFaceTarget: 1
 --- !u!114 &5410025904601978029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1687,6 +1697,7 @@ MonoBehaviour:
   animator: {fileID: 7665162067455944546}
   characterBrain: {fileID: 6182930195229746077}
   cameraAngleController: {fileID: 1203700633988673674}
+  testTarget: {fileID: 0}
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0
