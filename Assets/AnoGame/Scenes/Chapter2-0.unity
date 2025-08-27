@@ -23907,7 +23907,7 @@ PrefabInstance:
       objectReference: {fileID: 7092537996067713669, guid: d9f0c279ddb794711bdaed3f45dded94, type: 3}
     - target: {fileID: 1383781561140396094, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: maxSpawnTime
-      value: 60
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1383781561140396094, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: minChaseTime
@@ -23915,7 +23915,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1383781561140396094, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: minSpawnTime
-      value: 30
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2080231796069958229, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
       propertyPath: m_Name
@@ -45779,6 +45779,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6874227615926707864, guid: 2e883d6687d76d64d935bf4e479ecb11, type: 3}
+      propertyPath: _fadeIn
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874227615926707864, guid: 2e883d6687d76d64d935bf4e479ecb11, type: 3}
+      propertyPath: _fadeOut
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874227615926707864, guid: 2e883d6687d76d64d935bf4e479ecb11, type: 3}
       propertyPath: _autoReappear
       value: 1
       objectReference: {fileID: 0}
@@ -45789,6 +45797,10 @@ PrefabInstance:
     - target: {fileID: 8131568310775765259, guid: 2e883d6687d76d64d935bf4e479ecb11, type: 3}
       propertyPath: m_Name
       value: Trap1_Stun
+      objectReference: {fileID: 0}
+    - target: {fileID: 8131568310775765259, guid: 2e883d6687d76d64d935bf4e479ecb11, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -45913,10 +45925,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Trap2_Slow
       objectReference: {fileID: 0}
+    - target: {fileID: 1592035060180995000, guid: dde6b44d8c2be42478fa568dda6191b7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3956943844002316300, guid: dde6b44d8c2be42478fa568dda6191b7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 03d524161cecda04b9086a253ba56220, type: 2}
+    - target: {fileID: 5722845425048485072, guid: dde6b44d8c2be42478fa568dda6191b7, type: 3}
+      propertyPath: _fadeIn
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5722845425048485072, guid: dde6b44d8c2be42478fa568dda6191b7, type: 3}
+      propertyPath: _fadeOut
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5722845425048485072, guid: dde6b44d8c2be42478fa568dda6191b7, type: 3}
       propertyPath: _autoReappear
       value: 1
