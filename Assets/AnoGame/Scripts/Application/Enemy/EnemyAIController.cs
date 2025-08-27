@@ -27,6 +27,11 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField] private int animatorChildIndex = 0;
         [SerializeField] private string animatorBoolParam = "IsMove";
 
+        [Header("アニメーション速度")]
+        [SerializeField] private string locomotionSpeedParam = "LocomotionSpeed";
+        [SerializeField, Min(0.05f)] private float chaseAnimSpeedMult = 1.0f; // 通常
+        [SerializeField, Min(0.05f)] private float dashAnimSpeedMult  = 1.6f; // ダッシュ時
+
         [Header("ステート")]
         [SerializeField] private bool isChasing = false;
         public bool IsChasing => isChasing;
@@ -62,6 +67,7 @@ namespace AnoGame.Application.Enmemy.Control
 
         // Dashを途中で止めるためのCTS
         private CancellationTokenSource _dashCts;
+        private CancellationTokenSource _chaseLoopCts;
 
         void Start()
         {
@@ -74,13 +80,28 @@ namespace AnoGame.Application.Enmemy.Control
                 characterBrain = GetComponent<CharacterBrain>();
         }
 
+        private void CancelChaseLoopIfRunning()
+        {
+            if (_chaseLoopCts != null)
+            {
+                _chaseLoopCts.Cancel();
+                _chaseLoopCts.Dispose();
+                _chaseLoopCts = null;
+            }
+            // 進行中のDashも確実に止める
+            CancelDashIfRunning();
+        }
+
+        // 既存: OnDisable/OnDestroy にも ChaseLoop の停止を追加
         void OnDisable()
         {
+            CancelChaseLoopIfRunning();
             CancelDashIfRunning();
         }
 
         void OnDestroy()
         {
+            CancelChaseLoopIfRunning();
             CancelDashIfRunning();
         }
 
@@ -270,27 +291,60 @@ namespace AnoGame.Application.Enmemy.Control
                 agent.ResetPath();
                 agent.isStopped = true;
 
-                // 2) プレ突進待機
+                // ★ Animator元値を取得してから、待機中は「停止」へ
+                bool prevAnimMove = false;
+                if (animator != null)
+                {
+                    prevAnimMove = animator.GetBool(animatorBoolParam);
+                    animator.SetBool(animatorBoolParam, false);  // 待機中は歩かせない
+                }
+
+                // 2) ★ プレ待機を毎フレームループ化し、常にプレイヤー方向へ向く
                 if (dashPreWaitSeconds > 0f)
-                    await UniTask.Delay(TimeSpan.FromSeconds(dashPreWaitSeconds), cancellationToken: token);
+                {
+                    float endTime = Time.time + dashPreWaitSeconds;
 
-                // 3) 方向計算
-                Vector3 toPlayer = player.transform.position - transform.position;
-                toPlayer.y = 0f;
-                if (toPlayer.sqrMagnitude < 0.0001f) return;
+                    // ※ DashFlowAsync 側で agent.updateRotation=false 済み（念のため止めたい場合はここでも false を保証）
+                    // if (agent != null) agent.updateRotation = false;
 
-                Vector3 dir = toPlayer.normalized;
+                    while (Time.time < endTime)
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        if (player == null)
+                            player = GameObject.FindWithTag(playerTag);
+
+                        if (player != null)
+                        {
+                            Vector3 toPlayer = player.transform.position - transform.position;
+                            toPlayer.y = 0f;
+
+                            if (toPlayer.sqrMagnitude > 0.0001f && dashFaceTarget)
+                            {
+                                Vector3 dir = toPlayer.normalized;
+                                ApplyFacingAndAnimatorAngle(dir);   // ★ 毎フレーム向きを更新（Angleパラメータも更新）
+                            }
+                        }
+
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    }
+                }
+
+                // 3) 方向計算（直前の最新位置で算出）
+                Vector3 toPlayer2 = player != null ? (player.transform.position - transform.position) : Vector3.zero;
+                toPlayer2.y = 0f;
+                if (toPlayer2.sqrMagnitude < 0.0001f) return;
+
+                Vector3 dirDash = toPlayer2.normalized;
 
                 if (dashFaceTarget)
                 {
-                    ApplyFacingAndAnimatorAngle(dir /*, backstep:false*/);
-
+                    ApplyFacingAndAnimatorAngle(dirDash);
                 }
 
-                // 4) 直線ダッシュ（NavMeshAgent.Move ではなく CharacterBrain.ForceSetPosition で押し出す）
+                // 4) 直線ダッシュ準備（Transform直駆動）
                 float remaining = dashDistance;
 
-                // ★ NavMeshAgent が Transform を駆動しないように一時停止（Transform直書き対策）
                 bool prevUpdatePos = agent != null ? agent.updatePosition : true;
                 bool prevUpdateRot = agent != null ? agent.updateRotation : true;
                 if (agent != null)
@@ -299,11 +353,9 @@ namespace AnoGame.Application.Enmemy.Control
                     agent.updateRotation = false;
                 }
 
-                // ★ アニメ側もダッシュ中は確実に「移動中」にする
-                bool prevAnimMove = false;
+                // ★ 実ダッシュに入る直前で「移動中」にする（prevAnimMove は上書きしない！）
                 if (animator != null)
                 {
-                    prevAnimMove = animator.GetBool(animatorBoolParam);
                     animator.SetBool(animatorBoolParam, true);
                 }
 
@@ -317,18 +369,18 @@ namespace AnoGame.Application.Enmemy.Control
                         float moveLen = Mathf.Min(step, remaining);
 
                         Vector3 current = transform.position;
-                        Vector3 candidate = current + dir * moveLen;
+                        Vector3 candidate = current + dirDash * moveLen;
 
-                        // ★ 向き＆Angle を毎フレーム更新（回転は CharacterBrain に強制適用）
+                        // 向き＆Angle を毎フレーム更新
                         if (dashFaceTarget)
                         {
-                            ApplyFacingAndAnimatorAngle(dir /*, backstep:false*/);
+                            ApplyFacingAndAnimatorAngle(dirDash);
                         }
 
-                        // ★ 障害物チェック
+                        // 障害物チェック
                         if (NavMesh.Raycast(current, candidate, out var hitInfo, NavMesh.AllAreas))
                         {
-                            Vector3 stopPos = hitInfo.position - dir * 0.05f;
+                            Vector3 stopPos = hitInfo.position - dirDash * 0.05f;
                             if (NavMesh.SamplePosition(stopPos, out var snap, 0.2f, NavMesh.AllAreas))
                                 stopPos = snap.position;
 
@@ -336,37 +388,33 @@ namespace AnoGame.Application.Enmemy.Control
                             break;
                         }
 
-                        // ★ NavMesh 吸着 & 実移動
+                        // NavMesh 吸着 & 実移動
                         if (NavMesh.SamplePosition(candidate, out var sample, 0.2f, NavMesh.AllAreas))
                             candidate = sample.position;
 
                         characterBrain.ForceSetPosition(candidate);
 
-                        // 実進行分だけ残距離を減算
                         remaining -= Vector3.Distance(current, transform.position);
-
                         await UniTask.Yield(PlayerLoopTiming.Update, token);
                     }
                 }
                 finally
                 {
-                    // ★ NavMeshAgent と同期を戻す
+                    // NavMeshAgent と同期を戻す
                     if (agent != null)
                     {
-                        // 現在位置をエージェントに認識させる
                         agent.Warp(agent.transform.position);
                         agent.updatePosition = prevUpdatePos;
                         agent.updateRotation = prevUpdateRot;
                     }
 
-                    // ★ アニメの移動フラグを元に戻す
+                    // Animator の移動フラグを元に戻す（※ prevAnimMove を再利用）
                     if (animator != null)
                         animator.SetBool(animatorBoolParam, prevAnimMove);
                 }
             }
             catch (OperationCanceledException)
             {
-                // キャンセル時は安全に元状態へ
                 isChasing = prevChasing;
                 agent.isStopped = prevStopped;
                 throw;
@@ -374,7 +422,6 @@ namespace AnoGame.Application.Enmemy.Control
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                // 例外時も復帰させておく
                 isChasing = prevChasing;
                 agent.isStopped = prevStopped;
             }
@@ -393,42 +440,80 @@ namespace AnoGame.Application.Enmemy.Control
 
             if (isChasing)
             {
-                // 通常チェイスを有効化
                 agent.isStopped = false;
 
-                // ★ チェイス開始時に1回だけ突進（有効化時のみ）
+                // ループを開始（多重起動防止）
+                CancelChaseLoopIfRunning();
+
                 if (enableDash)
                 {
-                    // 既存ダッシュがあれば止める（多重起動防止）
-                    CancelDashIfRunning();
-
-                    _dashCts = new CancellationTokenSource();
-                    // 非同期起動（awaitしない）
+                    _chaseLoopCts = new CancellationTokenSource();
                     UniTask.Void(async () =>
                     {
                         try
                         {
-                            await DashFlowOnChaseStartAsync(_dashCts.Token);
+                            await ChaseCycleAsync(_chaseLoopCts.Token);
                         }
-                        catch (OperationCanceledException) { /* キャンセルは想定内 */ }
+                        catch (OperationCanceledException) { /* 正常キャンセル */ }
                         finally
                         {
-                            // ダッシュタスク終了後に片付け
-                            CancelDashIfRunning();
+                            // ループ終了時の片付け
+                            CancelChaseLoopIfRunning();
+                            animator.speed = chaseAnimSpeedMult;
+                            isChasing = false;
                         }
                     });
                 }
             }
             else
             {
-                // ★ チェイス停止時はダッシュもキャンセル
-                CancelDashIfRunning();
+                // チェイス停止：ループとDashを確実に停止
+                CancelChaseLoopIfRunning();
                 agent.isStopped = true;
             }
         }
 
-        // ★ 新規追加：チェイス開始時にだけ走らせる1回分のフロー
+        private async UniTask ChaseCycleAsync(CancellationToken token)
+        {
+            // 「現れたら突進」仕様：最初にいきなり突進してからチェイス
+            while (isChasing && !token.IsCancellationRequested)
+            {
+                // 突進（内部で pre-wait & 直線ダッシュを行い、終了時は元状態に戻す）
+                await DashFlowAsync(token);
+
+
+                // キャンセル・状態確認
+                if (token.IsCancellationRequested) break;
+
+                // 突進後は通常チェイスに戻す（FixedUpdateで追尾が走る）
+                if (agent != null) agent.isStopped = false;
+
+                // 「次の突進まで」のチェイス時間として dashPostWaitSeconds を使用
+                if (dashPostWaitSeconds > 0f)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(dashPostWaitSeconds), cancellationToken: token);
+                }
+
+                if (token.IsCancellationRequested) break;
+
+                isChasing = true;
+                
+                if (dashPostWaitSeconds > 0f)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(dashPostWaitSeconds), cancellationToken: token);
+                }
+                // ここでループ先頭へ戻り、再び突進
+            }
+        }
+
+        // ▼ 既存: 「チェイス開始時に一回だけ」版は互換のため残すが、中身は共通化
         private async UniTask DashFlowOnChaseStartAsync(CancellationToken token)
+        {
+            await DashFlowAsync(token);
+        }
+
+        // ▼ 新規: 既存 DashFlowOnChaseStartAsync の本体を切り出して再利用
+        private async UniTask DashFlowAsync(CancellationToken token)
         {
             if (IsStoryMode) return;
             if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
@@ -440,8 +525,6 @@ namespace AnoGame.Application.Enmemy.Control
                 player = GameObject.FindWithTag(playerTag);
             if (player == null) return;
 
-            // ※ 通常チェイスは on のままにしつつ、_isDashing フラグでFixedUpdateを止める方式にします。
-            //    エージェントのTransform支配を止めるため、一時的に updatePosition/Rotation を切ります。
             bool prevUpdatePos = agent.updatePosition;
             bool prevUpdateRot = agent.updateRotation;
 
@@ -454,23 +537,29 @@ namespace AnoGame.Application.Enmemy.Control
                 agent.updatePosition = false;
                 agent.updateRotation = false;
 
-                // 実ダッシュ（内部で pre/post wait、ForceSetPosition による直線移動）
                 GetComponent<CameraAngleToAnimatorAndSprite>()?.OnForcedMoveBegin();
-                await DashOnceAsync(token);
+                
+                // 実ダッシュ直前
+                animator.speed = dashAnimSpeedMult;
+                await DashOnceAsync(token); // ★ ここで pre-wait と直線ダッシュを実行
+
+                // 終了/キャンセル時
                 GetComponent<CameraAngleToAnimatorAndSprite>()?.OnForcedMoveEnd();
+                animator.speed = chaseAnimSpeedMult;
             }
             finally
             {
-                // 復帰：位置同期してから制御フラグ戻す
+                // 位置同期して制御フラグを戻す
                 agent.Warp(agent.transform.position);
                 agent.updatePosition = prevUpdatePos;
                 agent.updateRotation = prevUpdateRot;
 
-                agent.isStopped = !isChasing;  // チェイス継続なら false、停止なら true
+                // この後の通常チェイス再開は呼び出し側（ループ側）で agent.isStopped=false に戻す
+                agent.isStopped = !isChasing;
+
                 _isDashing = false;
             }
         }
-
 
         private float RoundAngleTo45(float angle)
         {

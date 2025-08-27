@@ -1344,7 +1344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _agent: {fileID: 0}
-  _speed: 3.6
+  _speed: 3.8
   TurnSpeed: 8
   MovePriority: 1
   TurnPriority: 1
@@ -1800,13 +1800,16 @@ MonoBehaviour:
   speedThreshold: 0.1
   animatorChildIndex: 0
   animatorBoolParam: IsMove
+  locomotionSpeedParam: LocomotionSpeed
+  chaseAnimSpeedMult: 1
+  dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
   enableDash: 1
-  dashPreWaitSeconds: 3
-  dashPostWaitSeconds: 3
+  dashPreWaitSeconds: 2.5
+  dashPostWaitSeconds: 1.2
   dashDistance: 10
-  dashSpeed: 8
+  dashSpeed: 16
   dashFaceTarget: 1
 --- !u!114 &3768759550073536308
 MonoBehaviour:
