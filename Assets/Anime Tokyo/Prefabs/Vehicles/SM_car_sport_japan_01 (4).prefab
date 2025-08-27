@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6778851741578807250}
   - component: {fileID: 8485804687793203691}
   - component: {fileID: 2977235121199424527}
-  m_Layer: 0
+  m_Layer: 29
   m_Name: Object017
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4.4916625, y: 8, z: 1.8416858}
+  m_Size: {x: 4.4916625, y: 1, z: 1.8416858}
   m_Center: {x: 0, y: 0.77176255, z: 0.0005068779}
 --- !u!1 &5851396184828872073
 GameObject:
@@ -122,7 +122,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6521077567682600755}
-  m_Layer: 0
+  - component: {fileID: 5197052834964865088}
+  m_Layer: 29
   m_Name: SM_car_sport_japan_01 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,6 +147,25 @@ Transform:
   - {fileID: 4494033189617292037}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5197052834964865088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5851396184828872073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &6737536949019352828
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,7 +177,7 @@ GameObject:
   - component: {fileID: 3234618778879052466}
   - component: {fileID: 23336685265491926}
   - component: {fileID: 7483200122252883793}
-  m_Layer: 0
+  m_Layer: 29
   m_Name: Cylinder107
   m_TagString: Untagged
   m_Icon: {fileID: 0}

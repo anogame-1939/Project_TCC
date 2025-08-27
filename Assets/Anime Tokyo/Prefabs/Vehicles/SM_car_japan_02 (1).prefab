@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7775050700636318839}
   - component: {fileID: 6265344253977605695}
   - component: {fileID: 909035511787824883}
-  m_Layer: 0
+  m_Layer: 29
   m_Name: Box416
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4.4916625, y: 8, z: 1.8416855}
+  m_Size: {x: 4.4916625, y: 1, z: 1.8416855}
   m_Center: {x: 0, y: 0.77176255, z: 0.0005070269}
 --- !u!1 &5769010345101270080
 GameObject:
@@ -122,7 +122,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6576509979398817530}
-  m_Layer: 0
+  - component: {fileID: -9158960946648040208}
+  m_Layer: 29
   m_Name: SM_car_japan_02 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,6 +147,25 @@ Transform:
   - {fileID: 9195280176742226655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-9158960946648040208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5769010345101270080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &8435447150338434053
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,7 +177,7 @@ GameObject:
   - component: {fileID: 9195280176742226655}
   - component: {fileID: 3969474530375172972}
   - component: {fileID: 7527350979565821633}
-  m_Layer: 0
+  m_Layer: 29
   m_Name: Cylinder110
   m_TagString: Untagged
   m_Icon: {fileID: 0}
