@@ -1240,6 +1240,7 @@ GameObject:
   - component: {fileID: 7179800872246753123}
   - component: {fileID: 5410025904601978029}
   - component: {fileID: 7174246713572979862}
+  - component: {fileID: -7059910927107520806}
   m_Layer: 14
   m_Name: Enemy_Miko
   m_TagString: Enemy
@@ -1676,12 +1677,22 @@ MonoBehaviour:
   dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
+  dashPattern: 0
   enableDash: 0
   dashPreWaitSeconds: 2
   dashPostWaitSeconds: 3
+  dashCooldownMinSeconds: 1
+  dashCooldownMaxSeconds: 3
   dashDistance: 10
   dashSpeed: 8
   dashFaceTarget: 1
+  homingSpeedMultiplier: 0.7
+  homingTurnSharpness: 6
+  zigzagSpeedMultiplier: 0.6
+  zigzagMaxAngleDeg: 25
+  zigzagFrequencyHz: 3
+  controlFacingWhileChasing: 1
+  chaseTurnSharpness: 8
 --- !u!114 &5410025904601978029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1721,6 +1732,26 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &-7059910927107520806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a70f55eba6898a34189ad47f99776f19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  move: {fileID: 5085902700854131339}
+  playerTag: Player
+  boostedSpeed: 7
+  revertSmoothing: 0
+  farBoostDistance: 12
+  nearReturnDistance: 6
+  autoRefreshTargets: 1
+  refreshInterval: 1
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0

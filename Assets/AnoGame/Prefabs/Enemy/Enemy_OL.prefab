@@ -308,6 +308,7 @@ GameObject:
   - component: {fileID: 1555985007829630829}
   - component: {fileID: 1434583519645761743}
   - component: {fileID: 7066592700834054209}
+  - component: {fileID: 3949941853238961511}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -634,13 +635,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d021daeb50ad3c4581d6e25b0d55562, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterBrain: {fileID: 0}
   moveControl: {fileID: 0}
   playerTag: Player
   speedThreshold: 0.1
   animatorChildIndex: 0
   animatorBoolParam: IsMove
+  locomotionSpeedParam: LocomotionSpeed
+  chaseAnimSpeedMult: 1
+  dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
+  dashPattern: 0
+  enableDash: 0
+  dashPreWaitSeconds: 2
+  dashPostWaitSeconds: 0.5
+  dashCooldownMinSeconds: 1
+  dashCooldownMaxSeconds: 3
+  dashDistance: 10
+  dashSpeed: 8
+  dashFaceTarget: 1
+  homingSpeedMultiplier: 0.7
+  homingTurnSharpness: 6
+  zigzagSpeedMultiplier: 0.6
+  zigzagMaxAngleDeg: 25
+  zigzagFrequencyHz: 3
+  controlFacingWhileChasing: 1
+  chaseTurnSharpness: 8
 --- !u!114 &7066592700834054209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -657,6 +678,27 @@ MonoBehaviour:
   animator: {fileID: 7665162067455944546}
   characterBrain: {fileID: 6182930195229746077}
   cameraAngleController: {fileID: 1555985007829630829}
+  testTarget: {fileID: 0}
+--- !u!114 &3949941853238961511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a70f55eba6898a34189ad47f99776f19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  move: {fileID: 5085902700854131339}
+  playerTag: Player
+  boostedSpeed: 7
+  revertSmoothing: 0
+  farBoostDistance: 12
+  nearReturnDistance: 6
+  autoRefreshTargets: 1
+  refreshInterval: 1
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0
