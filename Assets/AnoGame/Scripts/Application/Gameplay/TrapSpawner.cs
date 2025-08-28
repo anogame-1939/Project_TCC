@@ -243,7 +243,7 @@ namespace AnoGame.Application.Gameplay
                 go.transform.position = positions[i];
                 go.transform.rotation = Quaternion.identity;
 
-                var trap = go.GetComponent<AnoGame.Application.Animation.Gmmicks.TrapController>();
+                var trap = go.GetComponent<AnoGame.Application.Gmmicks.TrapController>();
                 if (trap != null)
                 {
                     trap.AppearAt(positions[i]);  // フェードインで出現（子の有効化＆フェード）
@@ -322,7 +322,7 @@ namespace AnoGame.Application.Gameplay
             {
                 if (go == null) continue;
 
-                var trap = go.GetComponent<Animation.Gmmicks.TrapController>();
+                var trap = go.GetComponent<Gmmicks.TrapController>();
 
                 if (active)
                 {

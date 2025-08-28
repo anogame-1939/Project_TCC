@@ -6,7 +6,7 @@ using AnoGame.Data;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace AnoGame.Application.Animation.Gmmicks
+namespace AnoGame.Application.Gmmicks
 {
     public class TrapController : MonoBehaviour
     {
