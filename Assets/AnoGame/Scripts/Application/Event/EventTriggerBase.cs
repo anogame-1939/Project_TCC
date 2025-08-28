@@ -163,7 +163,7 @@ namespace AnoGame.Application.Event
             }
             catch (Exception e)
             {
-                Debug.LogError($"OnDoneEventでエラー。急場で握りつぶし。:{e.Message}");
+                Debug.LogError($"OnDoneEventでエラー。急場で握りつぶし。:{gameObject.name}...{e.Message}");
 
 
             }
