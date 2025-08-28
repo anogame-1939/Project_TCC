@@ -47,7 +47,14 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField, Min(0f)] private float dashPreWaitSeconds = 2.0f;
 
         [Tooltip("突進後の待機秒数")]
-        [SerializeField, Min(0f)] private float dashPostWaitSeconds = 3.0f;
+        [SerializeField, Min(0f)] private float dashPostWaitSeconds = 0.5f;
+
+        [Tooltip("次の突進までのクールダウン最小秒（チェイスしながら経過、ランダム）")]
+        [SerializeField, Min(0f)] private float dashCooldownMinSeconds = 1f;
+
+        [Tooltip("次の突進までのクールダウン最大秒（チェイスしながら経過、ランダム）")]
+        [SerializeField, Min(0f)] private float dashCooldownMaxSeconds = 3f;
+
 
         [Tooltip("突進距離(直線)")]
         [SerializeField, Min(0.1f)] private float dashDistance = 10f;
@@ -478,32 +485,37 @@ namespace AnoGame.Application.Enmemy.Control
             // 「現れたら突進」仕様：最初にいきなり突進してからチェイス
             while (isChasing && !token.IsCancellationRequested)
             {
-                // 突進（内部で pre-wait & 直線ダッシュを行い、終了時は元状態に戻す）
+                // ダッシュ（内部でpre-waitと直線ダッシュ実行）
                 await DashFlowAsync(token);
-
-
-                // キャンセル・状態確認
                 if (token.IsCancellationRequested) break;
 
-                // 突進後は通常チェイスに戻す（FixedUpdateで追尾が走る）
+                // まだチェイス再開前なので念のため停止
+                if (agent != null) agent.isStopped = true;
+
+                // 1) 復帰待機：ダッシュ直後の硬直時間
+                if (dashPostWaitSeconds > 0f)
+                    await UniTask.Delay(TimeSpan.FromSeconds(dashPostWaitSeconds), cancellationToken: token);
+                if (token.IsCancellationRequested) break;
+
+                // 2) チェイス再開：FixedUpdateで追尾が動く
+                isChasing = true;
                 if (agent != null) agent.isStopped = false;
 
-                // 「次の突進まで」のチェイス時間として dashPostWaitSeconds を使用
-                if (dashPostWaitSeconds > 0f)
-                {
-                    await UniTask.Delay(TimeSpan.FromSeconds(dashPostWaitSeconds), cancellationToken: token);
-                }
+                // 3) クールダウン：次のダッシュまでの待ち(チェイス継続中)をランダム化
+                float cooldown = GetDashCooldownSeconds();
+                if (cooldown > 0f)
+                    await UniTask.Delay(TimeSpan.FromSeconds(cooldown), cancellationToken: token);
 
-                if (token.IsCancellationRequested) break;
-
-                isChasing = true;
-                
-                if (dashPostWaitSeconds > 0f)
-                {
-                    await UniTask.Delay(TimeSpan.FromSeconds(dashPostWaitSeconds), cancellationToken: token);
-                }
-                // ここでループ先頭へ戻り、再び突進
+                // 
             }
+        }
+
+        private float GetDashCooldownSeconds()
+        {
+            float min = Mathf.Max(0f, dashCooldownMinSeconds);
+            float max = Mathf.Max(min, dashCooldownMaxSeconds); // min > max の場合でも安全に
+            if (Mathf.Approximately(min, max)) return min;
+            return UnityEngine.Random.Range(min, max);
         }
 
         // ▼ 既存: 「チェイス開始時に一回だけ」版は互換のため残すが、中身は共通化
