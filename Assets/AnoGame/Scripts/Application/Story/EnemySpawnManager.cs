@@ -333,18 +333,10 @@ namespace AnoGame.Application.Enemy
         // 敵をアクティブ化
         // ↑この順番で処理させる
 
-        public async UniTask SetPositionNearPlayerAsync(Transform player, CancellationToken token)
+        public async UniTask SetPositionNearPlayerAsync(Vector3 playerPos, CancellationToken token)
         {
             var con = _currentEnemyInstance.GetComponent<EnemyAIController>();
-            await con.SpawnNearPlayerAsync(
-                player,
-                spawnDistance: 6f,
-                waitTime: 0.6f,                // お好み
-                moveDelay: moveDelay,          // ← フェードイン内の実待機も考慮
-                predictSeconds: 0.4f,          // ← 進行方向予測
-                coneAngleDeg: 35f,
-                token
-            );
+            await con.SpawnNearPlayerAsync(playerPos);   // ★IEnumerator → UniTask 化
         }
 
         public void PlaySpawnedSound()

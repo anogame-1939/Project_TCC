@@ -8,8 +8,7 @@ using AnoGame.Application.Enemy;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
-using Unity.TinyCharacterController.Brain;
-using AnoGame.Application.Gameplay; // ★ 追加: CancellationToken 用
+using Unity.TinyCharacterController.Brain; // ★ 追加: CancellationToken 用
 
 namespace AnoGame.Application.Enmemy.Control
 {
@@ -277,71 +276,26 @@ namespace AnoGame.Application.Enmemy.Control
         /// スポーン後のウィンドウ内で突進(Dash)を1回実行し、ウィンドウ終了時点でDashをキャンセル可能。
         /// </summary>
         public async UniTask SpawnNearPlayerAsync(
-            Transform player, 
+            Vector3 playerPosition,
             float spawnDistance = 5f,
-            float waitTime = 3f,
-            float moveDelay = 0f,           // ← EnemySpawnManagerのmoveDelayを渡す
-            float predictSeconds = 0.6f,    // ← 後述の予測時間
-            float coneAngleDeg = 35f,       // ← 前方ウェッジ角
-            CancellationToken token = default)
+            float waitTime = 3f)
         {
-            // 1) 予測に使う「将来の基準点」を先に計算（待機＋演出分を考慮）
-            float totalLead = Mathf.Max(0f, waitTime + moveDelay + predictSeconds);
-            Vector3 basisPos = PredictPlayerPosition(player, totalLead);
+            // 1) ワープ
+            Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * spawnDistance;
+            randomDirection.y = 0f;
+            Vector3 spawnPosition = playerPosition + randomDirection;
 
-            // 2) 前方ウェッジ（±coneAngle）内でランダム方向を選ぶ
-            Vector3 fwd = GetSmoothedForward(player); // 後述のスムーズ前方
-            Vector3 dir = Quaternion.Euler(0f, UnityEngine.Random.Range(-coneAngleDeg, coneAngleDeg), 0f) * fwd;
-
-            // 3) 候補点（NavMeshに吸着）
-            Vector3 candidate = basisPos + dir * spawnDistance;
-            if (NavMesh.SamplePosition(candidate, out var hit, spawnDistance, NavMesh.AllAreas))
-                candidate = hit.position;
-
-            // 4) ← ここではワープしない。まず猶予時間を待つ
-            await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: token);
-
-            // 5) 直前に最終補正（プレイヤーが大きく曲がっていたらミラー補正）
-            Vector3 final = EnsureFrontOfPlayer(player.position, candidate, fwd);
-            if (NavMesh.SamplePosition(final, out var snap, 0.4f, NavMesh.AllAreas))
-                final = snap.position;
-
-            GetComponent<BrainBase>()?.Warp(final, dir); // ★ late-warp
-        }
-
-        // --- ユーティリティ ---
-        private Vector3 PredictPlayerPosition(Transform player, float t)
-        {
-            // 簡易：直近フレームの速度 or 補助コンポから取得（無ければforward）
-            var tracker = player.GetComponent<MotionTracker>(); // 後述
-            Vector3 v = tracker ? tracker.SmoothedVelocity : player.forward * 3.5f; // 想定移動速度をフォールバック
-            v.y = 0f;
-            return player.position + v * Mathf.Max(0f, t);
-        }
-
-        private Vector3 GetSmoothedForward(Transform player)
-        {
-            var tracker = player.GetComponent<MotionTracker>();
-            Vector3 f = tracker && tracker.SmoothedForward.sqrMagnitude > 0.01f
-                ? tracker.SmoothedForward : player.forward;
-            f.y = 0f;
-            return f.sqrMagnitude > 0.0001f ? f.normalized : Vector3.forward;
-        }
-
-        private Vector3 EnsureFrontOfPlayer(Vector3 playerPos, Vector3 point, Vector3 playerFwd)
-        {
-            // 前後判定して後方なら“前方ミラー”に反転
-            Vector3 offset = point - playerPos;
-            offset.y = 0f;
-            float along = Vector3.Dot(offset, playerFwd);
-            if (along < 0f)
+            if (NavMesh.SamplePosition(spawnPosition, out NavMeshHit hit, spawnDistance, NavMesh.AllAreas))
             {
-                // forward 成分だけ符号反転 = 前方へミラー
-                Vector3 fComp = Vector3.Project(offset, playerFwd);
-                Vector3 nComp = offset - fComp;
-                offset = -fComp + nComp;
+                GetComponent<BrainBase>().Warp(hit.position, randomDirection);
             }
-            return playerPos + offset;
+            else
+            {
+                Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
+            }
+
+            // ★ ここではダッシュさせず、単に待つだけ（演出や猶予タイム）
+            await UniTask.Delay(TimeSpan.FromSeconds(waitTime));
         }
 
         /// <summary>

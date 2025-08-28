@@ -280,7 +280,7 @@ namespace AnoGame.Application.Enemy
                     // プレイヤー付近にセット
                     var player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
                     if (player == null) continue;
-                    await spawnManager.SetPositionNearPlayerAsync(player.transform, token);
+                    await spawnManager.SetPositionNearPlayerAsync(player.transform.position, token);
 
                     // インゲーム、インベントリ/オプション開いているときはスポーンをスキップ
                     if (GameStateManager.Instance.CurrentState == GameState.InGameEvent
