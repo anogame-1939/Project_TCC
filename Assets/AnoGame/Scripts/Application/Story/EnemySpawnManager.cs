@@ -13,6 +13,9 @@ using AnoGame.Application.Enmemy.Control;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using System;
+using UnityEngine.AI;
+
+
 
 
 
@@ -356,12 +359,16 @@ namespace AnoGame.Application.Enemy
         {
             if (!noSound) PlaySpawnedSound();                // SE 再生
 
+            _currentEnemyInstance.GetComponent<NavMeshAgent>().enabled = false;
+
             // Lifespan 側も UniTask 版を用意してある前提
             await _currentEnemyInstance
                 .GetComponent<EnemyLifespan>()
                 .PlayFadeInAsync(fadeInSettings);
 
             await UniTask.Delay(TimeSpan.FromSeconds(moveDelay), cancellationToken: token);
+
+            _currentEnemyInstance.GetComponent<NavMeshAgent>().enabled = true;
         }
 
         /// <summary>
