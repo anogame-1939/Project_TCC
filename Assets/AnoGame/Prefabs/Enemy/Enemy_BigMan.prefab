@@ -1344,7 +1344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _agent: {fileID: 0}
-  _speed: 3.8
+  _speed: 3.65
   TurnSpeed: 8
   MovePriority: 1
   TurnPriority: 1
@@ -1805,6 +1805,7 @@ MonoBehaviour:
   dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
+  dashPattern: 0
   enableDash: 1
   dashPreWaitSeconds: 2.5
   dashPostWaitSeconds: 0.1
@@ -1813,6 +1814,13 @@ MonoBehaviour:
   dashDistance: 15
   dashSpeed: 16
   dashFaceTarget: 1
+  homingSpeedMultiplier: 1.179
+  homingTurnSharpness: 2.04
+  zigzagSpeedMultiplier: 0.82
+  zigzagMaxAngleDeg: 45
+  zigzagFrequencyHz: 1.33
+  controlFacingWhileChasing: 1
+  chaseTurnSharpness: 8
 --- !u!114 &3768759550073536308
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -30,7 +30,7 @@ namespace AnoGame.Application.Enmemy.Control
         [Header("アニメーション速度")]
         [SerializeField] private string locomotionSpeedParam = "LocomotionSpeed";
         [SerializeField, Min(0.05f)] private float chaseAnimSpeedMult = 1.0f; // 通常
-        [SerializeField, Min(0.05f)] private float dashAnimSpeedMult  = 1.6f; // ダッシュ時
+        [SerializeField, Min(0.05f)] private float dashAnimSpeedMult = 1.6f; // ダッシュ時
 
         [Header("ステート")]
         [SerializeField] private bool isChasing = false;
@@ -39,7 +39,11 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField] private bool isStoryMode = false;
         public bool IsStoryMode => isStoryMode;
 
+        private enum DashPattern { Random, Straight, Homing, ZigZag }
+
         [Header("突進(Dash) 設定")]
+        [Header("ダッシュパターン")]
+        [SerializeField] private DashPattern dashPattern = DashPattern.Random; // Random=毎回ランダム
         [Tooltip("突進機能を有効にするか")]
         [SerializeField] private bool enableDash = false;
 
@@ -64,6 +68,24 @@ namespace AnoGame.Application.Enmemy.Control
 
         [Tooltip("突進中はターゲット方向へ即座に向きを合わせる")]
         [SerializeField] private bool dashFaceTarget = true;
+
+        [Header("追尾ダッシュ(2) 設定")]
+        [Tooltip("追尾時のダッシュ速度倍率（基準 dashSpeed に対する%）。")]
+        [SerializeField, Range(0.1f, 1.5f)] private float homingSpeedMultiplier = 0.7f;
+        [Tooltip("旋回の鋭さ（大きいほど素早くプレイヤー方向へ向く）")]
+        [SerializeField, Min(0f)] private float homingTurnSharpness = 6f; // 1/s 程度
+
+        [Header("ジグザグダッシュ(3) 設定")]
+        [Tooltip("ジグザグ時のダッシュ速度倍率（基準 dashSpeed に対する%）。")]
+        [SerializeField, Range(0.1f, 1.5f)] private float zigzagSpeedMultiplier = 0.6f;
+        [Tooltip("最大偏向角（度）。左右にこの角度まで振ります。")]
+        [SerializeField, Range(0f, 60f)] private float zigzagMaxAngleDeg = 25f;
+        [Tooltip("左右の振り回し周波数（Hz）。1秒間に何回左右に振るか。")]
+        [SerializeField, Range(0.1f, 10f)] private float zigzagFrequencyHz = 3f;
+
+        [Header("チェイス時の向き制御")]
+        [SerializeField] private bool controlFacingWhileChasing = true;           // 通常チェイスも向きを制御
+        [SerializeField, Min(0f)] private float chaseTurnSharpness = 8f;          // 回頭の鋭さ(>大=キビキビ)
 
         private bool _isDashing;
         public bool IsDashing => _isDashing;
@@ -166,6 +188,10 @@ namespace AnoGame.Application.Enmemy.Control
 
             if (player != null)
                 moveControl.SetTargetPosition(player.transform.position);
+
+            // ★ 追加：見た目の向きを合わせる（NavMeshAgentは回さない）
+            if (controlFacingWhileChasing)
+                UpdateChaseFacing();
         }
 
         public void FaceTarget(GameObject target)
@@ -448,6 +474,7 @@ namespace AnoGame.Application.Enmemy.Control
             if (isChasing)
             {
                 agent.isStopped = false;
+                if (controlFacingWhileChasing) UpdateChaseFacing();
 
                 // ループを開始（多重起動防止）
                 CancelChaseLoopIfRunning();
@@ -482,31 +509,38 @@ namespace AnoGame.Application.Enmemy.Control
 
         private async UniTask ChaseCycleAsync(CancellationToken token)
         {
-            // 「現れたら突進」仕様：最初にいきなり突進してからチェイス
+            // ベースライン：まずは通常チェイスを開始
+            isChasing = true;
+            if (agent != null) agent.isStopped = false;
+
+            // 0) 初回ダッシュまでのクールダウン（通常チェイス中）
+            float firstCooldown = GetDashCooldownSeconds();
+            if (firstCooldown > 0f)
+                await UniTask.Delay(TimeSpan.FromSeconds(firstCooldown), cancellationToken: token);
+
+            // 以降は「ダッシュ → 復帰待機 → チェイス再開 → クールダウン」を繰り返す
             while (isChasing && !token.IsCancellationRequested)
             {
-                // ダッシュ（内部でpre-waitと直線ダッシュ実行）
+                // 1) ダッシュ（内部で pre-wait と直線ダッシュを実行）
                 await DashFlowAsync(token);
                 if (token.IsCancellationRequested) break;
 
-                // まだチェイス再開前なので念のため停止
+                // 2) 復帰待機：ダッシュ直後の硬直（その間は停止）
                 if (agent != null) agent.isStopped = true;
-
-                // 1) 復帰待機：ダッシュ直後の硬直時間
                 if (dashPostWaitSeconds > 0f)
                     await UniTask.Delay(TimeSpan.FromSeconds(dashPostWaitSeconds), cancellationToken: token);
                 if (token.IsCancellationRequested) break;
 
-                // 2) チェイス再開：FixedUpdateで追尾が動く
+                // 3) チェイス再開（FixedUpdateで追尾が走る）
                 isChasing = true;
                 if (agent != null) agent.isStopped = false;
 
-                // 3) クールダウン：次のダッシュまでの待ち(チェイス継続中)をランダム化
+                // 4) クールダウン：次のダッシュまでの待機（通常チェイス中に経過、ランダム）
                 float cooldown = GetDashCooldownSeconds();
                 if (cooldown > 0f)
                     await UniTask.Delay(TimeSpan.FromSeconds(cooldown), cancellationToken: token);
 
-                // 
+                // ループ先頭へ（再びダッシュ）
             }
         }
 
@@ -524,7 +558,6 @@ namespace AnoGame.Application.Enmemy.Control
             await DashFlowAsync(token);
         }
 
-        // ▼ 新規: 既存 DashFlowOnChaseStartAsync の本体を切り出して再利用
         private async UniTask DashFlowAsync(CancellationToken token)
         {
             if (IsStoryMode) return;
@@ -550,14 +583,45 @@ namespace AnoGame.Application.Enmemy.Control
                 agent.updateRotation = false;
 
                 GetComponent<CameraAngleToAnimatorAndSprite>()?.OnForcedMoveBegin();
-                
-                // 実ダッシュ直前
-                animator.speed = dashAnimSpeedMult;
-                await DashOnceAsync(token); // ★ ここで pre-wait と直線ダッシュを実行
+
+                // ★ パターン選択
+                DashPattern selected = dashPattern;
+                if (selected == DashPattern.Random)
+                {
+                    // Straight=1, Homing=2, ZigZag=3 を等確率で
+                    selected = (DashPattern)UnityEngine.Random.Range(1, 4);
+                }
+
+                // ★ パターンに応じてアニメ速度も合わせる（見た目の整合性）
+                float typeSpeedMult = 1f;
+                switch (selected)
+                {
+                    case DashPattern.Homing: typeSpeedMult = homingSpeedMultiplier; break;
+                    case DashPattern.ZigZag: typeSpeedMult = zigzagSpeedMultiplier; break;
+                        // Straight は 1.0
+                }
+                if (animator != null) animator.speed = dashAnimSpeedMult * typeSpeedMult;
+
+                // ★ 各パターン実行
+                switch (selected)
+                {
+                    case DashPattern.Straight:
+                        Debug.Log("Dash: Straight");
+                        await DashOnceAsync(token);            // 既存の直線
+                        break;
+                    case DashPattern.Homing:
+                        Debug.Log("Dash: Homing");
+                        await DashOnceHomingAsync(token);      // 追尾（速度落とす）
+                        break;
+                    case DashPattern.ZigZag:
+                        Debug.Log("Dash: ZigZag");
+                        await DashOnceZigZagAsync(token);      // ジグザグ（速度落とす）
+                        break;
+                }
 
                 // 終了/キャンセル時
                 GetComponent<CameraAngleToAnimatorAndSprite>()?.OnForcedMoveEnd();
-                animator.speed = chaseAnimSpeedMult;
+                if (animator != null) animator.speed = chaseAnimSpeedMult;
             }
             finally
             {
@@ -603,6 +667,323 @@ namespace AnoGame.Application.Enmemy.Control
                 relativeAngle = RoundAngleTo45(relativeAngle);
                 animator.SetFloat("Angle", relativeAngle);
             }
+        }
+
+        private async UniTask DashOnceHomingAsync(CancellationToken token)
+        {
+            if (IsStoryMode) return;
+            if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
+            if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
+
+            if (player == null)
+                player = GameObject.FindWithTag(playerTag);
+            if (player == null || agent == null) return;
+
+            bool prevChasing = isChasing;
+            bool prevStopped = agent.isStopped;
+
+            _isDashing = true;
+
+            try
+            {
+                // 1) 通常チェイス停止
+                isChasing = false;
+                agent.ResetPath();
+                agent.isStopped = true;
+
+                // Animator: 待機→直前で移動ONに切替
+                bool prevAnimMove = false;
+                if (animator != null)
+                {
+                    prevAnimMove = animator.GetBool(animatorBoolParam);
+                    animator.SetBool(animatorBoolParam, false);
+                }
+
+                // 2) プレ待機（向きを合わせ続ける）
+                if (dashPreWaitSeconds > 0f)
+                {
+                    float endTime = Time.time + dashPreWaitSeconds;
+                    while (Time.time < endTime)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        if (player == null) player = GameObject.FindWithTag(playerTag);
+                        if (player != null && dashFaceTarget)
+                        {
+                            Vector3 toPlayer = (player.transform.position - transform.position);
+                            toPlayer.y = 0f;
+                            if (toPlayer.sqrMagnitude > 0.0001f)
+                                ApplyFacingAndAnimatorAngle(toPlayer.normalized);
+                        }
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    }
+                }
+
+                // 3) 初期方向
+                Vector3 dir = (player.transform.position - transform.position);
+                dir.y = 0f;
+                if (dir.sqrMagnitude < 0.0001f) return;
+                dir.Normalize();
+
+                float speed = dashSpeed * Mathf.Max(0.1f, homingSpeedMultiplier);
+                float remaining = dashDistance;
+
+                bool prevUpdatePos = agent != null ? agent.updatePosition : true;
+                bool prevUpdateRot = agent != null ? agent.updateRotation : true;
+                if (agent != null)
+                {
+                    agent.updatePosition = false;
+                    agent.updateRotation = false;
+                }
+                if (animator != null) animator.SetBool(animatorBoolParam, true);
+
+                try
+                {
+                    while (remaining > 0f)
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        // ★ 追尾：現在のdirを、プレイヤー方向へ徐々に寄せる
+                        Vector3 desired = player != null
+                            ? (player.transform.position - transform.position)
+                            : dir;
+                        desired.y = 0f;
+                        if (desired.sqrMagnitude > 0.0001f)
+                        {
+                            desired.Normalize();
+                            // 時間依存の滑らかな係数（フレームレート非依存のイメージ）
+                            float s = Mathf.Clamp01(homingTurnSharpness * Time.deltaTime);
+                            dir = Vector3.Slerp(dir, desired, s);
+                        }
+
+                        if (dashFaceTarget) ApplyFacingAndAnimatorAngle(dir);
+
+                        float step = speed * Time.deltaTime;
+                        float moveLen = Mathf.Min(step, remaining);
+
+                        Vector3 current = transform.position;
+                        Vector3 candidate = current + dir * moveLen;
+
+                        // 障害物チェック
+                        if (NavMesh.Raycast(current, candidate, out var hitInfo, NavMesh.AllAreas))
+                        {
+                            Vector3 stopPos = hitInfo.position - dir * 0.05f;
+                            if (NavMesh.SamplePosition(stopPos, out var snap, 0.2f, NavMesh.AllAreas))
+                                stopPos = snap.position;
+                            characterBrain.ForceSetPosition(stopPos);
+                            break;
+                        }
+
+                        if (NavMesh.SamplePosition(candidate, out var sample, 0.2f, NavMesh.AllAreas))
+                            candidate = sample.position;
+
+                        characterBrain.ForceSetPosition(candidate);
+
+                        remaining -= Vector3.Distance(current, transform.position);
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    }
+                }
+                finally
+                {
+                    if (agent != null)
+                    {
+                        agent.Warp(agent.transform.position);
+                        agent.updatePosition = prevUpdatePos;
+                        agent.updateRotation = prevUpdateRot;
+                    }
+                    if (animator != null) animator.SetBool(animatorBoolParam, prevAnimMove);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                isChasing = prevChasing;
+                agent.isStopped = prevStopped;
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                isChasing = prevChasing;
+                agent.isStopped = prevStopped;
+            }
+            finally
+            {
+                _isDashing = false;
+            }
+        }
+
+        private async UniTask DashOnceZigZagAsync(CancellationToken token)
+        {
+            if (IsStoryMode) return;
+            if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
+            if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
+
+            if (player == null)
+                player = GameObject.FindWithTag(playerTag);
+            if (player == null || agent == null) return;
+
+            bool prevChasing = isChasing;
+            bool prevStopped = agent.isStopped;
+
+            _isDashing = true;
+
+            try
+            {
+                // 1) 通常チェイス停止
+                isChasing = false;
+                agent.ResetPath();
+                agent.isStopped = true;
+
+                // Animator: 待機→直前で移動ONに切替
+                bool prevAnimMove = false;
+                if (animator != null)
+                {
+                    prevAnimMove = animator.GetBool(animatorBoolParam);
+                    animator.SetBool(animatorBoolParam, false);
+                }
+
+                // 2) プレ待機（向きを合わせ続ける）
+                if (dashPreWaitSeconds > 0f)
+                {
+                    float endTime = Time.time + dashPreWaitSeconds;
+                    while (Time.time < endTime)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        if (player == null) player = GameObject.FindWithTag(playerTag);
+                        if (player != null && dashFaceTarget)
+                        {
+                            Vector3 toPlayer = (player.transform.position - transform.position);
+                            toPlayer.y = 0f;
+                            if (toPlayer.sqrMagnitude > 0.0001f)
+                                ApplyFacingAndAnimatorAngle(toPlayer.normalized);
+                        }
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    }
+                }
+
+                // 3) 基準方向
+                Vector3 baseDir = (player.transform.position - transform.position);
+                baseDir.y = 0f;
+                if (baseDir.sqrMagnitude < 0.0001f) return;
+                baseDir.Normalize();
+
+                float speed = dashSpeed * Mathf.Max(0.1f, zigzagSpeedMultiplier);
+                float remaining = dashDistance;
+
+                bool prevUpdatePos = agent != null ? agent.updatePosition : true;
+                bool prevUpdateRot = agent != null ? agent.updateRotation : true;
+                if (agent != null)
+                {
+                    agent.updatePosition = false;
+                    agent.updateRotation = false;
+                }
+                if (animator != null) animator.SetBool(animatorBoolParam, true);
+
+                float elapsed = 0f;
+                float maxAng = Mathf.Abs(zigzagMaxAngleDeg);
+                float freq = Mathf.Max(0.1f, zigzagFrequencyHz);
+
+                try
+                {
+                    while (remaining > 0f)
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        elapsed += Time.deltaTime;
+                        // ★ ジグザグ角度（-maxAng ～ +maxAng）
+                        float ang = Mathf.Sin(elapsed * Mathf.PI * 2f * freq) * maxAng;
+                        Vector3 dir = Quaternion.Euler(0f, ang, 0f) * baseDir;
+
+                        if (dashFaceTarget) ApplyFacingAndAnimatorAngle(dir);
+
+                        float step = speed * Time.deltaTime;
+                        float moveLen = Mathf.Min(step, remaining);
+
+                        Vector3 current = transform.position;
+                        Vector3 candidate = current + dir * moveLen;
+
+                        // 障害物チェック
+                        if (NavMesh.Raycast(current, candidate, out var hitInfo, NavMesh.AllAreas))
+                        {
+                            Vector3 stopPos = hitInfo.position - dir * 0.05f;
+                            if (NavMesh.SamplePosition(stopPos, out var snap, 0.2f, NavMesh.AllAreas))
+                                stopPos = snap.position;
+                            characterBrain.ForceSetPosition(stopPos);
+                            break;
+                        }
+
+                        if (NavMesh.SamplePosition(candidate, out var sample, 0.2f, NavMesh.AllAreas))
+                            candidate = sample.position;
+
+                        characterBrain.ForceSetPosition(candidate);
+
+                        remaining -= Vector3.Distance(current, transform.position);
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    }
+                }
+                finally
+                {
+                    if (agent != null)
+                    {
+                        agent.Warp(agent.transform.position);
+                        agent.updatePosition = prevUpdatePos;
+                        agent.updateRotation = prevUpdateRot;
+                    }
+                    if (animator != null) animator.SetBool(animatorBoolParam, prevAnimMove);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                isChasing = prevChasing;
+                agent.isStopped = prevStopped;
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                isChasing = prevChasing;
+                agent.isStopped = prevStopped;
+            }
+            finally
+            {
+                _isDashing = false;
+            }
+        }
+
+        private void UpdateChaseFacing()
+        {
+            if (animator == null) return;
+
+            // 1) 進行意図の方向を決める：優先は agent.desiredVelocity
+            Vector3 dir = Vector3.zero;
+            if (agent != null)
+            {
+                var v = agent.desiredVelocity; // 目標速度（NavMeshが出す進行方向）
+                v.y = 0f;
+                if (v.sqrMagnitude > 0.0001f) dir = v.normalized;
+            }
+
+            // 2) ほぼ停止/コーナー手前などで desiredVelocity が出ない場合はプレイヤー方向
+            if (dir == Vector3.zero && player != null)
+            {
+                dir = (player.transform.position - transform.position);
+                dir.y = 0f;
+                if (dir.sqrMagnitude > 0.0001f) dir.Normalize();
+            }
+
+            if (dir == Vector3.zero) return;
+
+            // 3) スムーズに回頭（フレームレート非依存気味）
+            if (chaseTurnSharpness > 0f)
+            {
+                // 現在の forward → 目標dir へ少しずつ
+                Vector3 current = transform.forward;
+                current.y = 0f;
+                if (current.sqrMagnitude > 0.0001f)
+                    dir = Vector3.Slerp(current.normalized, dir, Mathf.Clamp01(chaseTurnSharpness * Time.deltaTime));
+            }
+
+            // 4) root回頭 & Animator Angle 更新（ダッシュ時と同じメソッドで統一）
+            ApplyFacingAndAnimatorAngle(dir);
         }
 
     }
