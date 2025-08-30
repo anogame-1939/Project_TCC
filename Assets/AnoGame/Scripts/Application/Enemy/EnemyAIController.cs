@@ -39,6 +39,53 @@ namespace AnoGame.Application.Enmemy.Control
         [SerializeField] private bool isStoryMode = false;
         public bool IsStoryMode => isStoryMode;
 
+        [Header("前方スポーン（進行方向予測）")]
+        [SerializeField, Tooltip("速度推定のサンプル間隔（秒）")]
+        private float motionSampleInterval = 0.10f;
+
+        [SerializeField, Tooltip("速度EMAのハーフライフ（秒）。小さいほどキビキビ追従")]
+        private float velocityEmaHalfLife = 0.30f;
+
+        [SerializeField, Tooltip("予測に使う先読み時間（秒） = speed * leadTime。距離は下記min/maxでClamp")]
+        private float predictionLeadTime = 0.6f;
+
+        [SerializeField, Tooltip("前方スポーンの最小距離（m）")]
+        private float aheadMinDistance = 3f;
+
+        [SerializeField, Tooltip("前方スポーンの最大距離（m）")]
+        private float aheadMaxDistance = 8f;
+
+        [SerializeField, Tooltip("プレイヤーが停止に近い時は予測を捨てる速度しきい値（m/s）")]
+        private float minPredictableSpeed = 0.2f;
+
+        [SerializeField, Tooltip("スポーン位置のNavMesh貼り付き半径（m）")]
+        private float navmeshSnapRadius = 1.0f;
+
+        [SerializeField, Tooltip("プレイヤーと敵の最小離隔（めり込み防止、m）")]
+        private float minSeparationFromPlayer = 1.2f;
+
+        [Header("前方/後方スポーンのランダム化")]
+        [SerializeField] private bool enableFrontBackRandom = true;
+
+        [Tooltip("前方から出る確率（0〜1）")]
+        [SerializeField, Range(0f, 1f)] private float frontSpawnProbability = 0.65f;
+
+        [Tooltip("後方スポーン時の距離倍率（前方距離×この倍率）")]
+        [SerializeField, Min(0.1f)] private float backDistanceScale = 1.1f;
+
+        [Header("前後ラインの微調整（見た目の単調さ回避）")]
+        [Tooltip("前後ラインに対するヨー角ジッター（±度）")]
+        [SerializeField, Range(0f, 45f)] private float lateralAngleJitterDeg = 8f;
+
+        [Tooltip("左右への横ズレ最大量（m）")]
+        [SerializeField, Min(0f)] private float lateralOffsetMax = 1.0f;
+
+        // 内部状態（履歴＆EMA）
+        private Vector3 _emaVelocity;          // 速度の指数移動平均
+        private Vector3 _lastSamplePos;        // 前回サンプル位置
+        private float _lastSampleTime = -1f; // 前回サンプル時刻
+        private float _lastMotionTick;       // サンプル間隔管理
+
         private enum DashPattern { Random, Straight, Homing, ZigZag }
 
         [Header("突進(Dash) 設定")]
@@ -176,6 +223,7 @@ namespace AnoGame.Application.Enmemy.Control
 
         void FixedUpdate()
         {
+            SamplePlayerMotion();
             if (this.IsStoryMode) return;
             if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
             if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
@@ -278,23 +326,39 @@ namespace AnoGame.Application.Enmemy.Control
         public async UniTask SpawnNearPlayerAsync(
             Vector3 playerPosition,
             float spawnDistance = 5f,
-            float waitTime = 3f)
+            float waitTime = 2f)
         {
-            // 1) ワープ
+            // 前/後の選択
+            bool fromFront = true;
+            if (enableFrontBackRandom)
+                fromFront = (UnityEngine.Random.value < frontSpawnProbability);
+
+            // まずは予測スポーン（前 or 後）
+            if (TryGetPredictiveSpawnPoint(fromFront, out var spawnPos, out var faceDir))
+            {
+                Vector3 forwardHint = faceDir.sqrMagnitude > 1e-4f ? faceDir.normalized : transform.forward;
+                GetComponent<BrainBase>().Warp(spawnPos, forwardHint);
+
+                // 見た目の向き合わせ（常にプレイヤー方向）
+                ApplyFacingAndAnimatorAngle((player.transform.position - spawnPos).normalized);
+                return;
+            }
+
+            // フォールバック：従来の円周近傍
             Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * spawnDistance;
             randomDirection.y = 0f;
-            Vector3 spawnPosition = playerPosition + randomDirection;
+            Vector3 fallback = playerPosition + randomDirection;
 
-            if (NavMesh.SamplePosition(spawnPosition, out NavMeshHit hit, spawnDistance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(fallback, out NavMeshHit hit, spawnDistance, NavMesh.AllAreas))
             {
                 GetComponent<BrainBase>().Warp(hit.position, randomDirection);
             }
             else
             {
-                Debug.LogWarning("有効なスポーン位置が見つかりませんでした。");
+                Debug.LogWarning("有効なスポーン位置が見つかりませんでした（Fallback）。");
             }
 
-            // ★ ここではダッシュさせず、単に待つだけ（演出や猶予タイム）
+            // 必要なら演出待機
             await UniTask.Delay(TimeSpan.FromSeconds(waitTime));
         }
 
@@ -985,6 +1049,179 @@ namespace AnoGame.Application.Enmemy.Control
             // 4) root回頭 & Animator Angle 更新（ダッシュ時と同じメソッドで統一）
             ApplyFacingAndAnimatorAngle(dir);
         }
+
+        private void SamplePlayerMotion()
+        {
+            if (player == null) player = GameObject.FindWithTag(playerTag);
+            if (player == null) return;
+
+            float now = Time.time;
+            if (now - _lastMotionTick < motionSampleInterval) return;
+            _lastMotionTick = now;
+
+            Vector3 p = player.transform.position;
+            if (_lastSampleTime < 0f)
+            {
+                _lastSamplePos = p;
+                _lastSampleTime = now;
+                _emaVelocity = Vector3.zero;
+                return;
+            }
+
+            float dt = Mathf.Max(1e-4f, now - _lastSampleTime);
+            Vector3 instVel = (p - _lastSamplePos) / dt;
+
+            // EMA係数：ハーフライフを使った“時間依存”なα
+            float hl = Mathf.Max(1e-3f, velocityEmaHalfLife);
+            float alpha = 1f - Mathf.Exp(-Mathf.Log(2f) * dt / hl);
+
+            _emaVelocity = Vector3.Lerp(_emaVelocity, instVel, alpha);
+            _lastSamplePos = p;
+            _lastSampleTime = now;
+        }
+
+        /// <summary>
+        /// プレイヤーの進行方向を推定し、「立ちふさがる」前方スポーン位置を算出する。
+        /// 成功時 true、pos=候補、faceDir=プレイヤーへ向くベクトル。
+        /// 停止に近い/予測不可なら false を返す。
+        /// </summary>
+        private bool TryGetFrontSpawnPoint(out Vector3 pos, out Vector3 faceDir)
+        {
+            pos = default; faceDir = default;
+            if (player == null) player = GameObject.FindWithTag(playerTag);
+            if (player == null) return false;
+
+            Vector3 playerPos = player.transform.position;
+
+            // 速度ベクトル（EMA）
+            Vector3 v = _emaVelocity; v.y = 0f;
+            float speed = v.magnitude;
+            if (speed < minPredictableSpeed)
+            {
+                // 予測無効：停止に近いので前方が定義できない
+                return false;
+            }
+
+            Vector3 dir = v / speed; // 正規化進行方向
+
+            // 先読み距離： speed * leadTime を [min, max] にClamp
+            float aheadDist = Mathf.Clamp(speed * predictionLeadTime, aheadMinDistance, aheadMaxDistance);
+
+            Vector3 target = playerPos + dir * aheadDist;
+
+            // NavMesh上に貼り付け
+            if (NavMesh.SamplePosition(target, out var hit, navmeshSnapRadius, NavMesh.AllAreas))
+            {
+                pos = hit.position;
+            }
+            else
+            {
+                // 前方直線上を少し縮めながら探す
+                bool placed = false;
+                for (int i = 0; i < 3; i++)
+                {
+                    aheadDist *= 0.6f; // 縮める
+                    Vector3 t2 = playerPos + dir * aheadDist;
+                    if (NavMesh.SamplePosition(t2, out hit, navmeshSnapRadius, NavMesh.AllAreas))
+                    {
+                        pos = hit.position;
+                        placed = true;
+                        break;
+                    }
+                }
+                if (!placed) return false;
+            }
+
+            // 最小離隔を確保（めり込み防止）
+            Vector3 toEnemy = pos - playerPos; toEnemy.y = 0f;
+            float d = toEnemy.magnitude;
+            if (d < minSeparationFromPlayer && d > 1e-4f)
+            {
+                pos = playerPos + toEnemy.normalized * minSeparationFromPlayer;
+            }
+
+            // 敵はプレイヤーの方を向かせる
+            faceDir = (playerPos - pos); faceDir.y = 0f;
+            if (faceDir.sqrMagnitude < 1e-4f) faceDir = -dir; // 念のため
+            return true;
+        }
+
+        /// <summary>
+        /// プレイヤーの進行方向（EMA速度）を使い、前方 or 後方に「立ちふさがる/追いすがる」スポーン位置を出す。
+        /// fromFront=true で前方、false で後方。成功時 true。
+        /// </summary>
+        private bool TryGetPredictiveSpawnPoint(bool fromFront, out Vector3 pos, out Vector3 faceDir)
+        {
+            pos = default; faceDir = default;
+
+            if (player == null) player = GameObject.FindWithTag(playerTag);
+            if (player == null) return false;
+
+            Vector3 playerPos = player.transform.position;
+
+            // EMA速度
+            Vector3 v = _emaVelocity; v.y = 0f;
+            float speed = v.magnitude;
+            if (speed < minPredictableSpeed) return false; // ほぼ停止なら予測不可
+
+            // 進行軸：前は +dir、後ろは -dir
+            Vector3 dir = v / speed;
+            Vector3 axis = fromFront ? dir : -dir;
+
+            // 基本距離 = speed * leadTime をClamp（後方時は少し伸ばせる）
+            float baseDist = Mathf.Clamp(speed * predictionLeadTime, aheadMinDistance, aheadMaxDistance);
+            if (!fromFront) baseDist *= Mathf.Max(0.1f, backDistanceScale);
+
+            // 角度ジッター（±lateralAngleJitterDeg）
+            float yawJitter = UnityEngine.Random.Range(-lateralAngleJitterDeg, lateralAngleJitterDeg);
+            Vector3 axisJittered = Quaternion.Euler(0f, yawJitter, 0f) * axis;
+
+            // 横ズレ（左右ランダム）
+            Vector3 right = Vector3.Cross(Vector3.up, axisJittered).normalized;
+            float lateral = (lateralOffsetMax > 0f)
+                ? UnityEngine.Random.Range(-lateralOffsetMax, lateralOffsetMax)
+                : 0f;
+
+            Vector3 target = playerPos + axisJittered * baseDist + right * lateral;
+
+            // NavMesh貼り付け（縮めながら再試行）
+            if (NavMesh.SamplePosition(target, out var hit, navmeshSnapRadius, NavMesh.AllAreas))
+            {
+                pos = hit.position;
+            }
+            else
+            {
+                bool placed = false;
+                float dist = baseDist;
+                for (int i = 0; i < 3; i++)
+                {
+                    dist *= 0.6f;
+                    Vector3 t2 = playerPos + axisJittered * dist + right * lateral;
+                    if (NavMesh.SamplePosition(t2, out hit, navmeshSnapRadius, NavMesh.AllAreas))
+                    {
+                        pos = hit.position;
+                        placed = true; break;
+                    }
+                }
+                if (!placed) return false;
+            }
+
+            // 最小離隔
+            Vector3 toEnemy = pos - playerPos; toEnemy.y = 0f;
+            float d = toEnemy.magnitude;
+            if (d < minSeparationFromPlayer && d > 1e-4f)
+            {
+                pos = playerPos + toEnemy.normalized * minSeparationFromPlayer;
+            }
+
+            // 敵は常にプレイヤーの方を見る（前/後どちらでも）
+            faceDir = (playerPos - pos); faceDir.y = 0f;
+            if (faceDir.sqrMagnitude < 1e-4f) faceDir = -axisJittered;
+
+            return true;
+        }
+
+
 
     }
 }
