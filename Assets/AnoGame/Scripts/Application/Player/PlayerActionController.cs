@@ -20,11 +20,9 @@ namespace AnoGame.Application.Player.Control
     [AddComponentMenu("Player/" + nameof(PlayerActionController))]
     public class PlayerActionController : MonoBehaviour, IForcedMoveController
     {
+        [SerializeField] private CharacterController _cc; 
         [SerializeField] private MoveControl moveControl;
         [SerializeField] private Animator animator;
-
-        // MoveControlの現在速度がこれ以上のとき IsMove を true にする
-        [SerializeField] private float moveSpeedThreshold = 0.5f;
 
         //──────────────────────────────────────────
         // ① IInputActionProvider を Inject で受け取る
@@ -37,6 +35,14 @@ namespace AnoGame.Application.Player.Control
 
         private void Awake()
         {
+            if (_cc == null)
+            {
+                _cc = GetComponent<CharacterController>();
+                if (_cc == null)
+                {
+                    Debug.LogWarning($"[{nameof(PlayerActionController)}] CharacterController がアタッチされていません。");
+                }
+            }
             //──────────────────────────────────────────
             // MoveControl / Animator が未設定なら GetComponent で取得
             //──────────────────────────────────────────
@@ -111,8 +117,12 @@ namespace AnoGame.Application.Player.Control
             // MoveControlの速度を取得し、閾値を超えていれば移動アニメをONに
             if (animator != null && moveControl != null)
             {
-                float currentSpeed = moveControl.CurrentSpeed;
-                bool isMove = currentSpeed > moveSpeedThreshold;
+                bool isMove = false;
+                if (_cc != null)
+                {
+                    // CharacterController の速度がゼロでなければ「移動中」
+                    isMove = _cc.velocity.sqrMagnitude > 0.0001f;
+                }
                 animator.SetBool("IsMove", isMove);
             }
         }
