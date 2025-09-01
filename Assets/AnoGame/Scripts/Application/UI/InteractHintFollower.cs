@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace AnoGame.Application.UI
 {
@@ -59,8 +60,7 @@ namespace AnoGame.Application.UI
                 if (go) target = go.transform;
             }
 
-            if (ui && !ui.gameObject.activeSelf)
-                ui.gameObject.SetActive(true);
+            ui.gameObject.SetActive(false);
         }
 
         private void LateUpdate()
@@ -141,6 +141,16 @@ namespace AnoGame.Application.UI
         {
             var go = GameObject.FindGameObjectWithTag(targetTag);
             if (go) target = go.transform;
+        }
+
+        public void ShowHint()
+        {
+            ui.gameObject.GetComponent<Image>().enabled = true;
+        }
+
+        public void HideHint()
+        {
+            ui.gameObject.GetComponent<Image>().enabled = false;
         }
     }
 }
