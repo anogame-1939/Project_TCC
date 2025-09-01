@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace AnoGame
+namespace AnoGame.Apllication.Direction
 {
     public class CinematicBars : MonoBehaviour
     {
