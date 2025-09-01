@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace AnoGame.Application.Player.Interaction
 {
+
     public enum InteractionKind { Pickup, Hide, Inspect }
 
     public struct InteractionOption
@@ -16,6 +17,7 @@ namespace AnoGame.Application.Player.Interaction
         public System.Action Execute;               // 実行
         public System.Action Cancel;                // ★ユーザーキャンセル時に呼ぶ（任意）
         public System.Func<bool> IsValid;           // ★継続中の有効判定（距離/角度/LoS等 任意）
+        public object Source;
     }
 
     public enum CancelReason { UserRequest, Distance, Interrupted }
@@ -31,6 +33,20 @@ namespace AnoGame.Application.Player.Interaction
         {
             Actor = actor; Kind = kind; Reason = reason; Source = source;
         }
+    }
+
+    // インタラクト可能なものが近くにあることを通知するためのメッセージ
+    public struct InteractablesNearbyChanged
+    {
+        public Transform Actor;
+        public bool HasAny;
+    }
+
+    public struct InteractionFocusChanged
+    {
+        public Transform Actor;
+        public InteractionOption? Previous;
+        public InteractionOption? Current;
     }
 
     public interface IInteractable

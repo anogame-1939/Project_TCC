@@ -40,7 +40,9 @@ namespace AnoGame.Application.Player
         private InteractionOption? _bestQuick;   // RequiresHold == false の最良
         private InteractionOption? _bestHold;    // RequiresHold == true  の最良
 
-
+        // フィールド追加
+        private bool _hasNearby;                           // 直近の「候補あり」状態
+        private InteractionOption? _focused;               // 直近の“提示中/最有力” オプション
 
         [SerializeField] private bool debugLog = true;   // ★オン/オフ切替
         void D(string msg)
@@ -152,6 +154,16 @@ namespace AnoGame.Application.Player
 
             // ★解決結果のサマリ
             D($"Resolve: options={optionsTotal}, bestQuick={(_bestQuick.HasValue ? _bestQuick.Value.Prompt : "null")}, bestHold={(_bestHold.HasValue ? _bestHold.Value.Prompt : "null")}");
+
+            var hasAny = optionsTotal > 0;
+
+            // 変更: 変化チェックをやめて、毎回 Publish する
+            _hasNearby = hasAny;
+            UniRx.MessageBroker.Default.Publish(new InteractablesNearbyChanged {
+                Actor = transform,
+                HasAny = _hasNearby
+            });
+            D($"Nearby -> { _hasNearby }");
         }
 
         private void OnInteractPerformed(InputAction.CallbackContext ctx)
