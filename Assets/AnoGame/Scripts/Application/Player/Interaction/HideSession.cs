@@ -23,50 +23,46 @@ namespace AnoGame.Application.Player.Interaction
         enum Phase { Idle, Approaching, Entering, Hidden, Exiting, Canceled }
         Phase _phase = Phase.Idle;
 
-        public async UniTask RunAsync(CancellationToken ct)
+        public async UniTask RunAsync(CancellationToken external)
         {
-            using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, _cts.Token);
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(external, _cts.Token);
             var token = linked.Token;
 
             IsActive = true;
 
+            // 占有（他プレイヤー/他処理と競合しないように）
             if (!_spot.TryReserve(_actor))
             { IsActive = false; return; }
 
             try
             {
-                _phase = Phase.Approaching;
-                await _spot.MoveIntoAsync(_actor, token);   // ← token を使う
+                // 入口→隠れる（移動経路・演出は HideSpotZone 側に委譲）
+                await _spot.MoveIntoAsync(_actor, token);
+                await _spot.EnterHideAsync(_actor, token);
 
-                _phase = Phase.Entering;
-                await _spot.EnterHideAsync(_actor, token);  // ← token を使う
-
-                _phase = Phase.Hidden;
-
-                // ★ここで待つ：出る / キャンセル / 無効化 のいずれかまで
+                // 隠れ中：出る/キャンセル/無効化 いずれかまで待機
                 await UniTask.WaitUntil(
                     () => _exitRequested || _cancelRequested || !IsValid(),
                     cancellationToken: token
                 );
 
-                // ★分岐：本当に出る？ それとも中断？
                 if (_exitRequested && (_danger?.Invoke() != true) && IsValid())
                 {
                     await _spot.ExitHideAsync(_actor, token);   // 退出演出を完了
+                    // ここで「出た」イベント等をPublishしたい場合はSpot側/ここで実施
                 }
                 else
                 {
-                    await _spot.CancelHideAsync(_actor, token); // 中断演出（軽い解除）
+                    // 中断or無効化時：必要なら軽い演出だけ
+                    await _spot.CancelHideAsync(_actor, token);
                 }
             }
             finally
             {
-                _phase = Phase.Canceled;
-                _spot.Release(_actor);   // ★ここでだけ EndLock（1回目で即解除されなくなる）
+                _spot.Release(_actor); // 占有解除＋カメラ/入力復帰など
                 IsActive = false;
             }
         }
-
 
         public bool IsValid() => _spot != null && _spot.StillValidFor(_actor);
 
