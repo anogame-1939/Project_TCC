@@ -13,6 +13,8 @@ namespace AnoGame.Application.Player.Interaction
         public HideSpotZone Spot;
         public HideRequested(Transform actor, HideSpotZone spot) { Actor = actor; Spot = spot; }
     }
+    
+    public struct HideBegan { public Transform Actor; public HideSpotZone Spot; public HideBegan(Transform a, HideSpotZone s) { Actor = a; Spot = s; } }
     public struct HideExited  { public Transform Actor; public HideSpotZone Spot; public HideExited(Transform a, HideSpotZone s){ Actor=a; Spot=s; } }
     public struct HideCanceled{ public Transform Actor; public HideSpotZone Spot; public HideCanceled(Transform a, HideSpotZone s){ Actor=a; Spot=s; } }
 
@@ -122,7 +124,11 @@ namespace AnoGame.Application.Player.Interaction
                 el.MoveToPoint(hidePoint.position, moveSpeed, stopDistance);
                 await WaitArriveAsync(actor, hidePoint.position, ct);
 
-                if (exitPoint != null) el.LookAt(exitPoint);
+                if (exitPoint != null)
+                {
+                    await UniTask.Yield(PlayerLoopTiming.Update, ct);
+                    el.LookAt(exitPoint);
+                }
             }
         }
 
@@ -132,7 +138,7 @@ namespace AnoGame.Application.Player.Interaction
 
             // その場で静止＆向き固定（必要に応じて LookAt も可）
             el.Freeze();
-            el.LookKeep();
+            // el.LookKeep();
 
             OnEnterHidden?.Invoke(actor);
             MessageBroker.Default.Publish(new HideBegan(actor, this));
