@@ -310,6 +310,8 @@ GameObject:
   - component: {fileID: 7066592700834054209}
   - component: {fileID: 3949941853238961511}
   - component: {fileID: -8439374336953332058}
+  - component: {fileID: -6838671714581490994}
+  - component: {fileID: 2091443860567756890}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -647,6 +649,19 @@ MonoBehaviour:
   dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
+  motionSampleInterval: 0.1
+  velocityEmaHalfLife: 0.3
+  predictionLeadTime: 0.6
+  aheadMinDistance: 3
+  aheadMaxDistance: 8
+  minPredictableSpeed: 0.2
+  navmeshSnapRadius: 1
+  minSeparationFromPlayer: 1.2
+  enableFrontBackRandom: 1
+  frontSpawnProbability: 0.65
+  backDistanceScale: 1.1
+  lateralAngleJitterDeg: 8
+  lateralOffsetMax: 1
   dashPattern: 0
   enableDash: 0
   dashPreWaitSeconds: 2
@@ -722,6 +737,38 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &-6838671714581490994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f674cbe464f3ffc40bd63ee7c9e0582b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  splineContainer: {fileID: 0}
+--- !u!114 &2091443860567756890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ae6c5a259ed1174da3edc672e7e1665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  behavior: 0
+  moveNavmeshControl: {fileID: 5085902700854131339}
+  playerTag: Player
+  splineContainer: {fileID: 0}
+  arriveDistance: 0.5
+  waitAtKnotSeconds: 0
+  loopPatrol: 1
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0
