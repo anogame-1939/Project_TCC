@@ -909,6 +909,7 @@ MonoBehaviour:
   chase: {fileID: 0}
   investigate: {fileID: 0}
   ret: {fileID: 0}
+  patrol: {fileID: 0}
   defaultEncounterTTL: 2
   defaultInvestigateTTL: 3
 --- !u!114 &25041132
@@ -37898,7 +37899,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 207.7777}
+  m_AnchoredPosition: {x: 0, y: 207.77814}
   m_SizeDelta: {x: 0, y: 486.223}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &660101641
@@ -78826,6 +78827,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7092537996067713669, guid: f29b8f60f10484c30a1a3d8f1e0414dc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1532879414}
+    - targetCorrespondingSourceObject: {fileID: 7092537996067713669, guid: f29b8f60f10484c30a1a3d8f1e0414dc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1532879432}
   m_SourcePrefab: {fileID: 100100000, guid: f29b8f60f10484c30a1a3d8f1e0414dc, type: 3}
 --- !u!1001 &1523608491
 PrefabInstance:
@@ -79049,7 +79053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   priority: 40
   active: 0
-  splineContainer: {fileID: 0}
+  splineContainer: {fileID: 1535693987}
   arriveDistance: 0.5
   loop: 1
 --- !u!114 &1532879391
@@ -79119,6 +79123,7 @@ MonoBehaviour:
   chase: {fileID: 1532879392}
   investigate: {fileID: 1532879387}
   ret: {fileID: 1532879388}
+  patrol: {fileID: 1532879389}
   defaultEncounterTTL: 2
   defaultInvestigateTTL: 3
 --- !u!195 &1532879397 stripped
@@ -79172,6 +79177,20 @@ MonoBehaviour:
   emaHalfLife: 0
   planarOnly: 1
   useFixedUpdate: 1
+--- !u!114 &1532879432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532879367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e609eb0391d7fca42aa94ce467e76173, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  director: {fileID: 1532879394}
+  reacquireWindow: 0.6
 --- !u!1 &1535693982
 GameObject:
   m_ObjectHideFlags: 0
@@ -86114,8 +86133,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 996609995}
   m_HandleRect: {fileID: 996609993}
   m_Direction: 2
-  m_Value: -0.00000044062836
-  m_Size: 0.567202
+  m_Value: -0.0000022031418
+  m_Size: 0.56927764
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

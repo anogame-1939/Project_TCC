@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -59,12 +60,23 @@ namespace AnoGame.Application.Enemy.AI
         [Tooltip("TTL 経過時に帰投を指示する先（任意）")]
         [SerializeField] private ReturnToAnchorIntentProvider returnToAnchor;
 
+        // ---------- 追加: 外部通知イベント ----------
+        public event Action<Vector3> OnActivated;
+        public event Action OnDeactivated;
+        public event Action<Vector3> OnExpired;
+        public event Action OnEscalatedToReturn;
+        public event Action<Vector3> OnNewTarget;
+        public event Action<Vector3> OnArrivedPoint;
+        public event Action<Vector3, float> OnDwellBegan;
+        public event Action<Vector3> OnDwellEnded;
+
         // --- 内部状態 ---
         private Vector3 _currentTarget;
         private bool _hasTarget;
         private float _dwellTimer;
         private float _expireAt;
         private float _nextPickAllowedTime;
+        private bool _wasDwelling; // 滞留状態フラグ（終了通知用）
 
         // ========= Public API =========
 
@@ -81,14 +93,27 @@ namespace AnoGame.Application.Enemy.AI
             _hasTarget = false;
             _dwellTimer = 0f;
             _nextPickAllowedTime = 0f;
+            _wasDwelling = false;
+
+            OnActivated?.Invoke(center);
         }
 
         /// <summary>外部から停止（再発見時など）</summary>
         public void Deactivate()
         {
+            if (!active && !hasCenter) return;
             active = false;
             hasCenter = false;
             _hasTarget = false;
+
+            // 滞留終了イベントの取りこぼし防止
+            if (_wasDwelling)
+            {
+                OnDwellEnded?.Invoke(_currentTarget);
+                _wasDwelling = false;
+            }
+
+            OnDeactivated?.Invoke();
         }
 
         /// <summary>再発見通知：即停止して下位（Chase など）に明け渡す想定</summary>
@@ -103,9 +128,25 @@ namespace AnoGame.Application.Enemy.AI
             // TTL経過で ReturnToAnchor へエスカレーション
             if (Time.time >= _expireAt)
             {
-                active = false;
+                OnExpired?.Invoke(center);
+
+                active = false; // 自身は止める
+                hasCenter = false;
+
                 if (returnToAnchor != null)
+                {
                     returnToAnchor.ActivateToNearest();
+                    OnEscalatedToReturn?.Invoke();
+                }
+
+                // 終端処理
+                if (_wasDwelling)
+                {
+                    OnDwellEnded?.Invoke(_currentTarget);
+                    _wasDwelling = false;
+                }
+
+                OnDeactivated?.Invoke();
                 return false;
             }
             return true;
@@ -123,16 +164,29 @@ namespace AnoGame.Application.Enemy.AI
             {
                 if (IsArrived(transform.position, _currentTarget, arriveDistance))
                 {
+                    // 到達イベント（1回だけ）
                     if (_dwellTimer <= 0f)
                     {
+                        OnArrivedPoint?.Invoke(_currentTarget);
                         _dwellTimer = dwellSecondsAtPoint;
+
+                        if (_dwellTimer > 0f)
+                        {
+                            OnDwellBegan?.Invoke(_currentTarget, _dwellTimer);
+                            _wasDwelling = true;
+                        }
                     }
                 }
 
                 if (_dwellTimer > 0f)
                 {
-                    _dwellTimer -= Time.deltaTime; // Router は FixedUpdate だが許容
-                    // 滞留中はその場（＝現目標）を維持
+                    _dwellTimer -= Time.deltaTime; // Router が FixedUpdate でも許容
+                    if (_dwellTimer <= 0f && _wasDwelling)
+                    {
+                        OnDwellEnded?.Invoke(_currentTarget);
+                        _wasDwelling = false;
+                    }
+                    // 滞留中は現目標を維持
                     goal = MoveGoal.FromPosition(_currentTarget);
                     return true;
                 }
@@ -145,6 +199,7 @@ namespace AnoGame.Application.Enemy.AI
                 {
                     _hasTarget = true;
                     _nextPickAllowedTime = Time.time + minPickInterval;
+                    OnNewTarget?.Invoke(_currentTarget);
                 }
                 else
                 {
@@ -152,6 +207,7 @@ namespace AnoGame.Application.Enemy.AI
                     _currentTarget = center;
                     _hasTarget = true;
                     _nextPickAllowedTime = Time.time + minPickInterval;
+                    OnNewTarget?.Invoke(_currentTarget);
                 }
             }
 
@@ -180,13 +236,10 @@ namespace AnoGame.Application.Enemy.AI
             {
                 for (int i = 0; i < sampleAttempts; i++)
                 {
-                    // XY: (-1..1) の円、Yは0で XZ平面へ
-                    Vector2 rand = Random.insideUnitCircle * r;
+                    Vector2 rand = UnityEngine.Random.insideUnitCircle * r;
 
-                    // 内側除外半径を適用（近すぎる点を避ける）
                     if (innerClearRadius > 0f && rand.sqrMagnitude < innerClearRadius * innerClearRadius)
                     {
-                        // 内円に入ったら外周へ押し出す
                         rand = rand.normalized * Mathf.Max(innerClearRadius, 0.01f);
                     }
 
@@ -208,7 +261,6 @@ namespace AnoGame.Application.Enemy.AI
         {
             if (!active && !hasCenter) return;
 
-            // 中心＆半径
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.35f);
             DrawDisc(center, searchRadius);
             if (innerClearRadius > 0f)
@@ -217,7 +269,6 @@ namespace AnoGame.Application.Enemy.AI
                 DrawDisc(center, innerClearRadius);
             }
 
-            // 現在の目標
             if (_hasTarget)
             {
                 Gizmos.color = Color.yellow;

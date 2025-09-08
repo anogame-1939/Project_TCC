@@ -16,10 +16,24 @@ namespace AnoGame.Application.Direction
         [SerializeField] ChaseIntentProvider chase;
         [SerializeField] InvestigateIntentProvider investigate;
         [SerializeField] ReturnToAnchorIntentProvider ret;
+        [SerializeField] PatrolSplineIntentProvider patrol;
 
         [Header("Defaults")]
         [SerializeField] float defaultEncounterTTL = 2.0f;
         [SerializeField] float defaultInvestigateTTL = 3.0f;
+
+    void Awake()
+    {
+        // Investigate 失敗→帰投開始
+        investigate.OnExpired += lastSeen =>
+        {
+            Debug.Log("見失った！");
+            ret.Deactivate();
+            patrol.IsActive();
+        };
+
+        
+    }
 
         // === Timeline から呼ぶ（SignalReceiver の UnityEvent 1本でOK） ===
         public void BeginEncounter(Transform focus) =>
