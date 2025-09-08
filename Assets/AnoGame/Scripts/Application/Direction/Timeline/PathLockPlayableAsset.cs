@@ -1,28 +1,20 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using UnityEngine.Splines;
 
 [System.Serializable]
 public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
 {
-    // シーン上のパス（Unity Splines）
-    public ExposedReference<SplineContainer> path;
-
-    [Header("Path range (0..1)")]
-    [Range(0,1)] public float from = 0f;
-    [Range(0,1)] public float to   = 1f;
+    [Header("Target (single transform)")]
+    public ExposedReference<Transform> target;     // ← 目的地
 
     [Header("Motion")]
     public float moveSpeed = 2.0f;                 // EventLockControl.MoveToPoint に渡す速度
     [Min(0f)] public float stopDistance = 0.05f;   // 〃
-    public AnimationCurve easing = AnimationCurve.Linear(0,0, 1,1);
 
-    
     [Header("Turn")]
     public TurnMode turnMode = TurnMode.FaceMove;
     public enum TurnMode { Keep, FaceMove, FaceTarget }
-    
     public ExposedReference<Transform> lookAt;     // FaceTarget 用
 
     [Header("Lock")]
@@ -35,15 +27,13 @@ public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
         var playable = ScriptPlayable<PathLockPlayableBehaviour>.Create(graph);
         var b = playable.GetBehaviour();
 
-        b.path = path;
-        b.from = Mathf.Clamp01(from);
-        b.to   = Mathf.Clamp01(to);
-        b.moveSpeed = moveSpeed;
-        b.stopDistance = stopDistance;
-        b.easing = easing ?? AnimationCurve.Linear(0,0,1,1);
-        b.turnMode = turnMode;
-        b.lookAt = lookAt;
-        b.lockDuringClip = lockDuringClip;
+        // クリップ設定を Behaviour にコピー
+        b.target        = target;
+        b.moveSpeed     = moveSpeed;
+        b.stopDistance  = stopDistance;
+        b.turnMode      = turnMode;
+        b.lookAt        = lookAt;
+        b.lockDuringClip= lockDuringClip;
 
         return playable;
     }
@@ -52,11 +42,20 @@ public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
 public class PathLockPlayableBehaviour : PlayableBehaviour
 {
     // クリップ設定（Mixer から参照）
-    public ExposedReference<SplineContainer> path;
-    public float from, to;
+    public ExposedReference<Transform> target;
     public float moveSpeed, stopDistance;
-    public AnimationCurve easing;
     public PathLockPlayableAsset.TurnMode turnMode;
     public ExposedReference<Transform> lookAt;
     public bool lockDuringClip;
+
+    // ランタイム状態（このクリップで MoveToPoint を一度だけ発行するためのフラグ）
+    [System.NonSerialized] public bool issuedOnce;
+    [System.NonSerialized] public int  targetInstanceId;
+
+    public override void OnBehaviourPlay(Playable playable, FrameData info)
+    {
+        // クリップ入り直し時にリセット
+        issuedOnce = false;
+        targetInstanceId = 0;
+    }
 }

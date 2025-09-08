@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using UnityEngine.Splines;
 using AnoGame.Application.Player.Control; // EventLockControl の名前空間
 
 [TrackColor(0.3f, 0.8f, 1f)]
 [TrackClipType(typeof(PathLockPlayableAsset))]
-[TrackBindingType(typeof(EventLockControl))] // ← バインド先は EventLockControl
+[TrackBindingType(typeof(EventLockControl))] // バインド先：EventLockControl
 public class PathLockTrack : TrackAsset
 {
     public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
@@ -26,76 +25,63 @@ public class PathLockMixer : PlayableBehaviour
         int inputCount = playable.GetInputCount();
         var resolver   = playable.GetGraph().GetResolver();
 
-        // 重なりブレンドに対応：各クリップの t を重み付き平均
-        float accumT = 0f, accumW = 0f;
-        SplineContainer chosenPath = null;
-        Transform lookAt = null;
-        PathLockPlayableAsset.TurnMode turnMode = PathLockPlayableAsset.TurnMode.FaceMove;
-        float moveSpeed = 0f, stopDist = 0.05f;
+        // ロック要否 & メイン（最も重い）クリップを決定
         bool anyActive = false;
-        bool needLock = false;
+        bool needLock  = false;
 
         double maxW = 0;
+        ScriptPlayable<PathLockPlayableBehaviour> mainPlayable = default;
+        PathLockPlayableBehaviour mainB = null;
+
         for (int i = 0; i < inputCount; i++)
         {
-            var inputPlayable = (ScriptPlayable<PathLockPlayableBehaviour>)playable.GetInput(i);
-            var weight = playable.GetInputWeight(i);
-            if (weight <= 0) continue;
+            var ip = (ScriptPlayable<PathLockPlayableBehaviour>)playable.GetInput(i);
+            var w  = playable.GetInputWeight(i);
+            if (w <= 0) continue;
 
-            var b = inputPlayable.GetBehaviour();
-            var path = b.path.Resolve(resolver);
-            if (!path || path.Spline == null) continue;
-
-            // 0..1 のクリップ内正規化時間
-            double dur = Mathf.Max(0.0001f, (float)inputPlayable.GetDuration());
-            float t01 = Mathf.Clamp01((float)(inputPlayable.GetTime() / dur));
-            float eased = b.easing != null ? b.easing.Evaluate(t01) : t01;
-            float t = Mathf.Lerp(b.from, b.to, eased);
-
-            accumT += t * (float)weight;
-            accumW += (float)weight;
             anyActive = true;
+            var b = ip.GetBehaviour();
             if (b.lockDuringClip) needLock = true;
 
-            // 最優先（最も重い）クリップのメタを採用
-            if (weight > maxW) {
-                maxW = weight;
-                chosenPath = path;
-                moveSpeed = b.moveSpeed;
-                stopDist  = b.stopDistance;
-                turnMode  = b.turnMode;
-                lookAt    = b.lookAt.Resolve(resolver);
-            }
+            if (w > maxW) { maxW = w; mainPlayable = ip; mainB = b; }
         }
 
-        // ロック管理
+        // ロック管理（再生中のどれか1つでも lockDuringClip ならオン）
         if (needLock && !_locked) { _ctrl.BeginLock(); _locked = true; }
         if (!needLock && _locked) { _ctrl.EndLock();   _locked = false; }
 
-        // 位置目標の更新
-        if (anyActive && accumW > 0f && chosenPath != null)
+        if (mainB == null) return;
+
+        // 向き設定（最も重いクリップに従う）
+        switch (mainB.turnMode)
         {
-            float finalT = accumT / accumW;
-            var pos = (Vector3)chosenPath.EvaluatePosition(finalT);
-
-            // 進行方向の向き設定
-            switch (turnMode)
-            {
-                case PathLockPlayableAsset.TurnMode.Keep:
-                    _ctrl.LookKeep();
-                    break;
-                case PathLockPlayableAsset.TurnMode.FaceMove:
-                    _ctrl.LookFaceMove();
-                    break;
-                case PathLockPlayableAsset.TurnMode.FaceTarget:
-                    if (lookAt != null) _ctrl.LookAt(lookAt);
+            case PathLockPlayableAsset.TurnMode.Keep:     _ctrl.LookKeep();     break;
+            case PathLockPlayableAsset.TurnMode.FaceMove: _ctrl.LookFaceMove(); break;
+            case PathLockPlayableAsset.TurnMode.FaceTarget:
+                {
+                    var t = mainB.lookAt.Resolve(resolver);
+                    if (t != null) _ctrl.LookAt(t);
                     else _ctrl.LookFaceMove();
-                    break;
-            }
-
-            // 目標点へ移動（EventLockControl の ToPoint を使用）
-            _ctrl.MoveToPoint(pos, moveSpeed, stopDist);
+                }
+                break;
         }
+
+        // 目的地 Transform を解決
+        var targetTf = mainB.target.Resolve(resolver);
+        if (targetTf == null) return;
+
+        int id = targetTf.GetInstanceID();
+
+        // ★重要：このクリップでまだ MoveToPoint を発行していない、または目的地が変わった時だけ一度だけ発行
+        if (!mainB.issuedOnce || mainB.targetInstanceId != id)
+        {
+            _ctrl.MoveToPoint(targetTf.position, mainB.moveSpeed, mainB.stopDistance);
+            mainB.issuedOnce = true;
+            mainB.targetInstanceId = id;
+        }
+
+        // 以降は「到着するまで」再発行しない（到着判定は EventLockControl 側の stopDistance に任せる）
+        // クリップ切替時は別インスタンスの Behaviour になるため、新しいクリップで再び一度だけ発行される。
     }
 
     public override void OnPlayableDestroy(Playable playable)
