@@ -5,6 +5,7 @@ using AnoGame.Application.Player.Control; // EventLockControl
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.TinyCharacterController.Interfaces.Components;
 
 namespace AnoGame.Application.Player.Interaction
 {
@@ -87,6 +88,14 @@ namespace AnoGame.Application.Player.Interaction
 
                 // 到達後に発火
                 FireEnter();
+
+                var brain = actor.GetComponent<IBrain>();
+                if (brain != null)
+                {
+                    var yaw = actor.transform.eulerAngles.y;
+                    // ここは IBrain 実装に応じた setter / メソッドに合わせる
+                    // 例: brain.SetYawAngle(yaw); または brain.YawAngle = yaw;
+                }
 
                 // 必要ならここで el.Freeze() / el.EndLock() の順を変える
                 el.EndLock();
