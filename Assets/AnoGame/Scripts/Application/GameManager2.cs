@@ -19,7 +19,6 @@ namespace AnoGame.Application
         private bool _dataLoaded = false;
         public bool DataLoaded => _dataLoaded;
 
-        public event Action<GameData> SaveGameData;
         public event Action<GameData> LoadGameData;
 
         private GameData _currentGameData;
@@ -108,10 +107,6 @@ namespace AnoGame.Application
         public void UpdateGameState(GameData newGameData)
         {
             _currentGameData = newGameData;
-            if (_currentGameData != null)
-            {
-                SaveGameData?.Invoke(_currentGameData);
-            }
         }
 
         public void AddItem()
@@ -157,7 +152,6 @@ namespace AnoGame.Application
             {
                 if (_currentGameData != null)
                 {
-                    SaveGameData?.Invoke(_currentGameData);
                     try
                     {
                         // アプリケーション終了時は同期的に保存を実行
