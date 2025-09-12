@@ -28,8 +28,12 @@ namespace AnoGame.Application.Direction
         investigate.OnExpired += lastSeen =>
         {
             Debug.Log("見失った！");
-            ret.Deactivate();
-            patrol.IsActive();
+            // まずChaseは止めておく（安全）
+            chase.SetActive(false);
+            // 帰投を開始（最近傍のKnotへ）
+            ret.ActivateToNearest();   // ★ ここが Deactivate ではなく Activate
+            // 巡回は常時ONでも良いが、明示的にONにしておくと安心
+            patrol.SetActive(true);
         };
 
         
@@ -46,14 +50,19 @@ namespace AnoGame.Application.Direction
         }
 
         // === ゲーム側（Perception等）から呼ぶ ===
-        public void NotifyLost(Vector3 lastSeen) =>
-            investigate.Activate(lastSeen, defaultInvestigateTTL);  // 失敗時は Provider 内で Return を起動
+        public void NotifyLost(Vector3 lastSeen)
+        {
+            chase.SetActive(false);                 // ★最重要：ChaseをOFF
+            ret.Deactivate();
+            investigate.Activate(lastSeen, defaultInvestigateTTL);
+        }
+
 
         public void NotifyFound()
         {
             investigate.Deactivate();
             ret.Deactivate();
-            chase.SetActive(true);
+            chase.SetActive(true);                  // 再露見＝追跡へ
         }
 
         // 任意：強制中断
