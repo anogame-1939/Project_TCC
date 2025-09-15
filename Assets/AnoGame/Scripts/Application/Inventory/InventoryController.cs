@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
 using AnoGame.Application.Input;
+using UnityEngine.EventSystems;
 
 namespace AnoGame.Application.Inventory
 {
@@ -17,12 +18,18 @@ namespace AnoGame.Application.Inventory
         // Player マップの Inventory 開閉用
         private InputAction _inventoryOpenAction;
         // UI マップの Cancel（閉じる用）
+
+        private InputAction _conrimAction;
         private InputAction _cancelAction;
         // UI マップの Inventory（閉じる用）
         private InputAction _inventoryCloseAction;
 
         [Inject] private IInputActionProvider _inputProvider;
         [Inject] public void Construct(InventoryManager inventoryManager) => _inventoryManager = inventoryManager;
+
+        bool _isModalOpen;
+
+        [SerializeField] ConfirmDialog _confirmDialog;
 
         void Start()
         {
@@ -102,12 +109,15 @@ namespace AnoGame.Application.Inventory
             // _inputProvider.SwitchToUI();
             var uiMap = _inputProvider.GetUIActionMap();
 
-            _cancelAction = uiMap.FindAction("Cancel", throwIfNotFound: true);
-            _cancelAction.performed += OnCancelPerformed;
+            _conrimAction  = uiMap.FindAction("Confirm",  true);
+            _cancelAction   = uiMap.FindAction("Cancel",   true);
+            _inventoryCloseAction = uiMap.FindAction("Inventory", false);
 
-            _inventoryCloseAction = uiMap.FindAction("Inventory", throwIfNotFound: true);
-            if (_inventoryCloseAction != null)
-                _inventoryCloseAction.performed += OnCancelPerformed;
+            _conrimAction.performed  += OnConfirmPerformed;
+            _cancelAction.performed   += OnCancelPerformed;
+            _inventoryCloseAction.performed += OnCancelPerformed;
+
+
 
             // 表示＆カーソル解放
             _canvasGroup.alpha      = 1;
@@ -140,6 +150,24 @@ namespace AnoGame.Application.Inventory
             StartCoroutine(EnforceCursorHide());
         }
 
+        private void OnConfirmPerformed(InputAction.CallbackContext _)
+        {
+            // 例：モーダル中の入力を無視する運用なら
+            if (_isModalOpen) return;
+
+            var go = EventSystem.current?.currentSelectedGameObject;
+            if (go == null) return;
+
+            // 自身に無ければ親から取得
+            InventorySlot slot = null;
+            if (!go.TryGetComponent(out slot))
+                slot = go.GetComponentInParent<InventorySlot>();
+
+            if (slot == null || slot.CurrentItem == null) return;
+
+            OpenConsumeConfirm(slot);
+        }
+
         public void Close()
         {
             Debug.Log("Close");
@@ -159,6 +187,48 @@ namespace AnoGame.Application.Inventory
                 Cursor.visible   = false;
             }
         }
+        
+        private void OpenConsumeConfirm(InventorySlot slot)
+        {
+            var displayName = string.IsNullOrEmpty(slot.LocalizedName)
+                ? slot.CurrentItem.ItemName
+                : slot.LocalizedName;
+
+            _isModalOpen = true; // モーダル運用の場合
+
+            _confirmDialog.Show(
+                title: $"{displayName} を使用しますか？",
+                onYes: () => { Consume(slot); _isModalOpen = false; },
+                onNo:  () => { _isModalOpen = false; }
+            );
+        }
+
+        private void Consume(InventorySlot slot)
+        {
+            var item = slot.CurrentItem;
+            if (item == null) return;
+
+            if (_inventoryManager.RemoveItem(item.ItemName, 1))
+            {
+                // Viewer をリフレッシュ（既存のやり方に合わせて再構築）
+                var items = _inventoryManager.GetInventory();
+                var inv = new AnoGame.Domain.Data.Models.Inventory();
+                foreach (var it in items) inv.AddItem(it);
+                _inventoryViewer.UpdateInventory(inv);
+            }
+            else
+            {
+                // 失敗時のトーストやダイアログなど（任意）
+                _confirmDialog.Show("使用できませんでした", onYes: ()=>{}, onNo: ()=>{});
+            }
+        }
+        
+        private void CloseDialog()
+        {
+            _isModalOpen = false;
+        }
+
+
 
         private void OnApplicationFocus(bool hasFocus)
         {
@@ -167,18 +237,18 @@ namespace AnoGame.Application.Inventory
                 if (GameStateManager.Instance.CurrentState == GameState.Gameplay)
                 {
                     Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible   = false;
+                    Cursor.visible = false;
                 }
                 else
                 {
                     Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible   = true;
+                    Cursor.visible = true;
                 }
             }
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                Cursor.visible   = true;
+                Cursor.visible = true;
             }
         }
     }
