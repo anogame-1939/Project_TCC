@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AnoGame.Domain.Inventory.Services;
+using UnityEngine;
 
 namespace AnoGame.Infrastructure.Services
 {
@@ -12,6 +13,9 @@ namespace AnoGame.Infrastructure.Services
     {
         public event Action<string> OnItemAdded;
         public event Action<string> OnItemRemoved;
+        public event Action<ItemConsumedArgs> OnItemConsumed;
+
+
         private HashSet<string> _itemNames = new();
 
         public void SetItems(HashSet<string> itemNames)
@@ -34,6 +38,12 @@ namespace AnoGame.Infrastructure.Services
             _itemNames.Remove(itemName);
             OnItemRemoved?.Invoke(itemName);
         }
+
+        public bool ConsumeItem(string itemId, int quantity = 1, GameObject user = null, Vector3? usePos = null)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
 

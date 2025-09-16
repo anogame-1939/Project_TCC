@@ -7,6 +7,8 @@ namespace AnoGame.Data
     [CreateAssetMenu(fileName = "New Item", menuName = "AnoGame/Items/Item Data")]
     public class ItemData : ScriptableObject, IItem
     {
+        [SerializeField] private string itemId; // 安定ID（Inspectorで設定 or 自動生成）
+        public string ItemId => itemId;
         [SerializeField] private string itemName;
         [SerializeField] private string description;
         [SerializeField] private AssetReference assetReference;

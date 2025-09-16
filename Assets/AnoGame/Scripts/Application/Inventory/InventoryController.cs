@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using VContainer;
 using AnoGame.Application.Input;
 using UnityEngine.EventSystems;
+using AnoGame.Application.Event;
+using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Application.Inventory
 {
@@ -11,6 +13,7 @@ namespace AnoGame.Application.Inventory
     {
         [SerializeField]
         private InventoryViewer _inventoryViewer;
+        [SerializeField] private ConsumeProximityTracker _tracker;
 
         private CanvasGroup _canvasGroup;
         private InventoryManager _inventoryManager;
@@ -25,7 +28,12 @@ namespace AnoGame.Application.Inventory
         private InputAction _inventoryCloseAction;
 
         [Inject] private IInputActionProvider _inputProvider;
-        [Inject] public void Construct(InventoryManager inventoryManager) => _inventoryManager = inventoryManager;
+        [Inject] private IInventoryService _inventoryService;
+        [Inject] public void Construct(InventoryManager inventoryManager, IInventoryService inventoryService)
+        {
+            _inventoryManager = inventoryManager;
+            _inventoryService = inventoryService;
+        }
 
         bool _isModalOpen;
 
@@ -208,9 +216,27 @@ namespace AnoGame.Application.Inventory
             var item = slot.CurrentItem;
             if (item == null) return;
 
-            if (_inventoryManager.RemoveItem(item.ItemName, 1))
+            var itemId = item.ItemName; // 暫定：将来は ItemId に切替
+            var player = GameObject.FindWithTag("Player");
+            var usePos = player ? player.transform.position : Vector3.zero;
+
+            // 近傍から「今使えるゾーン」を選ぶ
+            if (_tracker != null && _tracker.TryPickUsableZone(itemId, player, usePos,
+                                                            out var zone, out var reason))
             {
-                // Viewer をリフレッシュ（既存のやり方に合わせて再構築）
+                // ここで在庫消費 → 通知ルートに乗せる or ダイレクト起動
+                // 1) 正攻法：在庫消費 → OnItemConsumed 通知 → EventOnConsume.HandleItemConsumed
+                var ok = _inventoryService.ConsumeItem(itemId, 1, player, usePos);
+                if (!ok)
+                {
+                    _confirmDialog.Show("在庫が足りません。", onYes: () => { }, onNo: () => { });
+                    return;
+                }
+
+                // 2) あるいはダイレクトに実行（通知を待たず即起動したい場合）
+                // zone.TryStart(itemId, player, usePos);
+
+                // UI更新（既存の再構築ロジック）
                 var items = _inventoryManager.GetInventory();
                 var inv = new AnoGame.Domain.Data.Models.Inventory();
                 foreach (var it in items) inv.AddItem(it);
@@ -218,8 +244,8 @@ namespace AnoGame.Application.Inventory
             }
             else
             {
-                // 失敗時のトーストやダイアログなど（任意）
-                _confirmDialog.Show("使用できませんでした", onYes: ()=>{}, onNo: ()=>{});
+                Debug.Log("消費できず");
+                // _confirmDialog.Show(reason ?? "ここでは使用できません。", onYes: ()=>{}, onNo: ()=>{});
             }
         }
         
