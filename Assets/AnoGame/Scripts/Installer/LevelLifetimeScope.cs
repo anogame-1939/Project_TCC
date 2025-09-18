@@ -46,6 +46,12 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(condition));
             }
 
+            var eventOnConsumes = FindObjectsByType<EventOnConsume>(FindObjectsSortMode.None);
+            foreach (var eventOnConsume in eventOnConsumes)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(eventOnConsume));
+            }
+
             // builder.RegisterEntryPoint<LevelInitializer>();
         }
     }

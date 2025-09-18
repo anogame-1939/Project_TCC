@@ -1,5 +1,5 @@
-// ConfirmDialog（UGUI）
 using System;
+using System.Collections;
 using AnoGame.Application.Input;
 using TMPro;
 using UnityEngine;
@@ -16,6 +16,7 @@ public sealed class ConfirmDialog : MonoBehaviour
 
     InputAction _confirm, _cancel;
     Action _onYes, _onNo;
+    bool _canAcceptInput = false; // ← クールタイム制御フラグ
     
     [Inject] private IInputActionProvider _inputProvider;
 
@@ -29,6 +30,8 @@ public sealed class ConfirmDialog : MonoBehaviour
         var ui = _inputProvider.GetUIActionMap();
         _confirm = ui.FindAction("Confirm", true);
         _cancel = ui.FindAction("Cancel", true);
+
+        // すぐに購読はするが、入力フラグはfalseのまま
         _confirm.performed += OnSubmit;
         _cancel.performed += OnCancel;
 
@@ -37,17 +40,38 @@ public sealed class ConfirmDialog : MonoBehaviour
         noButton.onClick.AddListener(() => OnCancel(default));
 
         EventSystem.current.SetSelectedGameObject(yesButton.gameObject);
+
+        // クールタイム開始
+        StartCoroutine(InputCooldownCoroutine(0.5f));
+    }
+
+    IEnumerator InputCooldownCoroutine(float delay)
+    {
+        _canAcceptInput = false;
+        yield return new WaitForSeconds(delay);
+        _canAcceptInput = true;
     }
 
     public void Hide()
     {
         _confirm.performed -= OnSubmit;
-        _cancel .performed -= OnCancel;
+        _cancel.performed -= OnCancel;
         yesButton.onClick.RemoveAllListeners();
         noButton.onClick.RemoveAllListeners();
         gameObject.SetActive(false);
     }
 
-    void OnSubmit(InputAction.CallbackContext _){ _onYes?.Invoke(); Hide(); }
-    void OnCancel(InputAction.CallbackContext _){ _onNo?.Invoke();  Hide(); }
+    void OnSubmit(InputAction.CallbackContext _)
+    {
+        if (!_canAcceptInput) return;  // ← クールタイム中は無視
+        _onYes?.Invoke();
+        Hide();
+    }
+
+    void OnCancel(InputAction.CallbackContext _)
+    {
+        if (!_canAcceptInput) return;  // ← クールタイム中は無視
+        _onNo?.Invoke();
+        Hide();
+    }
 }

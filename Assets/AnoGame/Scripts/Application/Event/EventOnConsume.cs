@@ -17,7 +17,7 @@ namespace AnoGame.Application.Event
             [Header("どのアイテムを消費したとき？")]
             public ItemData item;          // Inspector 用（編集体験）
             [SerializeField, Tooltip("実行時に使う安定ID。OnValidateでitemから自動反映")]
-            public string itemId;          // 実行時はこちらのみ使用
+            public string itemId => item.ItemName;          // 実行時はこちらのみ使用
 
             [Header("起動するイベント（EventData or 直接Trigger指定）")]
             public EventData eventData;
@@ -41,6 +41,14 @@ namespace AnoGame.Application.Event
 
         [Inject] private IInventoryService _inventory;
         [Inject] private IEventService _eventService;
+
+        [Inject]
+        public virtual void Construct(IInventoryService inventory, IEventService eventService)
+        {
+            _inventory = inventory;
+            _eventService = eventService;
+        }
+
 
         private bool _subscribed;
 
@@ -194,7 +202,7 @@ namespace AnoGame.Application.Event
                 if (r.item != null)
                 {
                     // 【前提】ItemData に ItemId がある
-                    r.itemId = r.item.ItemId; // 無ければ r.item.ItemName に置換
+                    // r.itemId = r.item.ItemId; // 無ければ r.item.ItemName に置換
                 }
             }
         }

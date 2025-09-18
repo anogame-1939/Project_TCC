@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AnoGame.Application.Event
@@ -65,6 +66,22 @@ namespace AnoGame.Application.Event
             zone = null;
             reason = "付近に使用可能なイベントがありません。";
             return false;
+        }
+
+        /// <summary>
+        /// コンテキストメニューから呼んで、現在の NearbyZones をログに出す
+        /// </summary>
+        [ContextMenu("Debug/Print Nearby Zones")]
+        private void DebugPrintNearbyZones()
+        {
+            if (_nearby.Count == 0)
+            {
+                Debug.Log("[ConsumeTracker] NearbyZones is empty", this);
+                return;
+            }
+
+            var names = _nearby.Select(z => z.GetDebugName()).ToArray();
+            Debug.Log($"[ConsumeTracker] NearbyZones ({_nearby.Count}): {string.Join(", ", names)}", this);
         }
     }
 }
