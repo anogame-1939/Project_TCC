@@ -13,6 +13,8 @@ using AnoGame.Application.Inventory;
 using AnoGame.Application.Event;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Settings;
+using AnoGame.Apllication.Direction;
+using AnoGame.Application.Player.Control;
 
 namespace AnoGame.Application.Core
 {
@@ -20,16 +22,21 @@ namespace AnoGame.Application.Core
     {
         [SerializeField]
         ItemDatabase itemDatabase;
+        
+        [SerializeField] private EventLockControl _eventLockControl;
+        [SerializeField] private CinematicBars mainBars;
 
         protected override void Configure(IContainerBuilder builder)
         {
             // サービスの登録
             // builder.Register<EventService>(Lifetime.Singleton)
-               // .AsImplementedInterfaces();
+            // .AsImplementedInterfaces();
+            builder.RegisterComponent(_eventLockControl); 
+            builder.RegisterComponent(mainBars); 
 
-           
 
-            
+
+
             builder.Register<IGameDataRepository, GameDataRepository>(Lifetime.Singleton);
             builder.Register<IEventService, EventService>(Lifetime.Singleton);
             builder.Register<IInventoryService, InventoryService>(Lifetime.Singleton);
@@ -65,10 +72,10 @@ namespace AnoGame.Application.Core
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(trigger));
             }
-            
+
 
             builder.RegisterEntryPoint<LevelInitializer>();
-            
+
 
         }
     }
