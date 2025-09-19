@@ -146,7 +146,34 @@ namespace AnoGame.Application.Player.Control
 
         // ---- テスト用API（外部から操作しやすいユーティリティ） ----
         public void BeginLock() => _isActive = true;
-        public void EndLock() => _isActive = false;
+        public void EndLock(bool resetState = true)
+        {
+            _isActive = false;
+
+            // ★ デフォルトで状態クリアしておく（勝手移動の再発防止）
+            if (resetState)
+                ResetMoveTurnState(snapTargetToCurrentPosition: true);
+        }
+
+        private void ResetMoveTurnState(bool snapTargetToCurrentPosition)
+        {
+            // Move 側の初期化（安全なデフォルト）
+            moveBehavior = MoveBehavior.Freeze;
+            moveSpeed = 2.0f;                  // 既定を維持するならそのまま
+            constantDirection = Vector3.zero;  // 誤発進防止
+            followTarget = null;
+            stopDistance = Mathf.Max(0f, stopDistance); // そのまま維持 or 既定に戻す
+
+            // 「0 に戻す」か「現在位置に寄せる」かを選択
+            targetPoint = snapTargetToCurrentPosition ? transform.position : Vector3.zero;
+
+            _lastVelocity = Vector3.zero;
+
+            // Turn 側の初期化（必要なら）
+            lookAtTarget = null;
+            // デフォルトの向きモードに戻す（Keepが自然ならそちらでもOK）
+            turnBehavior = TurnBehavior.FaceMoveDirection;
+        }
 
         public void Freeze() { moveBehavior = MoveBehavior.Freeze; }
         public void MoveConstant(Vector3 worldDir, float speed)
