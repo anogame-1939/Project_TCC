@@ -23,7 +23,7 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField, Min(0.1f)] private float moveSpeed = 2.0f;
         [SerializeField, Min(0.0f)] private float stopDistance = 0.05f;
 
-        [Header("プリペア（シンプル発火）")]
+        [Header("イベント（移動前）")]
         [SerializeField] private UnityEvent onPrepareBegin;
         [SerializeField] private UnityEvent onPrepare;           // 毎フレーム
         [SerializeField] private UnityEvent onPrepareComplete;

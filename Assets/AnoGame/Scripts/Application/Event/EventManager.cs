@@ -3,6 +3,10 @@ using VContainer;
 
 namespace AnoGame.Application.Event
 {
+    /// <summary>
+    /// EventManager呼び出してるけど、あまり意味ない
+    /// _gameManager.CurrentGameData.EventHistoryも参照してるけど多分使ってない
+    /// </summary>
     public class EventManager
     {
         private readonly GameManager2 _gameManager;
