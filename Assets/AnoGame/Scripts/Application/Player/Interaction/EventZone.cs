@@ -9,13 +9,6 @@ using Unity.TinyCharacterController.Interfaces.Components;
 
 namespace AnoGame.Application.Player.Interaction
 {
-    /// <summary>
-    /// Player がトリガーに入ると、approachPath を順に辿り、到達時に onPlayerEnter を発火。
-    /// - Collider は isTrigger を推奨
-    /// - Player 判定は Tag で実施（既定 "Player"）
-    /// - EventLockControl が Actor(=Player) にあれば移動制御を行う
-    ///   無ければ path を飛ばして即時 onPlayerEnter を発火
-    /// </summary>
     [AddComponentMenu("AnoGame/Event Zone (Path->Invoke)")]
     [RequireComponent(typeof(Collider))]
     public class EventZone : MonoBehaviour
@@ -30,7 +23,12 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField, Min(0.1f)] private float moveSpeed = 2.0f;
         [SerializeField, Min(0.0f)] private float stopDistance = 0.05f;
 
-        [Header("イベント")]
+        [Header("プリペア（シンプル発火）")]
+        [SerializeField] private UnityEvent onPrepareBegin;
+        [SerializeField] private UnityEvent onPrepare;           // 毎フレーム
+        [SerializeField] private UnityEvent onPrepareComplete;
+
+        [Header("イベント（到達後）")]
         [SerializeField] private UnityEvent onPlayerEnter;
         [SerializeField] private UnityEvent onPlayerExit;
 
@@ -59,7 +57,7 @@ namespace AnoGame.Application.Player.Interaction
         {
             try
             {
-                // path 無し or 全て null → ただちに発火
+                // path 無し or 全て null → ただちに到達イベントのみ
                 if (!HasValidPath(approachPath))
                 {
                     FireEnter();
@@ -69,36 +67,42 @@ namespace AnoGame.Application.Player.Interaction
                 var el = FindEventLock(actor);
                 if (el == null)
                 {
-                    // EventLockControl が無い場合は即時発火（安全策）
+                    // 安全策：ロック不可なら即時到達扱い
                     FireEnter();
                     return;
                 }
 
-                // --- EventLockControl を使って移動制御 ---
+                // プリペア開始
+                onPrepareBegin?.Invoke();
+
+                // ---- 移動制御開始 ----
                 el.BeginLock();
                 el.LookFaceMove();
 
                 foreach (var p in approachPath)
                 {
                     if (p == null) continue;
+
                     el.MoveToPoint(p.position, moveSpeed, stopDistance);
-                    await WaitArriveAsync(actor, p.position, ct);
+                    await WaitArriveAsync(actor, p.position, ct, onPrepare);
                     if (ct.IsCancellationRequested) return;
                 }
 
-                // 到達後に発火
+                // プリペア完了
+                onPrepareComplete?.Invoke();
+
+                // 到達後イベント
                 FireEnter();
 
+                // 例：向きの確定など必要ならここで
                 var brain = actor.GetComponent<IBrain>();
                 if (brain != null)
                 {
                     var yaw = actor.transform.eulerAngles.y;
-                    // ここは IBrain 実装に応じた setter / メソッドに合わせる
-                    // 例: brain.SetYawAngle(yaw); または brain.YawAngle = yaw;
+                    // brain.SetYawAngle(yaw); // 実装に合わせて
                 }
 
-                // 必要ならここで el.Freeze() / el.EndLock() の順を変える
-                el.EndLock();
+                // el.EndLock();
             }
             finally
             {
@@ -126,14 +130,20 @@ namespace AnoGame.Application.Player.Interaction
             return actor.GetComponent<EventLockControl>() ?? actor.GetComponentInParent<EventLockControl>();
         }
 
-        private async UniTask WaitArriveAsync(Transform actor, Vector3 dest, CancellationToken ct)
+        private async UniTask WaitArriveAsync(Transform actor, Vector3 dest, CancellationToken ct, UnityEvent onPrepareTick)
         {
             var sq = Mathf.Max(0.0001f, stopDistance * stopDistance);
+            var destFlat = dest; destFlat.y = 0f;
+
             while (!ct.IsCancellationRequested)
             {
+                // プリペア（毎フレーム）
+                onPrepareTick?.Invoke();
+
                 var p = actor.position;
-                p.y = 0f; dest.y = 0f;
-                if ((p - dest).sqrMagnitude <= sq) break;
+                p.y = 0f;
+                if ((p - destFlat).sqrMagnitude <= sq) break;
+
                 await UniTask.Yield(PlayerLoopTiming.Update, ct);
             }
         }
