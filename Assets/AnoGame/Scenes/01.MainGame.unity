@@ -3394,6 +3394,14 @@ MonoBehaviour:
   moveSpeed: 4
   stopDistance: 0.05
   validDistance: 10
+  showGizmos: 1
+  showLabels: 1
+  pointRadius: 0.08
+  arrowSize: 0.25
+  pathColor: {r: 0, g: 0.8, b: 1, a: 0.9}
+  hideColor: {r: 0.2, g: 1, b: 0.2, a: 1}
+  exitColor: {r: 1, g: 0.9, b: 0.2, a: 1}
+  invalidColor: {r: 1, g: 0.3, b: 0.3, a: 0.8}
 --- !u!65 &69573957
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -34791,7 +34799,7 @@ MonoBehaviour:
   movePriority: 1000
   turnPriority: 1000
   _isActive: 0
-  moveBehavior: 0
+  moveBehavior: 2
   moveSpeed: 2
   constantDirection: {x: 0, y: 0, z: 1}
   followTarget: {fileID: 0}
@@ -38336,7 +38344,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 207.77768}
+  m_AnchoredPosition: {x: 0, y: 207.77766}
   m_SizeDelta: {x: 0, y: 486.223}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &660101641
@@ -86896,8 +86904,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 996609995}
   m_HandleRect: {fileID: 996609993}
   m_Direction: 2
-  m_Value: -0.00000014687612
-  m_Size: 0.5726324
+  m_Value: 0.00000014687612
+  m_Size: 0.57267
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -90899,6 +90907,14 @@ MonoBehaviour:
   moveSpeed: 3
   stopDistance: 0.05
   validDistance: 3
+  showGizmos: 1
+  showLabels: 1
+  pointRadius: 0.08
+  arrowSize: 0.25
+  pathColor: {r: 0, g: 0.8, b: 1, a: 0.9}
+  hideColor: {r: 0.2, g: 1, b: 0.2, a: 1}
+  exitColor: {r: 1, g: 0.9, b: 0.2, a: 1}
+  invalidColor: {r: 1, g: 0.3, b: 0.3, a: 0.8}
 --- !u!1001 &1830621922
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94836,6 +94852,14 @@ MonoBehaviour:
   moveSpeed: 4
   stopDistance: 0.05
   validDistance: 10
+  showGizmos: 1
+  showLabels: 1
+  pointRadius: 0.08
+  arrowSize: 0.25
+  pathColor: {r: 0, g: 0.8, b: 1, a: 0.9}
+  hideColor: {r: 0.2, g: 1, b: 0.2, a: 1}
+  exitColor: {r: 1, g: 0.9, b: 0.2, a: 1}
+  invalidColor: {r: 1, g: 0.3, b: 0.3, a: 0.8}
 --- !u!65 &1939834250
 BoxCollider:
   m_ObjectHideFlags: 0

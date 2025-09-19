@@ -53,6 +53,11 @@ namespace AnoGame.Application.Core
             }
 
             // builder.RegisterEntryPoint<LevelInitializer>();
+            var proxies = FindObjectsByType<TimelineEventLockProxy>(FindObjectsSortMode.None);
+            foreach (var p in proxies)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(p));
+            }
         }
     }
 

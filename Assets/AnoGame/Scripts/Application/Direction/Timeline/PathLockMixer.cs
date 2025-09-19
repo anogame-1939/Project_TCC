@@ -57,7 +57,7 @@ public class PathLockMixer : PlayableBehaviour
         }
 
         // 目的地 Transform を解決
-        var targetTf = mainB.target.Resolve(resolver);
+        var targetTf = mainB.target;
         if (targetTf == null) return;
 
         int id = targetTf.GetInstanceID();

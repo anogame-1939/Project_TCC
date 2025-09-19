@@ -27,8 +27,10 @@ public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
         var playable = ScriptPlayable<PathLockPlayableBehaviour>.Create(graph);
         var b = playable.GetBehaviour();
 
+        var resolver = graph.GetResolver();
+
         // クリップ設定を Behaviour にコピー
-        b.target        = target;
+        b.target        = target.Resolve(resolver);
         b.moveSpeed     = moveSpeed;
         b.stopDistance  = stopDistance;
         b.turnMode      = turnMode;
@@ -42,7 +44,7 @@ public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
 public class PathLockPlayableBehaviour : PlayableBehaviour
 {
     // クリップ設定（Mixer から参照）
-    public ExposedReference<Transform> target;
+    public Transform  target;
     public float moveSpeed, stopDistance;
     public PathLockPlayableAsset.TurnMode turnMode;
     public ExposedReference<Transform> lookAt;
