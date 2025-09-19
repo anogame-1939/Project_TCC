@@ -6,6 +6,8 @@ namespace AnoGame.Application.Event
     /// <summary>
     /// EventManager呼び出してるけど、あまり意味ない
     /// _gameManager.CurrentGameData.EventHistoryも参照してるけど多分使ってない
+    /// いや、使ってるわ
+    /// ゲームデータとしてクリア済みイベントを保持させて、セーブ時に書き込んでる
     /// </summary>
     public class EventManager
     {
