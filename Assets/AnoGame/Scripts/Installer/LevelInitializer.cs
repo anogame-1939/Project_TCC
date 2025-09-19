@@ -40,7 +40,7 @@ namespace AnoGame.Application.Core
         {
             if (_gameManager.CurrentGameData.EventHistory != null)
             {
-                _eventService.SetCleadEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+                _eventService.SetClearedEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
 
             }
 

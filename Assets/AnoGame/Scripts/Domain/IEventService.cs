@@ -6,7 +6,7 @@ namespace AnoGame.Domain.Event.Services
     public interface IEventService
     {
         event Action LoadedClearEvent;
-        void SetCleadEvents(HashSet<string> clearedEventIDs);
+        void SetClearedEvents(HashSet<string> clearedEventIDs);
         bool IsEventCleared(string eventID);
         void RegisterStartEventHandler(string eventID, System.Action handler);
         void RegisterCompleteEventHandler(string eventID, System.Action handler);

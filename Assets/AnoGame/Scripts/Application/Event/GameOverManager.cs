@@ -53,7 +53,7 @@ namespace AnoGame.Application.Event
             UnityEngine.Debug.Log($"itemNames.Count:{itemNames.Count}");
 
             // イベントをリセット
-            _eventService.SetCleadEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+            _eventService.SetClearedEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
         }
 
         public async void OnRetryGame()
