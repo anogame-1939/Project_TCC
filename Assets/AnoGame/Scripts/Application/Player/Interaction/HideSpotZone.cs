@@ -5,6 +5,10 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace AnoGame.Application.Player.Interaction
 {
     public struct HideRequested
@@ -47,6 +51,16 @@ namespace AnoGame.Application.Player.Interaction
         public System.Action<Transform> EnterHide;
 
         private Transform _occupant; // 占有者（1人用スポット）
+
+        [Header("Gizmos")]
+        [SerializeField] private bool showGizmos = true;
+        [SerializeField] private bool showLabels = true;
+        [SerializeField] private float pointRadius = 0.08f;
+        [SerializeField] private float arrowSize = 0.25f;
+        [SerializeField] private Color pathColor = new(0f, 0.8f, 1f, 0.9f);   // 水色
+        [SerializeField] private Color hideColor = new(0.2f, 1f, 0.2f, 1f);   // 緑
+        [SerializeField] private Color exitColor = new(1f, 0.9f, 0.2f, 1f);   // 黄
+        [SerializeField] private Color invalidColor = new(1f, 0.3f, 0.3f, 0.8f); // 赤
 
         // ===== 入口：オプション提示 =====
         public override bool TryBuildOptions(Transform actor, System.Collections.Generic.List<InteractionOption> buffer)
@@ -210,9 +224,101 @@ namespace AnoGame.Application.Player.Interaction
         }
 
 #if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (!showGizmos) return;
+
+            // 経路点（approachPath）を「null を除いて」集約
+            System.Span<Transform> span = approachPath is { Length: > 0 }
+                ? new System.Span<Transform>(approachPath)
+                : System.Span<Transform>.Empty;
+
+            // 1) approachPath: 点と線・矢印
+            Vector3? prev = null;
+            Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
+
+            foreach (var t in span)
+            {
+                if (t == null) continue;
+
+                // 点
+                Handles.color = pathColor;
+                Handles.SphereHandleCap(0, t.position, Quaternion.identity, pointRadius, EventType.Repaint);
+
+                // ラベル
+                if (showLabels)
+                {
+                    Handles.Label(t.position + Vector3.up * (pointRadius * 2f), $"Path({t.name})");
+                }
+
+                // 線と矢印
+                if (prev.HasValue)
+                {
+                    Handles.DrawLine(prev.Value, t.position, 2f);
+                    DrawArrow(prev.Value, t.position, arrowSize, pathColor);
+                }
+                prev = t.position;
+            }
+
+            // 2) hidePoint: 最終隠れ位置（緑）
+            if (hidePoint != null)
+            {
+                Handles.color = hideColor;
+                Handles.SphereHandleCap(0, hidePoint.position, Quaternion.identity, pointRadius * 1.2f, EventType.Repaint);
+                if (showLabels) Handles.Label(hidePoint.position + Vector3.up * (pointRadius * 2f), $"Hide({hidePoint.name})");
+
+                // 有効距離の可視化（validDistance）
+                if (validDistance > 0f)
+                {
+                    Handles.DrawWireDisc(hidePoint.position, Vector3.up, validDistance);
+                }
+
+                // 経路がある場合は終端→hidePoint も描画
+                if (prev.HasValue)
+                {
+                    Handles.color = pathColor;
+                    Handles.DrawLine(prev.Value, hidePoint.position, 2f);
+                    DrawArrow(prev.Value, hidePoint.position, arrowSize, pathColor);
+                }
+            }
+            else
+            {
+                // hidePoint 未設定時は警告表示
+                Handles.color = invalidColor;
+                var p = transform.position + Vector3.up * 0.05f;
+                Handles.CubeHandleCap(0, p, Quaternion.identity, pointRadius * 1.2f, EventType.Repaint);
+                if (showLabels) Handles.Label(p + Vector3.up * (pointRadius * 2f), "HidePoint = null");
+            }
+
+            // 3) exitPoint: 退出位置（黄）＆ hidePoint から矢印
+            if (exitPoint != null)
+            {
+                Handles.color = exitColor;
+                Handles.SphereHandleCap(0, exitPoint.position, Quaternion.identity, pointRadius * 1.2f, EventType.Repaint);
+                if (showLabels) Handles.Label(exitPoint.position + Vector3.up * (pointRadius * 2f), $"Exit({exitPoint.name})");
+
+                if (hidePoint != null)
+                {
+                    Handles.color = exitColor;
+                    Handles.DrawDottedLine(hidePoint.position, exitPoint.position, 3f);
+                    DrawArrow(hidePoint.position, exitPoint.position, arrowSize, exitColor);
+                }
+            }
+        }
+
+        private static void DrawArrow(Vector3 from, Vector3 to, float size, Color c)
+        {
+            var dir = to - from;
+            if (dir.sqrMagnitude < 0.0001f) return;
+            var rot = Quaternion.LookRotation(dir.normalized, Vector3.up);
+            var mid = Vector3.Lerp(from, to, 0.8f); // 先端寄りに矢印ヘッド
+            Handles.color = c;
+            Handles.ArrowHandleCap(0, mid, rot, size, EventType.Repaint);
+        }
+
         private void OnValidate()
         {
-            // approachPath の最初と最後の「null でない」要素を拾う
+            // 既存ロジック：approachPath の最初/最後の非 null を拾って exitPoint/hidePoint を補完
             Transform first = null, last = null;
             if (approachPath != null && approachPath.Length > 0)
             {
@@ -226,6 +332,9 @@ namespace AnoGame.Application.Player.Interaction
 
             if (first != null) exitPoint = first;
             if (last != null) hidePoint = last;
+
+            // エディタ上の再描画
+            SceneView.RepaintAll();
         }
 #endif
     }
