@@ -49,7 +49,7 @@ public class PathLockMixer : PlayableBehaviour
             case PathLockPlayableAsset.TurnMode.FaceMove: _ctrl.LookFaceMove(); break;
             case PathLockPlayableAsset.TurnMode.FaceTarget:
                 {
-                    var t = mainB.lookAt.Resolve(resolver);
+                    var t = mainB.lookAt;
                     if (t != null) _ctrl.LookAt(t);
                     else _ctrl.LookFaceMove();
                 }

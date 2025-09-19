@@ -54,25 +54,29 @@ public sealed class PathLockProxyMixer : PlayableBehaviour
             proxy.MoveTo(bhv.target, bhv.moveSpeed, bhv.stopDistance);
         }
 
-        /*
         // 向きの制御（例）
-        switch (bhv.faceMode)
+        switch (bhv.turnMode)
         {
-            case FaceMode.FaceMove:
-                proxy.FaceTowards(bhv.moveDirection); // moveDirection は適宜算出 or Asset 側で保持
+            case PathLockPlayableAsset.TurnMode.Keep:
+                proxy.LookKeep();
                 break;
-            case FaceMode.FaceTarget:
+
+            case PathLockPlayableAsset.TurnMode.FaceMove:
+                proxy.LookFaceMove();
+                break;
+
+            case PathLockPlayableAsset.TurnMode.FaceTarget:
                 if (bhv.lookAt != null)
                 {
-                    var dir = (bhv.lookAt.position - bhv.target.position).normalized;
-                    proxy.FaceTowards(dir);
+                    proxy.LookAt(bhv.lookAt);
+                }
+                else
+                {
+                    // FaceTarget だが lookAt 未設定ならフォールバック
+                    proxy.LookFaceMove();
                 }
                 break;
-            case FaceMode.Keep:
-            default:
-                break;
         }
-        */
     }
 
     public override void OnPlayableDestroy(Playable playable)

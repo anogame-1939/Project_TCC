@@ -6,19 +6,19 @@ using UnityEngine.Timeline;
 public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
 {
     [Header("Target (single transform)")]
-    public ExposedReference<Transform> target;     // ← 目的地
+    public ExposedReference<Transform> target;
 
     [Header("Motion")]
-    public float moveSpeed = 2.0f;                 // EventLockControl.MoveToPoint に渡す速度
-    [Min(0f)] public float stopDistance = 0.05f;   // 〃
+    public float moveSpeed = 2.0f;
+    [Min(0f)] public float stopDistance = 0.05f;
 
     [Header("Turn")]
     public TurnMode turnMode = TurnMode.FaceMove;
     public enum TurnMode { Keep, FaceMove, FaceTarget }
-    public ExposedReference<Transform> lookAt;     // FaceTarget 用
+    public ExposedReference<Transform> lookAt;     // ★ ここは Exposed のままでOK（解決は下で）
 
     [Header("Lock")]
-    public bool lockDuringClip = true;             // クリップ中だけ Begin/EndLock する
+    public bool lockDuringClip = true;
 
     public ClipCaps clipCaps => ClipCaps.Blending | ClipCaps.SpeedMultiplier | ClipCaps.ClipIn;
 
@@ -29,12 +29,12 @@ public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
 
         var resolver = graph.GetResolver();
 
-        // クリップ設定を Behaviour にコピー
+        // クリップ設定を Behaviour にコピー（★ Resolve 済みを渡す）
         b.target        = target.Resolve(resolver);
         b.moveSpeed     = moveSpeed;
         b.stopDistance  = stopDistance;
         b.turnMode      = turnMode;
-        b.lookAt        = lookAt;
+        b.lookAt        = lookAt.Resolve(resolver);   // ★ 追加：Resolve して Transform を渡す
         b.lockDuringClip= lockDuringClip;
 
         return playable;
@@ -44,20 +44,23 @@ public class PathLockPlayableAsset : PlayableAsset, ITimelineClipAsset
 public class PathLockPlayableBehaviour : PlayableBehaviour
 {
     // クリップ設定（Mixer から参照）
-    public Transform  target;
+    public Transform target;
     public float moveSpeed, stopDistance;
     public PathLockPlayableAsset.TurnMode turnMode;
-    public ExposedReference<Transform> lookAt;
+    public Transform lookAt;                // ★ ExposedReference → Transform に変更
     public bool lockDuringClip;
 
-    // ランタイム状態（このクリップで MoveToPoint を一度だけ発行するためのフラグ）
+    // 一度打ちや重複呼びを避けたい場合に使えるキャッシュ（必要に応じて）
     [System.NonSerialized] public bool issuedOnce;
     [System.NonSerialized] public int  targetInstanceId;
+    [System.NonSerialized] public PathLockPlayableAsset.TurnMode lastTurnMode;
+    [System.NonSerialized] public int  lastLookAtInstanceId;
 
     public override void OnBehaviourPlay(Playable playable, FrameData info)
     {
-        // クリップ入り直し時にリセット
         issuedOnce = false;
-        targetInstanceId = 0;
+        targetInstanceId = target ? target.GetInstanceID() : 0;
+        lastTurnMode = (PathLockPlayableAsset.TurnMode)(-1);
+        lastLookAtInstanceId = lookAt ? lookAt.GetInstanceID() : 0;
     }
 }
