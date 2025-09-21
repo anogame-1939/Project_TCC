@@ -73,36 +73,12 @@ namespace AnoGame.Application.Direction.Glitch
             if (!enabled && digital) SetDigitalIntensity(0f);
         }
 
-        public void SetAnalogParams(float scanLineJitter, float verticalJump, float horizontalShake, float colorDrift)
-        {
-            if (!analog) return;
-            // AnalogGlitch は targetMaterial に値を流し込む仕組み（あなたの改修版）なので
-            // フィールドに直接代入して LateUpdate で Material に反映させる方針でもOKだが、
-            // ここでは即時反映のために公開セッタを追加していない前提で、SerializeFieldを直接触るなら
-            // Editor/Runtime の都合上リフレクション or 公開setterが必要。
-            // ここでは最小：Material へ直書き（AnalogGlitch と同じ式）
-            var mat = analog ? analog.targetMaterial : null;
-            if (!mat) return;
-
-            float t = Time.time;
-            float vjTime = t * verticalJump * 11.3f; // 概ね同等の動きに
-            var sl_thresh = Mathf.Clamp01(1.0f - scanLineJitter * 1.2f);
-            var sl_disp = 0.002f + Mathf.Pow(scanLineJitter, 3) * 0.05f;
-
-            mat.SetVector("_ScanLineJitter", new Vector2(sl_disp, sl_thresh));
-            mat.SetVector("_VerticalJump", new Vector2(verticalJump, vjTime));
-            mat.SetFloat("_HorizontalShake", horizontalShake * 0.2f);
-            mat.SetVector("_ColorDrift", new Vector2(colorDrift * 0.04f, t * 606.11f));
-        }
+        public void SetAnalogParams(float scan, float vjump, float hshake, float drift)
+            => analog?.SetParams(scan, vjump, hshake, drift);
 
         public void SetDigitalIntensity(float intensity)
-        {
-            if (!digital) return;
-            digital.intensity = intensity;             // あなたの改修版 API
-            if (digital.targetMaterial)
-                digital.targetMaterial.SetFloat("_Intensity", intensity);
-        }
-
+            => digital?.SetIntensity(intensity);
+            
         public void ApplyAnalogProfile(AnalogGlitchProfile profile)
         {
             if (!profile) return;

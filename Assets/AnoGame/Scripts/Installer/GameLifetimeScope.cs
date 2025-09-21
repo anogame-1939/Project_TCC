@@ -35,7 +35,9 @@ namespace AnoGame.Application.Core
             // .AsImplementedInterfaces();
             builder.RegisterComponent(_eventLockControl);
             builder.RegisterComponent(mainBars);
-            builder.RegisterComponent(glitchController);
+            builder.RegisterComponent(glitchController)
+                       .As<IGlitchController>()
+                       .AsSelf();
 
 
 

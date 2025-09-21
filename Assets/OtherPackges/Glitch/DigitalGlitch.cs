@@ -21,6 +21,8 @@ namespace Kino
 
         static Color RandomColor() => new Color(Random.value, Random.value, Random.value, Random.value);
 
+        public void SetIntensity(float value) => intensity = Mathf.Clamp01(value);
+
         void SetUpResources()
         {
             if (_material != null) return;
