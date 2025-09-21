@@ -15,6 +15,7 @@ using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Settings;
 using AnoGame.Apllication.Direction;
 using AnoGame.Application.Player.Control;
+using AnoGame.Application.Direction.Glitch;
 
 namespace AnoGame.Application.Core
 {
@@ -25,14 +26,16 @@ namespace AnoGame.Application.Core
         
         [SerializeField] private EventLockControl _eventLockControl;
         [SerializeField] private CinematicBars mainBars;
+        [SerializeField] private GlitchController glitchController;
 
         protected override void Configure(IContainerBuilder builder)
         {
             // サービスの登録
             // builder.Register<EventService>(Lifetime.Singleton)
             // .AsImplementedInterfaces();
-            builder.RegisterComponent(_eventLockControl); 
-            builder.RegisterComponent(mainBars); 
+            builder.RegisterComponent(_eventLockControl);
+            builder.RegisterComponent(mainBars);
+            builder.RegisterComponent(glitchController);
 
 
 

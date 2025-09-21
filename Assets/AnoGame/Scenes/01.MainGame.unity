@@ -5560,6 +5560,7 @@ GameObject:
   - component: {fileID: 123524401}
   - component: {fileID: 123524403}
   - component: {fileID: 123524402}
+  - component: {fileID: 123524404}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -5767,6 +5768,21 @@ MonoBehaviour:
   _horizontalShake: 0
   _colorDrift: 0
   targetMaterial: {fileID: 2100000, guid: edfae289ebea6fe4ea1844e1d053e181, type: 2}
+--- !u!114 &123524404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123524395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b0d59baa9d8b640b10b6834fe09c7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetCamera: {fileID: 123524397}
+  analog: {fileID: 123524403}
+  digital: {fileID: 123524402}
 --- !u!1001 &126323675
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38387,7 +38403,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 207.77766}
+  m_AnchoredPosition: {x: 0, y: 207.77779}
   m_SizeDelta: {x: 0, y: 486.223}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &660101641
@@ -85010,6 +85026,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5564412529467788889, guid: ceb7572db17e14fecbba0ccf97666f00, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -79
+      objectReference: {fileID: 0}
     - target: {fileID: 5643538811247507267, guid: ceb7572db17e14fecbba0ccf97666f00, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.5
@@ -85972,6 +85992,7 @@ MonoBehaviour:
   itemDatabase: {fileID: 11400000, guid: 13c4c8cac8a63df4cb2689f3c68522dd, type: 2}
   _eventLockControl: {fileID: 590326551}
   mainBars: {fileID: 1646822439}
+  glitchController: {fileID: 123524404}
 --- !u!4 &1697523271
 Transform:
   m_ObjectHideFlags: 0
@@ -86956,8 +86977,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 996609995}
   m_HandleRect: {fileID: 996609993}
   m_Direction: 2
-  m_Value: 0.000001615638
-  m_Size: 0.5726701
+  m_Value: -0.00000014687618
+  m_Size: 0.57266486
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

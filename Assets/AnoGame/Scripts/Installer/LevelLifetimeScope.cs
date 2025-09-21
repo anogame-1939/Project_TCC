@@ -3,7 +3,7 @@ using VContainer;
 using VContainer.Unity;
 using AnoGame.Application.Event;
 using AnoGame.Application.Enemy;
-using AnoGame.Application.Inventory;
+using AnoGame.Application.Direction.Glitch;
 
 
 namespace AnoGame.Application.Core
@@ -55,6 +55,12 @@ namespace AnoGame.Application.Core
             // builder.RegisterEntryPoint<LevelInitializer>();
             var proxies = FindObjectsByType<TimelineEventLockProxy>(FindObjectsSortMode.None);
             foreach (var p in proxies)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(p));
+            }
+
+            var glitchProxies = FindObjectsByType<GlitchControllerProxy>(FindObjectsSortMode.None);
+            foreach (var p in glitchProxies)
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(p));
             }
