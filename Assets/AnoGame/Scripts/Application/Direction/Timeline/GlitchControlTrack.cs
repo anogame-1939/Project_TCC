@@ -10,7 +10,16 @@ namespace AnoGame.Application.Direction.Timeline
     [TrackBindingType(typeof(GlitchControllerProxy))]
     public sealed class GlitchControlTrack : TrackAsset
     {
-        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
-            => ScriptPlayable<GlitchControlMixer>.Create(graph, inputCount);
+    [SerializeField] bool resetToZeroWhenNoClip = true;   // クリップが無いフレームで 0 に戻す
+    [SerializeField] bool disableWhenNoClip     = false;  // ついでに機能自体もOFFにするか（任意）
+
+    public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+    {
+        var playable = ScriptPlayable<GlitchControlMixer>.Create(graph, inputCount);
+        var m = playable.GetBehaviour();
+        m.resetToZeroWhenNoClip = resetToZeroWhenNoClip;
+        m.disableWhenNoClip     = disableWhenNoClip;
+        return playable;
+    }
     }
 }

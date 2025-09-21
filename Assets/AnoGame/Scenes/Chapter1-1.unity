@@ -30735,7 +30735,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
   onPrepare:
     m_PersistentCalls:
       m_Calls: []
@@ -30800,6 +30800,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74b3c198ffc01748a918592f18194d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableVerboseLog: 1
+  logPrefix: '[GLITCH_PROXY]'
 --- !u!82 &1232639045
 AudioSource:
   m_ObjectHideFlags: 0
@@ -30908,7 +30910,7 @@ PlayableDirector:
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: 75037bfeda9819a4781937e215ce1320, type: 2}
   m_InitialState: 0
-  m_WrapMode: 2
+  m_WrapMode: 1
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
   m_SceneBindings:
