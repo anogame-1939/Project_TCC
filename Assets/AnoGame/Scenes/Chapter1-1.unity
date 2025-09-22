@@ -8361,7 +8361,6 @@ GameObject:
   - component: {fileID: 1933992938}
   - component: {fileID: 1933992937}
   - component: {fileID: 1933992936}
-  - component: {fileID: 1933992935}
   - component: {fileID: 1933992934}
   - component: {fileID: 1933992933}
   - component: {fileID: 1933992932}
@@ -8515,72 +8514,6 @@ PlayableDirector:
     value: {fileID: 1933992932}
   m_ExposedReferences:
     m_References: []
---- !u!114 &1933992935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1933992930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventData: {fileID: 11400000, guid: bfba33fdb2522a2448925d65bdc62adc, type: 2}
-  onPrepareEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventFinish:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1933992934}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1933992931}
-        m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-        m_MethodName: Log
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEventDone:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1933992934}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
-  onEventFailed:
-    m_PersistentCalls:
-      m_Calls: []
-  conditionComponents: []
-  _onStart: 0
 --- !u!114 &1933992936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8610,9 +8543,9 @@ MonoBehaviour:
   onPlayerEnter:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1933992935}
-        m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-        m_MethodName: StartEvent
+      - m_Target: {fileID: 1933992934}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
