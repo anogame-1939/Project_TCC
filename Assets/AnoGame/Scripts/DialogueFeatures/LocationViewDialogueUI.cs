@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using PixelCrushers.DialogueSystem;
 
-namespace AnoGame.DialogueFeatures
+namespace AnoGame.Apllication.DialogueFeatures
 {
     public class LocationViewDialogueUI : MultipleDialogueUI
     {

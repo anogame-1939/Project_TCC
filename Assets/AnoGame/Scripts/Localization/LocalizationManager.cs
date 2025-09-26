@@ -319,7 +319,7 @@ namespace Localizer
                 }
                 else
                 {
-                    Debug.LogError($"対応する翻訳がありませんでした。:{tmpro.text}");
+                    // Debug.LogError($"対応する翻訳がありませんでした。:{tmpro.text}");
                 }
             }
 

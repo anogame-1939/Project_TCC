@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace AnoGame.DialogueFeatures
+namespace AnoGame.Apllication.DialogueFeatures
 {
     public class LocationViewManager : MonoBehaviour
     {
