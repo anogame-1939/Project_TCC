@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace AnoGame.Application.Player.Interaction
 {
@@ -8,7 +9,7 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField] private string prompt = "調べる（長押し）";
         [SerializeField] private int priority = 500;
 
-        public System.Action OnInspected; // Timeline再生/ログ追加など
+        public UnityEvent OnInspected; // Timeline再生/ログ追加など
 
         public override bool TryBuildOptions(Transform actor, List<InteractionOption> buffer)
         {
