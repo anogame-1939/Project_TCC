@@ -170,6 +170,8 @@ public static class AllIn1ShaderImporter
 		{
 			res = UnityVersion.UNITY_2022;
 		}
+		else if (unityVersion.Contains("2023"))     // ★ 追加
+			res = UnityVersion.UNITY_6;   // ★ 2023年版はUNITY_6に含める
 		else if (unityVersion.Contains("6000"))
 		{
 			res = UnityVersion.UNITY_6;
