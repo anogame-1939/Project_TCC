@@ -6,7 +6,6 @@ using PixelCrushers.DialogueSystem;
 namespace AnoGame.Application.Direction.Timeline
 {
     [TrackClipType(typeof(DialogueConversationClip))]
-    [TrackBindingType(typeof(DialogueSystemTrigger))] // ← ここを Trigger に
     public class DialogueConversationTrack : TrackAsset
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
