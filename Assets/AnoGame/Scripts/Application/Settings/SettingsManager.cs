@@ -46,7 +46,7 @@ namespace AnoGame.Application.Settings
 
         public SettingsData CurrentSettingsData => _settingsData;
 
-        public void SetSettingsData(float masterVolume, float bgmVolume, float seSoundVolume, Language language)
+        public void SetSettingsData(float masterVolume, float bgmVolume, float seSoundVolume, AnoGame.Domain.Data.Models.Language language)
         {
             if (_settingsData == null)
                 _settingsData = GetDefaultSettingsData();
@@ -92,9 +92,9 @@ namespace AnoGame.Application.Settings
 
         public void UpdateLanguageFromInt(int languageValue)
         {
-            if (Enum.IsDefined(typeof(Language), languageValue))
+            if (Enum.IsDefined(typeof(AnoGame.Domain.Data.Models.Language), languageValue))
             {
-                Language languageEnum = (Language)languageValue;
+                AnoGame.Domain.Data.Models.Language languageEnum = (AnoGame.Domain.Data.Models.Language)languageValue;
 
                 if (_settingsData == null)
                     _settingsData = GetDefaultSettingsData();
@@ -142,16 +142,16 @@ namespace AnoGame.Application.Settings
             return new SettingsData(1.0f, 1.0f, 1.0f, GetDefaultLanguageBasedOnSystem());
         }
 
-        private Language GetDefaultLanguageBasedOnSystem()
+        private AnoGame.Domain.Data.Models.Language GetDefaultLanguageBasedOnSystem()
         {
             switch (UnityEngine.Application.systemLanguage)
             {
                 case SystemLanguage.Japanese:
-                    return Language.Japanese;
+                    return AnoGame.Domain.Data.Models.Language.Japanese;
                 case SystemLanguage.English:
-                    return Language.English;
+                    return AnoGame.Domain.Data.Models.Language.English;
                 default:
-                    return Language.English;
+                    return AnoGame.Domain.Data.Models.Language.English;
             }
         }
 

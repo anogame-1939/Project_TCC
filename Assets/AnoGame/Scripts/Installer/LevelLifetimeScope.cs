@@ -4,6 +4,7 @@ using VContainer.Unity;
 using AnoGame.Application.Event;
 using AnoGame.Application.Enemy;
 using AnoGame.Application.Direction.Glitch;
+using AnoGame.Application.Direction.Timeline;
 
 
 namespace AnoGame.Application.Core
