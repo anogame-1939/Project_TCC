@@ -7,14 +7,10 @@ namespace AnoGame.Application.Direction.Timeline
 {
     public class DialogueConversationClip : PlayableAsset, ITimelineClipAsset
     {
-        [Header("Start Conversation by... (either)")]
-        public ExposedReference<DialogueSystemTrigger> trigger;
-        public string conversationTitle;
-
-        [Header("Optional")]
-        public ExposedReference<Transform> actor;
-        public ExposedReference<Transform> conversant;
-
+        [Header("Override (optional)")]
+        public ExposedReference<DialogueSystemTrigger> triggerOverride; // ← 任意
+        public ExposedReference<Transform> actor;        // 任意（使わないなら無視される）
+        public ExposedReference<Transform> conversant;   // 任意
         [Tooltip("会話中はタイムラインをその場で停止")]
         public bool pauseDuringConversation = true;
 
@@ -25,16 +21,13 @@ namespace AnoGame.Application.Direction.Timeline
             var playable = ScriptPlayable<DialogueConversationBehaviour>.Create(graph);
             var b = playable.GetBehaviour();
 
-            var resolver = graph.GetResolver(); // = 再生中の PlayableDirector
-            b.director    = resolver as PlayableDirector;
-            b.trigger     = trigger.Resolve(resolver);
-            b.conversationTitle = conversationTitle;
-            b.actor       = actor.Resolve(resolver);
-            b.conversant  = conversant.Resolve(resolver);
+            var resolver = graph.GetResolver();                 // 自身の PlayableDirector
+            b.director            = resolver as PlayableDirector;
+            b.triggerOverride     = triggerOverride.Resolve(resolver);
+            b.actor               = actor.Resolve(resolver);
+            b.conversant          = conversant.Resolve(resolver);
             b.pauseDuringConversation = pauseDuringConversation;
             return playable;
         }
     }
-
-
 }
