@@ -761,13 +761,13 @@ MonoBehaviour:
     m_Start: 14.828511684254792
     m_ClipIn: 0
     m_Asset: {fileID: 7355182650938490950}
-    m_Duration: 15.838154982411876
+    m_Duration: 12.411588805053647
     m_TimeScale: 1
     m_ParentTrack: {fileID: 2163473248544817346}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: -1
-    m_BlendOutDuration: 1.7305869533369957
+    m_BlendOutDuration: -1
     m_MixInCurve:
       serializedVersion: 2
       m_Curve: []
@@ -794,12 +794,12 @@ MonoBehaviour:
     m_Start: 28.936079713329672
     m_ClipIn: 0
     m_Asset: {fileID: -3467158024065887178}
-    m_Duration: 15.238110355253198
+    m_Duration: 7.663920286670329
     m_TimeScale: 1.4999999999999998
     m_ParentTrack: {fileID: 2163473248544817346}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
-    m_BlendInDuration: 1.7305869533369957
+    m_BlendInDuration: -1
     m_BlendOutDuration: -1
     m_MixInCurve:
       serializedVersion: 2
@@ -1160,7 +1160,7 @@ MonoBehaviour:
     m_PreExtrapolationTime: 0
     m_DisplayName: "\u30CE\u30A4\u30BA\u5C0F2_audiostock_1405552"
   - m_Version: 1
-    m_Start: 27.24010048930844
+    m_Start: 25.932436090215468
     m_ClipIn: 0
     m_Asset: {fileID: 5644381881298554410}
     m_Duration: 3.6923356009070294
@@ -1228,6 +1228,75 @@ MonoBehaviour:
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
     m_DisplayName: "\u30CE\u30A4\u30BA\u5C0F3_audiostock_1400099"
+  - m_Version: 1
+    m_Start: 36.6
+    m_ClipIn: 0
+    m_Asset: {fileID: 7736326405905178705}
+    m_Duration: 3
+    m_TimeScale: 2
+    m_ParentTrack: {fileID: 3049021152941621177}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: -1
+    m_BlendOutDuration: -1
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: "\u767A\u898B_audiostock_957558"
   m_Markers:
     m_Objects: []
   m_TrackProperties:
@@ -1463,10 +1532,10 @@ MonoBehaviour:
     m_PreExtrapolationTime: 0
     m_DisplayName: DigitalGlitchProfile_Teaser
   - m_Version: 1
-    m_Start: 27.24010048930844
+    m_Start: 25.932436090215468
     m_ClipIn: 0
     m_Asset: {fileID: -4702513309616177104}
-    m_Duration: 5
+    m_Duration: 2.2508972431178655
     m_TimeScale: 1
     m_ParentTrack: {fileID: 3101176948155650827}
     m_EaseInDuration: 0
@@ -1690,6 +1759,23 @@ MonoBehaviour:
   m_Name: AudioPlayableAsset
   m_EditorClassIdentifier: 
   m_Clip: {fileID: 8300000, guid: f2ab64135325d9340adb21685fed13cd, type: 3}
+  m_Loop: 0
+  m_bufferingTime: 0.1
+  m_ClipProperties:
+    volume: 1
+--- !u!114 &7736326405905178705
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f10dd60657c6004587f237a7e90f8e4, type: 3}
+  m_Name: AudioPlayableAsset
+  m_EditorClassIdentifier: 
+  m_Clip: {fileID: 8300000, guid: 589d003848576e940b8ce99f53eb3623, type: 3}
   m_Loop: 0
   m_bufferingTime: 0.1
   m_ClipProperties:
