@@ -36,15 +36,22 @@ namespace AnoGame.Application.Player.Interaction
 
             try
             {
+                Debug.Log("[HideSession] Starting hide session", _actor);
                 // 入口→隠れる（移動経路・演出は HideSpotZone 側に委譲）
                 await _spot.MoveIntoAsync(_actor, token);
+
+                Debug.Log("[HideSession] Reached spot, entering hide", _actor);
                 await _spot.EnterHideAsync(_actor, token);
+
+                Debug.Log("[HideSession] Now hidden", _actor);
 
                 // 隠れ中：出る/キャンセル/無効化 いずれかまで待機
                 await UniTask.WaitUntil(
                     () => _exitRequested || _cancelRequested || !IsValid(),
                     cancellationToken: token
                 );
+
+                Debug.Log("[HideSession] Exit or Cancel requested, or became invalid", _actor);
 
                 if (_exitRequested && (_danger?.Invoke() != true) && IsValid())
                 {
@@ -66,7 +73,11 @@ namespace AnoGame.Application.Player.Interaction
 
         public bool IsValid() => _spot != null && _spot.StillValidFor(_actor);
 
-        public void RequestExit()   => _exitRequested = true;
+        public void RequestExit()
+        {
+            Debug.Log("[HideSession] Exit requested", _actor);
+            _exitRequested = true;
+        }
         public void RequestCancel() => _cancelRequested = true;
 
         public bool TryBuildRuntimeOptions(System.Collections.Generic.List<InteractionOption> buf)

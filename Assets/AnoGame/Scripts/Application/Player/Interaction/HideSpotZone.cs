@@ -4,6 +4,8 @@ using AnoGame.Application.Player.Control;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Events;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -42,13 +44,18 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField, Min(0.0f)] private float validDistance = 3.0f; // 継続許容距離（無効化判定）
 
         [Header("Hooks (任意)")]
-        public System.Action<Transform> OnBeginApproach; // 入り始め（入力ロック/レタボ等）
-        public System.Action<Transform> OnEnterHidden;   // 隠れ状態に入った
-        public System.Action<Transform> OnExitHidden;    // 退出（演出に合わせて呼びたい）
-        public System.Action<Transform> OnCanceled;      // 中断
+        [SerializeField]
+        private UnityEvent OnBeginApproach; // 入り始め（入力ロック/レタボ等）
+        [SerializeField]
+        private UnityEvent OnEnterHidden;   // 隠れ状態に入った
+        [SerializeField]
+        private UnityEvent OnExitHidden;    // 退出（演出に合わせて呼びたい）
+        [SerializeField]
+        private UnityEvent OnCanceled;      // 中断
 
         // 既存：任意の外部接続フック
-        public System.Action<Transform> EnterHide;
+        [SerializeField]
+        private UnityEvent EnterHide;
 
         private Transform _occupant; // 占有者（1人用スポット）
 
@@ -75,7 +82,7 @@ namespace AnoGame.Application.Player.Interaction
                 RequiresHold = false,
                 Execute = () =>
                 {
-                    EnterHide?.Invoke(actor); // 任意
+                    EnterHide?.Invoke(); // 任意
                     MessageBroker.Default.Publish(new HideRequested(actor, this));
                 }
             });
@@ -118,7 +125,7 @@ namespace AnoGame.Application.Player.Interaction
             el.BeginLock();
             el.LookFaceMove();
 
-            OnBeginApproach?.Invoke(actor);
+            OnBeginApproach?.Invoke();
 
             // 1) 経路があれば順に移動
             if (approachPath != null && approachPath.Length > 0)
@@ -154,7 +161,7 @@ namespace AnoGame.Application.Player.Interaction
             el.Freeze();
             // el.LookKeep();
 
-            OnEnterHidden?.Invoke(actor);
+            OnEnterHidden?.Invoke();
             MessageBroker.Default.Publish(new HideBegan(actor, this));
 
             // 必要なら1フレ待ち
@@ -165,7 +172,7 @@ namespace AnoGame.Application.Player.Interaction
         {
             var el = RequireEventLock(actor);
 
-            OnExitHidden?.Invoke(actor);
+            OnExitHidden?.Invoke();
 
             // 出口指定があればそこへ
             if (exitPoint != null)
@@ -184,7 +191,7 @@ namespace AnoGame.Application.Player.Interaction
         public async UniTask CancelHideAsync(Transform actor, CancellationToken ct)
         {
             var el = FindEventLock(actor);
-            OnCanceled?.Invoke(actor);
+            OnCanceled?.Invoke();
 
             // 状況に応じて少しだけ戻す/微演出を入れる場合はここに
             // ここでは即解除のみ
