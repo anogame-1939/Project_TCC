@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.TinyCharacterController.Interfaces.Core;
+using Unity.TinyCharacterController.Interfaces.Components;
 
 namespace AnoGame.Application.Player.Control
 {
@@ -12,6 +13,8 @@ namespace AnoGame.Application.Player.Control
     public sealed class EventLockControl : MonoBehaviour,
         IMove, ITurn, IPriorityLifecycle<IMove>, IPriorityLifecycle<ITurn>
     {
+        private IWarp _warp;
+        
         [Header("Priority (他のMove/Turnより高く)")]
         [SerializeField] int movePriority = 1000;
         [SerializeField] int turnPriority = 1000;
@@ -138,6 +141,36 @@ namespace AnoGame.Application.Player.Control
         }
 
         public int TurnSpeed => 0;
+
+        void Awake()
+        {
+            TryGetComponent(out _warp);
+        }
+
+        public bool TryWarp(Vector3 position) {
+            if (_warp == null) return false;
+            _warp.Warp(position);
+            return true;
+        }
+
+        public bool TryWarp(Vector3 position, Vector3 faceDir) {
+            if (_warp == null) return false;
+            _warp.Warp(position, faceDir);   // faceDir==Vector3.zero なら現向き維持（BrainBase仕様）
+            return true;
+        }
+
+        public bool TryWarp(Vector3 position, Quaternion rot)
+        {
+            if (_warp == null) return false;
+
+            // 位置を更新
+            _warp.Warp(position);
+
+            // 向きは Quaternion で更新
+            _warp.Warp(rot);
+
+            return true;
+        }
 
         // ---- ライフサイクル（必要ならここでアニメ切替など） ----
         public void OnAcquireHighestPriority() { /* 例: Animator.SetBool("IsMove", false); */ }

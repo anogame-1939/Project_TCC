@@ -26,7 +26,7 @@ namespace AnoGame.Application.Enemy.Animation
         [SerializeField] private string locomotionSpeedParam = "LocomotionSpeed"; // 空なら更新しない
 
         [Header("判定/平滑化")]
-        [SerializeField, Min(0f)] private float speedThreshold = 0.10f;   // これ超えたら移動扱い
+        [SerializeField, Min(0f)] private float speedThreshold = 0.05f;   // これ超えたら移動扱い
         [SerializeField, Min(0f)] private float emaHalfLife = 0.10f;      // 速度EMA（0で生値）
         [SerializeField] private bool planarOnly = true;                   // Y成分を除外して速度算出
 
