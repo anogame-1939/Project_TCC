@@ -437,6 +437,7 @@ Transform:
   - {fileID: 654688160}
   - {fileID: 605053054}
   - {fileID: 1210749943}
+  - {fileID: 996569596}
   - {fileID: 2111736887}
   - {fileID: 792925374}
   - {fileID: 364261780}
@@ -27252,7 +27253,7 @@ Transform:
   m_GameObject: {fileID: 605053053}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.06, y: 0, z: 1.99}
+  m_LocalPosition: {x: 1.32, y: 0, z: 1.99}
   m_LocalScale: {x: 0.27700832, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -29813,6 +29814,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brainCamera: {fileID: 0}
+--- !u!1 &996569595
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 996569596}
+  m_Layer: 0
+  m_Name: "\u632F\u308A\u5411\u304F\u524D"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &996569596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996569595}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 4.77}
+  m_LocalScale: {x: 0.27700832, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 69573958}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1004814331
 GameObject:
   m_ObjectHideFlags: 0
@@ -31006,7 +31038,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1210749943}
   m_Layer: 0
-  m_Name: Path_4
+  m_Name: "\u30EF\u30FC\u30D7\u30DD\u30A4\u30F3\u30C82"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38001,10 +38033,14 @@ PlayableDirector:
   m_ExposedReferences:
     m_References:
     - 871a3fb097d8d4d4a8d1965cc4d34471: {fileID: 364261780}
+    - bd8e5a96e0b6ae24d95a8dbb028828a2: {fileID: 996569596}
+    - 7700a4ffaa7b51040ad156b50ab97cc9: {fileID: 1210749943}
     - 29cba48d53db80a44b796e8d662492d9: {fileID: 790178948}
     - 76963f9e90856ae4ea387a33be0c960b: {fileID: 654688160}
     - fe809ff865da8944f96e0186a82db65e: {fileID: 1210749943}
     - c19a18e898859d64bb02edfc24fd2d03: {fileID: 364261780}
+    - 8569ac26990c86b4b895720e05a20ae6: {fileID: 1210749943}
+    - e2e4b1612e04f914d970dc5da0660213: {fileID: 996569596}
     - 070147215841cb347b32bbc57bc8991d: {fileID: 1692249529}
     - ced1e358e79c7c54882c8c5e929ac067: {fileID: 605053054}
     - 60f3b3e1c72087a4193c867450d1c380: {fileID: 2111736887}
