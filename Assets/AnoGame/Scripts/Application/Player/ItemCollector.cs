@@ -1,9 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UniRx;
+using AnoGame.Data;
+using AnoGame.Application.Inventory;
+using System.Collections.Generic;
 using VContainer;
 using AnoGame.Application.Input;
-using AnoGame.Messages;
+using UniRx;
+using AnoGame.Application.Steam;  // IInputActionProvider の名前空間
 
 namespace AnoGame.Application.Player
 {
@@ -15,71 +19,114 @@ namespace AnoGame.Application.Player
         [SerializeField] private LayerMask itemLayer;
         [SerializeField] private float viewAngle = 90.0f;
 
+        [Inject] private InventoryManager _inventoryManager;
         [Inject] private IInputActionProvider _inputProvider;
 
         private InputAction _interactAction;
 
         private void Awake()
         {
+            // (1) まず Player マップを有効化しておく
+            // _inputProvider.SwitchToPlayer();
+
+            // (2) Player マップを取得し、"Interact" アクションをキャッシュ
             var playerMap = _inputProvider.GetPlayerActionMap();
             _interactAction = playerMap.FindAction("Interact", throwIfNotFound: true);
         }
 
         private void OnEnable()
         {
+            // (3) Interact アクションの登録
             if (_interactAction != null)
+            {
                 _interactAction.performed += OnInteract;
+            }
         }
 
         private void OnDisable()
         {
             if (_interactAction != null)
-                _interactAction.performed -= OnInteract;
-        }
-
-        private void OnInteract(InputAction.CallbackContext ctx)
-        {
-            if (!ctx.performed) return;
-
-            var items = Physics.OverlapSphere(transform.position, collectRadius, itemLayer);
-            var target = FindClosestItemInView(items);
-            if (target == null) return;
-
-            var collectable = target.GetComponent<CollectableItem>();
-            if (collectable == null) return;
-
-            // ここでは “拾いたい” という要求だけを投げる
-            MessageBroker.Default.Publish(
-                new TryCollectItemRequest(transform, collectable)
-            );
-        }
-
-        private Collider FindClosestItemInView(Collider[] items)
-        {
-            Collider closest = null;
-            float min = float.MaxValue;
-            foreach (var it in items)
             {
-                var dir = (it.transform.position - transform.position).normalized;
-                var ang = Vector3.Angle(transform.forward, dir);
-                if (ang > viewAngle * 0.5f) continue;
-
-                var d = Vector3.Distance(transform.position, it.transform.position);
-                if (d < min) { min = d; closest = it; }
+                _interactAction.performed -= OnInteract;
             }
-            return closest;
+        }
+
+        private void OnInteract(InputAction.CallbackContext context)
+        {
+            // キーを押した瞬間に CollectItem を呼ぶ
+            if (context.performed)
+            {
+                CollectItem();
+            }
+        }
+
+        public void CollectItem()
+        {
+            // インベントリがいっぱいなら何もしない
+            if (_inventoryManager.IsInventoryFull())
+            {
+                Debug.LogWarning("Inventory is full!");
+                return;
+            }
+
+            // 周囲にあるアイテムを検出
+            Collider[] items = Physics.OverlapSphere(transform.position, collectRadius, itemLayer);
+            Collider closestItem = FindClosestItemInViewAngle(items);
+
+            if (closestItem != null)
+            {
+                CollectableItem collectableItem = closestItem.GetComponent<CollectableItem>();
+                if (collectableItem != null && _inventoryManager.AddItem(collectableItem))
+                {
+                    GetComponent<AudioSource>()?.Play();
+                    collectableItem.OnCollected();
+                    closestItem.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        private Collider FindClosestItemInViewAngle(Collider[] items)
+        {
+            Collider closestItem = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (Collider item in items)
+            {
+                Vector3 directionToItem = (item.transform.position - transform.position).normalized;
+                float angle = Vector3.Angle(transform.forward, directionToItem);
+
+                if (angle <= viewAngle / 2)
+                {
+                    float distance = Vector3.Distance(transform.position, item.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestItem = item;
+                    }
+                }
+            }
+
+            return closestItem;
+        }
+
+        public IReadOnlyList<Domain.Data.Models.InventoryItem> GetInventory()
+        {
+            return _inventoryManager.GetInventory();
         }
 
         private void OnDrawGizmosSelected()
         {
+            // Collection 範囲の可視化
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, collectRadius);
 
-            var right = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
-            var left  = Quaternion.Euler(0,-viewAngle / 2, 0) * transform.forward;
+            // 視野角の可視化
+            Vector3 rightDirection = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
+            Vector3 leftDirection = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward;
+
             Gizmos.color = Color.blue;
-            Gizmos.DrawRay(transform.position, right * collectRadius);
-            Gizmos.DrawRay(transform.position, left  * collectRadius);
+            Gizmos.DrawRay(transform.position, rightDirection * collectRadius);
+            Gizmos.DrawRay(transform.position, leftDirection * collectRadius);
         }
     }
 }
