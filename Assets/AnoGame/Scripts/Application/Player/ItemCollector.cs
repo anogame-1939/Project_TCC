@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using VContainer;
 using AnoGame.Application.Input;
 using UniRx;
-using AnoGame.Application.Steam;  // IInputActionProvider の名前空間
+using AnoGame.Application.Steam;
+using AnoGame.Messages;  // IInputActionProvider の名前空間
 
 namespace AnoGame.Application.Player
 {
@@ -76,13 +77,21 @@ namespace AnoGame.Application.Player
             if (closestItem != null)
             {
                 CollectableItem collectableItem = closestItem.GetComponent<CollectableItem>();
+                                    MessageBroker.Default.Publish(
+                        new ItemCollected(collectableItem.ItemData, collectableItem.Quantity, collectableItem.UniqueId, this.transform)
+                    );
                 if (collectableItem != null && _inventoryManager.AddItem(collectableItem))
                 {
                     GetComponent<AudioSource>()?.Play();
                     collectableItem.OnCollected();
                     closestItem.gameObject.SetActive(false);
+
+
+
                 }
             }
+
+            
         }
 
         private Collider FindClosestItemInViewAngle(Collider[] items)
