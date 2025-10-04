@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
-using VContainer;
 using AnoGame.Messages;
-using AnoGame.Application.Inventory;
 
 namespace AnoGame.Application.Inventory
 {
