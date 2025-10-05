@@ -13,12 +13,25 @@ public sealed class ConfirmDialog : MonoBehaviour
     [SerializeField] TMP_Text titleText;
     [SerializeField] Button yesButton;
     [SerializeField] Button noButton;
+    [SerializeField] CanvasGroup canvasGroup;
 
     InputAction _confirm, _cancel;
     Action _onYes, _onNo;
     bool _canAcceptInput = false; // ← クールタイム制御フラグ
     
     [Inject] private IInputActionProvider _inputProvider;
+
+    void Awake()
+    {
+        if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup != null)
+        {
+            canvasGroup.ignoreParentGroups = true; // ← 親のCGを無視
+            canvasGroup.blocksRaycasts = true;     // ← 自分はレイキャストを受ける
+            canvasGroup.interactable = true;
+        }
+        gameObject.SetActive(false);
+    }
 
     public void Show(string title, Action onYes, Action onNo)
     {

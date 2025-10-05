@@ -14,8 +14,10 @@ namespace AnoGame.Application.Inventory
         [SerializeField]
         private InventoryViewer _inventoryViewer;
         [SerializeField] private ConsumeProximityTracker _tracker;
+        [SerializeField] ConfirmDialog _confirmDialog;
 
         private CanvasGroup _canvasGroup;
+        private GameObject _lastSelectedGO;
         private InventoryManager _inventoryManager;
 
         // Player マップの Inventory 開閉用
@@ -37,7 +39,7 @@ namespace AnoGame.Application.Inventory
 
         bool _isModalOpen;
 
-        [SerializeField] ConfirmDialog _confirmDialog;
+
 
         void Start()
         {
@@ -198,18 +200,67 @@ namespace AnoGame.Application.Inventory
         
         private void OpenConsumeConfirm(InventorySlot slot)
         {
-            Debug.Log("[InventoryController]OpenConsumeConfirm");
             var displayName = string.IsNullOrEmpty(slot.LocalizedName)
                 ? slot.CurrentItem.ItemName
                 : slot.LocalizedName;
 
             _isModalOpen = true; // モーダル運用の場合
 
+            // 下層UIを無効化（入力もレイキャストも通さない）
+            if (_canvasGroup != null)
+            {
+                _canvasGroup.interactable   = false;
+                _canvasGroup.blocksRaycasts = false;
+            }
+
+            // 現在の選択を保存（キャンセル時に復帰する）
+            _lastSelectedGO = EventSystem.current?.currentSelectedGameObject;
+
             _confirmDialog.Show(
                 title: $"{displayName} を使用しますか？",
-                onYes: () => { Consume(slot); _isModalOpen = false; },
-                onNo:  () => { _isModalOpen = false; }
+                onYes: () =>
+                {
+                    // 先に消費処理
+                    Consume(slot);
+
+                    // 消費後の選択復帰（後述のヘルパー）
+                    RestoreSelectionAfterConsume(slot);
+
+                    CloseDialogAndUnlockUI();
+                },
+                onNo: () =>
+                {
+                    // そのまま元の選択に戻す
+                    RestoreSelection(_lastSelectedGO);
+                    CloseDialogAndUnlockUI();
+                }
             );
+        }
+
+        private void CloseDialogAndUnlockUI()
+        {
+            _isModalOpen = false;
+            if (_canvasGroup != null)
+            {
+                _canvasGroup.interactable   = true;
+                _canvasGroup.blocksRaycasts = true;
+            }
+
+            // 念のため：ゲーム状態が Inventory のままならマウス表示
+            if (GameStateManager.Instance.CurrentState == GameState.Inventory)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible   = true;
+            }
+        }
+
+
+        private void RestoreSelection(GameObject target)
+        {
+            if (target == null) return;
+            if (!target.activeInHierarchy) return;
+
+            EventSystem.current?.SetSelectedGameObject(target);
         }
 
         private void Consume(InventorySlot slot)
@@ -255,13 +306,47 @@ namespace AnoGame.Application.Inventory
             }
         }
 
-        
-        private void CloseDialog()
+        private void RestoreSelectionAfterConsume(InventorySlot consumedSlot)
         {
-            _isModalOpen = false;
+            // スロットがまだ有効でアイテムが残っていれば同じ場所を選択
+            if (consumedSlot != null && consumedSlot.isActiveAndEnabled && consumedSlot.CurrentItem != null)
+            {
+                EventSystem.current?.SetSelectedGameObject(consumedSlot.gameObject);
+                return;
+            }
+
+            // なくなった場合は隣接Selectableへ（右→下→左→上→nullなら先頭）
+            var sel = consumedSlot ? consumedSlot.GetComponent<UnityEngine.UI.Selectable>() : null;
+            UnityEngine.UI.Selectable next =
+                sel?.FindSelectableOnRight()
+            ?? sel?.FindSelectableOnDown()
+            ?? sel?.FindSelectableOnLeft()
+            ?? sel?.FindSelectableOnUp();
+
+            if (next != null)
+            {
+                EventSystem.current?.SetSelectedGameObject(next.gameObject);
+                return;
+            }
+
+            // 先頭フォールバック（InventoryViewerが管理している親から適当な子を探す）
+            var first = FindFirstSelectableUnder(_inventoryViewer.gameObject);
+            if (first != null)
+            {
+                EventSystem.current?.SetSelectedGameObject(first.gameObject);
+            }
+            else
+            {
+                // 何も無ければ選択を外す
+                EventSystem.current?.SetSelectedGameObject(null);
+            }
         }
 
-
+        private UnityEngine.UI.Selectable FindFirstSelectableUnder(GameObject root)
+        {
+            if (root == null) return null;
+            return root.GetComponentInChildren<UnityEngine.UI.Selectable>(includeInactive:false);
+        }
 
         private void OnApplicationFocus(bool hasFocus)
         {
