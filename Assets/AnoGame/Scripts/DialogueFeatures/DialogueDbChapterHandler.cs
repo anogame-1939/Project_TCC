@@ -124,7 +124,10 @@ namespace AnoGame.Apllication.DialogueFeatures
         {
             if (db == null) return;
             // 既に自分が追加済みならスキップ（Initialとして最初から入っている分は触らない）
-            if (_addedDatabases.Contains(db)) return;
+            if (_addedDatabases.Contains(db))
+            {
+                return;
+            }
 
             DialogueManager.AddDatabase(db);
             _addedDatabases.Add(db);

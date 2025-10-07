@@ -6,6 +6,7 @@ using AnoGame.Application.Input;
 using UnityEngine.EventSystems;
 using AnoGame.Application.Event;
 using AnoGame.Domain.Inventory.Services;
+using PixelCrushers.DialogueSystem;
 
 namespace AnoGame.Application.Inventory
 {
@@ -227,6 +228,8 @@ namespace AnoGame.Application.Inventory
                     RestoreSelectionAfterConsume(slot);
 
                     CloseDialogAndUnlockUI();
+
+                    DialogueLua.SetVariable("itemName", slot.CurrentItem.ItemName);
                 },
                 onNo: () =>
                 {
