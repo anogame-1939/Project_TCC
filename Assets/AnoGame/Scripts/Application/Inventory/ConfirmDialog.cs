@@ -72,7 +72,7 @@ public sealed class ConfirmDialog : MonoBehaviour
         _confirm.performed -= OnSubmit;
         _cancel.performed -= OnCancel;
         // （ボタンの onClick は Awake で一度だけ登録しているのでここでは触らない）
-        gameObject.SetActive(false);
+        // gameObject.SetActive(false);
         onHidden?.Invoke();                         // ← 非表示時既定処理
     }
 
