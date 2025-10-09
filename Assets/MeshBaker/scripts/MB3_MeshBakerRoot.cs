@@ -131,76 +131,118 @@ public abstract class MB3_MeshBakerRoot : MonoBehaviour {
 			meshAnalysisResultCache = new Dictionary<int, MB_Utility.MeshAnalysisResult>();
 		}
 		Dictionary<string, Material> matName2Mat = new Dictionary<string, Material>();
-		for (int i = 0; i < objsToMesh.Count; i++){
+		for (int i = 0; i < objsToMesh.Count; i++)
+		{
 			GameObject go = objsToMesh[i];
-			if (go == null){
+			if (go == null)
+			{
 				Debug.LogError(string.Format("The list of objects to combine contains a null at position {0}. Select and use [shift + delete] to remove the object, or purge all null objects from the context menu.", i));
-				return false;					
+				return false;
 			}
-			for (int j = i + 1; j < objsToMesh.Count; j++){
-				if (objsToMesh[i] == objsToMesh[j]){
+			for (int j = i + 1; j < objsToMesh.Count; j++)
+			{
+				if (objsToMesh[i] == objsToMesh[j])
+				{
 					Debug.LogError("The list of objects to combine contains duplicates at " + i + " and " + j);
-					return false;	
+					return false;
 				}
 			}
 
 			Material[] mats = MB_Utility.GetGOMaterials(go);
-			if (mats.Length == 0){
+			if (mats.Length == 0)
+			{
 				Debug.LogError("Object " + go + " in the list of objects to be combined does not have a material");
 				return false;
 			}
 			Mesh m = MB_Utility.GetMesh(go);
-			if (m == null){
+			if (m == null)
+			{
 				Debug.LogError("Object " + go + " in the list of objects to be combined does not have a mesh");
 				return false;
 			}
-			if (m != null && mom.textureBakeResults != null){ //This check can be very expensive and it only warns so only do this if we are in the editor.
-				if (Application.isEditor && 
-				    !Application.isPlaying &&
-					mom.textureBakeResults.doMultiMaterial && 
-					validationLevel >= MB2_ValidationLevel.robust){
+			if (m != null && mom.textureBakeResults != null)
+			{ //This check can be very expensive and it only warns so only do this if we are in the editor.
+				if (Application.isEditor &&
+					!Application.isPlaying &&
+					mom.textureBakeResults.doMultiMaterial &&
+					validationLevel >= MB2_ValidationLevel.robust)
+				{
 					MB_Utility.MeshAnalysisResult mar;
-					if (!meshAnalysisResultCache.TryGetValue(m.GetInstanceID(),out mar)){
-						MB_Utility.doSubmeshesShareVertsOrTris(m,ref mar);
-						meshAnalysisResultCache.Add (m.GetInstanceID(),mar);
+					if (!meshAnalysisResultCache.TryGetValue(m.GetInstanceID(), out mar))
+					{
+						MB_Utility.doSubmeshesShareVertsOrTris(m, ref mar);
+						meshAnalysisResultCache.Add(m.GetInstanceID(), mar);
 					}
-					if (mar.hasOverlappingSubmeshVerts){
-						Debug.LogWarning("Object " + objsToMesh[i] + " in the list of objects to combine has overlapping submeshes (submeshes share vertices). If the UVs associated with the shared vertices are important then this bake may not work. If you are using multiple materials then this object can only be combined with objects that use the exact same set of textures (each atlas contains one texture). There may be other undesirable side affects as well. Mesh Master, available in the asset store can fix overlapping submeshes.");	
+					if (mar.hasOverlappingSubmeshVerts)
+					{
+						Debug.LogWarning("Object " + objsToMesh[i] + " in the list of objects to combine has overlapping submeshes (submeshes share vertices). If the UVs associated with the shared vertices are important then this bake may not work. If you are using multiple materials then this object can only be combined with objects that use the exact same set of textures (each atlas contains one texture). There may be other undesirable side affects as well. Mesh Master, available in the asset store can fix overlapping submeshes.");
 					}
 				}
 			}
 
 			if (MBVersion.IsUsingAddressables())
 			{
-				HashSet<string> materialsWithDuplicateNames = new HashSet<string>();
+				// 1) マテリアル名ごとの使用Materialセット＆GO名セットを集計
+				Dictionary<string, HashSet<Material>> matName2MatSet = new Dictionary<string, HashSet<Material>>();
+				Dictionary<string, HashSet<string>> matName2GoNames = new Dictionary<string, HashSet<string>>();
+
 				for (int matIdx = 0; matIdx < mats.Length; matIdx++)
 				{
-					if (mats[matIdx] != null)
+					var mat = mats[matIdx];
+					if (mat == null) continue;
+
+					// Materialセット
+					if (!matName2MatSet.TryGetValue(mat.name, out var matSet))
 					{
-						if (matName2Mat.ContainsKey(mats[matIdx].name))
-						{
-							if (mats[matIdx] != matName2Mat[mats[matIdx].name])
-							{
-								// This is an error. If using addressables we consider materials that have the same name to be the same material when baking at runtime.
-								// Two different material must NOT have the same name.
-								materialsWithDuplicateNames.Add(mats[matIdx].name);
-							}
-						}
-						else
-						{
-							matName2Mat.Add(mats[matIdx].name, mats[matIdx]);
-						}
+						matSet = new HashSet<Material>();
+						matName2MatSet.Add(mat.name, matSet);
+					}
+					matSet.Add(mat);
+
+					// GO名セット
+					if (!matName2GoNames.TryGetValue(mat.name, out var goSet))
+					{
+						goSet = new HashSet<string>();
+						matName2GoNames.Add(mat.name, goSet);
+					}
+					goSet.Add(go.name);
+				}
+
+				// 2) 「同名で複数Material実体」を持つ名前を抽出
+				List<string> dupNames = new List<string>();
+				foreach (var kv in matName2MatSet)
+				{
+					if (kv.Value.Count > 1) // ← 同名で実体が複数
+					{
+						dupNames.Add(kv.Key);
 					}
 				}
 
-				if (materialsWithDuplicateNames.Count > 0)
+				if (dupNames.Count > 0)
 				{
-					String[] stringArray = new String[materialsWithDuplicateNames.Count];
-					materialsWithDuplicateNames.CopyTo(stringArray);
-					string matsWithSameName = string.Join(",", stringArray);
-					Debug.LogError("The source objects use different materials that have the same name (" + matsWithSameName + "). " +
+					// 3) エラーログ用に、名前ごとのGO一覧を連結
+					// matsWithSameName: 旧来と互換の簡易リスト
+					string matsWithSameName = string.Join(",", dupNames);
+
+					// 詳細: "MatNameA: GO1, GO2; MatNameB: GO3, GO4"
+					List<string> detailEntries = new List<string>();
+					for (int n = 0; n < dupNames.Count; n++)
+					{
+						string name = dupNames[n];
+						if (matName2GoNames.TryGetValue(name, out var goNames))
+						{
+							detailEntries.Add($"{name}: {string.Join(", ", goNames)}");
+						}
+					}
+					string detail = string.Join("; ", detailEntries);
+
+					Debug.LogError(
+						"The source objects use different materials that have the same name (" + matsWithSameName + "). " +
 						"If using addressables, materials with the same name are considered to be the same material when baking meshes at runtime. " +
-						"If you want to use this Material Bake Result at runtime then all source materials must have distinct names. Baking in edit-mode will still work.");
+						"If you want to use this Material Bake Result at runtime then all source materials must have distinct names. " +
+						"Baking in edit-mode will still work. " +
+						"Conflicting usages => " + detail
+					);
 				}
 			}
 		}
