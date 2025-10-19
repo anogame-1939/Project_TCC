@@ -216,6 +216,8 @@ GameObject:
   - component: {fileID: 5585552223980072049}
   - component: {fileID: 308643808499320233}
   - component: {fileID: 4906746148250170697}
+  - component: {fileID: 6282377177374415190}
+  - component: {fileID: 585512639451230999}
   m_Layer: 0
   m_Name: Light_13
   m_TagString: Untagged
@@ -291,6 +293,39 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6282377177374415190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8939649270100877946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9047a9e92d26424b95cda2d1affa3b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spotLight: {fileID: 1379594925880530368}
+  fx: {fileID: 585512639451230999}
+--- !u!114 &585512639451230999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8939649270100877946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 333d035840782d1449f589b7599dccc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spotLight: {fileID: 1379594925880530368}
+  bulbRenderer: {fileID: 4906746148250170697}
+  emissionOn: {r: 1, g: 0.85, b: 0.6, a: 1}
+  emissionOff: {r: 0.05, g: 0.05, b: 0.05, a: 1}
+  emissionIntensity: 2
+  spotOnIntensity: 109.36
+  spotOffIntensity: 0
 --- !u!1001 &7912208719051422003
 PrefabInstance:
   m_ObjectHideFlags: 0

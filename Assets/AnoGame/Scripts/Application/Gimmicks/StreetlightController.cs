@@ -1,22 +1,22 @@
 using UnityEngine;
 
-namespace AnoGame.Application.Gmmicks
+namespace AnoGame.Application.Gimmicks
 {
     public class StreetlightController : MonoBehaviour
     {
-        [SerializeField] private Light pointLight;
         [SerializeField] private Light spotLight;
+        [SerializeField] private StreetlightFxBlink fx; // ← 同一オブジェクト or 子に付与
 
         public Vector3 Position => transform.position;
 
-        enum State { Off, NoShadow, Full }
-        State _state = State.Off;
+        private enum State { Off, NoShadow, Full }
+        private State _state = State.Off;
 
         public void ApplyState(float dist, float fullOn, float noShadow, float off, float hysteresis = 2f)
         {
-            float fullOnIn = fullOn - hysteresis;
+            float fullOnIn   = fullOn   - hysteresis;
             float noShadowIn = noShadow - hysteresis;
-            float offOut = off + hysteresis;
+            float offOut     = off      + hysteresis;
 
             var next = _state;
             switch (_state)
@@ -32,15 +32,22 @@ namespace AnoGame.Application.Gmmicks
                     if (dist > noShadow) next = State.NoShadow;
                     break;
             }
+
             if (next != _state)
             {
                 _state = next;
-                bool on = _state != State.Off;
-                if (pointLight) pointLight.enabled = on;
-                if (spotLight) spotLight.enabled = on;
-                var shadows = (_state == State.Full) ? LightShadows.Soft : LightShadows.None;
-                if (pointLight) pointLight.shadows = shadows;
-                if (spotLight) spotLight.shadows = shadows;
+
+                bool masterOn = (_state != State.Off);
+                if (fx != null) fx.SetMasterEnabled(masterOn);
+
+                if (spotLight != null)
+                {
+                    spotLight.enabled = masterOn;
+                    spotLight.shadows = (_state == State.Full) ? LightShadows.Soft : LightShadows.None;
+                }
+
+                // LOD による見た目補助（遠景でも電球が暗く見えるよう軽く点ける等）を
+                // もし入れたい場合は fx 側に「ベース発光」を持たせてここで切替してもOK
             }
         }
 

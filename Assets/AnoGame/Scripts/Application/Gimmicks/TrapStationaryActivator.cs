@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace AnoGame.Application.Gmmicks
+namespace AnoGame.Application.Gimmicks
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Collider))]
