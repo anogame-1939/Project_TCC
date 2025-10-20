@@ -93,8 +93,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000004, guid: a099538f595227a49bf1f9a6a5e9d361, type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: e8a3f4d6661120c4ca5f6ddf964bb524, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -910,6 +910,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street_Light_A_09
       objectReference: {fileID: 0}
+    - target: {fileID: 3243662097487983012, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4416713322726933633, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.9
@@ -963,8 +967,16 @@ PrefabInstance:
       value: 71.263855
       objectReference: {fileID: 0}
     - target: {fileID: 5049938824455324589, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5049938824455324589, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
       propertyPath: m_InnerSpotAngle
       value: 38.563866
+      objectReference: {fileID: 0}
+    - target: {fileID: 6236427570954815306, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6677384424992163209, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
       propertyPath: m_Range
@@ -977,6 +989,10 @@ PrefabInstance:
     - target: {fileID: 6677384424992163209, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
       propertyPath: m_SpotAngle
       value: 71.263855
+      objectReference: {fileID: 0}
+    - target: {fileID: 6677384424992163209, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6677384424992163209, guid: 4c13111924467b942a539e4df1b2ae3c, type: 3}
       propertyPath: m_InnerSpotAngle
@@ -4179,6 +4195,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0_6
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 117.497856
@@ -5990,6 +6014,14 @@ PrefabInstance:
     - target: {fileID: 2777011868313362237, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.19279863
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9792,6 +9824,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street4
       objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -11.252579
@@ -12430,9 +12470,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -14106,6 +14154,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_Name
       value: Street4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -16344,6 +16400,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -22947,6 +23011,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.369999
@@ -28278,9 +28350,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -28460,6 +28540,10 @@ PrefabInstance:
     - target: {fileID: 1104077480999490670, guid: efc943baccd89484dad5222bff125b30, type: 3}
       propertyPath: m_Name
       value: SM_street_preset_03_4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1104077480999490670, guid: efc943baccd89484dad5222bff125b30, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -31333,6 +31417,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0_3
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5536607545090443803, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Size.x
       value: 12.375813
@@ -31356,6 +31444,10 @@ PrefabInstance:
     - target: {fileID: 5536607545090443803, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Center.z
       value: 0.000000019996145
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -35043,6 +35135,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0_12
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 33.5
@@ -35607,9 +35707,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -36483,9 +36591,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -38117,6 +38233,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -40118,9 +40242,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -41651,9 +41783,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -42263,6 +42403,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -42963,6 +43111,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.18
       objectReference: {fileID: 0}
+    - target: {fileID: 5559267846610783514, guid: c0b414244aef0d249b8b9dfaa69147b8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5559267846610783514, guid: c0b414244aef0d249b8b9dfaa69147b8, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5922060869161766742, guid: c0b414244aef0d249b8b9dfaa69147b8, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.4835167
@@ -43054,6 +43210,10 @@ PrefabInstance:
     - target: {fileID: 7733848147523927840, guid: c0b414244aef0d249b8b9dfaa69147b8, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.43274736
+      objectReference: {fileID: 0}
+    - target: {fileID: 8609095854806099722, guid: c0b414244aef0d249b8b9dfaa69147b8, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8723130912939761589, guid: c0b414244aef0d249b8b9dfaa69147b8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -44199,6 +44359,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -18.64
@@ -45264,9 +45432,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -48400,6 +48576,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0_4
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 58.186546
@@ -48692,6 +48876,14 @@ PrefabInstance:
     - target: {fileID: 2777011868313362237, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.z
       value: -0.24242401
+      objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -54010,9 +54202,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -55289,6 +55489,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_Name
       value: Street 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -56990,9 +57198,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -62049,9 +62265,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 756679911}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -65072,6 +65296,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -73032,6 +73264,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street4_1
       objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 51.88571
@@ -74201,6 +74441,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -88464,6 +88712,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street4
       objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -26.55452
@@ -88765,6 +89021,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -89339,6 +89603,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 102.56932
@@ -89400,6 +89672,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -92085,6 +92365,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0_8
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.851685
@@ -92480,6 +92768,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_Name
       value: Street4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -97325,6 +97621,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street0_5
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.263588
@@ -97460,6 +97764,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -98488,6 +98800,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -99789,6 +100109,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8096250332650086692, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Size.x
@@ -102012,6 +102340,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -104611,6 +104947,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: park street
       objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5536607545090443803, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Size.x
       value: 1
@@ -104634,6 +104974,10 @@ PrefabInstance:
     - target: {fileID: 5536607545090443803, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Center.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -109895,9 +110239,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -109955,6 +110307,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_Name
       value: Street 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -111131,6 +111491,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -112628,9 +112996,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -118250,9 +118626,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -118455,6 +118839,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_Name
       value: Street4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -118817,9 +119209,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -120863,9 +121263,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -123227,6 +123635,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_Name
       value: Street 2_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -127204,6 +127620,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 40.210014
@@ -129664,9 +130088,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1013104006469136178, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_Name
       value: Street3_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3240906958056287398, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 1aebf5a3380befd4fb681948e8198fa0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -130301,6 +130733,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_Name
       value: Street 2_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -132705,9 +133145,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -135626,9 +136074,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -136714,6 +137170,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_Name
       value: Street4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -140381,6 +140845,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street4_1
       objectReference: {fileID: 0}
+    - target: {fileID: 4848306412388620933, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7043036022337919249, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: a08f5834436ede04aa7fc143575a484c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 28.46
@@ -140730,9 +141202,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -143489,9 +143969,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -146512,6 +147000,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.316998
@@ -147279,9 +147775,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -149008,6 +149512,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Street 2_1
       objectReference: {fileID: 0}
+    - target: {fileID: 2044632107716153898, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4515625112070836670, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 9d072d20d89590d439f01383762bf1a3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -42.69863
@@ -150471,9 +150983,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1899208109}
     m_Modifications:
+    - target: {fileID: 1206293820325615993, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1702723968424822484, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_Name
       value: Street 3_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623386531740687085, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: de5d5f20d28f1da428d0fcdfc2d2f4c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -151839,6 +152359,14 @@ PrefabInstance:
     - target: {fileID: 1702723968424822484, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_Name
       value: Street0_5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719788040110635614, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166714902784588234, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8697470652444158378, guid: 6a3de97baf2255445abe652f3f0f07f8, type: 3}
       propertyPath: m_LocalPosition.x
