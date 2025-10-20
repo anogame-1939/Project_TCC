@@ -5,12 +5,31 @@ namespace AnoGame.Application.Gimmicks
     public class StreetlightController : MonoBehaviour
     {
         [SerializeField] private Light spotLight;
-        [SerializeField] private StreetlightFxBlink fx; // ← 同一オブジェクト or 子に付与
+        [SerializeField] private StreetlightFxBlink fx;
+
+        [Header("起動時に強制消灯する")]
+        [SerializeField] private bool startOff = true;
 
         public Vector3 Position => transform.position;
 
         private enum State { Off, NoShadow, Full }
         private State _state = State.Off;
+
+        private void Start()
+        {
+            if (startOff) ForceOff();
+        }
+
+        public void ForceOff()
+        {
+            _state = State.Off;
+            if (fx != null) fx.SetMasterEnabled(false);
+            if (spotLight != null)
+            {
+                spotLight.enabled = false;
+                spotLight.shadows = LightShadows.None;
+            }
+        }
 
         public void ApplyState(float dist, float fullOn, float noShadow, float off, float hysteresis = 2f)
         {
@@ -45,14 +64,10 @@ namespace AnoGame.Application.Gimmicks
                     spotLight.enabled = masterOn;
                     spotLight.shadows = (_state == State.Full) ? LightShadows.Soft : LightShadows.None;
                 }
-
-                // LOD による見た目補助（遠景でも電球が暗く見えるよう軽く点ける等）を
-                // もし入れたい場合は fx 側に「ベース発光」を持たせてここで切替してもOK
             }
         }
 
-        // （任意）自己登録パターン：動的生成にも対応
-        private void OnEnable() => StreetlightManager.TryRegister(this);
+        private void OnEnable()  => StreetlightManager.TryRegister(this);
         private void OnDisable() => StreetlightManager.TryUnregister(this);
     }
 }

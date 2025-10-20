@@ -128,6 +128,7 @@ GameObject:
   - component: {fileID: 1880366683808028813}
   - component: {fileID: 2086661435053366070}
   - component: {fileID: 6602788102390936578}
+  - component: {fileID: 5859213449497399106}
   m_Layer: 0
   m_Name: Street_Light_A_06
   m_TagString: Untagged
@@ -205,6 +206,23 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5859213449497399106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6431640633730123917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 513cab6ef7065fc40a1538520b4ce480, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightSource: {fileID: 5585552223980072049}
+  offsetForward: {x: -0.7, y: 2, z: 0.04}
+  offsetBackward: {x: -0.7, y: 2, z: -0.04}
+  offsetLeft: {x: -0.7, y: 2, z: 0}
+  offsetRight: {x: -0.7, y: 2, z: 0}
 --- !u!1 &8939649270100877946
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,7 +252,7 @@ Transform:
   m_GameObject: {fileID: 8939649270100877946}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.6872804, y: 2.0981, z: 0.00021118164}
+  m_LocalPosition: {x: -0.7, y: 2, z: 0.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -307,6 +325,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spotLight: {fileID: 1379594925880530368}
   fx: {fileID: 585512639451230999}
+  startOff: 1
 --- !u!114 &585512639451230999
 MonoBehaviour:
   m_ObjectHideFlags: 0

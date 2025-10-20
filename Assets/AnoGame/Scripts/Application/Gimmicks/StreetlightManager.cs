@@ -36,7 +36,7 @@ namespace AnoGame.Application.Gimmicks
 
         private void OnDisable()
         {
-            _group?.Dispose();
+            if (_group != null) _group?.Dispose();
             if (_instance == this) _instance = null;
         }
 
