@@ -16,11 +16,13 @@ namespace AnoGame.Application.Inventory
         [SerializeField] private TMP_Text descText;
 
         [Header("Timing")]
+        [SerializeField] private float startDelay = 0.5f;
         [SerializeField] private float fadeIn = 0.2f;
         [SerializeField] private float stay = 2.0f;
         [SerializeField] private float fadeOut = 0.2f;
-        [SerializeField]
-        private UnityEvent _getEvent;
+        [SerializeField] private UnityEvent _startEvent;
+        [SerializeField] private UnityEvent _getEvent;
+        [SerializeField] private UnityEvent _endEvent;
 
         private bool _busy;
 
@@ -46,32 +48,39 @@ namespace AnoGame.Application.Inventory
                 iconImage.sprite = null;
             }
 
+            // イベント開始時にちょっと遅延
+            _startEvent?.Invoke();
+            await UniTask.Delay((int)(startDelay * 1000));
+
             // 表示
             gameObject.SetActive(true);
             _getEvent?.Invoke();
-            await FadeTo(1f, fadeIn);
+            await FadeTo(0, 1f, fadeIn);
             await UniTask.Delay((int)(stay * 1000));
-            await FadeTo(0f, fadeOut);
+            await FadeTo(1f, 0f, fadeOut);
 
             // アンロード
             if (data.AssetReference != null) data.AssetReference.ReleaseAsset();
             gameObject.SetActive(false);
             _busy = false;
+
+            _endEvent?.Invoke();
         }
 
         public bool IsBusy => _busy;
 
         public void MarkBusy() => _busy = true;
 
-        private async UniTask FadeTo(float target, float duration)
+        private async UniTask FadeTo(float start, float target, float duration)
         {
             group.gameObject.SetActive(true);
-            group.alpha = 0f;
-            float start = group.alpha;
+
             float t = 0f;
+
+            // UIはゲームの一時停止に影響されない方が自然なら unscaledDeltaTime を推奨
             while (t < duration)
             {
-                t += Time.deltaTime;
+                t += Time.unscaledDeltaTime;  // あるいは Time.deltaTime のままでもOK
                 group.alpha = Mathf.Lerp(start, target, t / duration);
                 await UniTask.Yield();
             }
