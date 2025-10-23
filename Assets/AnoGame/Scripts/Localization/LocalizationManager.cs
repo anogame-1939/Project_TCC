@@ -290,7 +290,7 @@ namespace Localizer
             var tmpros = Resources.FindObjectsOfTypeAll(typeof(TMP_Text)) as TMP_Text[];
             foreach (var tmpro in tmpros)
             {
-                Debug.Log($"テキスト翻訳中: {tmpro.name} - {tmpro.text}");
+                // Debug.Log($"テキスト翻訳中: {tmpro.name} - {tmpro.text}");
                 LocalizeComponent localizeComponent = tmpro.gameObject.GetComponent<LocalizeComponent>();
 
                 if (localizeComponent == null)
@@ -306,7 +306,7 @@ namespace Localizer
                 }
                 else if (localizeComponent.Ignore)
                 {
-                    Debug.Log($"テキスト翻訳スキップ: {tmpro.text}");
+                    //Debug.Log($"テキスト翻訳スキップ: {tmpro.text}");
                     continue;
                 }
 
@@ -315,7 +315,7 @@ namespace Localizer
                 if (entry != null)
                 {
                     tmpro.text = entry.LocalizedValue;
-                    Debug.Log($"テキスト翻訳完了: '{localizeComponent.OriginText}' -> '{entry.LocalizedValue}'");
+                    // Debug.Log($"テキスト翻訳完了: '{localizeComponent.OriginText}' -> '{entry.LocalizedValue}'");
                 }
                 else
                 {
@@ -339,9 +339,9 @@ namespace Localizer
             Debug.Log("ApplyFont: メソッド開始");
 
             // ■ ① LocalizationSettings の初期化完了を待つ
-            Debug.Log("ApplyFont: LocalizationSettings.InitializationOperation を待機します...");
+            //Debug.Log("ApplyFont: LocalizationSettings.InitializationOperation を待機します...");
             await LocalizationSettings.InitializationOperation.ToUniTask();
-            Debug.Log("ApplyFont: LocalizationSettings 初期化完了");
+            //Debug.Log("ApplyFont: LocalizationSettings 初期化完了");
 
             // ■ ② TableReference がセットされているかチェック
             if (_fontTable == null || _localizedFontReference == null)
@@ -350,14 +350,14 @@ namespace Localizer
                 return;
             }
 
-            Debug.Log($"ApplyFont: TableCollectionName = {_fontTable.TableReference.TableCollectionName}");
+            //Debug.Log($"ApplyFont: TableCollectionName = {_fontTable.TableReference.TableCollectionName}");
 
             // ■ ③ テーブルをロード
-            Debug.Log("ApplyFont: GetTableAsync を呼び出します...");
+            //Debug.Log("ApplyFont: GetTableAsync を呼び出します...");
             AsyncOperationHandle<AssetTable> tableHandle =
                 LocalizationSettings.AssetDatabase.GetTableAsync(_fontTable.TableReference);
             await tableHandle.ToUniTask();
-            Debug.Log("ApplyFont: tableHandle.ToUniTask() が完了しました");
+            //Debug.Log("ApplyFont: tableHandle.ToUniTask() が完了しました");
 
             AssetTable assetTable = tableHandle.Result;
             if (assetTable == null)
@@ -365,7 +365,7 @@ namespace Localizer
                 Debug.LogError($"ApplyFont: AssetTable が null でした。(Table: {_fontTable.TableReference.TableCollectionName})");
                 return;
             }
-            Debug.Log($"ApplyFont: AssetTable を取得できました: {assetTable.TableCollectionName}");
+            //Debug.Log($"ApplyFont: AssetTable を取得できました: {assetTable.TableCollectionName}");
 
             // ■ ④ キー名を ResolveKeyName で取得 (デバッグ用途)
             string entryKey = _localizedFontReference.TableEntryReference.ResolveKeyName(assetTable.SharedData);
@@ -374,7 +374,7 @@ namespace Localizer
                 Debug.LogError($"ApplyFont: ResolveKeyName でエントリ名を解決できませんでした。(KeyId: {_localizedFontReference.TableEntryReference.KeyId})");
                 return;
             }
-            Debug.Log($"ApplyFont: (ResolveKeyName) Entry 名 = {entryKey}");
+            //Debug.Log($"ApplyFont: (ResolveKeyName) Entry 名 = {entryKey}");
 
             // ■ ⑤ 取得した TableEntryReference をそのまま使ってフォントをロード
             Debug.Log($"ApplyFont: GetAssetAsync を呼び出します: KeyId={_localizedFontReference.TableEntryReference.KeyId}");
@@ -382,7 +382,7 @@ namespace Localizer
                 assetTable.GetAssetAsync<TMP_FontAsset>(_localizedFontReference.TableEntryReference);
 
             await fontHandle.ToUniTask();
-            Debug.Log("ApplyFont: fontHandle.ToUniTask() が完了しました");
+            //Debug.Log("ApplyFont: fontHandle.ToUniTask() が完了しました");
 
             TMP_FontAsset tmpFontAsset = fontHandle.Result;
             if (tmpFontAsset == null)
@@ -401,7 +401,7 @@ namespace Localizer
                     continue;
                 tmpro.font = tmpFontAsset;
             }
-            Debug.Log($"ApplyFont: 全 TextMeshProUGUI にフォント '{tmpFontAsset.name}' を適用しました");
+            //Debug.Log($"ApplyFont: 全 TextMeshProUGUI にフォント '{tmpFontAsset.name}' を適用しました");
         }
 
 
