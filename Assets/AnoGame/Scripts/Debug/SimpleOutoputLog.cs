@@ -6,11 +6,11 @@ namespace AnoGame.SLFBDebug
     {
         public void Log()
         {
-            Debug.Log($"はい-name:{name}");
+            Debug.Log($"はい-name:{name}", this);
         }
         public void Log(string message)
         {
-            Debug.Log($"message:{message}-name:{name}");
+            Debug.Log($"message:{message}-name:{name}", this);
         }
     }
 }
