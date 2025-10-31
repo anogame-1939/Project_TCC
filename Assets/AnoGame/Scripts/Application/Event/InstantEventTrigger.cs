@@ -34,7 +34,7 @@ namespace AnoGame.Application.Event
         protected override void OnStartEvent()
         {
             base.OnStartEvent();
-            Debug.Log($"InstantEventTrigger-OnStartEvent:{name}");
+            Debug.Log($"InstantEventTrigger-OnStartEvent:{name}", this);
 
             if (CheckConditions())
             {
@@ -48,7 +48,7 @@ namespace AnoGame.Application.Event
         public override void OnFinishEvent()
         {
             base.OnFinishEvent();
-            Debug.Log($"InstantEventTrigger-OnCompleteEvent:{name}");
+            Debug.Log($"InstantEventTrigger-OnCompleteEvent:{name}", this);
         }
     }
 }

@@ -108,8 +108,11 @@ namespace AnoGame.Application.Event
 
         protected bool CheckConditions()
         {
+            Debug.Log($"CheckConditions:{name} ConditionsCount:{_conditions.Count}");
             if (_conditions.Count == 0)
                 return true;
+
+            Debug.Log($"AllConditionsSatisfied:{_conditions.All(condition => condition.IsSatisfied())}");
 
             return _conditions.All(condition => condition.IsSatisfied());
         }
