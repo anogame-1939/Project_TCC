@@ -45,6 +45,8 @@ namespace AnoGame.Application.Core
             builder.Register<IGameDataRepository, GameDataRepository>(Lifetime.Singleton);
             builder.Register<IEventService, EventService>(Lifetime.Singleton);
             builder.Register<IInventoryService, InventoryService>(Lifetime.Singleton);
+            builder.Register<IConsumeZoneResolver, ConsumeZoneResolver>(Lifetime.Singleton);
+
             builder.Register<GameManager>(Lifetime.Singleton);
 
             // インベントリマネージャの登録

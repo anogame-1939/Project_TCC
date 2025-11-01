@@ -301,11 +301,14 @@ namespace AnoGame.Application.Inventory
                 var inv = new AnoGame.Domain.Data.Models.Inventory();
                 foreach (var it in items) inv.AddItem(it);
                 _inventoryViewer.UpdateInventory(inv);
+
+                // TODO:ここでアイテム消費成功時のイベントor処理を呼ぶ
             }
             else
             {
                 Debug.LogWarning($"[InventoryController] '{itemId}' を消費できず. Reason={reason}");
                 // _confirmDialog.Show(reason ?? "ここでは使用できません。", onYes: ()=>{}, onNo: ()=>{});
+                // TODO:ここで使用できない旨のフィードバックを出す
             }
         }
 
