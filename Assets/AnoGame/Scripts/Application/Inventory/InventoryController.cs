@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using AnoGame.Application.Event;
 using AnoGame.Domain.Inventory.Services;
 using PixelCrushers.DialogueSystem;
+using UnityEngine.Events;
 
 namespace AnoGame.Application.Inventory
 {
@@ -15,7 +16,9 @@ namespace AnoGame.Application.Inventory
         [SerializeField]
         private InventoryViewer _inventoryViewer;
         [SerializeField] private ConsumeProximityTracker _tracker;
-        [SerializeField] ConfirmDialog _confirmDialog;
+        [SerializeField] private ConfirmDialog _confirmDialog;
+        [SerializeField] private UnityEvent _itemConsumedsuccessEvent;
+        [SerializeField] private UnityEvent _itemConsumeFailedEvent;
 
         private CanvasGroup _canvasGroup;
         private GameObject _lastSelectedGO;
@@ -302,13 +305,13 @@ namespace AnoGame.Application.Inventory
                 foreach (var it in items) inv.AddItem(it);
                 _inventoryViewer.UpdateInventory(inv);
 
-                // TODO:ここでアイテム消費成功時のイベントor処理を呼ぶ
+                _itemConsumedsuccessEvent?.Invoke();
             }
             else
             {
                 Debug.LogWarning($"[InventoryController] '{itemId}' を消費できず. Reason={reason}");
                 // _confirmDialog.Show(reason ?? "ここでは使用できません。", onYes: ()=>{}, onNo: ()=>{});
-                // TODO:ここで使用できない旨のフィードバックを出す
+                _itemConsumeFailedEvent?.Invoke();
             }
         }
 
