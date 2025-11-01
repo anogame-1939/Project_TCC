@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using AnoGame.Application.Event;
 using AnoGame.Domain.Inventory.Services;
 using UnityEngine;
+using VContainer;
 
 namespace AnoGame.Infrastructure.Services
 {
@@ -15,8 +17,12 @@ namespace AnoGame.Infrastructure.Services
         public event Action<string> OnItemRemoved;
         public event Action<ItemConsumedArgs> OnItemConsumed;
 
-
         private HashSet<string> _itemNames = new();
+
+        [Inject]
+        public InventoryService(IConsumeZoneResolver resolver) => _resolver = resolver;
+
+        private readonly IConsumeZoneResolver _resolver;
 
         public void SetItems(HashSet<string> itemNames)
         {
