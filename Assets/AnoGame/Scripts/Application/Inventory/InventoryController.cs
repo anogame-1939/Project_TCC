@@ -275,45 +275,60 @@ namespace AnoGame.Application.Inventory
             if (item == null)
             {
                 Debug.LogWarning("[InventoryController] slot.CurrentItem が null");
+                _itemConsumeFailedEvent?.Invoke();
                 return;
             }
 
-            var itemId = item.ItemName; // 暫定：将来は ItemId に切替
-            var player = GameObject.FindWithTag("Player"); // TODO:参照方法見直し
+            var itemId = item.ItemName; // TODO: 将来は安定IDへ
+            var player = GameObject.FindWithTag("Player"); // TODO: 参照改善（DI等）
             var usePos = player ? player.transform.position : Vector3.zero;
 
+            // 1) まずUI側プレチェック：どのゾーンで使えるか（ユーザへ理由を返すため）
             string reason = null;
-            if (_tracker != null &&
-                _tracker.TryPickUsableZone(itemId, player, usePos, out var zone, out reason))
+            if (_tracker == null ||
+                !_tracker.TryPickUsableZone(itemId, player, usePos, out var zone, out reason))
             {
-                Debug.Log($"[InventoryController] '{itemId}' を消費しようとしています. Zone={zone.GetDebugName()} Reason={reason}");
-
-                var ok = _inventoryService.ConsumeItem(itemId, 1, player, usePos);
-                if (!ok)
-                {
-                    Debug.LogWarning($"[InventoryController] '{itemId}' の消費に失敗: 在庫不足");
-                    _confirmDialog.Show("在庫が足りません。", onYes: () => { }, onNo: () => { });
-                    return;
-                }
-
-                Debug.Log($"[InventoryController] '{itemId}' を正常に消費しました");
-                _inventoryManager.RemoveItem(itemId);
-
-                // UI更新
-                var items = _inventoryManager.GetInventory();
-                var inv = new AnoGame.Domain.Data.Models.Inventory();
-                foreach (var it in items) inv.AddItem(it);
-                _inventoryViewer.UpdateInventory(inv);
-
-                _itemConsumedsuccessEvent?.Invoke();
-            }
-            else
-            {
-                Debug.LogWarning($"[InventoryController] '{itemId}' を消費できず. Reason={reason}");
+                Debug.LogWarning($"[InventoryController] '{itemId}' を消費できず (ゾーン未解決). Reason={reason}");
                 // _confirmDialog.Show(reason ?? "ここでは使用できません。", onYes: ()=>{}, onNo: ()=>{});
                 _itemConsumeFailedEvent?.Invoke();
+                return;
             }
+
+            Debug.Log($"[InventoryController] '{itemId}' を消費予定. Zone={zone.GetDebugName()} Reason={reason}");
+
+            // 2) 最終審級：InventoryService に可否を委譲（在庫や他条件）
+            var serviceOk = _inventoryService.ConsumeItem(itemId, 1, player, usePos);
+            if (!serviceOk)
+            {
+                Debug.LogWarning($"[InventoryController] '{itemId}' 消費失敗: 在庫不足/サービスNG");
+                _confirmDialog.Show("在庫が足りません。", onYes: () => { }, onNo: () => { });
+                _itemConsumeFailedEvent?.Invoke();
+                return;
+            }
+
+            // 3) ゾーンに“実行”を指示（ここで該当 EventOnConsume のイベントが走る）
+            var started = zone.TryStart(itemId, player, usePos);
+            if (!started)
+            {
+                // 実行フェーズで弾かれた（距離が変わった、視線遮蔽物、クールダウン等）
+                Debug.LogWarning($"[InventoryController] '{itemId}' のイベント実行に失敗: zone={zone.GetDebugName()}");
+                // ここで“返金”が必要なら、InventoryServiceにリストアAPIを用意する（将来）
+                _itemConsumeFailedEvent?.Invoke();
+                return;
+            }
+
+            // 4) ここまで来たら成功：UI在庫の見た目を更新し、成功イベントを発火
+            _inventoryManager.RemoveItem(itemId);
+
+            var items = _inventoryManager.GetInventory();
+            var inv = new AnoGame.Domain.Data.Models.Inventory();
+            foreach (var it in items) inv.AddItem(it);
+            _inventoryViewer.UpdateInventory(inv);
+
+            _itemConsumedsuccessEvent?.Invoke();
+            Debug.Log($"[InventoryController] '{itemId}' を正常に消費し、イベントを実行しました (zone={zone.GetDebugName()})");
         }
+
 
         private void RestoreSelectionAfterConsume(InventorySlot consumedSlot)
         {
