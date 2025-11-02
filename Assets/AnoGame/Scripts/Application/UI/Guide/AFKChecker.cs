@@ -2,7 +2,9 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-using Unity.TinyCharacterController.Control; // MoveControl
+using Unity.TinyCharacterController.Control;
+using AnoGame.Application;
+using UnityEngine.InputSystem; // MoveControl
 
 namespace AnoGame.UI.Guide
 {
@@ -64,7 +66,8 @@ namespace AnoGame.UI.Guide
                 if (moveControl == null)
                 {
                     Debug.LogError("[AFKChecker] MoveControl が見つかりません。");
-                    enabled = false; return;
+                    enabled = false;
+                    return;
                 }
             }
 
@@ -78,6 +81,32 @@ namespace AnoGame.UI.Guide
                 float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                 float speed = moveControl.CurrentSpeed;
                 bool isMoving = speed > speedThreshold;
+
+                // 🔸任意のキーが押されたら即AFK解除
+                if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+                {
+                    MarkActive();
+                    continue;
+                }
+
+                // 🔸マウスクリック・パッド入力もAFK解除したい場合
+                if (Mouse.current != null && 
+                    (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame))
+                {
+                    MarkActive();
+                    continue;
+                }
+
+                if (GameStateManager.Instance.CurrentState != Application.GameState.Gameplay)
+                {
+                    if (IsAFK)
+                    {
+                        SetAFK(false);
+                        guide?.Hide();
+                    }
+                    InactiveElapsed = 0f;
+                    continue;
+                }
 
                 if (isMoving)
                 {

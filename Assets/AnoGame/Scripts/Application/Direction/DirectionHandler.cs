@@ -10,11 +10,13 @@ namespace AnoGame.Application.Direction
     {
         [Inject] EventLockControl _eventLockControl;
         [Inject] CinematicBars _cinematicBars;
+        [SerializeField] private GameStateHandler _gameStateHandler;
 
 
         [ContextMenu("StatEvent")]
         public void StatEvent()
         {
+            _gameStateHandler.SetInGameEvent();
             _eventLockControl.BeginLock();
             _cinematicBars.Show();
         }
@@ -22,6 +24,7 @@ namespace AnoGame.Application.Direction
         [ContextMenu("EndEvent")]
         public void EndEvent()
         {
+            _gameStateHandler.SetGameplay();
             _eventLockControl.EndLock();
             _cinematicBars.Hide();
         }
