@@ -13,6 +13,7 @@ namespace AnoGame.Application.Inventory
 {
     public class InventoryController : MonoBehaviour
     {
+        [SerializeField] UiInputRouter _router;
         [SerializeField]
         private InventoryViewer _inventoryViewer;
         [SerializeField] private ConsumeProximityTracker _tracker;
@@ -28,10 +29,13 @@ namespace AnoGame.Application.Inventory
         private InputAction _inventoryOpenAction;
         // UI マップの Cancel（閉じる用）
 
-        private InputAction _conrimAction;
+        private InputAction _confirmAction;
         private InputAction _cancelAction;
         // UI マップの Inventory（閉じる用）
         private InputAction _inventoryCloseAction;
+
+        private GameObject _pendingSelectGO;   // 次回Openで選びたいGO（生きていれば最優先）
+        private int? _pendingSelectIndex; 
 
         [Inject] private IInputActionProvider _inputProvider;
         [Inject] private IInventoryService _inventoryService;
@@ -119,19 +123,15 @@ namespace AnoGame.Application.Inventory
                 _inventoryViewer.UpdateInventory(inv);
             }
 
-            // UI マップへ切り替え ＆ Cancel / Inventory（UI） を購読
-            // _inputProvider.SwitchToUI();
+            _inputProvider.SwitchToUI();
             var uiMap = _inputProvider.GetUIActionMap();
 
-            _conrimAction  = uiMap.FindAction("Confirm",  true);
-            _cancelAction   = uiMap.FindAction("Cancel",   true);
-            _inventoryCloseAction = uiMap.FindAction("Inventory", false);
+            // これだけに集約：CancelはRouterが受ける
+            _router.BeginRouting(uiMap.FindAction("Cancel", true));
+            _router.OnUnhandledCancel += Close;
 
-            _conrimAction.performed  += OnConfirmPerformed;
-            _cancelAction.performed   += OnCancelPerformed;
-            _inventoryCloseAction.performed += OnCancelPerformed;
-
-
+            _confirmAction = uiMap.FindAction("Confirm", true);
+            _confirmAction.performed += OnConfirmPerformed;
 
             // 表示＆カーソル解放
             _canvasGroup.alpha      = 1;
@@ -147,17 +147,11 @@ namespace AnoGame.Application.Inventory
             Cursor.visible          = false;
 
             // UI マップ購読解除
-            if (_cancelAction != null)
-            {
-                _cancelAction.performed -= OnCancelPerformed;
-                _cancelAction = null;
-            }
-            if (_inventoryCloseAction != null)
-            {
-                _inventoryCloseAction.performed -= OnCancelPerformed;
-                _inventoryCloseAction = null;
-            }
+            _confirmAction.performed -= OnConfirmPerformed;
 
+            _router.OnUnhandledCancel -= Close;
+            _router.EndRouting();
+            
             // Player マップへ復帰
             _inputProvider.SwitchToPlayer();
 
@@ -224,11 +218,14 @@ namespace AnoGame.Application.Inventory
                 title: $"{displayName} を使用しますか？",
                 onYes: () =>
                 {
-                    // 先に消費処理
+                    var nextSel = ComputeNextSelectable(slot);
+                    _pendingSelectGO = nextSel ? nextSel.gameObject : null;
+                    _pendingSelectIndex = ComputeSelectableIndexUnderRoot(_inventoryViewer.gameObject, _pendingSelectGO);
+
                     Consume(slot);
 
                     // 消費後の選択復帰（後述のヘルパー）
-                    RestoreSelectionAfterConsume(slot);
+                    // RestoreSelectionAfterConsume(slot);
 
                     CloseDialogAndUnlockUI();
 
@@ -245,12 +242,36 @@ namespace AnoGame.Application.Inventory
             );
         }
 
+        private UnityEngine.UI.Selectable ComputeNextSelectable(InventorySlot consumedSlot)
+        {
+            var sel = consumedSlot ? consumedSlot.GetComponent<UnityEngine.UI.Selectable>() : null;
+            UnityEngine.UI.Selectable next =
+                sel?.FindSelectableOnRight()
+            ?? sel?.FindSelectableOnDown()
+            ?? sel?.FindSelectableOnLeft()
+            ?? sel?.FindSelectableOnUp();
+
+            if (next != null) return next;
+
+            // 最後の砦：先頭
+            return FindFirstSelectableUnder(_inventoryViewer.gameObject);
+        }
+
+        private int? ComputeSelectableIndexUnderRoot(GameObject root, GameObject target)
+        {
+            if (root == null || target == null) return null;
+            var list = root.GetComponentsInChildren<UnityEngine.UI.Selectable>(includeInactive: false);
+            for (int i = 0; i < list.Length; i++)
+                if (list[i].gameObject == target) return i;
+            return null;
+        }
+
         private void CloseDialogAndUnlockUI()
         {
             _isModalOpen = false;
             if (_canvasGroup != null)
             {
-                _canvasGroup.interactable   = true;
+                _canvasGroup.interactable = true;
                 _canvasGroup.blocksRaycasts = true;
             }
 
@@ -258,7 +279,7 @@ namespace AnoGame.Application.Inventory
             if (GameStateManager.Instance.CurrentState == GameState.Inventory)
             {
                 Cursor.lockState = CursorLockMode.None;
-                Cursor.visible   = true;
+                Cursor.visible = true;
             }
         }
 

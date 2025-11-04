@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using AnoGame.Application.Input;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,107 +7,220 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using VContainer;
+using AnoGame.Application.Input;
 
-public sealed class ConfirmDialog : MonoBehaviour
+/// <summary>
+/// モーダルな確認ダイアログ。
+/// - Cancel入力は UiInputRouter のスタックで最前面が“消費”
+/// - Confirm入力は UI ActionMap の "Confirm" を購読（ボタンと同等）
+/// - 表示/非表示時に CanvasGroup を制御し、EventSystem の選択も管理
+/// </summary>
+namespace AnoGame.Application.Inventory
 {
-    [SerializeField] TMP_Text titleText;
-    [SerializeField] Button yesButton;
-    [SerializeField] Button noButton;
-    [SerializeField] CanvasGroup canvasGroup;
-
-    [Header("Default callbacks (always run)")]
-    [SerializeField] UnityEvent onYesDefault;
-    [SerializeField] UnityEvent onNoDefault;
-
-    [Header("Optional hooks")]
-    [SerializeField] UnityEvent onShown;
-    [SerializeField] UnityEvent onHidden;
-
-    InputAction _confirm, _cancel;
-    Action _onYes, _onNo;
-    bool _canAcceptInput = false;
-
-    [Inject] private IInputActionProvider _inputProvider;
-
-    void Awake()
+    public sealed class ConfirmDialog : MonoBehaviour
     {
-        if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
-        SetVisible(false, instant: true); // 最初は非表示
+        [Header("UI References")]
+        [SerializeField] private TMP_Text titleText;
+        [SerializeField] private Button yesButton;
+        [SerializeField] private Button noButton;
+        [SerializeField] private CanvasGroup canvasGroup;
 
-        yesButton.onClick.RemoveAllListeners();
-        noButton.onClick.RemoveAllListeners();
-        yesButton.onClick.AddListener(InvokeYes);
-        noButton.onClick.AddListener(InvokeNo);
-    }
+        [Header("Integration")]
+        [SerializeField] private UiInputRouter router; // シーン上の共通Routerをアサイン
 
-    public void Show(string title, Action onYes, Action onNo)
-    {
-        titleText.text = title;
-        _onYes = onYes; 
-        _onNo = onNo;
+        [Header("Behavior")]
+        [SerializeField, Tooltip("表示直後、誤入力を防ぐための受付ディレイ(秒)")]
+        private float inputCooldownSeconds = 0.25f;
 
-        SetVisible(true);
-        onShown?.Invoke();
+        [Header("Default callbacks (always run first)")]
+        [SerializeField] private UnityEvent onYesDefault;
+        [SerializeField] private UnityEvent onNoDefault;
 
-        var ui = _inputProvider.GetUIActionMap();
-        _confirm = ui.FindAction("Confirm", true);
-        _cancel = ui.FindAction("Cancel", true);
+        [Header("Optional hooks")]
+        [SerializeField] private UnityEvent onShown;
+        [SerializeField] private UnityEvent onHidden;
 
-        _confirm.performed += OnSubmit;
-        _cancel.performed += OnCancel;
+        // DI
+        [Inject] private IInputActionProvider _inputProvider;
 
-        EventSystem.current?.SetSelectedGameObject(yesButton.gameObject);
+        // 状態
+        public bool IsOpen { get; private set; }
+        private bool _canAcceptInput;
+        private Action _onYes, _onNo;
+        private IDisposable _cancelToken;     // Routerに積んだハンドラの解除トークン
+        private InputAction _confirmAction;   // UI ActionMap の "Confirm"
 
-        StartCoroutine(InputCooldownCoroutine(0.5f));
-    }
-
-    public void Hide()
-    {
-        _confirm.performed -= OnSubmit;
-        _cancel.performed -= OnCancel;
-
-        SetVisible(false);
-        onHidden?.Invoke();
-    }
-
-    void SetVisible(bool visible, bool instant = false)
-    {
-        if (canvasGroup == null) return;
-
-        canvasGroup.alpha = visible ? 1f : 0f;
-        canvasGroup.interactable = visible;
-        canvasGroup.blocksRaycasts = visible;
-    }
-
-    void OnSubmit(InputAction.CallbackContext _) => InvokeYes();
-    void OnCancel(InputAction.CallbackContext _) => InvokeNo();
-
-    void InvokeYes()
-    {
-        if (!_canAcceptInput) return;
-        try
+        void Awake()
         {
-            onYesDefault?.Invoke();
-            _onYes?.Invoke();
-        }
-        finally { Hide(); }
-    }
+            // 参照チェック
+            if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
+            if (yesButton == null || noButton == null)
+            {
+                Debug.LogError("[ConfirmDialog] yesButton / noButton の参照が不足しています。");
+            }
+            if (router == null)
+            {
+                Debug.LogError("[ConfirmDialog] UiInputRouter の参照が未設定です。");
+            }
 
-    void InvokeNo()
-    {
-        if (!_canAcceptInput) return;
-        try
+            // ボタンのクリックをメソッドに集約
+            if (yesButton != null)
+            {
+                yesButton.onClick.RemoveAllListeners();
+                yesButton.onClick.AddListener(InvokeYes);
+            }
+            if (noButton != null)
+            {
+                noButton.onClick.RemoveAllListeners();
+                noButton.onClick.AddListener(InvokeNo);
+            }
+
+            // 初期は非表示
+            SetVisible(false, instant: true);
+            IsOpen = false;
+            _canAcceptInput = false;
+        }
+
+        /// <summary>
+        /// ダイアログ表示。CancelはRouterで最優先No扱い、ConfirmはUI.ActionMapの"Confirm"を購読。
+        /// </summary>
+        public void Show(string title, Action onYes, Action onNo)
         {
-            onNoDefault?.Invoke();
-            _onNo?.Invoke();
-        }
-        finally { Hide(); }
-    }
+            if (titleText != null) titleText.text = title ?? string.Empty;
+            _onYes = onYes;
+            _onNo = onNo;
 
-    IEnumerator InputCooldownCoroutine(float delay)
-    {
-        _canAcceptInput = false;
-        yield return new WaitForSeconds(delay);
-        _canAcceptInput = true;
+            // 可視化
+            SetVisible(true);
+            IsOpen = true;
+            onShown?.Invoke();
+
+            // CancelはRouterのスタック最上段として“消費”する
+            if (router != null)
+            {
+                _cancelToken = router.PushCancelHandler(() =>
+                {
+                    if (!IsOpen) return false;
+                    InvokeNo();         // Cancel = No
+                    return true;        // ここで消費（下層に落とさない）
+                });
+            }
+
+            // ConfirmはUI ActionMapから取得して購読（ボタンと同等）
+            try
+            {
+                var uiMap = _inputProvider?.GetUIActionMap();
+                _confirmAction = uiMap?.FindAction("Confirm", throwIfNotFound: true);
+                if (_confirmAction != null)
+                {
+                    // _confirmAction.performed += OnSubmit;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[ConfirmDialog] Confirmアクション購読に失敗: {e.Message}");
+            }
+
+            // フォーカスをYesに（パッド/キーボード操作の起点にする）
+            if (yesButton != null)
+            {
+                EventSystem.current?.SetSelectedGameObject(yesButton.gameObject);
+            }
+
+            // 誤入力ガード
+            StopAllCoroutines();
+            StartCoroutine(InputCooldownCoroutine(inputCooldownSeconds));
+        }
+
+        /// <summary>非表示（購読解除・RouterからPop）</summary>
+        public void Hide()
+        {
+            // Confirm購読解除（nullガード）
+            if (_confirmAction != null)
+            {
+                _confirmAction.performed -= OnSubmit;
+                _confirmAction = null;
+            }
+
+            // Routerスタックから自分のハンドラを外す
+            _cancelToken?.Dispose();
+            _cancelToken = null;
+
+            // 可視化OFF
+            SetVisible(false);
+            IsOpen = false;
+            onHidden?.Invoke();
+
+            // 入力ガード停止
+            _canAcceptInput = false;
+            StopAllCoroutines();
+        }
+
+        // ---- UI/入力ハンドラ -------------------------------------------------
+
+        private void OnSubmit(InputAction.CallbackContext _)
+        {
+            InvokeYes();
+        }
+
+        public void InvokeYes()
+        {
+            if (!IsOpen || !_canAcceptInput) return;
+
+            try
+            {
+                onYesDefault?.Invoke();   // 常に先に呼ぶ
+                _onYes?.Invoke();         // 呼び出し側コールバック
+            }
+            finally
+            {
+                Hide();
+            }
+        }
+
+        public void InvokeNo()
+        {
+            if (!IsOpen || !_canAcceptInput) return;
+
+            try
+            {
+                onNoDefault?.Invoke();    // 常に先に呼ぶ
+                _onNo?.Invoke();          // 呼び出し側コールバック
+            }
+            finally
+            {
+                Hide();
+            }
+        }
+
+        // ---- 内部ユーティリティ ----------------------------------------------
+
+        private void SetVisible(bool visible, bool instant = false)
+        {
+            if (canvasGroup == null) return;
+
+            canvasGroup.alpha = visible ? 1f : 0f;
+            canvasGroup.interactable = visible;
+            canvasGroup.blocksRaycasts = visible; // モーダルなので可視時はレイキャストON
+        }
+
+        private IEnumerator InputCooldownCoroutine(float delay)
+        {
+            _canAcceptInput = false;
+            if (delay > 0f) yield return new WaitForSeconds(delay);
+            _canAcceptInput = true;
+        }
+
+        // 安全のため、オブジェクト破棄時にも購読解除
+        private void OnDestroy()
+        {
+            if (_confirmAction != null)
+            {
+                _confirmAction.performed -= OnSubmit;
+                _confirmAction = null;
+            }
+            _cancelToken?.Dispose();
+            _cancelToken = null;
+        }
     }
 }
