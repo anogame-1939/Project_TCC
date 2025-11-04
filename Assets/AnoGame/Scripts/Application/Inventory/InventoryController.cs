@@ -233,6 +233,8 @@ namespace AnoGame.Application.Inventory
                     CloseDialogAndUnlockUI();
 
                     DialogueLua.SetVariable("itemName", slot.LocalizedName);
+
+                    Hide();
                 },
                 onNo: () =>
                 {
