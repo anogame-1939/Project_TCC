@@ -45497,6 +45497,7 @@ GameObject:
   - component: {fileID: 1883453680}
   - component: {fileID: 1883453684}
   - component: {fileID: 1883453685}
+  - component: {fileID: 1883453686}
   m_Layer: 0
   m_Name: "\u30A4\u30D9\u30F3\u30C8\u30A8\u30EA\u30A2_8_\u30D3\u30FC\u30EB\u30B1\u30FC\u30B9\u4F7F\u7528"
   m_TagString: Untagged
@@ -45726,9 +45727,9 @@ MonoBehaviour:
           m_StringArgument: "\u30D3\u30FC\u30EB\u30B1\u30FC\u30B9\u4F7F\u7528"
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1883453679}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
+      - m_Target: {fileID: 1883453686}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -45834,6 +45835,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ba63981f93ab641a5073f0473a55c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1883453686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1883453675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playableDirector: {fileID: 1883453679}
 --- !u!1 &1899380745
 GameObject:
   m_ObjectHideFlags: 0

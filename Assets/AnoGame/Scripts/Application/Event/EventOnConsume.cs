@@ -92,7 +92,7 @@ namespace AnoGame.Application.Event
             // VContainerの注入順対策：Startで購読開始
             if (!_subscribed && _inventory != null)
             {
-                _inventory.OnItemConsumed += HandleItemConsumed;
+                // _inventory.OnItemConsumed += HandleItemConsumed;
                 _subscribed = true;
             }
         }
@@ -101,7 +101,7 @@ namespace AnoGame.Application.Event
         {
             if (_subscribed && _inventory != null)
             {
-                _inventory.OnItemConsumed -= HandleItemConsumed;
+                // _inventory.OnItemConsumed -= HandleItemConsumed;
                 _subscribed = false;
             }
         }

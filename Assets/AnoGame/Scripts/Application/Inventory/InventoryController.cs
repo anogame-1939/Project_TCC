@@ -329,6 +329,9 @@ namespace AnoGame.Application.Inventory
                 return;
             }
 
+            // この時点で成功とする
+            _itemConsumedsuccessEvent?.Invoke();
+
             // 3) ゾーンに“実行”を指示（ここで該当 EventOnConsume のイベントが走る）
             var started = zone.TryStart(itemId, player, usePos);
             if (!started)
@@ -348,7 +351,7 @@ namespace AnoGame.Application.Inventory
             foreach (var it in items) inv.AddItem(it);
             _inventoryViewer.UpdateInventory(inv);
 
-            _itemConsumedsuccessEvent?.Invoke();
+            
             Debug.Log($"[InventoryController] '{itemId}' を正常に消費し、イベントを実行しました (zone={zone.GetDebugName()})");
         }
 
