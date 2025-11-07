@@ -12,14 +12,14 @@ namespace AnoGame.Application.UI
 
         [Header("オンなら画面を表示。オフなら暗転して非表示。")]
         [SerializeField]
-        private bool defalutFeedIn = false;
+        private bool defaultFeedIn = false;
 
         private Coroutine _fadeCoroutine;
 
         void Start()
         {
             Assert.IsNotNull(_fadeImage, "FadeImage component is not assigned");
-            if (defalutFeedIn) FadeIn(0);
+            if (defaultFeedIn) FadeIn(0);
             else FadeOut(0);
         }
 
@@ -40,14 +40,14 @@ namespace AnoGame.Application.UI
 
         private IEnumerator FadeOutInRoutine(float duration)
         {
-            var falfDuration = duration / 2;
-            yield return StartCoroutine(FadeRoutine(0f, 1f, falfDuration));
+            var halfDuration = duration / 2;
+            yield return StartCoroutine(FadeRoutine(0f, 1f, halfDuration));
 
 
 
-            yield return new WaitForSeconds(falfDuration / 2);
+            yield return new WaitForSeconds(halfDuration / 2);
 
-            yield return StartCoroutine(FadeRoutine(1f, 0f, falfDuration));
+            yield return StartCoroutine(FadeRoutine(1f, 0f, halfDuration));
 
 
         }
