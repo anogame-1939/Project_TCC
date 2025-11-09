@@ -5,40 +5,50 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
-using AnoGame.Data; // EventData の名前空間
+using AnoGame.Data;
 
 public sealed class EventEditorWindow : EditorWindow
 {
-    // ───────── 設定（既定保存先は const） ─────────
-    private const string DEFAULT_SAVE_PATH = "Assets/AnoGame/Data/Events";
+    // ───────── 設定 ─────────
+    private const string DEFAULT_SAVE_PATH = "Assets/AnoGame/Data/Items";
     private const string EDITORPREFS_PATH_KEY = "AnoGame.EventEditor.SavePath";
-
-    // ファイル名書式: 1-2.013.イベント名.asset
     private static readonly Regex NameRegex =
         new Regex(@"^(\d+)-(\d+)\.(\d{3})\.(.+)$", RegexOptions.Compiled);
 
-    // ───────── GUI 状態 ─────────
-    private EventData _draft;              // 画面で編集するドラフト
+    // ───────── 作成用 GUI 状態 ─────────
+    private EventData _draft;
     private SerializedObject _so;
-    private SerializedProperty _spEventId;
-    private SerializedProperty _spEventName;
-    private SerializedProperty _spDescription;
-    private SerializedProperty _spIsOneTime;
+    private SerializedProperty _spEventId, _spEventName, _spDescription, _spIsOneTime;
 
     private static readonly int[] ChapterOptions = Enumerable.Range(1, 50).ToArray();
     private static readonly int[] SectionOptions = Enumerable.Range(1, 50).ToArray();
-    private int _chapterIndex; // 0-based index for arrays above
-    private int _sectionIndex;
-
+    private int _chapterIndex, _sectionIndex;
     private string _savePath;
+
+    // ───────── 並べ替え用 GUI 状態 ─────────
+    private enum Tab { Create, Reorder }
+    private Tab _tab;
+
+    private class Entry
+    {
+        public string guid;
+        public string path;     // Assets/..../1-2.003.名前.asset
+        public string namePart; // 名前（拡張子なしから枝番を除いた部分）
+        public int chapter, section, branch;
+        public override string ToString() => $"{chapter}-{section}.{branch:000}.{namePart}";
+    }
+    private readonly List<Entry> _entries = new();
+    private ReorderableList _list;
+    private Vector2 _listScroll;
 
     [MenuItem("Tools/EventEditor")]
     private static void Open()
     {
         var w = GetWindow<EventEditorWindow>("Event Editor");
-        w.minSize = new Vector2(480, 420);
+        w.minSize = new Vector2(520, 460);
         w.Show();
     }
 
@@ -52,9 +62,9 @@ public sealed class EventEditorWindow : EditorWindow
         _spIsOneTime   = _so.FindProperty("isOneTime");
 
         _savePath = EditorPrefs.GetString(EDITORPREFS_PATH_KEY, DEFAULT_SAVE_PATH);
+        _chapterIndex = 0; _sectionIndex = 0;
 
-        _chapterIndex = 0; // 1章
-        _sectionIndex = 0; // 1節
+        BuildReorderableList();
     }
 
     private void OnDisable()
@@ -66,27 +76,25 @@ public sealed class EventEditorWindow : EditorWindow
 
     private void OnGUI()
     {
-        using (new EditorGUILayout.VerticalScope("box"))
+        // タブ
+        using (new EditorGUILayout.HorizontalScope())
         {
-            GUILayout.Label("章 / 節", EditorStyles.boldLabel);
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                _chapterIndex = EditorGUILayout.Popup(
-                    new GUIContent("章"),
-                    _chapterIndex,
-                    ChapterOptions.Select(i => i.ToString()).ToArray(),
-                    GUILayout.MaxWidth(240));
-
-                _sectionIndex = EditorGUILayout.Popup(
-                    new GUIContent("節"),
-                    _sectionIndex,
-                    SectionOptions.Select(i => i.ToString()).ToArray(),
-                    GUILayout.MaxWidth(240));
-            }
+            if (GUILayout.Toggle(_tab == Tab.Create, "作成", EditorStyles.toolbarButton)) _tab = Tab.Create;
+            if (GUILayout.Toggle(_tab == Tab.Reorder, "並べ替え", EditorStyles.toolbarButton)) _tab = Tab.Reorder;
         }
+        EditorGUILayout.Space(4);
 
+        // 章・節（両タブ共通）
+        DrawChapterSectionPicker();
+
+        if (_tab == Tab.Create) DrawCreateTab();
+        else DrawReorderTab();
+    }
+
+    // ───────── タブ：作成 ─────────
+    private void DrawCreateTab()
+    {
         EditorGUILayout.Space(6);
-
         using (new EditorGUILayout.VerticalScope("box"))
         {
             GUILayout.Label("EventData プロパティ", EditorStyles.boldLabel);
@@ -99,7 +107,6 @@ public sealed class EventEditorWindow : EditorWindow
         }
 
         EditorGUILayout.Space(6);
-
         using (new EditorGUILayout.VerticalScope("box"))
         {
             GUILayout.Label("保存設定", EditorStyles.boldLabel);
@@ -119,16 +126,11 @@ public sealed class EventEditorWindow : EditorWindow
                             var rel = "Assets" + selected.Substring(proj.Length).Replace("\\", "/");
                             _savePath = rel;
                         }
-                        else
-                        {
-                            EditorUtility.DisplayDialog("無効なパス", "プロジェクト内（Assets配下）のフォルダを選択してください。", "OK");
-                        }
+                        else EditorUtility.DisplayDialog("無効なパス", "Assets 配下を選択してください。", "OK");
                     }
                 }
                 if (GUILayout.Button("既定に戻す", GUILayout.Width(100)))
-                {
                     _savePath = DEFAULT_SAVE_PATH;
-                }
             }
 
             using (new EditorGUILayout.HorizontalScope())
@@ -136,13 +138,184 @@ public sealed class EventEditorWindow : EditorWindow
                 if (GUILayout.Button("保存（作成）", GUILayout.Height(26)))
                     SaveEvent();
 
-                if (GUILayout.Button("枝番の振り直し（章‐節）", GUILayout.Height(26)))
-                    RenumberBranchesForCurrentChapterSection();
+                if (GUILayout.Button("（現在の章‐節）を自動採番で振り直し", GUILayout.Height(26)))
+                {
+                    AutoRenumberForCurrentChapterSection();
+                    // Reorder タブにも反映
+                    ReloadEntries();
+                }
             }
         }
     }
 
-    // ───────── 保存 ─────────
+    // ───────── タブ：並べ替え ─────────
+    private void DrawReorderTab()
+    {
+        using (new EditorGUILayout.VerticalScope("box"))
+        {
+            GUILayout.Label($"並べ替え（{CurrentChapter}-{CurrentSection}）", EditorStyles.boldLabel);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("リストを読み込み/更新", GUILayout.Width(180)))
+                    ReloadEntries();
+
+                GUILayout.FlexibleSpace();
+
+                if (GUILayout.Button("この順番で枝番を振り直す", GUILayout.Height(24)))
+                    RenumberByCurrentListOrder();
+            }
+
+            EditorGUILayout.Space(6);
+
+            _listScroll = EditorGUILayout.BeginScrollView(_listScroll, GUILayout.ExpandHeight(true));
+            _list.DoLayoutList();
+            EditorGUILayout.EndScrollView();
+
+            EditorGUILayout.HelpBox(
+                "ドラッグ＆ドロップで順序を入れ替え → ボタンで 001,002… と連番を振り直します。\n" +
+                "リネームは AssetDatabase.MoveAsset を用いるため .meta の GUID は維持され、参照は切れません。",
+                MessageType.Info);
+        }
+    }
+
+    // ───────── 共通 UI ─────────
+    private void DrawChapterSectionPicker()
+    {
+        using (new EditorGUILayout.VerticalScope("box"))
+        {
+            GUILayout.Label("章 / 節", EditorStyles.boldLabel);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                _chapterIndex = EditorGUILayout.Popup(new GUIContent("章"),
+                    _chapterIndex, ChapterOptions.Select(i => i.ToString()).ToArray(), GUILayout.MaxWidth(240));
+                _sectionIndex = EditorGUILayout.Popup(new GUIContent("節"),
+                    _sectionIndex, SectionOptions.Select(i => i.ToString()).ToArray(), GUILayout.MaxWidth(240));
+
+                GUILayout.FlexibleSpace();
+
+                EditorGUILayout.LabelField("保存先:", GUILayout.Width(50));
+                EditorGUILayout.SelectableLabel(_savePath, GUILayout.Height(16));
+            }
+        }
+    }
+
+    // ───────── 並べ替え内部 ─────────
+    private void BuildReorderableList()
+    {
+        _list = new ReorderableList(_entries, typeof(Entry), true, true, false, false);
+        _list.drawHeaderCallback = rect =>
+        {
+            EditorGUI.LabelField(rect, "イベント一覧（ドラッグで順序変更）");
+        };
+        _list.drawElementCallback = (rect, index, active, focused) =>
+        {
+            if (index < 0 || index >= _entries.Count) return;
+            var e = _entries[index];
+            rect.height = EditorGUIUtility.singleLineHeight;
+            EditorGUI.LabelField(rect, $"{index+1,2}. {e.chapter}-{e.section}.{e.branch:000}.{e.namePart}");
+        };
+        _list.onSelectCallback = l =>
+        {
+            if (l.index >= 0 && l.index < _entries.Count)
+                EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(_entries[l.index].path));
+        };
+    }
+
+    private void ReloadEntries()
+    {
+        _entries.Clear();
+        if (!AssetDatabase.IsValidFolder(_savePath))
+        {
+            AssetDatabase.Refresh();
+            return;
+        }
+
+        int chapter = CurrentChapter;
+        int section = CurrentSection;
+
+        var guids = AssetDatabase.FindAssets("t:EventData", new[] { _savePath });
+        foreach (var g in guids)
+        {
+            var p = AssetDatabase.GUIDToAssetPath(g);
+            var name = Path.GetFileNameWithoutExtension(p);
+            var m = NameRegex.Match(name);
+            if (!m.Success) continue;
+            int ch = int.Parse(m.Groups[1].Value);
+            int se = int.Parse(m.Groups[2].Value);
+            if (ch != chapter || se != section) continue;
+
+            var entry = new Entry
+            {
+                guid = g,
+                path = p,
+                chapter = ch,
+                section = se,
+                branch = int.Parse(m.Groups[3].Value),
+                namePart = m.Groups[4].Value
+            };
+            _entries.Add(entry);
+        }
+
+        // 現在の枝番順で表示開始（ここから自由に入れ替え）
+        _entries.Sort((a, b) => a.branch.CompareTo(b.branch));
+        _list.index = -1;
+        Repaint();
+    }
+
+    private void RenumberByCurrentListOrder()
+    {
+        if (_entries.Count == 0)
+        {
+            EditorUtility.DisplayDialog("情報", "並べ替える対象がありません。まずリストを読み込んでください。", "OK");
+            return;
+        }
+
+        int chapter = CurrentChapter;
+        int section = CurrentSection;
+
+        // 現在の並び順に 001,002… を付けてリネーム
+        for (int i = 0; i < _entries.Count; i++)
+        {
+            var e = _entries[i];
+            string dir = Path.GetDirectoryName(e.path).Replace("\\", "/");
+            string newName = $"{chapter}-{section}.{(i + 1):000}.{e.namePart}";
+            string newPath = $"{dir}/{newName}.asset";
+
+            if (e.path != newPath)
+            {
+                string err = AssetDatabase.MoveAsset(e.path, newPath);
+                if (!string.IsNullOrEmpty(err))
+                {
+                    Debug.LogError($"[EventEditor] Rename 失敗: {e.path} -> {newPath}\n{err}");
+                }
+                else
+                {
+                    e.path = newPath;
+                    e.branch = i + 1;
+                }
+            }
+        }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log($"[EventEditor] 並べ替え順で枝番振り直し完了（章{chapter}-節{section}）。");
+        // 再読み込みして確定順を表示
+        ReloadEntries();
+    }
+
+    private void AutoRenumberForCurrentChapterSection()
+    {
+        // 名前昇順で自動並べ（従来の一括振り直し）
+        ReloadEntries();
+        _entries.Sort((a, b) => string.Compare(a.namePart, b.namePart, StringComparison.CurrentCulture));
+        RenumberByCurrentListOrder();
+    }
+
+    private int CurrentChapter => ChapterOptions[_chapterIndex];
+    private int CurrentSection => SectionOptions[_sectionIndex];
+
+    // ───────── 保存（作成）─────────
     private void SaveEvent()
     {
         string evName = (_spEventName.stringValue ?? "").Trim();
@@ -151,99 +324,30 @@ public sealed class EventEditorWindow : EditorWindow
             EditorUtility.DisplayDialog("エラー", "Event Name を入力してください。", "OK");
             return;
         }
-
-        // フォルダ作成
         if (!AssetDatabase.IsValidFolder(_savePath))
         {
             Directory.CreateDirectory(_savePath);
             AssetDatabase.Refresh();
         }
 
-        int chapter = ChapterOptions[_chapterIndex];
-        int section = SectionOptions[_sectionIndex];
-
-        // 既存資産から同じ 章-節 の最大枝番を検索
+        int chapter = CurrentChapter;
+        int section = CurrentSection;
         int next = FindNextBranchNumber(_savePath, chapter, section);
 
         string safeName = SanitizeFileName(evName);
         string fileNameNoExt = $"{chapter}-{section}.{next:000}.{safeName}";
         string path = $"{_savePath}/{fileNameNoExt}.asset";
 
-        // 新規アセットを作成（ドラフト内容をコピー）
         var newAsset = ScriptableObject.CreateInstance<EventData>();
         EditorUtility.CopySerialized(_draft, newAsset);
-
         AssetDatabase.CreateAsset(newAsset, path);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         EditorGUIUtility.PingObject(newAsset);
 
         Debug.Log($"[EventEditor] 生成: {path}");
-    }
-
-    // ───────── 振り直し ─────────
-    private void RenumberBranchesForCurrentChapterSection()
-    {
-        int chapter = ChapterOptions[_chapterIndex];
-        int section = SectionOptions[_sectionIndex];
-
-        if (!AssetDatabase.IsValidFolder(_savePath))
-        {
-            EditorUtility.DisplayDialog("情報", "保存先フォルダがまだ存在しません。", "OK");
-            return;
-        }
-
-        // 指定 章-節 の EventData アセットを収集
-        var guids = AssetDatabase.FindAssets("t:EventData", new[] { _savePath });
-        var targets = new List<(string guid, string path, string namePart)>();
-
-        foreach (var g in guids)
-        {
-            var p = AssetDatabase.GUIDToAssetPath(g);
-            var name = Path.GetFileNameWithoutExtension(p);
-            var m = NameRegex.Match(name);
-            if (!m.Success) continue;
-
-            int ch = int.Parse(m.Groups[1].Value);
-            int se = int.Parse(m.Groups[2].Value);
-            if (ch != chapter || se != section) continue;
-
-            string nm = m.Groups[4].Value; // イベント名
-            targets.Add((g, p, nm));
-        }
-
-        if (targets.Count == 0)
-        {
-            EditorUtility.DisplayDialog("情報", $"章{chapter}-節{section} に該当アセットが見つかりません。", "OK");
-            return;
-        }
-
-        // イベント名（日本語含む）で昇順に並べ、001,002... を付け直す
-        targets = targets
-            .OrderBy(t => t.namePart, StringComparer.CurrentCulture)
-            .ToList();
-
-        int branch = 1;
-        foreach (var t in targets)
-        {
-            string dir = Path.GetDirectoryName(t.path).Replace("\\", "/");
-            string newName = $"{chapter}-{section}.{branch:000}.{t.namePart}";
-            string newPath = $"{dir}/{newName}.asset";
-
-            if (t.path != newPath)
-            {
-                string err = AssetDatabase.MoveAsset(t.path, newPath);
-                if (!string.IsNullOrEmpty(err))
-                {
-                    Debug.LogError($"[EventEditor] Rename 失敗: {t.path} -> {newPath}\n{err}");
-                }
-            }
-            branch++;
-        }
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        Debug.Log($"[EventEditor] 枝番振り直し完了（章{chapter}-節{section}）。");
+        // リストにも反映
+        ReloadEntries();
     }
 
     // ───────── ヘルパ ─────────
@@ -264,14 +368,13 @@ public sealed class EventEditorWindow : EditorWindow
             int br = int.Parse(m.Groups[3].Value);
             if (br > max) max = br;
         }
-        return max + 1; // 次の枝番
+        return max + 1;
     }
 
     private static string SanitizeFileName(string s)
     {
         if (string.IsNullOrEmpty(s)) return "NewEvent";
-        foreach (var c in Path.GetInvalidFileNameChars())
-            s = s.Replace(c, '_');
+        foreach (var c in Path.GetInvalidFileNameChars()) s = s.Replace(c, '_');
         return s.Trim();
     }
 }
