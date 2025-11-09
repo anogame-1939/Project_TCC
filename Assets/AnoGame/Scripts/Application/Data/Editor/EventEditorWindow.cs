@@ -12,7 +12,7 @@ using AnoGame.Data; // EventData の名前空間
 public sealed class EventEditorWindow : EditorWindow
 {
     // ───────── 設定（既定保存先は const） ─────────
-    private const string DEFAULT_SAVE_PATH = "Assets/Game/Data/Events";
+    private const string DEFAULT_SAVE_PATH = "Assets/AnoGame/Data/Events";
     private const string EDITORPREFS_PATH_KEY = "AnoGame.EventEditor.SavePath";
 
     // ファイル名書式: 1-2.013.イベント名.asset
