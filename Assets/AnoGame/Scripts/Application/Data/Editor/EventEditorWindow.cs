@@ -12,6 +12,16 @@ using AnoGame.Data;
 
 public sealed class EventEditorWindow : EditorWindow
 {
+    private struct LabelWidthScope : IDisposable
+    {
+        private readonly float _old;
+        public LabelWidthScope(float width)
+        {
+            _old = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = width;
+        }
+        public void Dispose() => EditorGUIUtility.labelWidth = _old;
+    }
     // ───────── 設定 ─────────
     private const string DEFAULT_SAVE_PATH = "Assets/AnoGame/Data/Items";
     private const string EDITORPREFS_PATH_KEY = "AnoGame.EventEditor.SavePath";
@@ -23,8 +33,8 @@ public sealed class EventEditorWindow : EditorWindow
     private SerializedObject _so;
     private SerializedProperty _spEventId, _spEventName, _spDescription, _spIsOneTime;
 
-    private static readonly int[] ChapterOptions = Enumerable.Range(1, 50).ToArray();
-    private static readonly int[] SectionOptions = Enumerable.Range(1, 50).ToArray();
+    private static readonly int[] ChapterOptions = Enumerable.Range(1, 5).ToArray();
+    private static readonly int[] SectionOptions = Enumerable.Range(1, 5).ToArray();
     private int _chapterIndex, _sectionIndex;
     private string _savePath;
 
@@ -180,20 +190,38 @@ public sealed class EventEditorWindow : EditorWindow
     }
 
     // ───────── 共通 UI ─────────
+    // 置き換え
     private void DrawChapterSectionPicker()
     {
         using (new EditorGUILayout.VerticalScope("box"))
         {
             GUILayout.Label("章 / 節", EditorStyles.boldLabel);
+
+            // 1行目：章・節（左寄せのみ）
+            using (new EditorGUILayout.HorizontalScope())
+            using (new LabelWidthScope(24f)) // 「章」「節」のラベル幅を小さく固定
+            {
+                // 幅も固定してコンパクトに
+                _chapterIndex = EditorGUILayout.Popup(
+                    new GUIContent("章"),
+                    _chapterIndex,
+                    ChapterOptions.Select(i => i.ToString()).ToArray(),
+                    GUILayout.Width(70));   // 例：ラベル＋ドロップダウンで約140px
+
+                GUILayout.Space(8);
+
+                _sectionIndex = EditorGUILayout.Popup(
+                    new GUIContent("節"),
+                    _sectionIndex,
+                    SectionOptions.Select(i => i.ToString()).ToArray(),
+                    GUILayout.Width(70));
+
+                // ここでは FlexibleSpace を置かない → 左側に寄る
+            }
+
+            // 2行目：保存先の表示（幅を取るので別行に）
             using (new EditorGUILayout.HorizontalScope())
             {
-                _chapterIndex = EditorGUILayout.Popup(new GUIContent("章"),
-                    _chapterIndex, ChapterOptions.Select(i => i.ToString()).ToArray(), GUILayout.MaxWidth(240));
-                _sectionIndex = EditorGUILayout.Popup(new GUIContent("節"),
-                    _sectionIndex, SectionOptions.Select(i => i.ToString()).ToArray(), GUILayout.MaxWidth(240));
-
-                GUILayout.FlexibleSpace();
-
                 EditorGUILayout.LabelField("保存先:", GUILayout.Width(50));
                 EditorGUILayout.SelectableLabel(_savePath, GUILayout.Height(16));
             }
