@@ -57,12 +57,15 @@ namespace AnoGame.Application.Player.Interaction
         {
             try
             {
+                Debug.Log($"[EventZone] {name} triggered by {actor.name}");
                 // path 無し or 全て null → ただちに到達イベントのみ
                 if (!HasValidPath(approachPath))
                 {
                     FireEnter();
                     return;
                 }
+
+                Debug.Log($"[EventZone] {name} preparing move for {actor.name}");
 
                 var el = FindEventLock(actor);
                 if (el == null)
@@ -71,6 +74,7 @@ namespace AnoGame.Application.Player.Interaction
                     FireEnter();
                     return;
                 }
+                Debug.Log($"[EventZone] {name} preparing move for {actor.name}");
 
                 // プリペア開始
                 onPrepareBegin?.Invoke();
@@ -78,6 +82,7 @@ namespace AnoGame.Application.Player.Interaction
                 // ---- 移動制御開始 ----
                 el.BeginLock();
                 el.LookFaceMove();
+                Debug.Log($"[EventZone] {name} preparing move for {actor.name}");
 
                 foreach (var p in approachPath)
                 {
@@ -87,12 +92,16 @@ namespace AnoGame.Application.Player.Interaction
                     await WaitArriveAsync(actor, p.position, ct, onPrepare);
                     if (ct.IsCancellationRequested) return;
                 }
+                Debug.Log($"[EventZone] {name} preparing move for {actor.name}");
 
                 // プリペア完了
                 onPrepareComplete?.Invoke();
+                Debug.Log($"[EventZone] {name} preparing move for {actor.name}");
 
                 // 到達後イベント
                 FireEnter();
+
+                Debug.Log($"[EventZone] {name} preparing move for {actor.name}");
 
                 // 例：向きの確定など必要ならここで
                 var brain = actor.GetComponent<IBrain>();
