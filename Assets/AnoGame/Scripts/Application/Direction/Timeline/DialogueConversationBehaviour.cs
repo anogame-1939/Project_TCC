@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using Cysharp.Threading.Tasks;
 using PixelCrushers.DialogueSystem;
+using App = UnityEngine.Application;
 
 namespace AnoGame.Application.Direction.Timeline
 {
@@ -25,7 +26,7 @@ namespace AnoGame.Application.Direction.Timeline
 
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
-            if (_fired || !UnityEngine.Application.isPlaying) return;
+            if (_fired || !App.isPlaying) return;
             _fired = true;
 
             if (pauseDuringConversation) PauseTimeline();
@@ -71,9 +72,23 @@ namespace AnoGame.Application.Direction.Timeline
             root.SetSpeed(_prevSpeed <= 0 ? 1 : _prevSpeed);
         }
 
-        public override void OnBehaviourPause(Playable playable, FrameData info)
+public override void OnBehaviourPause(Playable playable, FrameData info)
+{
+    // 再生中にこのクリップの評価が終わったタイミングで会話を強制停止
+    if (App.isPlaying && DialogueManager.IsConversationActive)
+    {
+        DialogueManager.StopConversation();
+
+        // 会話中にタイムラインを止めていた場合は強制的に再開しておく
+        if (pauseDuringConversation)
         {
-            _fired = false; // ループ/シーク再入に対応
+            ResumeTimeline();
         }
+    }
+
+    // ループ/シーク再入に対応
+    _fired = false;
+}
+
     }
 }
