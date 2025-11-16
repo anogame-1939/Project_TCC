@@ -7679,6 +7679,7 @@ GameObject:
   - component: {fileID: 284172273}
   - component: {fileID: 284172282}
   - component: {fileID: 284172283}
+  - component: {fileID: 284172284}
   m_Layer: 0
   m_Name: "\u30A4\u30D9\u30F3\u30C8\u30A8\u30EA\u30A2_9_B"
   m_TagString: Untagged
@@ -7747,6 +7748,8 @@ PlayableDirector:
     value: {fileID: 2925914750973783342}
   - key: {fileID: -3234765377962735658, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
     value: {fileID: 284172283}
+  - key: {fileID: -1794670236940367697, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
+    value: {fileID: 0}
   m_ExposedReferences:
     m_References:
     - fb30efc9092110645b046df9dec71d31: {fileID: 2018438733}
@@ -8120,6 +8123,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74b3c198ffc01748a918592f18194d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &284172284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 284172272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2490de3e9323f94299edfd5022ee5e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  director: {fileID: 284172275}
 --- !u!95 &295531178 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 7665162067455944546, guid: f29b8f60f10484c30a1a3d8f1e0414dc, type: 3}

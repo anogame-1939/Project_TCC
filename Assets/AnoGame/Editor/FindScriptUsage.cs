@@ -60,7 +60,11 @@ namespace AnoGame
 
                     // シーンを一時的に開いて検索（変更はしない）
                     var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-                    var objects = GameObject.FindObjectsOfType(targetType, true);
+                    var objects = GameObject.FindObjectsByType(
+                        targetType,
+                        FindObjectsInactive.Include,
+                        FindObjectsSortMode.None
+                    );
 
                     foreach (var obj in objects)
                     {
@@ -69,9 +73,9 @@ namespace AnoGame
                             var path = BuildHierarchyPath(comp.gameObject);
                             results.Add(new FindScriptUsageWindow.ResultRow
                             {
-                                ScenePath   = scenePath,
-                                SceneFile   = System.IO.Path.GetFileName(scenePath),
-                                Hierarchy   = path.Split('/'),
+                                ScenePath = scenePath,
+                                SceneFile = System.IO.Path.GetFileName(scenePath),
+                                Hierarchy = path.Split('/'),
                                 DisplayPath = path,
                             });
                         }
