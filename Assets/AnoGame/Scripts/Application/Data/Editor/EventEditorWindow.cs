@@ -64,12 +64,7 @@ public sealed class EventEditorWindow : EditorWindow
 
     private void OnEnable()
     {
-        if (_draft == null) _draft = ScriptableObject.CreateInstance<EventData>();
-        _so = new SerializedObject(_draft);
-        _spEventId     = _so.FindProperty("eventId");
-        _spEventName   = _so.FindProperty("eventName");
-        _spDescription = _so.FindProperty("description");
-        _spIsOneTime   = _so.FindProperty("isOneTime");
+        EnsureSerializedObject();
 
         _savePath = EditorPrefs.GetString(EDITORPREFS_PATH_KEY, DEFAULT_SAVE_PATH);
         _chapterIndex = 0; _sectionIndex = 0;
@@ -81,8 +76,17 @@ public sealed class EventEditorWindow : EditorWindow
     {
         if (!string.IsNullOrEmpty(_savePath))
             EditorPrefs.SetString(EDITORPREFS_PATH_KEY, _savePath);
-        if (_draft != null) DestroyImmediate(_draft);
+
+        if (_draft != null)
+        {
+            DestroyImmediate(_draft);
+            _draft = null;
+        }
+
+        _so = null;
+        _spEventId = _spEventName = _spDescription = _spIsOneTime = null;
     }
+
 
     private void OnGUI()
     {
@@ -101,13 +105,35 @@ public sealed class EventEditorWindow : EditorWindow
         else DrawReorderTab();
     }
 
+    private void EnsureSerializedObject()
+    {
+        // target が死んでいたら作り直す
+        if (_draft == null)
+        {
+            _draft = ScriptableObject.CreateInstance<EventData>();
+        }
+
+        if (_so == null || _so.targetObject == null)
+        {
+            _so = new SerializedObject(_draft);
+            _spEventId = _so.FindProperty("eventId");
+            _spEventName = _so.FindProperty("eventName");
+            _spDescription = _so.FindProperty("description");
+            _spIsOneTime = _so.FindProperty("isOneTime");
+        }
+    }
+
     // ───────── タブ：作成 ─────────
     private void DrawCreateTab()
     {
         EditorGUILayout.Space(6);
         using (new EditorGUILayout.VerticalScope("box"))
         {
+            EnsureSerializedObject();
+            if (_so == null || _so.targetObject == null) return;
+
             GUILayout.Label("EventData プロパティ", EditorStyles.boldLabel);
+
             _so.Update();
             EditorGUILayout.PropertyField(_spEventId,     new GUIContent("Event Id"));
             EditorGUILayout.PropertyField(_spEventName,   new GUIContent("Event Name"));

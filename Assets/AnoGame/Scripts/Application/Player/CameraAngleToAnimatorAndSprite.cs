@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.TinyCharacterController;          // CharacterSettings が含まれる名前空間
 using Unity.TinyCharacterController.Brain;
+using UnityEngine.Rendering;
 
 namespace AnoGame.Application.Player.Control
 {
@@ -42,8 +43,12 @@ namespace AnoGame.Application.Player.Control
         private void Start()
         {
             if (!animator)          animator = GetComponentInChildren<Animator>();
-            if (!spriteRenderer)    spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (!characterBrain)    characterBrain = GetComponent<CharacterBrain>();
+            if (!spriteRenderer)
+            {
+                spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+                spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            }
+            if (!characterBrain) characterBrain = GetComponent<CharacterBrain>();
             if (!characterSettings) characterSettings = GetComponent<CharacterSettings>();
         }
 
@@ -81,6 +86,7 @@ namespace AnoGame.Application.Player.Control
 
         private void LateUpdate()
         {
+            spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
             if (!cameraTransform)
             {
                 cameraTransform = characterSettings?.CameraTransform ??
