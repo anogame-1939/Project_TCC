@@ -1,12 +1,13 @@
 using UnityEngine;
+using UnityEngine.Events;
 using AnoGame.Application.Story;
 
-namespace AnoGame.Application.Enemy
+namespace AnoGame.Application.Story
 {
-    public class EnemySpawner : MonoBehaviour
+    public class StorySceneLoadedHandler : MonoBehaviour
     {
         [SerializeField]
-        private GameObject enemyPrefab;
+        private UnityEvent onSceneLoaded;
 
         private void Start()
         {
@@ -32,15 +33,7 @@ namespace AnoGame.Application.Enemy
 
         private void OnChapterLoaded(bool useRetryPoint)
         {
-            Spawn();
-        }
-
-        private void Spawn()
-        {
-            if (enemyPrefab != null)
-            {
-                Instantiate(enemyPrefab, transform.position, transform.rotation);
-            }
+            onSceneLoaded?.Invoke();
         }
     }
 }
