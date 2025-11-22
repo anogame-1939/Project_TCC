@@ -30,7 +30,7 @@ namespace Unity.TinyCharacterController.Control
     [RequireInterface(typeof(IBrain))]
     [RenamedFrom("TinyCharacterController.Control.MoveNavmeshControl")]
     [RenamedFrom("TinyCharacterController.MoveByNavigationControl")]
-    public class MoveNavmeshControl : MonoBehaviour, 
+    public class MoveNavmeshControl : MonoBehaviour,
         IMove, ITurn, IUpdateComponent,
         IComponentCondition
     {
@@ -48,38 +48,39 @@ namespace Unity.TinyCharacterController.Control
         /// </summary>
         [Header("Settings")]
         [SerializeField]
-        [FormerlySerializedAs("Speed")] 
+        [FormerlySerializedAs("Speed")]
         private float _speed = 4;
 
         /// <summary>
         /// Character turn speed.
         /// </summary>
-        [FormerlySerializedAs("_turnSpeed")] [Range(-1, 50)]
+        [FormerlySerializedAs("_turnSpeed")]
+        [Range(-1, 50)]
         public int TurnSpeed = 8;
 
         /// <summary>
         /// Character move priority.
         /// </summary>
-        [FormerlySerializedAs("_movePriority")] 
+        [FormerlySerializedAs("_movePriority")]
         [Header("movement and orientation")]
         public int MovePriority = 1;
 
         /// <summary>
         /// Character Turn Priority.
         /// </summary>
-        [FormerlySerializedAs("_turnPriority")] 
+        [FormerlySerializedAs("_turnPriority")]
         public int TurnPriority = 1;
 
         /// <summary>
         /// Callback when destination is reached
         /// </summary>
         public UnityEvent OnArrivedAtDestination;
-        
+
         private ITransform _transform;
         private float _yawAngle;
         private Vector3 _moveVelocity;
-        
-        private void Awake()
+
+        private void Start()
         {
             TryGetComponent(out _transform);
 
@@ -112,7 +113,7 @@ namespace Unity.TinyCharacterController.Control
                 _agent.autoBraking = false;
             }
         }
-        
+
         private void OnDrawGizmosSelected()
         {
             if (Application.isPlaying == false)
@@ -121,7 +122,7 @@ namespace Unity.TinyCharacterController.Control
             var position = _agent.destination;
             var center = position + new Vector3(0, 1, 0);
             var cubeSize = new Vector3(0.5f, 2f, 0.5f);
-            
+
             GizmoDrawUtility.DrawCube(center, cubeSize, Color.yellow);
 
             if (_agent.path.status == NavMeshPathStatus.PathComplete)
@@ -140,7 +141,7 @@ namespace Unity.TinyCharacterController.Control
         }
 
 #endif
-        
+
         /// <summary>
         /// True if the character has reached the target point.
         /// </summary>
@@ -158,7 +159,7 @@ namespace Unity.TinyCharacterController.Control
                 _agent.speed = _speed;
             }
         }
-        
+
         /// <summary>
         /// Set a target point to move to.
         /// </summary>
@@ -179,12 +180,12 @@ namespace Unity.TinyCharacterController.Control
         /// <param name="distance">distance from the target</param>.
         public void SetTargetPosition(Vector3 position, float distance)
         {
-            var deltaPosition =  _transform.Position - position;
+            var deltaPosition = _transform.Position - position;
             deltaPosition.y = 0;
             var direction = deltaPosition.normalized * distance;
             SetTargetPosition(position + direction);
         }
-        
+
         /// <summary>
         /// Current Speed.
         /// </summary>
@@ -202,34 +203,34 @@ namespace Unity.TinyCharacterController.Control
         int ITurn.TurnSpeed => TurnSpeed;
 
         float ITurn.YawAngle => _yawAngle;
-        
+
         void IUpdateComponent.OnUpdate(float deltaTime)
         {
             using var profiler = new ProfilerScope(nameof(MoveNavmeshControl));
 
-            if (_agent.pathPending )
+            if (_agent.pathPending)
                 return;
             var distance = _agent.remainingDistance;
-            
+
             if (_agent.isOnOffMeshLink)
             {
-                var deltaPosition =   _agent.currentOffMeshLinkData.endPos - _transform.Position;
+                var deltaPosition = _agent.currentOffMeshLinkData.endPos - _transform.Position;
                 deltaPosition.y = 0;
                 var direction = deltaPosition.normalized;
-                
-                if( deltaPosition.sqrMagnitude < 1)
+
+                if (deltaPosition.sqrMagnitude < 1)
                     _agent.CompleteOffMeshLink();
-                
+
                 _moveVelocity = direction * _speed;
                 _agent.nextPosition = _transform.Position + _moveVelocity * deltaTime;
-                
+
             }
             else
             {
-                var deltaPosition =   _agent.steeringTarget - _transform.Position;
+                var deltaPosition = _agent.steeringTarget - _transform.Position;
                 deltaPosition.y = 0;
-                
-                var isMoving = distance  - deltaTime * _speed >  0;
+
+                var isMoving = distance - deltaTime * _speed > 0;
                 if (isMoving && IsArrived == false)
                 {
                     _yawAngle = Vector3.SignedAngle(Vector3.forward, deltaPosition, Vector3.up);
@@ -237,7 +238,7 @@ namespace Unity.TinyCharacterController.Control
                 else
                 {
                     // Process stopped because speed is 0 or target point has been reached.
-                    if (IsArrived == false )
+                    if (IsArrived == false)
                     {
                         OnArrivedAtDestination?.Invoke();
                         IsArrived = true;
@@ -249,12 +250,12 @@ namespace Unity.TinyCharacterController.Control
                 // _moveVelocity = direction * currentSpeed;
                 _moveVelocity = _agent.desiredVelocity.normalized * currentSpeed;
                 _agent.nextPosition = _transform.Position + _moveVelocity * deltaTime;
-                
+
             }
         }
 
         int IUpdateComponent.Order => Order.Control;
-        
+
         void IComponentCondition.OnConditionCheck(List<string> messageList)
         {
             if (_agent != null && _agent.transform.parent != transform)
