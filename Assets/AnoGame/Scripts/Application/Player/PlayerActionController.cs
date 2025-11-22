@@ -109,11 +109,6 @@ namespace AnoGame.Application.Player.Control
 
         private void Update()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
-            {
-                animator.SetBool("IsMove", false);
-                return;
-            }
             // MoveControlの速度を取得し、閾値を超えていれば移動アニメをONに
             if (animator != null && moveControl != null)
             {
