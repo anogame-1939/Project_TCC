@@ -9,7 +9,7 @@ namespace AnoGame.Application.Direction.Timeline
     {
         [SerializeField] private EnemySpawnManager _spawnManager;
 
-        private EventLockControl _enemyCtrl
+        public EventLockControl EnemyCtrl
         {
             get
             {
@@ -20,17 +20,17 @@ namespace AnoGame.Application.Direction.Timeline
         }
 
         // タイムラインから叩きたい薄いAPI
-        public void BeginLock() => _enemyCtrl?.BeginLock();
-        public void EndLock() => _enemyCtrl?.EndLock();
+        public void BeginLock() => EnemyCtrl?.BeginLock();
+        public void EndLock() => EnemyCtrl?.EndLock();
 
         public void MoveTo(Transform target, float speed, float stopDistance)
         {
-            if (_enemyCtrl == null || target == null) return;
-            _enemyCtrl.MoveToPoint(target.position, speed, stopDistance);
+            if (EnemyCtrl == null || target == null) return;
+            EnemyCtrl.MoveToPoint(target.position, speed, stopDistance);
         }
 
-        public void LookKeep() => _enemyCtrl?.LookKeep();
-        public void LookFaceMove() => _enemyCtrl?.LookFaceMove();
-        public void LookAt(Transform t) => _enemyCtrl?.LookAt(t);
+        public void LookKeep() => EnemyCtrl?.LookKeep();
+        public void LookFaceMove() => EnemyCtrl?.LookFaceMove();
+        public void LookAt(Transform t) => EnemyCtrl?.LookAt(t);
     }
 }
