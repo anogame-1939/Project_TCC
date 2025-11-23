@@ -46,7 +46,7 @@ namespace AnoGame.Application.Story
             // enemyForcedMover.enabled = false;
             // enemyForcedMover.GetComponent<EnemyAIController>().enabled = false;
 
-            EnemySpawnManager.Instance.SetupToStoryMode();
+            // EnemySpawnManager.Instance.SetupToStoryMode();
 
         }
 
@@ -61,7 +61,7 @@ namespace AnoGame.Application.Story
 
             // 敵の移動を通常モードに戻す
             // NOTE:雑にいれたけど問題があれば見直す
-            EnemySpawnManager.Instance.SetupToNormalMode();
+            // EnemySpawnManager.Instance.SetupToNormalMode();
         }
 
         private void MoveToTarget(GameObject target, bool doBackstep = false)

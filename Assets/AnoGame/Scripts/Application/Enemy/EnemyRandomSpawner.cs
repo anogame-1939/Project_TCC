@@ -141,7 +141,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.StartEnemyMovement();
+                // _spawnManager.StartEnemyMovement();
             }
         }
 
@@ -152,7 +152,7 @@ namespace AnoGame.Application.Enemy
         {
             if (_spawnManager != null)
             {
-                _spawnManager.StopEnemyMovement();
+                // _spawnManager.StopEnemyMovement();
             }
         }
 

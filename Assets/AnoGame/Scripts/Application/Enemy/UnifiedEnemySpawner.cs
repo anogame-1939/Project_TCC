@@ -66,50 +66,50 @@ namespace AnoGame.Application.Enemy
             // enemyPrefabを設定（各モード共通のプレハブ）
             if (enemyPrefab != null)
             {
-                spawnManager.SetEnemyPrefab(enemyPrefab);
-                spawnManager.InitializeEnemy();
+                // spawnManager.SetEnemyPrefab(enemyPrefab);
+                // spawnManager.InitializeEnemy();
             }
         }
 
         public void SetStoryMode()
         {
             Debug.LogError("廃止-いや、まて。。");
-            spawnManager.SetupToStoryMode();
+            // spawnManager.SetupToStoryMode();
         }
 
         public void SetNormalMode()
         {
             Debug.LogError("廃止");
-            spawnManager.SetupToNormalMode();
+            // spawnManager.SetupToNormalMode();
         }
 
         public void SetRandomMode()
         {
             Debug.LogError("廃止");
-            spawnManager.SetupToRamdomMode();
+            // spawnManager.SetupToRamdomMode();
         }
 
         public void StorySpawn()
         {
-            spawnManager.SetupToStoryMode();
+            // spawnManager.SetupToStoryMode();
 
-            spawnManager.SpawnEnemyAtStart();
+            // spawnManager.SpawnEnemyAtStart();
         }
 
         public void SetEventData(EventData eventData)
         {
-            spawnManager.SetEventData(eventData);
+            // spawnManager.SetEventData(eventData);
         }
 
         public async void SpawnfixedPsition(Transform position)
         {
-            await spawnManager.SpawnfixedPsition(position.position, position.localRotation);
-            spawnManager.EnableChasing();
+            // await spawnManager.SpawnfixedPsition(position.position, position.localRotation);
+            // spawnManager.EnableChasing();
         }
 
         public async void SpawnfixedPsition_Story(Transform position)
         {
-            await spawnManager.SpawnfixedPsition_Story(position.position, position.localRotation);
+            // await spawnManager.SpawnfixedPsition_Story(position.position, position.localRotation);
         }
 
         /// <summary>
@@ -146,31 +146,31 @@ namespace AnoGame.Application.Enemy
                 await UniTask.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: token);
 
                 // ここでチェイス停止
-                spawnManager.DisableChasing();
+                // spawnManager.DisableChasing();
                 Debug.Log("逃げ切り成功");
 
                 // 敵がまだ生きているか確認
                 if (spawnManager?.CurrentEnemyInstance == null) return;
 
                 // フェードアウト演出開始
-                var playTask = spawnManager.PlayDespawnedEffectAsync(token);
+                // var playTask = spawnManager.PlayDespawnedEffectAsync(token);
 
                 // 1 秒後に DeactivateEemy() を実行
                 UniTask.Void(async () =>
                 {
                     await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
-                    spawnManager.DeactivateEnemy();
+                    // spawnManager.DeactivateEnemy();
                 });
 
                 // エフェクト完了を待つ
-                await playTask;
+                // await playTask;
 
                 // 念のため Deactivate
                 
-                spawnManager.DeactivateEnemy();
+                // spawnManager.DeactivateEnemy();
 
                 // EventDataを成功とする
-                spawnManager.ScuccesEvent();
+                // spawnManager.ScuccesEvent();
                 
             }
             catch (OperationCanceledException)
@@ -280,7 +280,7 @@ namespace AnoGame.Application.Enemy
                     // プレイヤー付近にセット
                     var player = GameObject.FindWithTag(SLFBRules.TAG_PLAYER);
                     if (player == null) continue;
-                    await spawnManager.SetPositionNearPlayerAsync(player.transform.position, token);
+                    // await spawnManager.SetPositionNearPlayerAsync(player.transform.position, token);
 
                     // インゲーム、インベントリ/オプション開いているときはスポーンをスキップ
                     if (GameStateManager.Instance.CurrentState == GameState.InGameEvent
@@ -291,28 +291,28 @@ namespace AnoGame.Application.Enemy
                     }
 
                     // 出現演出
-                    await spawnManager.PlaySpawnedEffectAsync(token);
+                    // await spawnManager.PlaySpawnedEffectAsync(token);
 
                     // 本体出現＆チェイス
-                    spawnManager.ActivateEnemy();
-                    spawnManager.EnableChasing();
+                    // spawnManager.ActivateEnemy();
+                    // spawnManager.EnableChasing();
 
                     // チェイス時間ランダム
                     float chaseTime = UnityEngine.Random.Range(minChaseTime, maxChaseTime);
                     await UniTask.Delay(TimeSpan.FromSeconds(chaseTime), cancellationToken: token);
 
                     // 退場演出
-                    var playTask = spawnManager.PlayDespawnedEffectAsync(token);
+                    // var playTask = spawnManager.PlayDespawnedEffectAsync(token);
                     UniTask.Void(async () =>
                     {
                         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
-                        spawnManager.DeactivateEnemy();
+                        // spawnManager.DeactivateEnemy();
                     });
-                    await playTask;
+                    // await playTask;
 
                     // 後片付け
-                    spawnManager.DisableChasing();
-                    spawnManager.DeactivateEnemy();
+                    // spawnManager.DisableChasing();
+                    // spawnManager.DeactivateEnemy();
                 }
             }
             catch (OperationCanceledException)
@@ -323,7 +323,7 @@ namespace AnoGame.Application.Enemy
                 var effectToken = CancellationToken.None;
                 try
                 {
-                    await spawnManager.PlayDespawnedEffectAsync(effectToken);
+                    // await spawnManager.PlayDespawnedEffectAsync(effectToken);
                 }
                 catch (OperationCanceledException)
                 {
@@ -331,8 +331,8 @@ namespace AnoGame.Application.Enemy
                 }
 
                 // ── 演出後に後処理 ──
-                spawnManager.DisableChasing();
-                spawnManager.DeactivateEnemy();
+                // spawnManager.DisableChasing();
+                // spawnManager.DeactivateEnemy();
             }
             finally
             {
@@ -362,11 +362,11 @@ namespace AnoGame.Application.Enemy
             _spawnLoopCts?.Cancel();
             _spawnEntryCts?.Cancel();
 
-            spawnManager.DisableChasing();
-            await spawnManager.PlayDespawnedEffectAsync(
-                _spawnLoopCts?.Token ?? CancellationToken.None
-            );
-            spawnManager.DeactivateEnemy();
+            // spawnManager.DisableChasing();
+            // await spawnManager.PlayDespawnedEffectAsync(
+            //     _spawnLoopCts?.Token ?? CancellationToken.None
+            // );
+            // spawnManager.DeactivateEnemy();
         }
 
         /// <summary>
@@ -382,10 +382,10 @@ namespace AnoGame.Application.Enemy
             var token = _despawnTimerCts.Token;
             if (settings != null)
             {
-                var playTask = spawnManager.PlayDespawnedEffectLoopAsync(settings, token);
+                // var playTask = spawnManager.PlayDespawnedEffectLoopAsync(settings, token);
 
                 // PlayDespawnedEffectAsync の完了を待ってから DisableChashing()
-                await playTask;
+                // await playTask;
             }
         }
 
@@ -395,8 +395,8 @@ namespace AnoGame.Application.Enemy
         /// <param name="duration">完全フェードアウトにかかる時間</param>
         public async void ApCompletePartialFadeOut(float duration)
         {
-            var playTask = spawnManager.PlayDespawnedEffectLoopEndAsync(duration);
-            await playTask;
+            // var playTask = spawnManager.PlayDespawnedEffectLoopEndAsync(duration);
+            // await playTask;
         }
     }
 }

@@ -39,7 +39,8 @@ namespace AnoGame.Application.Enemy
         {
             if (enemyPrefab != null)
             {
-                Instantiate(enemyPrefab, transform.position, transform.rotation);
+                // Instantiate(enemyPrefab, transform.position, transform.rotation);
+                EnemySpawnManager.Instance.Spawn(enemyPrefab, transform.position, transform.rotation);
             }
         }
     }

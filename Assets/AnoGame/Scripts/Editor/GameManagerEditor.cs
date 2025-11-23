@@ -127,7 +127,7 @@ namespace AnoGame.Editor
                                 {
                                     StartFromChapter(storyIndex, chapterIndex, selectedStartType == StartPointType.RetryPoint);
                                     PlayerSpawnManager.Instance.OnChapterLoaded(selectedStartType == StartPointType.RetryPoint);
-                                    EnemySpawnManager.Instance.OnChapterLoaded(selectedStartType == StartPointType.RetryPoint);
+                                    // EnemySpawnManager.Instance.OnChapterLoaded(selectedStartType == StartPointType.RetryPoint);
 
                                 }
                                 EditorGUILayout.EndHorizontal();

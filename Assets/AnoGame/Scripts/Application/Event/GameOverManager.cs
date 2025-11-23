@@ -32,7 +32,11 @@ namespace AnoGame.Application.Event
             UnityEngine.Debug.Log("OnGameOver");
 
             GameStateManager.Instance.SetState(GameState.GameOver);
-            EnemySpawnManager.Instance.DestroyCurrentEnemyInstance();
+            // EnemySpawnManager.Instance.DestroyCurrentEnemyInstance();
+            if (EnemySpawnManager.Instance.CurrentEnemyInstance != null)
+            {
+                Destroy(EnemySpawnManager.Instance.CurrentEnemyInstance);
+            }
 
             // 主にゲームオーバー画面表示で使用
             GameOver?.Invoke();
