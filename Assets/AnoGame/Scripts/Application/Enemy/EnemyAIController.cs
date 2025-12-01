@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Splines;
 using AnoGame.Application.Player.Control;
 using Unity.TinyCharacterController.Control;
 using Unity.TinyCharacterController.Core; // NOTE:微妙...別のnamespaceがいい
@@ -38,6 +39,24 @@ namespace AnoGame.Application.Enmemy.Control
 
         [SerializeField] private bool isStoryMode = false;
         public bool IsStoryMode => isStoryMode;
+
+        public enum BehaviorMode { ChasePlayer, PatrolSpline }
+        [Header("行動モード")]
+        [SerializeField] private BehaviorMode behavior = BehaviorMode.ChasePlayer;
+
+        [Header("Spline パトロール")]
+        [SerializeField] private SplineContainer splineContainer;
+        [Tooltip("この距離以下で次のウェイポイントへ進む")]
+        [SerializeField, Min(0.05f)] private float arriveDistance = 0.5f;
+        [Tooltip("各Knotで停止する秒数（0で即時遷移）")]
+        [SerializeField, Min(0f)] private float waitAtKnotSeconds = 0f;
+        [Tooltip("最後のKnotの次は先頭に戻る（true）/ その場で停止（false）")]
+        [SerializeField] private bool loopPatrol = true;
+
+        // Spline内部状態
+        private int currentKnotIndex = 0;
+        private Vector3 currentTargetWorld;
+        private float waitTimer = 0f;
 
         [Header("前方スポーン（進行方向予測）")]
         [SerializeField, Tooltip("速度推定のサンプル間隔（秒）")]
@@ -154,6 +173,9 @@ namespace AnoGame.Application.Enmemy.Control
             animator = transform.GetChild(animatorChildIndex).GetComponent<Animator>();
             if (characterBrain == null)
                 characterBrain = GetComponent<CharacterBrain>();
+
+            if (behavior == BehaviorMode.PatrolSpline)
+                ResetPatrolAndSetFirstTarget();
         }
 
         private void CancelChaseLoopIfRunning()
@@ -228,18 +250,120 @@ namespace AnoGame.Application.Enmemy.Control
             if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
             if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
 
-            // ★ ダッシュ中 or 非チェイス中 は通常チェイス停止
-            if (!isChasing || _isDashing) return;
+            // ★ ダッシュ中 は通常AI処理をスキップ
+            if (_isDashing) return;
 
-            if (player == null)
-                player = GameObject.FindWithTag(playerTag);
+            if (behavior == BehaviorMode.ChasePlayer)
+            {
+                // 既存のチェイスロジック
+                if (!isChasing) return;
 
-            if (player != null)
-                moveControl.SetTargetPosition(player.transform.position);
+                if (player == null)
+                    player = GameObject.FindWithTag(playerTag);
 
-            // ★ 追加：見た目の向きを合わせる（NavMeshAgentは回さない）
-            if (controlFacingWhileChasing)
-                UpdateChaseFacing();
+                if (player != null)
+                    moveControl.SetTargetPosition(player.transform.position);
+
+                // ★ 追加：見た目の向きを合わせる（NavMeshAgentは回さない）
+                if (controlFacingWhileChasing)
+                    UpdateChaseFacing();
+            }
+            else if (behavior == BehaviorMode.PatrolSpline)
+            {
+                UpdatePatrolLogic();
+            }
+        }
+
+        private void UpdatePatrolLogic()
+        {
+            if (splineContainer == null || splineContainer.Spline == null || splineContainer.Spline.Count == 0)
+                return;
+
+            // Knot到達待機中
+            if (waitTimer > 0f)
+            {
+                waitTimer -= Time.fixedDeltaTime;
+                return;
+            }
+
+            // 目的地を維持
+            moveControl.SetTargetPosition(currentTargetWorld);
+
+            // 到達判定
+            bool reached = false;
+            if (agent != null && !agent.pathPending)
+            {
+                if (agent.remainingDistance <= arriveDistance)
+                    reached = true;
+            }
+            else
+            {
+                float planar = Vector3.Distance(new Vector3(transform.position.x, 0f, transform.position.z),
+                                                new Vector3(currentTargetWorld.x, 0f, currentTargetWorld.z));
+                if (planar <= arriveDistance)
+                    reached = true;
+            }
+
+            if (reached)
+                AdvanceToNextKnot();
+        }
+
+        private void ResetPatrolAndSetFirstTarget()
+        {
+            currentKnotIndex = 0;
+            if (TryGetKnotWorldPosition(currentKnotIndex, out var wp))
+            {
+                currentTargetWorld = wp;
+                moveControl.SetTargetPosition(currentTargetWorld);
+                waitTimer = waitAtKnotSeconds;
+            }
+        }
+
+        private void AdvanceToNextKnot()
+        {
+            int count = splineContainer.Spline.Count;
+            if (count <= 0) return;
+
+            int next = currentKnotIndex + 1;
+            if (next >= count)
+            {
+                if (!loopPatrol) return;
+                next = 0;
+            }
+
+            currentKnotIndex = next;
+
+            if (TryGetKnotWorldPosition(currentKnotIndex, out var wp))
+            {
+                currentTargetWorld = wp;
+                moveControl.SetTargetPosition(currentTargetWorld);
+                waitTimer = waitAtKnotSeconds;
+            }
+        }
+
+        private bool TryGetKnotWorldPosition(int index, out Vector3 worldPos)
+        {
+            worldPos = default;
+            var spline = splineContainer?.Spline;
+            if (spline == null || index < 0 || index >= spline.Count) return false;
+
+            Vector3 local = (Vector3)spline[index].Position;
+            worldPos = splineContainer.transform.TransformPoint(local);
+            return true;
+        }
+
+        public void SetBehavior(BehaviorMode newMode)
+        {
+            if (behavior == newMode) return;
+            behavior = newMode;
+
+            if (behavior == BehaviorMode.PatrolSpline)
+                ResetPatrolAndSetFirstTarget();
+            else if (behavior == BehaviorMode.ChasePlayer)
+            {
+                // チェイスに戻る際は必要なら初期化
+                isChasing = true;
+            }
         }
 
         public void FaceTarget(GameObject target)
@@ -1223,5 +1347,27 @@ namespace AnoGame.Application.Enmemy.Control
 
 
 
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (behavior == BehaviorMode.PatrolSpline)
+            {
+                if (splineContainer != null && splineContainer.Spline != null)
+                {
+                    Gizmos.color = Color.cyan;
+                    for (int i = 0; i < splineContainer.Spline.Count; i++)
+                    {
+                        Vector3 local = (Vector3)splineContainer.Spline[i].Position;
+                        Vector3 world = splineContainer.transform.TransformPoint(local);
+                        Gizmos.DrawSphere(world, 0.15f);
+                    }
+                }
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(currentTargetWorld, arriveDistance);
+            }
+        }
+#endif
     }
 }

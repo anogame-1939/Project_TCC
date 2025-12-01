@@ -9,6 +9,7 @@ namespace AnoGame.Application.Enmemy.Control // ← 既存に合わせて綴り�
     /// MoveNavmeshControl 経由で移動する最小AI。
     /// 追跡 or Spline巡回 をインスペクターで切替可能。
     /// </summary>
+    [System.Obsolete("EnemyAIController に統合されました。使用しないでください。")]
     public class EnemyAIController_V2 : MonoBehaviour
     {
         public enum BehaviorMode { ChasePlayer, PatrolSpline }

@@ -32,7 +32,8 @@ namespace Unity.TinyCharacterController.Control
     [RenamedFrom("TinyCharacterController.MoveByNavigationControl")]
     public class MoveNavmeshControl : MonoBehaviour,
         IMove, ITurn, IUpdateComponent,
-        IComponentCondition
+        IComponentCondition,
+        IPriorityLifecycle<IMove>, IPriorityLifecycle<ITurn>
     {
         /// <summary>
         /// Agent used to control character movement.
@@ -262,6 +263,40 @@ namespace Unity.TinyCharacterController.Control
             {
                 messageList.Add("Please place the agent as a child object of the character.");
             }
+        }
+
+        void IPriorityLifecycle<IMove>.OnAcquireHighestPriority()
+        {
+            if (_agent != null)
+            {
+                _agent.isStopped = false;
+            }
+        }
+
+        void IPriorityLifecycle<IMove>.OnLoseHighestPriority()
+        {
+            if (_agent != null)
+            {
+                _agent.isStopped = true;
+                _agent.ResetPath();
+            }
+            _moveVelocity = Vector3.zero;
+        }
+
+        void IPriorityLifecycle<IMove>.OnUpdateWithHighestPriority(float deltaTime)
+        {
+        }
+
+        void IPriorityLifecycle<ITurn>.OnAcquireHighestPriority()
+        {
+        }
+
+        void IPriorityLifecycle<ITurn>.OnLoseHighestPriority()
+        {
+        }
+
+        void IPriorityLifecycle<ITurn>.OnUpdateWithHighestPriority(float deltaTime)
+        {
         }
 
     }
