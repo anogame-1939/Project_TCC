@@ -161,112 +161,26 @@ namespace Unity.TinyCharacterController.Control
             }
         }
 
+        private bool _hasPriority = false;
+
         /// <summary>
         /// Set a target point to move to.
         /// </summary>
         /// <param name="position">Target position</param>
         public void SetTargetPosition(Vector3 position)
         {
+            if (!_hasPriority) return;
+
             _agent.isStopped = false;
             _agent.SetDestination(position);
             IsArrived = false;
         }
 
-        /// <summary>
-        /// Set the target point to move to.
-        /// and, the character maintains the <see cref="distance"/> distance.
-        /// Use when you do not necessarily want to move to the same coordinates as the target, for example in melee combat.
-        /// </summary>
-        /// <param name="position">Position of target</param>
-        /// <param name="distance">distance from the target</param>.
-        public void SetTargetPosition(Vector3 position, float distance)
-        {
-            var deltaPosition = _transform.Position - position;
-            deltaPosition.y = 0;
-            var direction = deltaPosition.normalized * distance;
-            SetTargetPosition(position + direction);
-        }
-
-        /// <summary>
-        /// Current Speed.
-        /// </summary>
-        public float CurrentSpeed => IsArrived ? 0 : _speed;
-
-        int IPriority<IMove>.Priority => MovePriority;
-
-        /// <summary>
-        /// Movement vector
-        /// </summary>
-        public Vector3 MoveVelocity => _moveVelocity;
-
-        int IPriority<ITurn>.Priority => TurnPriority;
-
-        int ITurn.TurnSpeed => TurnSpeed;
-
-        float ITurn.YawAngle => _yawAngle;
-
-        void IUpdateComponent.OnUpdate(float deltaTime)
-        {
-            using var profiler = new ProfilerScope(nameof(MoveNavmeshControl));
-
-            if (_agent.pathPending)
-                return;
-            var distance = _agent.remainingDistance;
-
-            if (_agent.isOnOffMeshLink)
-            {
-                var deltaPosition = _agent.currentOffMeshLinkData.endPos - _transform.Position;
-                deltaPosition.y = 0;
-                var direction = deltaPosition.normalized;
-
-                if (deltaPosition.sqrMagnitude < 1)
-                    _agent.CompleteOffMeshLink();
-
-                _moveVelocity = direction * _speed;
-                _agent.nextPosition = _transform.Position + _moveVelocity * deltaTime;
-
-            }
-            else
-            {
-                var deltaPosition = _agent.steeringTarget - _transform.Position;
-                deltaPosition.y = 0;
-
-                var isMoving = distance - deltaTime * _speed > 0;
-                if (isMoving && IsArrived == false)
-                {
-                    _yawAngle = Vector3.SignedAngle(Vector3.forward, deltaPosition, Vector3.up);
-                }
-                else
-                {
-                    // Process stopped because speed is 0 or target point has been reached.
-                    if (IsArrived == false)
-                    {
-                        OnArrivedAtDestination?.Invoke();
-                        IsArrived = true;
-                        _agent.isStopped = true;
-                    }
-                }
-                // var speed = _agent.desiredVelocity.magnitude;
-                var currentSpeed = distance < Speed * deltaTime ? distance / deltaTime : Speed;
-                // _moveVelocity = direction * currentSpeed;
-                _moveVelocity = _agent.desiredVelocity.normalized * currentSpeed;
-                _agent.nextPosition = _transform.Position + _moveVelocity * deltaTime;
-
-            }
-        }
-
-        int IUpdateComponent.Order => Order.Control;
-
-        void IComponentCondition.OnConditionCheck(List<string> messageList)
-        {
-            if (_agent != null && _agent.transform.parent != transform)
-            {
-                messageList.Add("Please place the agent as a child object of the character.");
-            }
-        }
+        // ... (SetTargetPosition overload calls this one, so it's covered)
 
         void IPriorityLifecycle<IMove>.OnAcquireHighestPriority()
         {
+            _hasPriority = true;
             if (_agent != null)
             {
                 _agent.isStopped = false;
@@ -275,6 +189,7 @@ namespace Unity.TinyCharacterController.Control
 
         void IPriorityLifecycle<IMove>.OnLoseHighestPriority()
         {
+            _hasPriority = false;
             if (_agent != null)
             {
                 _agent.isStopped = true;
@@ -297,6 +212,56 @@ namespace Unity.TinyCharacterController.Control
 
         void IPriorityLifecycle<ITurn>.OnUpdateWithHighestPriority(float deltaTime)
         {
+        }
+
+        // Implementation of IMove
+        public Vector3 MoveVelocity => _agent != null ? _agent.velocity : Vector3.zero;
+
+        // Implementation of IPriority<IMove>
+        int IPriority<IMove>.Priority => MovePriority;
+
+        // Implementation of ITurn
+        int ITurn.TurnSpeed => TurnSpeed;
+        float ITurn.YawAngle => _yawAngle;
+
+        // Implementation of IPriority<ITurn>
+        int IPriority<ITurn>.Priority => TurnPriority;
+
+        // Implementation of IUpdateComponent
+        int IUpdateComponent.Order => Order.Control;
+
+        void IUpdateComponent.OnUpdate(float deltaTime)
+        {
+            if (_agent != null && _agent.isActiveAndEnabled && _agent.isOnNavMesh)
+            {
+                // Update YawAngle to match movement direction
+                if (_agent.velocity.sqrMagnitude > 0.01f)
+                {
+                    _yawAngle = Vector3.SignedAngle(Vector3.forward, _agent.velocity.normalized, Vector3.up);
+                }
+
+                // Check if arrived
+                if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance)
+                {
+                    if (!IsArrived)
+                    {
+                        IsArrived = true;
+                        OnArrivedAtDestination?.Invoke();
+                    }
+                }
+            }
+        }
+
+        // Implementation of IComponentCondition
+        public void OnConditionCheck(List<string> messages)
+        {
+            if (_agent != null)
+            {
+                messages.Add($"Agent Path Status: {_agent.pathStatus}");
+                messages.Add($"Agent Has Path: {_agent.hasPath}");
+                messages.Add($"Agent Velocity: {_agent.velocity}");
+                messages.Add($"Is Arrived: {IsArrived}");
+            }
         }
 
     }
