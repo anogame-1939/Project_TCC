@@ -11,8 +11,9 @@ namespace AnoGame.Application.Enemy
 
         public void Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
         {
+            Debug.Log("prefab " + prefab);
             if (prefab == null) return;
-            
+
             // 既存の敵がいれば削除するなどの処理が必要ならここに追加
             if (_currentEnemyInstance != null)
             {

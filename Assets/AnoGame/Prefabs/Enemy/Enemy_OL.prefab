@@ -312,6 +312,7 @@ GameObject:
   - component: {fileID: -8439374336953332058}
   - component: {fileID: -6838671714581490994}
   - component: {fileID: 2091443860567756890}
+  - component: {fileID: 3027689247613781079}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -769,6 +770,29 @@ MonoBehaviour:
   arriveDistance: 0.5
   waitAtKnotSeconds: 0
   loopPatrol: 1
+--- !u!114 &3027689247613781079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a98eaf752614344a957f0788f398eda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movePriority: 1000
+  turnPriority: 1000
+  _isActive: 0
+  moveBehavior: 0
+  moveSpeed: 2
+  constantDirection: {x: 0, y: 0, z: 1}
+  followTarget: {fileID: 0}
+  targetPoint: {x: 0, y: 0, z: 0}
+  stopDistance: 0.05
+  turnBehavior: 1
+  lookAtTarget: {fileID: 0}
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0

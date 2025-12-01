@@ -12,6 +12,7 @@ namespace AnoGame.Application.Direction.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
+            Debug.Log("playerdata " + playerData);
             var proxy = playerData as TimelineEnemyEventLockProxy;
             if (proxy == null)
             {
@@ -26,6 +27,8 @@ namespace AnoGame.Application.Direction.Timeline
                 _lastProxy = proxy;
                 _cachedWarp = null;
             }
+            Debug.Log("proxy.EnemyCtrl " + proxy.EnemyCtrl);
+            Debug.Log("proxy.EnemyCtrl " + proxy.EnemyCtrl.name);
 
             // キャッシュがない場合は取得を試みる (Enemyが後からSpawnする場合などに対応)
             if (_cachedWarp == null)

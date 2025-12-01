@@ -60,7 +60,7 @@ namespace AnoGame.Application.Core
             }
 
             var enemyProxies = FindObjectsByType<TimelineEnemyEventLockProxy>(FindObjectsSortMode.None);
-            foreach (var p in proxies)
+            foreach (var p in enemyProxies)
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(p));
             }

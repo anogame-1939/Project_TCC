@@ -23,6 +23,12 @@ namespace AnoGame.Application.Direction.Timeline
             }
         }
 
+        void Start()
+        {
+            Debug.Log("_spawnManager: " + _spawnManager);
+            Debug.Log($"[TimelineEnemyEventLockProxy] EnemyCtrl: {EnemyCtrl}");
+        }
+
         // タイムラインから叩きたい薄いAPI
         public void BeginLock() => EnemyCtrl?.BeginLock();
         public void EndLock() => EnemyCtrl?.EndLock();
