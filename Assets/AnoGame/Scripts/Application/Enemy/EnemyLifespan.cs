@@ -19,9 +19,9 @@ namespace AnoGame.Application.Enemy
 
         [Header("それぞれのパーティクルが出現・消滅するタイミング")]
         [SerializeField, Range(0f, 1f)]
-        private float fadeInPlayThreshold  = 0.2f;
+        private float fadeInPlayThreshold = 0.2f;
         [SerializeField, Range(0f, 1f)]
-        private float fadeInStopThreshold  = 0.8f;
+        private float fadeInStopThreshold = 0.8f;
         [SerializeField, Range(0f, 1f)]
         private float fadeOutPlayThreshold = 0.2f;
         [SerializeField, Range(0f, 1f)]
@@ -55,7 +55,7 @@ namespace AnoGame.Application.Enemy
 
         private void Start()
         {
-            Initialize();
+            // Initialize();
         }
 
         private void Initialize()
@@ -117,7 +117,7 @@ namespace AnoGame.Application.Enemy
             }
         }
 
-        
+
 
         private void OnEnable()
         {
@@ -429,19 +429,19 @@ namespace AnoGame.Application.Enemy
 
             // --- ② 開始／終了値を算出 ---
             float[] startVals = new float[_spriteRenderers.Length];
-            float[] endVals   = new float[_spriteRenderers.Length];
+            float[] endVals = new float[_spriteRenderers.Length];
 
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 var mat = _spriteRenderers[i].material;
                 startVals[i] = mat.HasProperty(DissolveAmountProperty)
                             ? mat.GetFloat(DissolveAmountProperty) : 0f;
-                endVals[i]   = 1 - settings.targetAlpha;
+                endVals[i] = 1 - settings.targetAlpha;
             }
 
             // --- ③ フェード本体と影スケールを並列起動 ---
             var dissolveCoroutine = StartCoroutine(DissolveCoroutine(startVals, endVals, settings.duration));
-            var shadowCoroutine   = StartCoroutine(ShadowScaleCoroutine());
+            var shadowCoroutine = StartCoroutine(ShadowScaleCoroutine());
 
             // --- ④ 2 本とも終わるまで順に待機 ---
             yield return dissolveCoroutine;
@@ -465,19 +465,19 @@ namespace AnoGame.Application.Enemy
 
             // --- ② 開始／終了値を算出 ---
             float[] startVals = new float[_spriteRenderers.Length];
-            float[] endVals   = new float[_spriteRenderers.Length];
+            float[] endVals = new float[_spriteRenderers.Length];
 
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 var mat = _spriteRenderers[i].material;
                 startVals[i] = mat.HasProperty(DissolveAmountProperty)
                             ? mat.GetFloat(DissolveAmountProperty) : 0f;
-                endVals[i]   = settings.targetAlpha;
+                endVals[i] = settings.targetAlpha;
             }
 
             // --- ③ フェード本体と影スケールを並列起動 ---
             var dissolveCoroutine = StartCoroutine(DissolveCoroutine(startVals, endVals, settings.duration));
-            var shadowCoroutine   = StartCoroutine(ShadowScaleCoroutine(true));
+            var shadowCoroutine = StartCoroutine(ShadowScaleCoroutine(true));
 
             // --- ④ 2 本とも終わるまで順に待機 ---
             yield return dissolveCoroutine;
@@ -528,7 +528,7 @@ namespace AnoGame.Application.Enemy
                 float t = Mathf.Clamp01(elapsed / shadowScaleDuration);
 
                 // ── カーブで加速／減速を制御
-                float curveT = toSmall? shadowToSmall.Evaluate(t) : shadowToBig.Evaluate(t);  // 0→1 の非線形補間係数
+                float curveT = toSmall ? shadowToSmall.Evaluate(t) : shadowToBig.Evaluate(t);  // 0→1 の非線形補間係数
 
                 for (int i = 0; i < shadowObjects.Length; i++)
                 {
@@ -541,7 +541,7 @@ namespace AnoGame.Application.Enemy
 
             // 終了時に完全な 1 を保証
             // foreach (var sh in shadowObjects)
-                // sh.transform.localScale = Vector3.one;
+            // sh.transform.localScale = Vector3.one;
         }
 
         private void StopAllParticle()
@@ -619,7 +619,7 @@ namespace AnoGame.Application.Enemy
 
             // 並列実行
             var dissolveTask = DissolveWithEffect();
-            var shadowTask   = ShadowScaleAsync(settings.duration, false);
+            var shadowTask = ShadowScaleAsync(settings.duration, false);
             await UniTask.WhenAll(dissolveTask, shadowTask);
         }
 
@@ -691,7 +691,7 @@ namespace AnoGame.Application.Enemy
             }
 
             var dissolveTask = DissolveWithEffectOut();
-            var shadowTask   = ShadowScaleAsync(settings.duration, true);
+            var shadowTask = ShadowScaleAsync(settings.duration, true);
             await UniTask.WhenAll(dissolveTask, shadowTask);
         }
 
@@ -796,7 +796,7 @@ namespace AnoGame.Application.Enemy
             }
 
             var dissolveTask = DissolveWithEffectOut();
-            var shadowTask   = ShadowScaleAsync(duration, true);
+            var shadowTask = ShadowScaleAsync(duration, true);
             await UniTask.WhenAll(dissolveTask, shadowTask);
         }
 
