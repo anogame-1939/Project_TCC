@@ -64,6 +64,7 @@ namespace AnoGame.Application.Direction.Timeline
 
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
+            Debug.Log("[WarpPlayableBehaviour] OnBehaviourPlay - Resetting fired flag");
             fired = false; // クリップ頭に入るたびリセット
         }
     }

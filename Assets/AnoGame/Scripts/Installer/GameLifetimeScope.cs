@@ -23,10 +23,12 @@ namespace AnoGame.Application.Core
     {
         [SerializeField]
         ItemDatabase itemDatabase;
-        
+
         [SerializeField] private EventLockControl _eventLockControl;
         [SerializeField] private CinematicBars mainBars;
         [SerializeField] private GlitchController glitchController;
+
+        [SerializeField] private EnemySpawnManager _enemySpawnManager;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -38,6 +40,7 @@ namespace AnoGame.Application.Core
             builder.RegisterComponent(glitchController)
                        .As<IGlitchController>()
                        .AsSelf();
+            builder.RegisterComponent(_enemySpawnManager);
 
 
 
@@ -70,8 +73,6 @@ namespace AnoGame.Application.Core
 
             builder.RegisterComponentInHierarchy<GameManager2>();
             builder.RegisterComponentInHierarchy<GameOverManager>();
-
-            builder.RegisterComponentInHierarchy<EnemySpawnManager>();
 
             // EventTriggerBaseを継承したコンポーネントの検索と登録
             var eventTriggers = FindObjectsByType<EventTriggerBase>(FindObjectsSortMode.None);

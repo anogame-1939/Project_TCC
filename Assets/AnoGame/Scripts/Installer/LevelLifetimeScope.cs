@@ -6,7 +6,6 @@ using AnoGame.Application.Enemy;
 using AnoGame.Application.Direction.Glitch;
 using AnoGame.Application.Direction.Timeline;
 
-
 namespace AnoGame.Application.Core
 {
     public class LevelLifetimeScope : LifetimeScope
@@ -55,6 +54,12 @@ namespace AnoGame.Application.Core
 
             // builder.RegisterEntryPoint<LevelInitializer>();
             var proxies = FindObjectsByType<TimelineEventLockProxy>(FindObjectsSortMode.None);
+            foreach (var p in proxies)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(p));
+            }
+
+            var enemyProxies = FindObjectsByType<TimelineEnemyEventLockProxy>(FindObjectsSortMode.None);
             foreach (var p in proxies)
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(p));

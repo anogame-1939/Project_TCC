@@ -1,19 +1,23 @@
 using UnityEngine;
 using AnoGame.Application.Player.Control; // EventLockControl
 using AnoGame.Application.Enemy; // EnemySpawnManager
+using VContainer;
 
 namespace AnoGame.Application.Direction.Timeline
 {
     [DisallowMultipleComponent]
     public sealed class TimelineEnemyEventLockProxy : MonoBehaviour
     {
-        [SerializeField] private EnemySpawnManager _spawnManager;
+        [Inject] private EnemySpawnManager _spawnManager;
 
         public EventLockControl EnemyCtrl
         {
             get
             {
-                if (_spawnManager == null) return null;
+                if (_spawnManager == null)
+                {
+                    _spawnManager = EnemySpawnManager.Instance;
+                }
                 if (_spawnManager.CurrentEnemyInstance == null) return null;
                 return _spawnManager.CurrentEnemyInstance.GetComponent<EventLockControl>();
             }

@@ -13,23 +13,44 @@ namespace AnoGame.Application.Direction.Timeline
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             var proxy = playerData as TimelineEnemyEventLockProxy;
-            if (proxy == null) return;
+            if (proxy == null)
+            {
+                Debug.LogWarning("[WarpEnemyProxyMixer] Proxy is null");
+                return;
+            }
 
             // Proxyが変わったら IWarp を再取得
             if (!ReferenceEquals(proxy, _lastProxy))
             {
+                Debug.Log($"[WarpEnemyProxyMixer] Proxy changed. New proxy: {proxy.name}");
                 _lastProxy = proxy;
                 _cachedWarp = null;
+            }
 
+            // キャッシュがない場合は取得を試みる (Enemyが後からSpawnする場合などに対応)
+            if (_cachedWarp == null)
+            {
                 var enemyCtrl = proxy.EnemyCtrl; // ← 公開したプロパティを利用
                 if (enemyCtrl != null)
                 {
                     // 同じGO or 親から IWarp を取得（Brain）
                     _cachedWarp = enemyCtrl.GetComponent<IWarp>() ?? enemyCtrl.GetComponentInParent<IWarp>();
+                    if (_cachedWarp != null)
+                    {
+                        Debug.Log($"[WarpEnemyProxyMixer] Cached IWarp: {_cachedWarp != null}");
+                    }
                 }
+                // else
+                // {
+                //     Debug.LogWarning("[WarpEnemyProxyMixer] EnemyCtrl is null on proxy");
+                // }
             }
 
-            if (_cachedWarp == null) return;
+            if (_cachedWarp == null)
+            {
+                Debug.LogWarning("[WarpEnemyProxyMixer] Cached Warp is null");
+                return;
+            }
 
             int inputCount = playable.GetInputCount();
             for (int i = 0; i < inputCount; i++)
@@ -37,9 +58,11 @@ namespace AnoGame.Application.Direction.Timeline
                 var weight = playable.GetInputWeight(i);
                 if (weight <= 0f) continue;
 
-                var sp  = (ScriptPlayable<WarpPlayableBehaviour>)playable.GetInput(i);
+                var sp = (ScriptPlayable<WarpPlayableBehaviour>)playable.GetInput(i);
                 var bhv = sp.GetBehaviour();
                 if (bhv.fired) continue;
+
+                Debug.Log($"[WarpEnemyProxyMixer] Firing warp. Weight: {weight}");
 
                 // 目標座標
                 Vector3 pos = (bhv.useTarget && bhv.target != null)
@@ -50,10 +73,12 @@ namespace AnoGame.Application.Direction.Timeline
                 switch (bhv.facing)
                 {
                     case WarpPlayableAsset.WarpFacing.Keep:
+                        Debug.Log($"[WarpEnemyProxyMixer] Warping to {pos} (Keep Facing)");
                         _cachedWarp.Warp(pos); // 位置のみ（向き維持）
                         break;
 
                     case WarpPlayableAsset.WarpFacing.FaceDirection:
+                        Debug.Log($"[WarpEnemyProxyMixer] Warping to {pos} (Face Direction: {bhv.worldFacingDirection})");
                         _cachedWarp.Warp(pos, bhv.worldFacingDirection); // 位置＋方向ベクトル
                         break;
 
@@ -64,6 +89,7 @@ namespace AnoGame.Application.Direction.Timeline
                             dir = bhv.lookAt.position - pos;
                             dir.y = 0f;
                         }
+                        Debug.Log($"[WarpEnemyProxyMixer] Warping to {pos} (Face Target: {bhv.lookAt?.name}, Dir: {dir})");
                         _cachedWarp.Warp(pos, dir);
                         break;
                 }
