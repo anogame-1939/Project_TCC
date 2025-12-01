@@ -311,7 +311,6 @@ GameObject:
   - component: {fileID: 3949941853238961511}
   - component: {fileID: -8439374336953332058}
   - component: {fileID: -6838671714581490994}
-  - component: {fileID: 2091443860567756890}
   - component: {fileID: 3027689247613781079}
   m_Layer: 14
   m_Name: Enemy_OL
@@ -650,6 +649,11 @@ MonoBehaviour:
   dashAnimSpeedMult: 1.6
   isChasing: 0
   isStoryMode: 0
+  behavior: 0
+  splineContainer: {fileID: 0}
+  arriveDistance: 0.5
+  waitAtKnotSeconds: 0
+  loopPatrol: 1
   motionSampleInterval: 0.1
   velocityEmaHalfLife: 0.3
   predictionLeadTime: 0.6
@@ -751,25 +755,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   splineContainer: {fileID: 0}
---- !u!114 &2091443860567756890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ae6c5a259ed1174da3edc672e7e1665, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  behavior: 0
-  moveNavmeshControl: {fileID: 5085902700854131339}
-  playerTag: Player
-  splineContainer: {fileID: 0}
-  arriveDistance: 0.5
-  waitAtKnotSeconds: 0
-  loopPatrol: 1
 --- !u!114 &3027689247613781079
 MonoBehaviour:
   m_ObjectHideFlags: 0
