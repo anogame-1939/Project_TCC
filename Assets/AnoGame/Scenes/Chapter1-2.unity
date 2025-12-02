@@ -1131,6 +1131,7 @@ GameObject:
   - component: {fileID: 89539914}
   - component: {fileID: 89539913}
   - component: {fileID: 89539916}
+  - component: {fileID: 89539917}
   m_Layer: 0
   m_Name: "VCam_2_\u3082\u3046\u4E00\u5EA6\u30A2\u30D1\u30FC\u30C8\u306E\u65B9\u3092\u5411\u304F"
   m_TagString: Untagged
@@ -1556,6 +1557,18 @@ MonoBehaviour:
         Velocity: {x: 5, y: 5, z: 5}
         ClearImpulseOnStop: 0
         DrawGizmos: 0
+--- !u!114 &89539917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89539910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 437b52ff2c949e04b954c34bbaad0387, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &90862588
 GameObject:
   m_ObjectHideFlags: 0
@@ -8348,6 +8361,8 @@ PlayableDirector:
     value: {fileID: 338764139}
   - key: {fileID: 1594457369474775805, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
     value: {fileID: 338764139}
+  - key: {fileID: -7535183107387217322, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
+    value: {fileID: 89539917}
   m_ExposedReferences:
     m_References:
     - fb30efc9092110645b046df9dec71d31: {fileID: 2018438733}
