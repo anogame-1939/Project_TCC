@@ -9,10 +9,15 @@ namespace AnoGame.Application.Timeline.CameraShake
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             var controller = playerData as CinemachineShakeController;
-            if (controller == null) return;
+            if (controller == null)
+            {
+                Debug.LogWarning("CameraShakeMixerBehaviour: Controller is null!");
+                return;
+            }
 
             float totalIntensity = 0f;
             float totalFrequency = 0f;
+            Vector3 totalOffset = Vector3.zero;
 
             int inputCount = playable.GetInputCount();
 
@@ -26,10 +31,12 @@ namespace AnoGame.Application.Timeline.CameraShake
 
                     totalIntensity += input.intensity * inputWeight;
                     totalFrequency += input.frequency * inputWeight;
+                    totalOffset += input.offset * inputWeight;
                 }
             }
 
             controller.SetShake(totalIntensity, totalFrequency);
+            controller.SetOffset(totalOffset);
         }
     }
 }
