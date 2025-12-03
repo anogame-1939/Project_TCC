@@ -273,6 +273,10 @@ namespace Unity.TinyCharacterController.Control
         /// Resets the NavMeshAgent component.
         /// This is a workaround for initialization issues where the agent fails to attach to the NavMesh.
         /// </summary>
+        /// <summary>
+        /// Resets the NavMeshAgent component.
+        /// This is a workaround for initialization issues where the agent fails to attach to the NavMesh.
+        /// </summary>
         [ContextMenu("Reset Agent")]
         public void ResetAgent()
         {
@@ -291,6 +295,16 @@ namespace Unity.TinyCharacterController.Control
         {
             if (_agent != null)
             {
+                // In Editor, we might still want to fully recreate it if it's truly broken, 
+                // but for consistency with the request, we'll try to just toggle if possible,
+                // or fall back to the old method if the user specifically wanted "Reset" in editor to mean "Recreate".
+                // However, the user's feedback was primarily about runtime behavior.
+                // Let's keep the editor behavior as "Recreate" for safety unless specified otherwise,
+                // as "enabled" toggle in Edit mode might not trigger the same initialization hooks as Play mode.
+                // Actually, the user said "ResetAgentでこのような処理に変えてみてください" (Change ResetAgent to this process),
+                // referring to the runtime code.
+                // I will keep the Editor immediate reset as a full recreation to be safe, 
+                // as "yield return null" doesn't work in Edit mode without EditorCoroutineUtility.
                 DestroyImmediate(_agent);
             }
             CreateAndSetupAgent();
@@ -301,27 +315,29 @@ namespace Unity.TinyCharacterController.Control
         {
             if (_agent != null)
             {
-                Debug.Log($"[MoveNavmeshControl] Destroying old agent...");
-                Destroy(_agent);
-                _agent = null;
+                Debug.Log($"[MoveNavmeshControl] Disabling agent...");
+                _agent.enabled = false;
             }
 
-            // Wait for end of frame to ensure destruction is processed
+            // Wait for end of frame to ensure the disable is processed
             yield return null;
 
-            Debug.Log($"[MoveNavmeshControl] Creating new agent...");
-            CreateAndSetupAgent();
-
-            // Optional: Wait another frame to ensure initialization?
-            yield return null;
-
-            if (_agent != null && _agent.isOnNavMesh)
+            if (_agent != null)
             {
-                Debug.Log($"[MoveNavmeshControl] Agent reset complete. OnNavMesh: true", this);
+                Debug.Log($"[MoveNavmeshControl] Enabling agent...");
+                _agent.enabled = true;
+
+                // Re-apply settings just in case
+                _agent.speed = _speed;
+                _agent.updatePosition = false;
+                _agent.updateRotation = false;
             }
-            else
-            {
 
+            yield return null;
+
+            if (_agent != null)
+            {
+                Debug.Log($"[MoveNavmeshControl] Agent reset complete. OnNavMesh: {_agent.isOnNavMesh}", this);
             }
         }
 
@@ -331,7 +347,14 @@ namespace Unity.TinyCharacterController.Control
             var agent = gameObject.AddComponent<NavMeshAgent>();
             agent.TryGetComponent(out _agent);
 
-
+            // Re-apply settings
+            if (_agent != null)
+            {
+                _agent.transform.localPosition = Vector3.zero;
+                _agent.speed = _speed;
+                _agent.updatePosition = false;
+                _agent.updateRotation = false;
+            }
         }
 
     }
