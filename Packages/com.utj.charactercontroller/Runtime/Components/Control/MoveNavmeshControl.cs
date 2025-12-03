@@ -261,7 +261,77 @@ namespace Unity.TinyCharacterController.Control
                 messages.Add($"Agent Has Path: {_agent.hasPath}");
                 messages.Add($"Agent Velocity: {_agent.velocity}");
                 messages.Add($"Is Arrived: {IsArrived}");
+                messages.Add($"Is On NavMesh: {_agent.isOnNavMesh}");
             }
+            else
+            {
+                messages.Add("Agent is null.");
+            }
+        }
+
+        /// <summary>
+        /// Resets the NavMeshAgent component.
+        /// This is a workaround for initialization issues where the agent fails to attach to the NavMesh.
+        /// </summary>
+        [ContextMenu("Reset Agent")]
+        public void ResetAgent()
+        {
+            Debug.Log($"[MoveNavmeshControl] ResetAgent called");
+            if (Application.isPlaying)
+            {
+                StartCoroutine(ResetAgentCoroutine());
+            }
+            else
+            {
+                ResetAgentImmediate();
+            }
+        }
+
+        private void ResetAgentImmediate()
+        {
+            if (_agent != null)
+            {
+                DestroyImmediate(_agent);
+            }
+            CreateAndSetupAgent();
+            Debug.Log("NavMeshAgent has been reset (Immediate).", this);
+        }
+
+        private System.Collections.IEnumerator ResetAgentCoroutine()
+        {
+            if (_agent != null)
+            {
+                Debug.Log($"[MoveNavmeshControl] Destroying old agent...");
+                Destroy(_agent);
+                _agent = null;
+            }
+
+            // Wait for end of frame to ensure destruction is processed
+            yield return null;
+
+            Debug.Log($"[MoveNavmeshControl] Creating new agent...");
+            CreateAndSetupAgent();
+
+            // Optional: Wait another frame to ensure initialization?
+            yield return null;
+
+            if (_agent != null && _agent.isOnNavMesh)
+            {
+                Debug.Log($"[MoveNavmeshControl] Agent reset complete. OnNavMesh: true", this);
+            }
+            else
+            {
+
+            }
+        }
+
+        private void CreateAndSetupAgent()
+        {
+            // Create new agent
+            var agent = gameObject.AddComponent<NavMeshAgent>();
+            agent.TryGetComponent(out _agent);
+
+
         }
 
     }

@@ -1,7 +1,9 @@
 using AnoGame.Application.Enemy;
 using AnoGame.Application.Enmemy.Control;
+using AnoGame.Application.Enemy.AI;
 using AnoGame.Application.Player.Control;
 using UnityEngine;
+using Unity.TinyCharacterController.Control;
 
 namespace AnoGame.Application.Story
 {
@@ -12,10 +14,14 @@ namespace AnoGame.Application.Story
             Debug.Log($"[EnemyMoveHandler] StartChase called. Time: {Time.time}");
             // EnemySpawnManager.Instance.SetupToStoryMode();
 
+
+
             var enemy = EnemySpawnManager.Instance.CurrentEnemyInstance;
+            enemy.GetComponent<MoveNavmeshControl>().ResetAgent();
             if (enemy != null)
             {
                 Debug.Log($"[EnemyMoveHandler] CurrentEnemyInstance found: {enemy.name}");
+                // 1. EventLock (Existing)
                 var eventLock = enemy.GetComponent<EventLockControl>();
                 if (eventLock != null)
                 {
@@ -28,13 +34,36 @@ namespace AnoGame.Application.Story
                     Debug.LogWarning("[EnemyMoveHandler] EventLockControl NOT found on enemy.");
                 }
 
+                // 2. New System: Enable Chase, Disable Patrol
+                var chaseIntent = enemy.GetComponent<ChaseIntentProvider>();
+                if (chaseIntent != null)
+                {
+                    Debug.Log("[EnemyMoveHandler] Enabling ChaseIntentProvider.");
+                    chaseIntent.SetActive(true);
+                }
+                else
+                {
+                    Debug.LogWarning("[EnemyMoveHandler] ChaseIntentProvider NOT found on enemy.");
+                }
+
+                var patrolIntent = enemy.GetComponent<PatrolSplineIntentProvider>();
+                if (patrolIntent != null)
+                {
+                    Debug.Log("[EnemyMoveHandler] Disabling PatrolSplineIntentProvider.");
+                    patrolIntent.SetActive(false);
+                }
+
+                return;
+
+                // 3. Old System: Disable EnemyAIController
                 var ai = enemy.GetComponent<EnemyAIController>();
                 if (ai != null)
                 {
-                    Debug.Log($"[EnemyMoveHandler] EnemyAIController found. Setting Chasing=true. IsChasing before: {ai.IsChasing}");
-                    ai.SetChasing(true);
+                    Debug.Log($"[EnemyMoveHandler] EnemyAIController found. Disabling Legacy AI. IsChasing before: {ai.IsChasing}");
+                    ai.SetChasing(false);
                     ai.SetStoryMode(false);
-                    Debug.Log($"[EnemyMoveHandler] EnemyAIController IsChasing after: {ai.IsChasing}");
+                    ai.enabled = false; // Ensure it doesn't interfere
+                    Debug.Log($"[EnemyMoveHandler] EnemyAIController IsChasing after: {ai.IsChasing}, Enabled: {ai.enabled}");
                 }
                 else
                 {

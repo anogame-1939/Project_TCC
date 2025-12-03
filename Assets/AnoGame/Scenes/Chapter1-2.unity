@@ -8779,13 +8779,13 @@ MonoBehaviour:
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 297600889}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: 
+        - m_Target: {fileID: 297600892}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: StartChase
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -8915,11 +8915,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f35797485bdf74196c420866249769, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &297600889 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5601170780326599541, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+--- !u!114 &297600892 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 912642633394794230, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
   m_PrefabInstance: {fileID: 297600886}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d81a5a43bd28f6a48a423636d43d8316, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &305497915
 GameObject:
   m_ObjectHideFlags: 0
@@ -34156,7 +34162,7 @@ Transform:
   m_GameObject: {fileID: 790178943}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.02, y: 1.2364088, z: -0.829998}
+  m_LocalPosition: {x: -0.02, y: 1.2364088, z: -0.5}
   m_LocalScale: {x: 0.5154639, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

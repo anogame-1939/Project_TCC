@@ -318,7 +318,6 @@ GameObject:
   - component: {fileID: 8761270284036521345}
   - component: {fileID: 300162142529563162}
   - component: {fileID: 1397259935253161434}
-  - component: {fileID: 4955139561132355029}
   - component: {fileID: 6490954179236640322}
   - component: {fileID: 2275634345151545987}
   m_Layer: 14
@@ -901,30 +900,6 @@ MonoBehaviour:
   patrol: {fileID: 296865261083013438}
   defaultEncounterTTL: 2
   defaultInvestigateTTL: 3
---- !u!114 &4955139561132355029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a98eaf752614344a957f0788f398eda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movePriority: 1000
-  turnPriority: 1000
-  _isActive: 0
-  moveBehavior: 0
-  moveSpeed: 2
-  constantDirection: {x: 0, y: 0, z: 0}
-  followTarget: {fileID: 0}
-  targetPoint: {x: -83, y: 0, z: -59.98}
-  stopDistance: 0.05
-  turnBehavior: 1
-  lookAtTarget: {fileID: 0}
-  fixedAngle: 0
 --- !u!114 &6490954179236640322
 MonoBehaviour:
   m_ObjectHideFlags: 0

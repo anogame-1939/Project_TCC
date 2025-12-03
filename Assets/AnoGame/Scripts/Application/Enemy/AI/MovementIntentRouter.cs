@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.TinyCharacterController.Control;
+using UnityEngine.AI;
 
 namespace AnoGame.Application.Enemy.AI
 {
@@ -32,11 +33,16 @@ namespace AnoGame.Application.Enemy.AI
 
         private void FixedUpdate()
         {
+            Debug.Log($"[MovementIntentRouter] FixedUpdate");
+            Debug.Log($"[MovementIntentRouter] moveNavmeshControl: {moveNavmeshControl}");
+            Debug.Log($"[MovementIntentRouter] _providers.Count: {_providers.Count}");
+            // Debug.Log($"[MovementIntentRouter] GetComponent<NavMeshAgent>().enabled: {GetComponent<NavMeshAgent>().enabled}");
             if (moveNavmeshControl == null || _providers.Count == 0) return;
 
             // 優先度降順で走査
             foreach (var p in _providers.OrderByDescending(pv => pv.Priority))
             {
+                Debug.Log($"[MovementIntentRouter] Provider: {p.GetType().Name}, Priority: {p.Priority}, IsActive: {p.IsActive()}");
                 if (!p.IsActive()) continue;
 
                 // Debug.Log($"[MovementIntentRouter] Active Provider found: {p.GetType().Name}, Priority: {p.Priority}");
