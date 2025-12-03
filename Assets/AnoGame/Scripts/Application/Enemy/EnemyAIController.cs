@@ -13,7 +13,7 @@ using Unity.TinyCharacterController.Brain; // ★ 追加: CancellationToken 用
 
 namespace AnoGame.Application.Enmemy.Control
 {
-    public class EnemyAIController : MonoBehaviour, IForcedMoveController
+    public class EnemyAIController : MonoBehaviour
     {
         // 先頭のフィールド群に追加
         [SerializeField] private CharacterBrain characterBrain;

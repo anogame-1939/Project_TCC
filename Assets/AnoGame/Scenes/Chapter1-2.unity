@@ -1001,8 +1001,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: bcf6524ce6451f34cb7106d0c00da9a5, type: 2}
   m_PivotOffset: {x: 0.81, y: 0, z: 0}
-  m_AmplitudeGain: 1
-  m_FrequencyGain: 1
+  m_AmplitudeGain: 0
+  m_FrequencyGain: 0
   mNoiseOffsets: {x: 637.52435, y: 878.00745, z: -453.87424}
 --- !u!1 &88049815
 GameObject:
@@ -8312,8 +8312,8 @@ GameObject:
   - component: {fileID: 284172277}
   - component: {fileID: 284172276}
   - component: {fileID: 284172275}
-  - component: {fileID: 284172274}
   - component: {fileID: 284172273}
+  - component: {fileID: 284172274}
   - component: {fileID: 284172282}
   - component: {fileID: 284172283}
   - component: {fileID: 284172284}
@@ -8397,6 +8397,10 @@ PlayableDirector:
     value: {fileID: 338764139}
   - key: {fileID: -7535183107387217322, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
     value: {fileID: 89539917}
+  - key: {fileID: -5666620178435591413, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
+    value: {fileID: 297600888}
+  - key: {fileID: 6505799321644411476, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
+    value: {fileID: 284172282}
   m_ExposedReferences:
     m_References:
     - fb30efc9092110645b046df9dec71d31: {fileID: 2018438733}
@@ -8757,6 +8761,7 @@ MonoBehaviour:
   m_Events:
     m_Signals:
     - {fileID: 11400000, guid: b1f3c4dbcb41f4a4abe8fb30dc1aee15, type: 2}
+    - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -8767,6 +8772,20 @@ MonoBehaviour:
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 297600889}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -8896,6 +8915,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f35797485bdf74196c420866249769, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &297600889 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5601170780326599541, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 297600886}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &305497915
 GameObject:
   m_ObjectHideFlags: 0

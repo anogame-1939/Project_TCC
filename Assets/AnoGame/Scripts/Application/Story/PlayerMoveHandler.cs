@@ -5,52 +5,19 @@ namespace AnoGame.Application.Story
 {
     public class PlayerMoveHandler : MonoBehaviour
     {
-        /// <summary>
-        /// シーン上にあるすべての ForcedMovementController のうち、
-        /// タグが "Player" かつアクティブで有効なものを探して返す。
-        /// 見つからなければ null を返す。
-        /// </summary>
-        private ForcedMovementController FindActivePlayerForcedMover()
-        {
-            // シーン上にあるすべての ForcedMovementController を取得
-            ForcedMovementController[] allControllers = FindObjectsOfType<ForcedMovementController>();
-
-            // その中から、タグが "Player" で、アクティブ＆有効なものを探す
-            foreach (var controller in allControllers)
-            {
-                if (controller.CompareTag("Player") && controller.isActiveAndEnabled)
-                {
-                    Debug.Log($"Player ForcedMover Found : {controller.gameObject.name}");
-                    return controller;
-                }
-            }
-
-            // 見つからなかった場合は null を返す
-            return null;
-        }
+        // TODO: InjectでPlayerControlを取得して、強制移動モードを制御する
 
         public void EnableForceMode()
         {
-            ForcedMovementController playerForcedTransformMover = FindActivePlayerForcedMover();
-            if (playerForcedTransformMover == null) return;
-
-            playerForcedTransformMover.EnableForceMode();
+            // TODO: EventLockControlを取得して、ForceModeを有効にする
         }
 
         public void DisableForceMode()
         {
-            ForcedMovementController playerForcedTransformMover = FindActivePlayerForcedMover();
-            if (playerForcedTransformMover == null) return;
-
-            playerForcedTransformMover.DisableForceMode();
         }
 
         private void MoveToTarget(GameObject target, bool doBackstep = false)
         {
-            ForcedMovementController playerForcedTransformMover = FindActivePlayerForcedMover();
-            if (playerForcedTransformMover == null) return;
-
-            playerForcedTransformMover.ForceMoveTo(target.transform.position, doBackstep);
         }
 
         public void MoveToTarget(GameObject target)
@@ -67,10 +34,6 @@ namespace AnoGame.Application.Story
 
         public void SetAngle(float angle)
         {
-            ForcedMovementController forcedMovementController = FindActivePlayerForcedMover();
-            if (forcedMovementController == null) return;
-
-            forcedMovementController.SetAngle(angle);
         }
 
         public void FaceToTarget(GameObject target)

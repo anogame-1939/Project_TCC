@@ -14,7 +14,7 @@ namespace AnoGame.Application.Player.Control
         IMove, ITurn, IPriorityLifecycle<IMove>, IPriorityLifecycle<ITurn>
     {
         private IWarp _warp;
-        
+
         [Header("Priority (他のMove/Turnより高く)")]
         [SerializeField] int movePriority = 1000;
         [SerializeField] int turnPriority = 1000;
@@ -34,10 +34,11 @@ namespace AnoGame.Application.Player.Control
         [SerializeField, Min(0f)] float stopDistance = 0.05f;
 
         // ===== Turn 設定 =====
-        public enum TurnBehavior { Keep, FaceMoveDirection, FaceTarget }
+        public enum TurnBehavior { Keep, FaceMoveDirection, FaceTarget, FaceOppositeMoveDirection, FixedAngle }
         [Header("Turn")]
         [SerializeField] TurnBehavior turnBehavior = TurnBehavior.FaceMoveDirection;
         [SerializeField] Transform lookAtTarget;
+        [SerializeField] float fixedAngle;
 
         // ---- IMove / ITurn 優先度 ----
         int IPriority<IMove>.Priority => _isActive ? movePriority : 0;
@@ -135,6 +136,19 @@ namespace AnoGame.Application.Player.Control
                             var angle = Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg;
                             return angle;
                         }
+
+                    case TurnBehavior.FaceOppositeMoveDirection:
+                        {
+                            var v = _lastVelocity;
+                            v.y = 0f;
+                            if (v.sqrMagnitude < 0.0001f) return transform.eulerAngles.y;
+                            // 逆方向なので -v
+                            var angle = Mathf.Atan2(-v.x, -v.z) * Mathf.Rad2Deg;
+                            return angle;
+                        }
+
+                    case TurnBehavior.FixedAngle:
+                        return fixedAngle;
                 }
                 return transform.eulerAngles.y;
             }
@@ -147,13 +161,15 @@ namespace AnoGame.Application.Player.Control
             TryGetComponent(out _warp);
         }
 
-        public bool TryWarp(Vector3 position) {
+        public bool TryWarp(Vector3 position)
+        {
             if (_warp == null) return false;
             _warp.Warp(position);
             return true;
         }
 
-        public bool TryWarp(Vector3 position, Vector3 faceDir) {
+        public bool TryWarp(Vector3 position, Vector3 faceDir)
+        {
             if (_warp == null) return false;
             _warp.Warp(position, faceDir);   // faceDir==Vector3.zero なら現向き維持（BrainBase仕様）
             return true;
@@ -236,7 +252,9 @@ namespace AnoGame.Application.Player.Control
 
         public void LookKeep() => turnBehavior = TurnBehavior.Keep;
         public void LookFaceMove() => turnBehavior = TurnBehavior.FaceMoveDirection;
+        public void LookFaceOppositeMove() => turnBehavior = TurnBehavior.FaceOppositeMoveDirection;
         public void LookAt(Transform t) { lookAtTarget = t; turnBehavior = TurnBehavior.FaceTarget; }
+        public void TurnToAngle(float angle) { fixedAngle = angle; turnBehavior = TurnBehavior.FixedAngle; }
 
         // ---- Context Menu（右クリック/︙メニューから即操作） ----
         [ContextMenu("EventLock/Begin Lock")] void Ctx_Begin() => BeginLock();
@@ -251,7 +269,7 @@ namespace AnoGame.Application.Player.Control
 
         // ---- 内部保持 ----
         private Vector3 _lastVelocity = Vector3.zero;
-        
+
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.cyan;

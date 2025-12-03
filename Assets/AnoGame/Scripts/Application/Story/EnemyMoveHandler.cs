@@ -7,69 +7,78 @@ namespace AnoGame.Application.Story
 {
     public class EnemyMoveHandler : MonoBehaviour
     {
-        // ---------------------------------------------------------
-        // まず、条件に合う ForcedMovementController を探すメソッドを用意
-        // ---------------------------------------------------------
-        private ForcedMovementController FindActiveEnemyForcedMover()
+        public void StartChase()
         {
-            // シーン上にあるすべての ForcedMovementController を取得
-            ForcedMovementController[] allControllers = FindObjectsOfType<ForcedMovementController>();
-            
-            // その中から、下記条件を満たす最初のものを返す
-            //  - ゲームオブジェクトのタグが "EnemyTag"
-            //  - ゲームオブジェクト自体がアクティブ
-            //  - スクリプトが有効 (isActiveAndEnabled)
-            foreach (var controller in allControllers)
+            // EnemySpawnManager.Instance.SetupToStoryMode();
+
+            var enemy = EnemySpawnManager.Instance.CurrentEnemyInstance;
+            if (enemy != null)
             {
-                if (controller.CompareTag("Enemy") && controller.isActiveAndEnabled)
+                var eventLock = enemy.GetComponent<EventLockControl>();
+                if (eventLock != null)
                 {
-                    Debug.Log($"Enemy ForcedMover Found : {controller.gameObject.name}");
-                    return controller;
+                    eventLock.EndLock();
+                }
+
+                var ai = enemy.GetComponent<EnemyAIController>();
+                if (ai != null)
+                {
+                    ai.SetChasing(true);
+                    ai.SetStoryMode(false);
                 }
             }
-
-            // 見つからなかった場合は null を返す
-            return null;
         }
 
         // ---------------------------------------------------------
-        // 以降、EnableForceMode / DisableForceMode / MoveToTarget 等で
-        // 上記のメソッドを使って取得したものを使うように変更
+        // EventLockControlを探す
         // ---------------------------------------------------------
-
-        public void EnableForceMode()
+        private EventLockControl FindActiveEnemyEventLock()
         {
-            // ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
-            // if (enemyForcedMover == null) return;
+            var enemy = EnemySpawnManager.Instance.CurrentEnemyInstance;
+            if (enemy != null && enemy.activeInHierarchy)
+            {
+                return enemy.GetComponent<EventLockControl>();
+            }
 
-            // enemyForcedMover.EnableForceMode();
-            // enemyForcedMover.enabled = false;
-            // enemyForcedMover.GetComponent<EnemyAIController>().enabled = false;
-
-            // EnemySpawnManager.Instance.SetupToStoryMode();
-
+            // Fallback
+            var enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach (var e in enemies)
+            {
+                if (e.activeInHierarchy)
+                {
+                    var ctrl = e.GetComponent<EventLockControl>();
+                    if (ctrl != null && ctrl.isActiveAndEnabled)
+                    {
+                        return ctrl;
+                    }
+                }
+            }
+            return null;
         }
 
         public void DisableForceMode()
         {
-            ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
-            if (enemyForcedMover == null) return;
-
-            // enemyForcedMover.DisableForceMode();
-            enemyForcedMover.enabled = true;
-            enemyForcedMover.GetComponent<EnemyAIController>().SetChasing(true);
-
-            // 敵の移動を通常モードに戻す
-            // NOTE:雑にいれたけど問題があれば見直す
-            // EnemySpawnManager.Instance.SetupToNormalMode();
+            StartChase();
         }
 
         private void MoveToTarget(GameObject target, bool doBackstep = false)
         {
-            ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
-            if (enemyForcedMover == null) return;
+            EventLockControl ctrl = FindActiveEnemyEventLock();
+            if (ctrl == null || target == null) return;
 
-            enemyForcedMover.ForceMoveTo(target.transform.position, doBackstep);
+            ctrl.BeginLock();
+
+            if (doBackstep)
+            {
+                // Backstep: Move to target but face opposite to movement (Moonwalk)
+                ctrl.MoveToPoint(target.transform.position, 5f);
+                ctrl.LookFaceOppositeMove();
+            }
+            else
+            {
+                ctrl.MoveToPoint(target.transform.position, 5f);
+                ctrl.LookFaceMove();
+            }
         }
 
         public void MoveToTarget(GameObject target)
@@ -84,18 +93,16 @@ namespace AnoGame.Application.Story
 
         public void SetAngle(float angle)
         {
-            ForcedMovementController enemyForcedMover = FindActiveEnemyForcedMover();
-            if (enemyForcedMover == null) return;
+            EventLockControl ctrl = FindActiveEnemyEventLock();
+            if (ctrl == null) return;
 
-            enemyForcedMover.SetAngle(angle);
+            ctrl.BeginLock();
+            ctrl.TurnToAngle(angle);
         }
 
         public void FaceToTarget(GameObject target)
         {
-            // こちらは PlayerActionController を使う例のままですが、
-            // 同じ要領で EnemyTag かどうかを判定して探したい場合は
-            // 別途 FindObjectsOfType<PlayerActionController>() などで
-            // フィルタリングする実装に変更可能です。
+            // PlayerActionController logic remains for Player
             PlayerActionController playerForcedTransformMover = FindAnyObjectByType<PlayerActionController>();
             if (playerForcedTransformMover == null) return;
 

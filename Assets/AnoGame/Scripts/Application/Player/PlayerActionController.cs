@@ -8,19 +8,10 @@ using AnoGame.Application.Input;  // IInputActionProvider の名前空間
 
 namespace AnoGame.Application.Player.Control
 {
-    /// <summary>
-    /// 強制移動の開始・終了を受け取るためのインターフェース
-    /// </summary>
-    public interface IForcedMoveController
-    {
-        void StopChasing();
-        void StartChasing();
-    }
-
     [AddComponentMenu("Player/" + nameof(PlayerActionController))]
-    public class PlayerActionController : MonoBehaviour, IForcedMoveController
+    public class PlayerActionController : MonoBehaviour
     {
-        [SerializeField] private CharacterController _cc; 
+        [SerializeField] private CharacterController _cc;
         [SerializeField] private MoveControl moveControl;
         [SerializeField] private Animator animator;
 
