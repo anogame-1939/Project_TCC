@@ -270,6 +270,14 @@ namespace AnoGame.Application.Player.Control
         // ---- 内部保持 ----
         private Vector3 _lastVelocity = Vector3.zero;
 
+        private void Update()
+        {
+            if (_isActive)
+            {
+                Debug.Log($"[EventLockControl] Update - IsActive: {_isActive}, MoveBehavior: {moveBehavior}, Priority(Move): {((IPriority<IMove>)this).Priority}, Priority(Turn): {((IPriority<ITurn>)this).Priority}");
+            }
+        }
+
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.cyan;

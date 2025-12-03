@@ -246,23 +246,50 @@ namespace AnoGame.Application.Enmemy.Control
         void FixedUpdate()
         {
             SamplePlayerMotion();
-            if (this.IsStoryMode) return;
-            if (GameStateManager.Instance.CurrentState == GameState.GameOver) return;
-            if (GameStateManager.Instance.CurrentState == GameState.InGameEvent) return;
+            if (this.IsStoryMode)
+            {
+                // Debug.Log("[EnemyAIController] FixedUpdate skipped due to IsStoryMode");
+                return;
+            }
+            if (GameStateManager.Instance.CurrentState == GameState.GameOver)
+            {
+                // Debug.Log("[EnemyAIController] FixedUpdate skipped due to GameOver");
+                return;
+            }
+            if (GameStateManager.Instance.CurrentState == GameState.InGameEvent)
+            {
+                // Debug.Log("[EnemyAIController] FixedUpdate skipped due to InGameEvent");
+                return;
+            }
 
             // ★ ダッシュ中 は通常AI処理をスキップ
-            if (_isDashing) return;
+            if (_isDashing)
+            {
+                // Debug.Log("[EnemyAIController] FixedUpdate skipped due to IsDashing");
+                return;
+            }
 
             if (behavior == BehaviorMode.ChasePlayer)
             {
                 // 既存のチェイスロジック
-                if (!isChasing) return;
+                if (!isChasing)
+                {
+                    // Debug.Log("[EnemyAIController] Not chasing (isChasing=false)");
+                    return;
+                }
 
                 if (player == null)
                     player = GameObject.FindWithTag(playerTag);
 
                 if (player != null)
+                {
+                    // Debug.Log($"[EnemyAIController] Setting target position to {player.transform.position}");
                     moveControl.SetTargetPosition(player.transform.position);
+                }
+                else
+                {
+                    Debug.LogWarning("[EnemyAIController] Player not found!");
+                }
 
                 // ★ 追加：見た目の向きを合わせる（NavMeshAgentは回さない）
                 if (controlFacingWhileChasing)
@@ -273,6 +300,7 @@ namespace AnoGame.Application.Enmemy.Control
                 UpdatePatrolLogic();
             }
         }
+
 
         private void UpdatePatrolLogic()
         {
