@@ -317,10 +317,10 @@ GameObject:
   - component: {fileID: 296865261083013438}
   - component: {fileID: 8761270284036521345}
   - component: {fileID: 300162142529563162}
-  - component: {fileID: 1397259935253161434}
   - component: {fileID: 6490954179236640322}
-  - component: {fileID: 2275634345151545987}
   - component: {fileID: 5260855969895964056}
+  - component: {fileID: 1796915948952402702}
+  - component: {fileID: 626229431214549771}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -882,25 +882,6 @@ MonoBehaviour:
   areaMask: -1
   defaultTTL: 3
   returnToAnchor: {fileID: 8761270284036521345}
---- !u!114 &1397259935253161434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a828bf9d441bffc49a8de16f39abfdcc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventLock: {fileID: 6890212920349990426}
-  chase: {fileID: 3905562830400558746}
-  investigate: {fileID: 300162142529563162}
-  ret: {fileID: 8761270284036521345}
-  patrol: {fileID: 296865261083013438}
-  defaultEncounterTTL: 2
-  defaultInvestigateTTL: 3
 --- !u!114 &6490954179236640322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -924,20 +905,6 @@ MonoBehaviour:
   emaHalfLife: 0
   planarOnly: 1
   useFixedUpdate: 1
---- !u!114 &2275634345151545987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e609eb0391d7fca42aa94ce467e76173, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  director: {fileID: 1397259935253161434}
-  reacquireWindow: 0.6
 --- !u!114 &5260855969895964056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -945,7 +912,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e60144648c1dd834a862d6986509a798, type: 3}
   m_Name: 
@@ -959,7 +926,40 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 1
-  director: {fileID: 1397259935253161434}
+  director: {fileID: 0}
+--- !u!114 &1796915948952402702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b94ab87740e354fb5f68f949d83356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventLock: {fileID: 6890212920349990426}
+  chase: {fileID: 3905562830400558746}
+  investigate: {fileID: 300162142529563162}
+  ret: {fileID: 8761270284036521345}
+  patrol: {fileID: 296865261083013438}
+  defaultEncounterTTL: 2
+  defaultInvestigateTTL: 3
+--- !u!114 &626229431214549771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d396a3e9885b8a45941dd9a94ed61f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  director: {fileID: 1796915948952402702}
+  targetPlayer: {fileID: 0}
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0

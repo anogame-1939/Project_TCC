@@ -13,12 +13,12 @@ namespace AnoGame.Application.Enemy.AI
         [SerializeField] private LayerMask obstacleLayer;
 
         [Header("References")]
-        [SerializeField] private EncounterDirector director;
+        [SerializeField] private EnemyBehaviorCoordinator director;
 
         private void Awake()
         {
             if (eyeTransform == null) eyeTransform = transform;
-            if (director == null) director = GetComponentInParent<EncounterDirector>();
+            if (director == null) director = GetComponentInParent<EnemyBehaviorCoordinator>();
         }
 
         private void FixedUpdate()
@@ -39,6 +39,12 @@ namespace AnoGame.Application.Enemy.AI
                     float distToTarget = Vector3.Distance(eyeTransform.position, target.transform.position);
                     if (!Physics.Raycast(eyeTransform.position, dirToTarget, distToTarget, obstacleLayer))
                     {
+                        // Check if target is hidden
+                        if (target.TryGetComponent<IVisibleTarget>(out var visibleTarget) && visibleTarget.IsHidden)
+                        {
+                            continue;
+                        }
+
                         // Player found!
                         if (director != null)
                         {

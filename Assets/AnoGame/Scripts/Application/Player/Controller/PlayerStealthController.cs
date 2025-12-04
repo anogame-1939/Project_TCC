@@ -1,4 +1,5 @@
 using AnoGame.Application.Direction;
+using AnoGame.Application.Enemy.AI;
 using AnoGame.Application.Player.Interaction;
 using UniRx;
 using UnityEngine;
@@ -7,11 +8,11 @@ using UnityEngine.Events;
 namespace AnoGame.Application.Player.Controller
 {
     // UnityEvent の引数付き版（インスペクタで使いやすくするためのラッパ）
-    [System.Serializable] public class TransformEvent : UnityEvent<Transform> {}
-    [System.Serializable] public class HideSpotEvent : UnityEvent<HideSpotZone> {}
-    [System.Serializable] public class CancelReasonEvent : UnityEvent<CancelReason> {}
+    [System.Serializable] public class TransformEvent : UnityEvent<Transform> { }
+    [System.Serializable] public class HideSpotEvent : UnityEvent<HideSpotZone> { }
+    [System.Serializable] public class CancelReasonEvent : UnityEvent<CancelReason> { }
 
-    public class PlayerStealthController : MonoBehaviour
+    public class PlayerStealthController : MonoBehaviour, IVisibleTarget
     {
         private readonly CompositeDisposable _disposables = new();
 
@@ -28,6 +29,10 @@ namespace AnoGame.Application.Player.Controller
         // 同フレーム内の二重発火を抑止するためのフラグ
         private bool _hideCanceledThisFrame;
 
+        // IVisibleTarget implementation
+        public Transform GetTransform() => transform;
+        public bool IsHidden { get; private set; }
+
         private void OnEnable()
         {
             MessageBroker.Default
@@ -40,6 +45,8 @@ namespace AnoGame.Application.Player.Controller
                     onHideStarted?.Invoke();
                     onHideStartedActor?.Invoke(msg.Actor);
                     onHideStartedSpot?.Invoke(msg.Spot);
+
+                    IsHidden = true;
 
                 })
                 .AddTo(_disposables);
@@ -56,6 +63,8 @@ namespace AnoGame.Application.Player.Controller
                     onHideCanceled?.Invoke();
                     onHideCanceledActor?.Invoke(e.Actor);
                     onHideCanceledReason?.Invoke(e.Reason);
+
+                    IsHidden = false;
                 })
                 .AddTo(_disposables);
 
@@ -74,6 +83,8 @@ namespace AnoGame.Application.Player.Controller
                     onHideCanceled?.Invoke();
                     onHideCanceledActor?.Invoke(e.Actor);
                     onHideCanceledReason?.Invoke(e.Reason);
+
+                    IsHidden = false;
                 })
                 .AddTo(_disposables);
         }

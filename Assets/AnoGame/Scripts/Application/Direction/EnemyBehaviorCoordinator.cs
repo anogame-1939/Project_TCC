@@ -12,7 +12,7 @@ namespace AnoGame.Application.Direction
     // ===================================
     [RequireComponent(typeof(MovementIntentRouter))]
     [ComponentDescription("敵 AI の挙動切替をまとめて管理する Director\n - 各 IntentProvider の Activate/Deactivate を呼ぶだけ\n - Timeline からの呼び出しも想定")]
-    public sealed class EncounterDirector : MonoBehaviour
+    public sealed class EnemyBehaviorCoordinator : MonoBehaviour
     {
         [SerializeField] EventLockIntentProvider eventLock;
         [SerializeField] ChaseIntentProvider chase;
@@ -23,6 +23,9 @@ namespace AnoGame.Application.Direction
         [Header("Defaults")]
         [SerializeField] float defaultEncounterTTL = 2.0f;
         [SerializeField] float defaultInvestigateTTL = 3.0f;
+
+        private enum State { Patrol, Chase, Investigate }
+        private State _currentState = State.Patrol;
 
         void Awake()
         {
@@ -36,9 +39,9 @@ namespace AnoGame.Application.Direction
                 ret.ActivateToNearest();   // ★ ここが Deactivate ではなく Activate
                                            // 巡回は常時ONでも良いが、明示的にONにしておくと安心
                 patrol.SetActive(true);
+
+                _currentState = State.Patrol;
             };
-
-
         }
 
         // === Timeline から呼ぶ（SignalReceiver の UnityEvent 1本でOK） ===
@@ -49,11 +52,17 @@ namespace AnoGame.Application.Direction
         {
             eventLock.Deactivate();       // 内部で NavMesh 再開＋ELock解除
             chase.SetActive(true);
+            _currentState = State.Chase;
         }
 
         // === ゲーム側（Perception等）から呼ぶ ===
         public void NotifyLost(Vector3 lastSeen)
         {
+            if (_currentState == State.Investigate) return;
+
+            Debug.Log("見失った！捜索モードへ移行");
+            _currentState = State.Investigate;
+
             chase.SetActive(false);                 // ★最重要：ChaseをOFF
             ret.Deactivate();
             investigate.Activate(lastSeen, defaultInvestigateTTL);
@@ -62,9 +71,26 @@ namespace AnoGame.Application.Direction
 
         public void NotifyFound()
         {
+            if (_currentState == State.Chase) return;
+
+            Debug.Log("発見！追跡開始");
+            _currentState = State.Chase;
+
             investigate.Deactivate();
             ret.Deactivate();
             chase.SetActive(true);                  // 再露見＝追跡へ
+        }
+
+        public void NotifyNoiseHeard(Vector3 noisePosition)
+        {
+            if (_currentState == State.Chase) return;
+
+            Debug.Log($"音を感知！ {noisePosition} を調査しに行きます");
+            _currentState = State.Investigate;
+
+            chase.SetActive(false);
+            ret.Deactivate();
+            investigate.Activate(noisePosition, defaultInvestigateTTL);
         }
 
         // 任意：強制中断
@@ -74,6 +100,7 @@ namespace AnoGame.Application.Direction
             investigate.Deactivate();
             ret.Deactivate();
             chase.SetActive(false);
+            _currentState = State.Patrol;
         }
     }
 }

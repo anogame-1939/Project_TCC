@@ -11,7 +11,7 @@ namespace AnoGame.Scripts.Editor.Attributes
     // we'll target specific classes or use a base class approach if needed later.
     // For now, per the plan, we target EncounterDirector.
 
-    [CustomEditor(typeof(EncounterDirector))]
+    [CustomEditor(typeof(EnemyBehaviorCoordinator))]
     public class ComponentDescriptionEditor : UnityEditor.Editor
     {
         private string _description;
