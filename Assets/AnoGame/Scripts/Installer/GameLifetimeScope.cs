@@ -16,6 +16,7 @@ using AnoGame.Application.Settings;
 using AnoGame.Apllication.Direction;
 using AnoGame.Application.Player.Control;
 using AnoGame.Application.Direction.Glitch;
+using AnoGame.Application.Enemy.AI;
 
 namespace AnoGame.Application.Core
 {
@@ -84,6 +85,19 @@ namespace AnoGame.Application.Core
 
             builder.RegisterEntryPoint<LevelInitializer>();
 
+            // PatrolRouteRegistryの登録
+            var patrolRegistry = FindAnyObjectByType<PatrolRouteRegistry>();
+            if (patrolRegistry != null)
+            {
+                builder.RegisterInstance<IPatrolRouteRegistry>(patrolRegistry);
+            }
+
+            // EnemySpawnManagerへのInject
+            var spawnManager = FindAnyObjectByType<EnemySpawnManager>();
+            if (spawnManager != null)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(spawnManager));
+            }
 
         }
     }

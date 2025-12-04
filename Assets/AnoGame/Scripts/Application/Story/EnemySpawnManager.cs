@@ -1,5 +1,7 @@
 using UnityEngine;
 using AnoGame.Application.Core;
+using AnoGame.Application.Enemy.AI;
+using UnityEngine.Splines;
 
 namespace AnoGame.Application.Enemy
 {
@@ -8,6 +10,14 @@ namespace AnoGame.Application.Enemy
         [SerializeField]
         private GameObject _currentEnemyInstance;
         public GameObject CurrentEnemyInstance => _currentEnemyInstance;
+
+        private IPatrolRouteRegistry _patrolRouteRegistry;
+
+        [VContainer.Inject]
+        public void Construct(IPatrolRouteRegistry registry)
+        {
+            _patrolRouteRegistry = registry;
+        }
 
         public void Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
         {
@@ -21,6 +31,20 @@ namespace AnoGame.Application.Enemy
             }
 
             _currentEnemyInstance = Instantiate(prefab, position, rotation);
+
+            // パトロールルートの注入
+            if (_patrolRouteRegistry != null)
+            {
+                var spline = _patrolRouteRegistry.GetPatrolRoute();
+                if (spline != null)
+                {
+                    var returnToAnchor = _currentEnemyInstance.GetComponentInChildren<AnoGame.Application.Enemy.AI.ReturnToAnchorIntentProvider>();
+                    if (returnToAnchor != null) returnToAnchor.Initialize(spline);
+
+                    var patrolSpline = _currentEnemyInstance.GetComponentInChildren<AnoGame.Application.Enemy.AI.PatrolSplineIntentProvider>();
+                    if (patrolSpline != null) patrolSpline.Initialize(spline);
+                }
+            }
         }
     }
 }

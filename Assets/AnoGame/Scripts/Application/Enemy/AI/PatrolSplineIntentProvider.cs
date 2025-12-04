@@ -21,6 +21,11 @@ namespace AnoGame.Application.Enemy.AI
 
         public int Priority => priority;
 
+        public void Initialize(SplineContainer container)
+        {
+            splineContainer = container;
+        }
+
         private bool TryGetKnotWorld(int index, out Vector3 pos)
         {
             pos = default;
@@ -47,7 +52,7 @@ namespace AnoGame.Application.Enemy.AI
 
             // 到達チェック（平面距離の最小実装）
             Vector3 a = transform.position; a.y = 0f;
-            Vector3 b = _currentWorld;     b.y = 0f;
+            Vector3 b = _currentWorld; b.y = 0f;
             if (Vector3.Distance(a, b) <= arriveDistance)
             {
                 int next = _currentIndex + 1;

@@ -20,6 +20,16 @@ namespace AnoGame.Application.Enemy.AI
 
         public int Priority => priority;
 
+        public void Initialize(SplineContainer container)
+        {
+            splineContainer = container;
+        }
+
+        void Update()
+        {
+            Debug.Log("Update:" + splineContainer);
+        }
+
         public void ActivateToNearest()
         {
             active = true;
@@ -36,7 +46,7 @@ namespace AnoGame.Application.Enemy.AI
 
             // 到達したら自動で解除（巡回など下位に明け渡す）
             Vector3 a = transform.position; a.y = 0f;
-            Vector3 b = _anchorWorld;       b.y = 0f;
+            Vector3 b = _anchorWorld; b.y = 0f;
             if (Vector3.Distance(a, b) <= arriveDistance)
             {
                 active = false;
