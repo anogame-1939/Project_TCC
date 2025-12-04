@@ -2,6 +2,7 @@
 using UnityEngine;
 using AnoGame.Application.Enemy.AI;
 
+
 namespace AnoGame.Application.Direction
 {
     // ===================================
@@ -10,6 +11,7 @@ namespace AnoGame.Application.Direction
     //  - Timeline からの呼び出しも想定
     // ===================================
     [RequireComponent(typeof(MovementIntentRouter))]
+    [ComponentDescription("敵 AI の挙動切替をまとめて管理する Director\n - 各 IntentProvider の Activate/Deactivate を呼ぶだけ\n - Timeline からの呼び出しも想定")]
     public sealed class EncounterDirector : MonoBehaviour
     {
         [SerializeField] EventLockIntentProvider eventLock;
@@ -22,22 +24,22 @@ namespace AnoGame.Application.Direction
         [SerializeField] float defaultEncounterTTL = 2.0f;
         [SerializeField] float defaultInvestigateTTL = 3.0f;
 
-    void Awake()
-    {
-        // Investigate 失敗→帰投開始
-        investigate.OnExpired += lastSeen =>
+        void Awake()
         {
-            Debug.Log("見失った！");
-            // まずChaseは止めておく（安全）
-            chase.SetActive(false);
-            // 帰投を開始（最近傍のKnotへ）
-            ret.ActivateToNearest();   // ★ ここが Deactivate ではなく Activate
-            // 巡回は常時ONでも良いが、明示的にONにしておくと安心
-            patrol.SetActive(true);
-        };
+            // Investigate 失敗→帰投開始
+            investigate.OnExpired += lastSeen =>
+            {
+                Debug.Log("見失った！");
+                // まずChaseは止めておく（安全）
+                chase.SetActive(false);
+                // 帰投を開始（最近傍のKnotへ）
+                ret.ActivateToNearest();   // ★ ここが Deactivate ではなく Activate
+                                           // 巡回は常時ONでも良いが、明示的にONにしておくと安心
+                patrol.SetActive(true);
+            };
 
-        
-    }
+
+        }
 
         // === Timeline から呼ぶ（SignalReceiver の UnityEvent 1本でOK） ===
         public void BeginEncounter(Transform focus) =>
