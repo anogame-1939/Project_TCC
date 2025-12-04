@@ -320,6 +320,7 @@ GameObject:
   - component: {fileID: 1397259935253161434}
   - component: {fileID: 6490954179236640322}
   - component: {fileID: 2275634345151545987}
+  - component: {fileID: 5260855969895964056}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -937,6 +938,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   director: {fileID: 1397259935253161434}
   reacquireWindow: 0.6
+--- !u!114 &5260855969895964056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e60144648c1dd834a862d6986509a798, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewDistance: 10
+  viewAngle: 90
+  eyeTransform: {fileID: 2365655322038012229}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  director: {fileID: 1397259935253161434}
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0
