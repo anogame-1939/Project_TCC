@@ -2,6 +2,8 @@ using UnityEngine;
 using AnoGame.Application.Core;
 using AnoGame.Application.Enemy.AI;
 using UnityEngine.Splines;
+using VContainer;
+using VContainer.Unity;
 
 namespace AnoGame.Application.Enemy
 {
@@ -12,11 +14,13 @@ namespace AnoGame.Application.Enemy
         public GameObject CurrentEnemyInstance => _currentEnemyInstance;
 
         private IPatrolRouteRegistry _patrolRouteRegistry;
+        private IObjectResolver _objectResolver;
 
-        [VContainer.Inject]
-        public void Construct(IPatrolRouteRegistry registry)
+        [Inject]
+        public void Construct(IPatrolRouteRegistry registry, IObjectResolver objectResolver)
         {
             _patrolRouteRegistry = registry;
+            _objectResolver = objectResolver;
         }
 
         public void Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
@@ -31,6 +35,7 @@ namespace AnoGame.Application.Enemy
             }
 
             _currentEnemyInstance = Instantiate(prefab, position, rotation);
+            _objectResolver.InjectGameObject(_currentEnemyInstance);
 
             // パトロールルートの注入
             if (_patrolRouteRegistry != null)

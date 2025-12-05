@@ -33,23 +33,18 @@ namespace AnoGame.Application.Enemy.AI
 
         private void FixedUpdate()
         {
-            Debug.Log($"[MovementIntentRouter] FixedUpdate");
-            Debug.Log($"[MovementIntentRouter] moveNavmeshControl: {moveNavmeshControl}");
-            Debug.Log($"[MovementIntentRouter] _providers.Count: {_providers.Count}");
             // Debug.Log($"[MovementIntentRouter] GetComponent<NavMeshAgent>().enabled: {GetComponent<NavMeshAgent>().enabled}");
             if (moveNavmeshControl == null || _providers.Count == 0) return;
 
             // 優先度降順で走査
             foreach (var p in _providers.OrderByDescending(pv => pv.Priority))
             {
-                Debug.Log($"[MovementIntentRouter] Provider: {p.GetType().Name}, Priority: {p.Priority}, IsActive: {p.IsActive()}");
                 if (!p.IsActive()) continue;
 
                 // Debug.Log($"[MovementIntentRouter] Active Provider found: {p.GetType().Name}, Priority: {p.Priority}");
 
                 if (p.TryGetGoal(out var goal) && goal.IsValid)
                 {
-                    Debug.Log($"[MovementIntentRouter] Selected Provider: {p.GetType().Name}, Priority: {p.Priority}, Goal: {goal.Position}");
                     moveNavmeshControl.SetTargetPosition(goal.Position);
                     // Facing を使って回頭を行いたい場合は MoveNavmeshControl 側で拡張
                     break;

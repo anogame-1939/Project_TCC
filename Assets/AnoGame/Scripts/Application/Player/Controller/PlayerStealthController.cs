@@ -4,6 +4,7 @@ using AnoGame.Application.Player.Interaction;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Events;
+using System;
 
 namespace AnoGame.Application.Player.Controller
 {
@@ -32,6 +33,7 @@ namespace AnoGame.Application.Player.Controller
         // IVisibleTarget implementation
         public Transform GetTransform() => transform;
         public bool IsHidden { get; private set; }
+        public IObservable<bool> IsHiddenObservable => this.ObserveEveryValueChanged(x => x.IsHidden);
 
         private void OnEnable()
         {

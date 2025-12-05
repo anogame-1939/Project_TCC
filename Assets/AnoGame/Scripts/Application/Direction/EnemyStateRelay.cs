@@ -1,32 +1,29 @@
-// AnoGame.Application.Direction
 using System;
 using AnoGame.Application.Player.Interaction;
 using AnoGame.Application.Player.Perception;
+using AnoGame.Application.Enemy.AI;
 using UniRx;
 using UnityEngine;
+using VContainer;
 
 namespace AnoGame.Application.Direction
 {
     public sealed class EnemyStateRelay : MonoBehaviour
     {
         [SerializeField] EnemyBehaviorCoordinator director;
-        [SerializeField] Player.Controller.PlayerStealthController targetPlayer;
+
+        [Inject]
+        IVisibleTarget targetPlayer;
 
         private void Start()
         {
-            if (targetPlayer == null)
-            {
-                // Try to find player if not assigned
-                targetPlayer = FindObjectOfType<Player.Controller.PlayerStealthController>();
-            }
-
             if (targetPlayer != null)
             {
-                targetPlayer.ObserveEveryValueChanged(p => p.IsHidden)
+                targetPlayer.IsHiddenObservable
                     .Where(isHidden => isHidden)
                     .Subscribe(_ =>
                     {
-                        director.NotifyLost(targetPlayer.transform.position);
+                        director.NotifyLost(targetPlayer.GetTransform().position);
                     })
                     .AddTo(this);
             }

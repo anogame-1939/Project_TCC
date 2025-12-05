@@ -198,7 +198,13 @@ namespace AnoGame.Application.Player
             D($"Input: Interact performed ({ctx.interaction?.GetType().Name ?? "Press"})");
 
             // セッション中は「出る」を最優先
-            if (_session?.IsActive == true) { _session.RequestExit(); return; }
+            if (_session?.IsActive == true)
+            {
+                _session.RequestExit();
+                UniRx.MessageBroker.Default.Publish(
+                    new HideCanceled(transform, CancelReason.UserRequest));
+                return;
+            }
 
             // 実行直前に再解決（離れてたら実行しないため）
             ResolveBest();

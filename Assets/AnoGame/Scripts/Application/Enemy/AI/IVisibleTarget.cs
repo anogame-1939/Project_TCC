@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 namespace AnoGame.Application.Enemy.AI
 {
@@ -6,5 +7,6 @@ namespace AnoGame.Application.Enemy.AI
     {
         Transform GetTransform();
         bool IsHidden { get; }
+        IObservable<bool> IsHiddenObservable { get; }
     }
 }

@@ -24,6 +24,8 @@ namespace AnoGame.Application.Core
     {
         [SerializeField]
         ItemDatabase itemDatabase;
+        [SerializeField]
+        GameObject player;
 
         [SerializeField] private EventLockControl _eventLockControl;
         [SerializeField] private CinematicBars mainBars;
@@ -82,7 +84,7 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(trigger));
             }
 
-
+            // 一見して何が貼っているいるのが分からないのはよくないかも
             builder.RegisterEntryPoint<LevelInitializer>();
 
             // PatrolRouteRegistryの登録
@@ -99,6 +101,14 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(spawnManager));
             }
 
+            if (player != null)
+            {
+                if (player.TryGetComponent<IVisibleTarget>(out var visibleTarget))
+                {
+                    Debug.Log("EnemyStateRelay: Player found");
+                    builder.RegisterInstance<IVisibleTarget>(visibleTarget);
+                }
+            }
         }
     }
 
