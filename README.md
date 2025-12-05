@@ -42,6 +42,25 @@ https://github.com/adobe-fonts/source-han-sans?tab=License-1-ov-file#License-1-o
 ## Project_TCCが開発されたUnityのバージョン
 * Unity 2023.2.0f1
 
+## プロジェクトのアーキテクチャ (Project Architecture)
+このゲームは、以下のシーン構成とLifetimeScopeによる依存関係注入（DI）フローで動作します。
+
+### 1. StartUp シーン
+- **役割**: アプリケーションの初期化と永続的なデータの管理。
+- **LifetimeScope**: `PersistLifetimeScope`
+  - 各種永続的な登録処理を行います。
+
+### 2. MainGame シーン
+- **読み込み**: StartUpシーンからマルチシーンとして読み込まれます。
+- **LifetimeScope**: `GameLifetimeScope`
+  - `PersistLifetimeScope` の内容を引き継ぎます。
+  - ゲームのメインループに必要な登録とInjectを行います。
+
+### 3. Stage / Chapter シーン
+- **読み込み**: MainGameシーンに入った後、マルチシーンとして読み込まれます。
+- **LifetimeScope**: `LevelLifetimeScope`
+  - ステージやチャプター固有の各種登録とInjectを行います。
+
 ## 概要
 
 * Tiny Character Controller (TCC) は、キャラクターの挙動を複数の小さなコンポーネントを組み合わせて実現するシステムです。
