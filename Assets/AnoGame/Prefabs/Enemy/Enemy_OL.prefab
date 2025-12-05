@@ -298,28 +298,28 @@ GameObject:
   - component: {fileID: 8237711469134898448}
   - component: {fileID: 6182930195229746077}
   - component: {fileID: 5085902700854131339}
+  - component: {fileID: 3027689247613781079}
   - component: {fileID: 1377983333902755919}
   - component: {fileID: 8311000640156970895}
+  - component: {fileID: 8545826120565574306}
+  - component: {fileID: -8439374336953332058}
   - component: {fileID: 2003501855128678836}
   - component: {fileID: 4183435016230059746}
-  - component: {fileID: 8545826120565574306}
   - component: {fileID: 1190557266045678637}
   - component: {fileID: -2493535432171837609}
-  - component: {fileID: 1555985007829630829}
   - component: {fileID: 1434583519645761743}
+  - component: {fileID: 1555985007829630829}
   - component: {fileID: 3949941853238961511}
-  - component: {fileID: -8439374336953332058}
+  - component: {fileID: 6490954179236640322}
   - component: {fileID: -6838671714581490994}
-  - component: {fileID: 3027689247613781079}
   - component: {fileID: 1431485421636668416}
   - component: {fileID: 3905562830400558746}
   - component: {fileID: 6890212920349990426}
   - component: {fileID: 296865261083013438}
   - component: {fileID: 8761270284036521345}
   - component: {fileID: 300162142529563162}
-  - component: {fileID: 6490954179236640322}
-  - component: {fileID: 5260855969895964056}
   - component: {fileID: 1796915948952402702}
+  - component: {fileID: 5260855969895964056}
   - component: {fileID: 626229431214549771}
   m_Layer: 14
   m_Name: Enemy_OL
@@ -430,6 +430,30 @@ MonoBehaviour:
   OnArrivedAtDestination:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3027689247613781079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a98eaf752614344a957f0788f398eda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movePriority: 1000
+  turnPriority: 1000
+  _isActive: 0
+  moveBehavior: 0
+  moveSpeed: 2
+  constantDirection: {x: 0, y: 0, z: 1}
+  followTarget: {fileID: 0}
+  targetPoint: {x: 0, y: 0, z: 0}
+  stopDistance: 0.05
+  turnBehavior: 1
+  lookAtTarget: {fileID: 0}
+  fixedAngle: 0
 --- !u!114 &1377983333902755919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,6 +491,49 @@ MonoBehaviour:
   _onLeave:
     m_PersistentCalls:
       m_Calls: []
+--- !u!135 &8545826120565574306
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.35
+  m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!195 &-8439374336953332058
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!114 &2003501855128678836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -494,27 +561,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isActive: 1
   damage: 1
---- !u!135 &8545826120565574306
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.35
-  m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!114 &1190557266045678637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,27 +660,6 @@ MonoBehaviour:
   hitDetector: {fileID: 4183435016230059746}
   lifespan: {fileID: 1190557266045678637}
   _eventData: {fileID: 0}
---- !u!114 &1555985007829630829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dc04127d71040648aa94c3883ba7730, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 7665162067455944546}
-  angleParamName: Angle
-  cameraTransform: {fileID: 0}
-  use2DFlip: 0
-  spriteRenderer: {fileID: 3983856807045630392}
-  characterBrain: {fileID: 6182930195229746077}
-  characterSettings: {fileID: 8237711469134898448}
-  useAngleSnap: 1
-  snapStep: 45
 --- !u!114 &1434583519645761743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,7 +667,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d021daeb50ad3c4581d6e25b0d55562, type: 3}
   m_Name: 
@@ -692,6 +717,27 @@ MonoBehaviour:
   zigzagFrequencyHz: 3
   controlFacingWhileChasing: 1
   chaseTurnSharpness: 8
+--- !u!114 &1555985007829630829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dc04127d71040648aa94c3883ba7730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 7665162067455944546}
+  angleParamName: Angle
+  cameraTransform: {fileID: 0}
+  use2DFlip: 0
+  spriteRenderer: {fileID: 3983856807045630392}
+  characterBrain: {fileID: 6182930195229746077}
+  characterSettings: {fileID: 8237711469134898448}
+  useAngleSnap: 1
+  snapStep: 45
 --- !u!114 &3949941853238961511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -712,28 +758,29 @@ MonoBehaviour:
   nearReturnDistance: 6
   autoRefreshTargets: 1
   refreshInterval: 1
---- !u!195 &-8439374336953332058
-NavMeshAgent:
+--- !u!114 &6490954179236640322
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
   m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08d351ef8c23e104694d04a2ab25da82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 7665162067455944546}
+  characterBrain: {fileID: 0}
+  navmeshControl: {fileID: 0}
+  rigidBody: {fileID: 0}
+  agent: {fileID: -8439374336953332058}
+  isMoveBoolParam: IsMove
+  locomotionSpeedParam: LocomotionSpeed
+  speedThreshold: 0.3
+  emaHalfLife: 0
+  planarOnly: 1
+  useFixedUpdate: 1
 --- !u!114 &-6838671714581490994
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -747,30 +794,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   splineContainer: {fileID: 0}
---- !u!114 &3027689247613781079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a98eaf752614344a957f0788f398eda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movePriority: 1000
-  turnPriority: 1000
-  _isActive: 0
-  moveBehavior: 0
-  moveSpeed: 2
-  constantDirection: {x: 0, y: 0, z: 1}
-  followTarget: {fileID: 0}
-  targetPoint: {x: 0, y: 0, z: 0}
-  stopDistance: 0.05
-  turnBehavior: 1
-  lookAtTarget: {fileID: 0}
-  fixedAngle: 0
 --- !u!114 &1431485421636668416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -882,7 +905,7 @@ MonoBehaviour:
   areaMask: -1
   defaultTTL: 3
   returnToAnchor: {fileID: 8761270284036521345}
---- !u!114 &6490954179236640322
+--- !u!114 &1796915948952402702
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -891,20 +914,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 7092537996067713669}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08d351ef8c23e104694d04a2ab25da82, type: 3}
+  m_Script: {fileID: 11500000, guid: 01b94ab87740e354fb5f68f949d83356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 7665162067455944546}
-  characterBrain: {fileID: 0}
-  navmeshControl: {fileID: 0}
-  rigidBody: {fileID: 0}
-  agent: {fileID: -8439374336953332058}
-  isMoveBoolParam: IsMove
-  locomotionSpeedParam: LocomotionSpeed
-  speedThreshold: 0.3
-  emaHalfLife: 0
-  planarOnly: 1
-  useFixedUpdate: 1
+  eventLock: {fileID: 6890212920349990426}
+  chase: {fileID: 3905562830400558746}
+  investigate: {fileID: 300162142529563162}
+  ret: {fileID: 8761270284036521345}
+  patrol: {fileID: 296865261083013438}
+  defaultEncounterTTL: 2
+  defaultInvestigateTTL: 3
 --- !u!114 &5260855969895964056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -927,25 +946,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   director: {fileID: 0}
---- !u!114 &1796915948952402702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01b94ab87740e354fb5f68f949d83356, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventLock: {fileID: 6890212920349990426}
-  chase: {fileID: 3905562830400558746}
-  investigate: {fileID: 300162142529563162}
-  ret: {fileID: 8761270284036521345}
-  patrol: {fileID: 296865261083013438}
-  defaultEncounterTTL: 2
-  defaultInvestigateTTL: 3
 --- !u!114 &626229431214549771
 MonoBehaviour:
   m_ObjectHideFlags: 0
