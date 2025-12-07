@@ -46,10 +46,7 @@ namespace AnoGame.Application.Player
         private bool _hasNearby;                           // 直近の「候補あり」状態
         private InteractionOption? _focused;               // 直近の“提示中/最有力” オプション
 
-        private IInteractionSession _session;
 
-        // HideRequested を受けたらセッション開始
-        private CompositeDisposable _disposables;
 
         [SerializeField] private bool debugLog = true;   // ★オン/オフ切替
         void D(string msg)
@@ -66,12 +63,6 @@ namespace AnoGame.Application.Player
 
         private void OnEnable()
         {
-            _disposables = new CompositeDisposable();
-            UniRx.MessageBroker.Default
-                .Receive<HideRequested>()
-                .Subscribe(e => StartHideSession(e.Actor, e.Spot))
-                .AddTo(_disposables);
-            
             _interact.performed += OnInteractPerformed;
             _cancel.performed += OnCancelPerformed; // ★追加
 
@@ -80,7 +71,7 @@ namespace AnoGame.Application.Player
 
         private void OnDisable()
         {
-            _disposables?.Dispose();
+
             _interact.performed -= OnInteractPerformed;
             _cancel.performed -= OnCancelPerformed; // ★追加
         }
@@ -96,19 +87,10 @@ namespace AnoGame.Application.Player
                 ResolveBest();
             }
 
-            if (_session?.IsActive == true && !_session.IsValid())
-                _session.RequestCancel();
+
         }
 
-        private void StartHideSession(Transform actor, HideSpotZone spot)
-        {
-            // 既存の継続処理があれば中断
-            _session?.RequestCancel();
 
-            var s = new AnoGame.Application.Player.Interaction.HideSession(actor, spot, dangerCheck: null);
-            _session = s;
-            s.RunAsync(this.GetCancellationTokenOnDestroy()).Forget();
-        }
 
         private void RefreshCandidates()
         {
@@ -186,25 +168,19 @@ namespace AnoGame.Application.Player
 
             // 変更: 変化チェックをやめて、毎回 Publish する
             _hasNearby = hasAny;
-            UniRx.MessageBroker.Default.Publish(new InteractablesNearbyChanged {
+            UniRx.MessageBroker.Default.Publish(new InteractablesNearbyChanged
+            {
                 Actor = transform,
                 HasAny = _hasNearby
             });
-            D($"Nearby -> { _hasNearby }");
+            D($"Nearby -> {_hasNearby}");
         }
 
         private void OnInteractPerformed(InputAction.CallbackContext ctx)
         {
             D($"Input: Interact performed ({ctx.interaction?.GetType().Name ?? "Press"})");
 
-            // セッション中は「出る」を最優先
-            if (_session?.IsActive == true)
-            {
-                _session.RequestExit();
-                UniRx.MessageBroker.Default.Publish(
-                    new HideCanceled(transform, CancelReason.UserRequest));
-                return;
-            }
+
 
             // 実行直前に再解決（離れてたら実行しないため）
             ResolveBest();

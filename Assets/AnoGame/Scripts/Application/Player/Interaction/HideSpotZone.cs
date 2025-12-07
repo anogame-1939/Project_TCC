@@ -19,10 +19,10 @@ namespace AnoGame.Application.Player.Interaction
         public HideSpotZone Spot;
         public HideRequested(Transform actor, HideSpotZone spot) { Actor = actor; Spot = spot; }
     }
-    
+
     public struct HideBegan { public Transform Actor; public HideSpotZone Spot; public HideBegan(Transform a, HideSpotZone s) { Actor = a; Spot = s; } }
-    public struct HideExited  { public Transform Actor; public HideSpotZone Spot; public HideExited(Transform a, HideSpotZone s){ Actor=a; Spot=s; } }
-    public struct HideCanceled{ public Transform Actor; public HideSpotZone Spot; public HideCanceled(Transform a, HideSpotZone s){ Actor=a; Spot=s; } }
+    public struct HideExited { public Transform Actor; public HideSpotZone Spot; public HideExited(Transform a, HideSpotZone s) { Actor = a; Spot = s; } }
+    public struct HideCanceled { public Transform Actor; public HideSpotZone Spot; public HideCanceled(Transform a, HideSpotZone s) { Actor = a; Spot = s; } }
 
     public class HideSpotZone : InteractableZone
     {
@@ -72,6 +72,22 @@ namespace AnoGame.Application.Player.Interaction
         // ===== 入口：オプション提示 =====
         public override bool TryBuildOptions(Transform actor, System.Collections.Generic.List<InteractionOption> buffer)
         {
+            // 既に自分が隠れているなら「出る」を提示
+            if (_occupant == actor)
+            {
+                Debug.Log("提示：出る");
+                buffer.Add(new InteractionOption
+                {
+                    Kind = InteractionKind.Hide,
+                    Prompt = "出る",
+                    Priority = 1000, // 隠れるより優先
+                    RequiresHold = false,
+                    Execute = () => ExecuteExit(actor).Forget(),
+                    IsContinuous = false
+                });
+                return true;
+            }
+
             if (!InDistance(actor) || !InAngle(actor) || !HasLoS(actor)) return false;
 
             buffer.Add(new InteractionOption
@@ -80,13 +96,32 @@ namespace AnoGame.Application.Player.Interaction
                 Prompt = prompt,
                 Priority = priority,
                 RequiresHold = false,
-                Execute = () =>
-                {
-                    EnterHide?.Invoke(); // 任意
-                    MessageBroker.Default.Publish(new HideRequested(actor, this));
-                }
+                Execute = () => ExecuteHide(actor).Forget()
             });
             return true;
+        }
+
+        private async UniTaskVoid ExecuteHide(Transform actor)
+        {
+            if (!TryReserve(actor)) return;
+
+            EnterHide?.Invoke(); // 任意
+            MessageBroker.Default.Publish(new HideRequested(actor, this));
+
+            var ct = this.GetCancellationTokenOnDestroy();
+
+            // 入口→隠れる
+            await MoveIntoAsync(actor, ct);
+            await EnterHideAsync(actor, ct);
+        }
+
+        private async UniTaskVoid ExecuteExit(Transform actor)
+        {
+            var ct = this.GetCancellationTokenOnDestroy();
+
+            // 退出
+            await ExitHideAsync(actor, ct);
+            Release(actor);
         }
 
         // ===== セッションから呼ばれるAPI =====
@@ -174,16 +209,22 @@ namespace AnoGame.Application.Player.Interaction
 
             OnExitHidden?.Invoke();
 
+            Debug.Log("退出開始");
             // 出口指定があればそこへ
             if (exitPoint != null)
             {
+                Debug.Log("出口へ移動");
+
                 el.LookFaceMove();
                 el.MoveToPoint(exitPoint.position, moveSpeed, stopDistance);
                 await WaitArriveAsync(actor, exitPoint.position, ct);
             }
+            Debug.Log("退出完了");
 
             // ロック解除して完了
             el.EndLock();
+
+            Debug.Log("退出完了2");
 
             MessageBroker.Default.Publish(new HideExited(actor, this));
         }
@@ -220,7 +261,9 @@ namespace AnoGame.Application.Player.Interaction
 
         private async UniTask WaitArriveAsync(Transform actor, Vector3 dest, CancellationToken ct)
         {
-            var sq = Mathf.Max(0.0001f, stopDistance * stopDistance);
+            // 到達判定を少し緩める（stopDistance + 0.1f）
+            var threshold = stopDistance + 0.1f;
+            var sq = threshold * threshold;
             while (!ct.IsCancellationRequested)
             {
                 var p = actor.position;

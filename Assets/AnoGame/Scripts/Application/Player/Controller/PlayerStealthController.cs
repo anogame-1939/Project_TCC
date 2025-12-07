@@ -53,6 +53,25 @@ namespace AnoGame.Application.Player.Controller
                 })
                 .AddTo(_disposables);
 
+
+
+            // 正常退出（HideExited）
+            MessageBroker.Default
+                .Receive<HideExited>()
+                .Subscribe(e =>
+                {
+                    Debug.Log($"[Stealth] HideExited: {e.Actor.name}", this);
+                    IsHidden = false;
+
+                    // 必要なら UnityEvent も発火（onHideCanceled を流用するか、別イベントにするか）
+                    // ここでは一旦 Canceled 扱いにしておく（UI表示などを消すため）
+                    onHideCanceled?.Invoke();
+                    onHideCanceledActor?.Invoke(e.Actor);
+                    // Reason は UserRequest とみなすか、default にするか
+                    onHideCanceledReason?.Invoke(CancelReason.UserRequest);
+                })
+                .AddTo(_disposables);
+
             // 明示的な HideCanceled（ゾーン側からの個別イベント）
             MessageBroker.Default
                 .Receive<HideCanceled>()
