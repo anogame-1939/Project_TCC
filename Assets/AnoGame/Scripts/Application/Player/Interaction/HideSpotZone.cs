@@ -57,7 +57,9 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField]
         private UnityEvent EnterHide;
 
+
         private Transform _occupant; // 占有者（1人用スポット）
+        private bool _isBusy;        // 処理中フラグ（二重実行防止）
 
         [Header("Gizmos")]
         [SerializeField] private bool showGizmos = true;
@@ -72,10 +74,12 @@ namespace AnoGame.Application.Player.Interaction
         // ===== 入口：オプション提示 =====
         public override bool TryBuildOptions(Transform actor, System.Collections.Generic.List<InteractionOption> buffer)
         {
+            // 処理中は一切のインタラクションを受け付けない
+            if (_isBusy) return false;
+
             // 既に自分が隠れているなら「出る」を提示
             if (_occupant == actor)
             {
-                Debug.Log("提示：出る");
                 buffer.Add(new InteractionOption
                 {
                     Kind = InteractionKind.Hide,
@@ -103,25 +107,43 @@ namespace AnoGame.Application.Player.Interaction
 
         private async UniTaskVoid ExecuteHide(Transform actor)
         {
+            if (_isBusy) return;
             if (!TryReserve(actor)) return;
 
-            EnterHide?.Invoke(); // 任意
-            MessageBroker.Default.Publish(new HideRequested(actor, this));
+            _isBusy = true;
+            try
+            {
+                EnterHide?.Invoke(); // 任意
+                MessageBroker.Default.Publish(new HideRequested(actor, this));
 
-            var ct = this.GetCancellationTokenOnDestroy();
+                var ct = this.GetCancellationTokenOnDestroy();
 
-            // 入口→隠れる
-            await MoveIntoAsync(actor, ct);
-            await EnterHideAsync(actor, ct);
+                // 入口→隠れる
+                await MoveIntoAsync(actor, ct);
+                await EnterHideAsync(actor, ct);
+            }
+            finally
+            {
+                _isBusy = false;
+            }
         }
 
         private async UniTaskVoid ExecuteExit(Transform actor)
         {
-            var ct = this.GetCancellationTokenOnDestroy();
+            if (_isBusy) return;
+            _isBusy = true;
+            try
+            {
+                var ct = this.GetCancellationTokenOnDestroy();
 
-            // 退出
-            await ExitHideAsync(actor, ct);
-            Release(actor);
+                // 退出
+                await ExitHideAsync(actor, ct);
+                Release(actor);
+            }
+            finally
+            {
+                _isBusy = false;
+            }
         }
 
         // ===== セッションから呼ばれるAPI =====
@@ -231,6 +253,12 @@ namespace AnoGame.Application.Player.Interaction
 
         public async UniTask CancelHideAsync(Transform actor, CancellationToken ct)
         {
+            if (_isBusy) return; // 既に何か実行中なら... いや、強制キャンセルは通すべきか？いったん通す
+            // _isBusy = true; // キャンセルは特殊なのでBusyチェックは緩めるか、逆にセットするか
+
+            // 強制中断なのでフラグを折る
+            _isBusy = false;
+
             var el = FindEventLock(actor);
             OnCanceled?.Invoke();
 
