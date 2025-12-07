@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.TinyCharacterController;          // CharacterSettings が含まれる名前空間
-using Unity.TinyCharacterController.Brain;
 using UnityEngine.Rendering;
 
 namespace AnoGame.Application.Player.Control
@@ -24,7 +23,7 @@ namespace AnoGame.Application.Player.Control
         [SerializeField] private SpriteRenderer spriteRenderer;
 
         [Header("▼ キャラクター設定 (Brain参照用)")]
-        [SerializeField] private CharacterBrain characterBrain;
+        // [SerializeField] private CharacterBrain characterBrain; // Deprecated
 
         [Header("▼ キャラクター設定 (カメラ参照用)")]
         [SerializeField] private CharacterSettings characterSettings;
@@ -42,19 +41,19 @@ namespace AnoGame.Application.Player.Control
 
         private void Start()
         {
-            if (!animator)          animator = GetComponentInChildren<Animator>();
+            if (!animator) animator = GetComponentInChildren<Animator>();
             if (!spriteRenderer)
             {
                 spriteRenderer = GetComponentInChildren<SpriteRenderer>();
                 spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
             }
-            if (!characterBrain) characterBrain = GetComponent<CharacterBrain>();
+            // if (!characterBrain) characterBrain = GetComponent<CharacterBrain>();
             if (!characterSettings) characterSettings = GetComponent<CharacterSettings>();
         }
 
         private void Update()
         {
-            if (!animatorEnabled || !characterBrain) return;
+            if (!animatorEnabled) return;
 
             // 1) カメラ Transform を取得
             if (!cameraTransform)
@@ -65,8 +64,10 @@ namespace AnoGame.Application.Player.Control
             }
 
             // 2) カメラから見た角度を取得
-            float camY    = cameraTransform.eulerAngles.y;
-            float yawAngle = characterBrain.YawAngle;      // -180～180
+            float camY = cameraTransform.eulerAngles.y;
+            // float yawAngle = characterBrain.YawAngle;      // -180～180
+            // TCC Brain 除去対応: Transformの回転を直接使用
+            float yawAngle = transform.eulerAngles.y;
 
             float rawAngle = Mathf.DeltaAngle(camY, yawAngle);
 
@@ -86,7 +87,9 @@ namespace AnoGame.Application.Player.Control
 
         private void LateUpdate()
         {
-            spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            if (spriteRenderer)
+                spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+
             if (!cameraTransform)
             {
                 cameraTransform = characterSettings?.CameraTransform ??
@@ -101,6 +104,6 @@ namespace AnoGame.Application.Player.Control
 
         // ───────────── 強制移動コールバック ─────────────
         public void OnForcedMoveBegin() => animatorEnabled = false;
-        public void OnForcedMoveEnd()  => animatorEnabled = true;
+        public void OnForcedMoveEnd() => animatorEnabled = true;
     }
 }

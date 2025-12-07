@@ -1,23 +1,20 @@
 using UnityEngine;
 using UnityEngine.AI;
-using Unity.TinyCharacterController.Brain;      // CharacterBrain
-using Unity.TinyCharacterController.Control;    // MoveNavmeshControl
+using AnoGame.Application.Enemy.Control;
 
 namespace AnoGame.Application.Enemy.Animation
 {
     /// <summary>
     /// アニメ用のIsMove/LocomotionSpeedを更新するだけの軽量スクリプト。
     /// 速度ソース優先度:
-    ///   CharacterBrain.TotalVelocity → MoveNavmeshControl.MoveVelocity → Rigidbody → Transform差分
-    /// EventLock中でも CharacterBrain 由来の速度で正しく止まります。
+    ///   EnemyLocomotionHandler.Velocity → Rigidbody → Transform差分
     /// </summary>
     [AddComponentMenu("AnoGame/Animation/" + nameof(BrainSpeedToIsMove))]
     public sealed class BrainSpeedToIsMove : MonoBehaviour
     {
         [Header("参照")]
         [SerializeField] private Animator animator;                       // 未指定なら自動取得
-        [SerializeField] private CharacterBrain characterBrain;           // 最優先
-        [SerializeField] private MoveNavmeshControl navmeshControl;       // 次点
+        [SerializeField] private EnemyLocomotionHandler locomotionHandler; // New Main
         [SerializeField] private Rigidbody rigidBody;                     // 任意
         [SerializeField] private NavMeshAgent agent;                      // 最後の最後の参考にするなら
 
@@ -40,20 +37,18 @@ namespace AnoGame.Application.Enemy.Animation
 
         void Reset()
         {
-            animator        ??= GetComponentInChildren<Animator>();
-            characterBrain  ??= GetComponent<CharacterBrain>();
-            navmeshControl  ??= GetComponent<MoveNavmeshControl>();
-            rigidBody       ??= GetComponentInChildren<Rigidbody>();
-            agent           ??= GetComponentInChildren<NavMeshAgent>();
+            animator ??= GetComponentInChildren<Animator>();
+            locomotionHandler ??= GetComponent<EnemyLocomotionHandler>();
+            rigidBody ??= GetComponentInChildren<Rigidbody>();
+            agent ??= GetComponentInChildren<NavMeshAgent>();
         }
 
         void Awake()
         {
-            if (animator == null)        animator = GetComponentInChildren<Animator>();
-            if (characterBrain == null)  characterBrain = GetComponent<CharacterBrain>();
-            if (navmeshControl == null)  navmeshControl = GetComponent<MoveNavmeshControl>();
-            if (rigidBody == null)       rigidBody = GetComponentInChildren<Rigidbody>();
-            if (agent == null)           agent = GetComponentInChildren<NavMeshAgent>();
+            if (animator == null) animator = GetComponentInChildren<Animator>();
+            if (locomotionHandler == null) locomotionHandler = GetComponent<EnemyLocomotionHandler>();
+            if (rigidBody == null) rigidBody = GetComponentInChildren<Rigidbody>();
+            if (agent == null) agent = GetComponentInChildren<NavMeshAgent>();
         }
 
         void OnEnable()
@@ -90,23 +85,15 @@ namespace AnoGame.Application.Enemy.Animation
         {
             if (_paused) return 0f;
 
-            // 1) CharacterBrain.TotalVelocity（最終合成速度）
-            if (characterBrain != null)
+            // 0) EnemyLocomotionHandler (New Custom System)
+            if (locomotionHandler != null)
             {
-                var v = characterBrain.TotalVelocity; // <- これが一番信頼できる
+                var v = locomotionHandler.Velocity;
                 if (planarOnly) v.y = 0f;
                 return v.magnitude;
             }
 
-            // 2) MoveNavmeshControl.MoveVelocity
-            if (navmeshControl != null)
-            {
-                var v = navmeshControl.MoveVelocity;
-                if (planarOnly) v.y = 0f;
-                return v.magnitude;
-            }
-
-            // 3) Rigidbody
+            // 1) Rigidbody
             if (rigidBody != null)
             {
                 var v = rigidBody.velocity;
@@ -114,7 +101,7 @@ namespace AnoGame.Application.Enemy.Animation
                 return v.magnitude;
             }
 
-            // 4) NavMeshAgent（本当に最後の参考。updatePosition=false等で当てにならない場合あり）
+            // 2) NavMeshAgent（本当に最後の参考。updatePosition=false等で当てにならない場合あり）
             if (agent != null && agent.enabled)
             {
                 var v = agent.velocity;
@@ -122,7 +109,7 @@ namespace AnoGame.Application.Enemy.Animation
                 return v.magnitude;
             }
 
-            // 5) Transform 差分
+            // 3) Transform 差分
             if (!_hasLastPos)
             {
                 _lastPos = transform.position;
@@ -145,7 +132,7 @@ namespace AnoGame.Application.Enemy.Animation
         }
 
         // --- 外部制御（任意） ---
-        public void Pause()  => _paused = true;   // EventLockで手動制御したい時に
+        public void Pause() => _paused = true;   // EventLockで手動制御したい時に
         public void Resume() => _paused = false;
         public void ForceSetIsMove(bool v) { if (animator) animator.SetBool(isMoveBoolParam, v); }
     }

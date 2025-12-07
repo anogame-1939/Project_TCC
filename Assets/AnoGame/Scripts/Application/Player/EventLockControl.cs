@@ -107,6 +107,9 @@ namespace AnoGame.Application.Player.Control
         }
 
         // ---- ITurn: 目標Yaw角度（度） ----
+        // 外部公開プロパティ（TCC依存回避用）
+        public float TargetYawAngle => ((ITurn)this).YawAngle;
+
         float ITurn.YawAngle
         {
             get

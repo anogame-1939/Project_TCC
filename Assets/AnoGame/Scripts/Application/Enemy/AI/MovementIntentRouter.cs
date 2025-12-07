@@ -4,15 +4,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Unity.TinyCharacterController.Control;
 using UnityEngine.AI;
+using AnoGame.Application.Enemy.Control;
 
 namespace AnoGame.Application.Enemy.AI
 {
     public class MovementIntentRouter : MonoBehaviour
     {
         [Header("実行層")]
-        [SerializeField] private MoveNavmeshControl moveNavmeshControl;
+        [SerializeField] private EnemyLocomotionHandler locomotionHandler;
 
         [Header("候補（IIntentProvider 実装を持つ MonoBehaviour を並べる）")]
         [SerializeField] private List<MonoBehaviour> providerBehaviours = new();
@@ -21,8 +21,8 @@ namespace AnoGame.Application.Enemy.AI
 
         private void Awake()
         {
-            if (moveNavmeshControl == null)
-                moveNavmeshControl = GetComponent<MoveNavmeshControl>();
+            if (locomotionHandler == null)
+                locomotionHandler = GetComponent<EnemyLocomotionHandler>();
 
             _providers.Clear();
             foreach (var mb in providerBehaviours)
@@ -34,7 +34,7 @@ namespace AnoGame.Application.Enemy.AI
         private void FixedUpdate()
         {
             // Debug.Log($"[MovementIntentRouter] GetComponent<NavMeshAgent>().enabled: {GetComponent<NavMeshAgent>().enabled}");
-            if (moveNavmeshControl == null || _providers.Count == 0) return;
+            if (locomotionHandler == null || _providers.Count == 0) return;
 
             // 優先度降順で走査
             foreach (var p in _providers.OrderByDescending(pv => pv.Priority))
@@ -45,7 +45,7 @@ namespace AnoGame.Application.Enemy.AI
 
                 if (p.TryGetGoal(out var goal) && goal.IsValid)
                 {
-                    moveNavmeshControl.SetTargetPosition(goal.Position);
+                    locomotionHandler.SetDestination(goal.Position);
                     // Facing を使って回頭を行いたい場合は MoveNavmeshControl 側で拡張
                     break;
                 }

@@ -1,57 +1,51 @@
 using UnityEngine;
 using UnityEngine.Playables;
-using Unity.TinyCharacterController.Interfaces.Components; // IWarp
+using AnoGame.Application.Enemy.Control;
 
 namespace AnoGame.Application.Direction.Timeline
 {
     public sealed class WarpEnemyProxyMixer : PlayableBehaviour
     {
-        // バインド先が切り替わった時だけ IWarp を取り直す
+        // バインド先が切り替わった時だけ Handler を取り直す
         private TimelineEnemyEventLockProxy _lastProxy;
-        private IWarp _cachedWarp;
+        private EnemyLocomotionHandler _cachedHandler;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            Debug.Log("playerdata " + playerData);
+            // Debug.Log("playerdata " + playerData);
             var proxy = playerData as TimelineEnemyEventLockProxy;
             if (proxy == null)
             {
-                Debug.LogWarning("[WarpEnemyProxyMixer] Proxy is null");
+                // Debug.LogWarning("[WarpEnemyProxyMixer] Proxy is null");
                 return;
             }
 
-            // Proxyが変わったら IWarp を再取得
+            // Proxyが変わったら Handler を再取得
             if (!ReferenceEquals(proxy, _lastProxy))
             {
                 Debug.Log($"[WarpEnemyProxyMixer] Proxy changed. New proxy: {proxy.name}");
                 _lastProxy = proxy;
-                _cachedWarp = null;
+                _cachedHandler = null;
             }
-            Debug.Log("proxy.EnemyCtrl " + proxy.EnemyCtrl);
-            Debug.Log("proxy.EnemyCtrl " + proxy.EnemyCtrl.name);
 
             // キャッシュがない場合は取得を試みる (Enemyが後からSpawnする場合などに対応)
-            if (_cachedWarp == null)
+            if (_cachedHandler == null)
             {
                 var enemyCtrl = proxy.EnemyCtrl; // ← 公開したプロパティを利用
                 if (enemyCtrl != null)
                 {
-                    // 同じGO or 親から IWarp を取得（Brain）
-                    _cachedWarp = enemyCtrl.GetComponent<IWarp>() ?? enemyCtrl.GetComponentInParent<IWarp>();
-                    if (_cachedWarp != null)
+                    // 同じGO or 親から Handler を取得
+                    _cachedHandler = enemyCtrl.GetComponent<EnemyLocomotionHandler>() ?? enemyCtrl.GetComponentInParent<EnemyLocomotionHandler>();
+                    if (_cachedHandler != null)
                     {
-                        Debug.Log($"[WarpEnemyProxyMixer] Cached IWarp: {_cachedWarp != null}");
+                        Debug.Log($"[WarpEnemyProxyMixer] Cached Handler: {_cachedHandler != null}");
                     }
                 }
-                // else
-                // {
-                //     Debug.LogWarning("[WarpEnemyProxyMixer] EnemyCtrl is null on proxy");
-                // }
             }
 
-            if (_cachedWarp == null)
+            if (_cachedHandler == null)
             {
-                Debug.LogWarning("[WarpEnemyProxyMixer] Cached Warp is null");
+                // Debug.LogWarning("[WarpEnemyProxyMixer] Cached Handler is null");
                 return;
             }
 
@@ -77,12 +71,12 @@ namespace AnoGame.Application.Direction.Timeline
                 {
                     case WarpPlayableAsset.WarpFacing.Keep:
                         Debug.Log($"[WarpEnemyProxyMixer] Warping to {pos} (Keep Facing)");
-                        _cachedWarp.Warp(pos); // 位置のみ（向き維持）
+                        _cachedHandler.Warp(pos); // 位置のみ（向き維持）
                         break;
 
                     case WarpPlayableAsset.WarpFacing.FaceDirection:
                         Debug.Log($"[WarpEnemyProxyMixer] Warping to {pos} (Face Direction: {bhv.worldFacingDirection})");
-                        _cachedWarp.Warp(pos, bhv.worldFacingDirection); // 位置＋方向ベクトル
+                        _cachedHandler.Warp(pos, bhv.worldFacingDirection); // 位置＋方向ベクトル
                         break;
 
                     case WarpPlayableAsset.WarpFacing.FaceTarget:
@@ -93,7 +87,7 @@ namespace AnoGame.Application.Direction.Timeline
                             dir.y = 0f;
                         }
                         Debug.Log($"[WarpEnemyProxyMixer] Warping to {pos} (Face Target: {bhv.lookAt?.name}, Dir: {dir})");
-                        _cachedWarp.Warp(pos, dir);
+                        _cachedHandler.Warp(pos, dir);
                         break;
                 }
 

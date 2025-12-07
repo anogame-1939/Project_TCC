@@ -1026,13 +1026,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a828bf9d441bffc49a8de16f39abfdcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventLock: {fileID: 0}
-  chase: {fileID: 0}
-  investigate: {fileID: 0}
-  ret: {fileID: 0}
-  patrol: {fileID: 0}
-  defaultEncounterTTL: 2
-  defaultInvestigateTTL: 3
 --- !u!114 &25041132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1045,7 +1038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 184fb2bb279d8ce46a31eef50839a5e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveNavmeshControl: {fileID: 1881987378}
+  locomotionHandler: {fileID: 0}
   providerBehaviours: []
 --- !u!4 &25041133
 Transform:
@@ -37361,7 +37354,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 207.77783}
+  m_AnchoredPosition: {x: 0, y: 207.77849}
   m_SizeDelta: {x: 0, y: 486.223}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &660101641
@@ -85942,7 +85935,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 996609995}
   m_HandleRect: {fileID: 996609993}
   m_Direction: 2
-  m_Value: -0.00000014687618
+  m_Value: -0.0000024968951
   m_Size: 0.5726701
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -91939,17 +91932,6 @@ NavMeshAgent:
   m_CorrespondingSourceObject: {fileID: -8439374336953332058, guid: f29b8f60f10484c30a1a3d8f1e0414dc, type: 3}
   m_PrefabInstance: {fileID: 1881987374}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1881987378 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5085902700854131339, guid: f29b8f60f10484c30a1a3d8f1e0414dc, type: 3}
-  m_PrefabInstance: {fileID: 1881987374}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1881987375}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 241afe2e26a3f498e910e12b53c4dd1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1881987379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91962,10 +91944,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e609eb0391d7fca42aa94ce467e76173, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  director: {fileID: 1881987382}
-  reacquireWindow: 0.6
-  _lastSeen: {x: 0, y: 0, z: 0}
-  _maybeLost: 0
 --- !u!114 &1881987380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91979,8 +91957,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 1881987376}
-  characterBrain: {fileID: 0}
-  navmeshControl: {fileID: 0}
+  locomotionHandler: {fileID: 0}
   rigidBody: {fileID: 0}
   agent: {fileID: 1881987377}
   isMoveBoolParam: IsMove
@@ -92025,13 +92002,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a828bf9d441bffc49a8de16f39abfdcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventLock: {fileID: 1881987386}
-  chase: {fileID: 1881987387}
-  investigate: {fileID: 1881987383}
-  ret: {fileID: 1881987384}
-  patrol: {fileID: 1881987385}
-  defaultEncounterTTL: 2
-  defaultInvestigateTTL: 3
 --- !u!114 &1881987383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92075,6 +92045,7 @@ MonoBehaviour:
   active: 0
   splineContainer: {fileID: 0}
   arriveDistance: 0.5
+  forceArriveDistance: 3
 --- !u!114 &1881987385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92136,7 +92107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 184fb2bb279d8ce46a31eef50839a5e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveNavmeshControl: {fileID: 1881987378}
+  locomotionHandler: {fileID: 0}
   providerBehaviours:
   - {fileID: 1881987387}
   - {fileID: 1881987386}
