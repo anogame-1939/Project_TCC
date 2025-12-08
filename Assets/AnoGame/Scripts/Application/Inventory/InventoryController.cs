@@ -35,11 +35,12 @@ namespace AnoGame.Application.Inventory
         private InputAction _inventoryCloseAction;
 
         private GameObject _pendingSelectGO;   // 次回Openで選びたいGO（生きていれば最優先）
-        private int? _pendingSelectIndex; 
+        private int? _pendingSelectIndex;
 
         [Inject] private IInputActionProvider _inputProvider;
         [Inject] private IInventoryService _inventoryService;
-        [Inject] public void Construct(InventoryManager inventoryManager, IInventoryService inventoryService)
+        [Inject]
+        public void Construct(InventoryManager inventoryManager, IInventoryService inventoryService)
         {
             _inventoryManager = inventoryManager;
             _inventoryService = inventoryService;
@@ -89,7 +90,7 @@ namespace AnoGame.Application.Inventory
                 _inventoryOpenAction.performed -= OnInventoryOpenPerformed;
             // UI マップ購読解除
             if (_cancelAction != null)
-                _cancelAction.performed  -= OnCancelPerformed;
+                _cancelAction.performed -= OnCancelPerformed;
             if (_inventoryCloseAction != null)
                 _inventoryCloseAction.performed -= OnCancelPerformed;
         }
@@ -99,14 +100,17 @@ namespace AnoGame.Application.Inventory
 
         void ToggleInventory()
         {
+            Debug.Log("ToggleInventory:" + GameStateManager.Instance.CurrentState);
             var state = GameStateManager.Instance.CurrentState;
             if (state == GameState.Gameplay)
             {
+                Debug.Log("ToggleInventory");
                 GameStateManager.Instance.SetState(GameState.Inventory);
                 Show();
             }
             else if (state == GameState.Inventory)
             {
+                Debug.Log("ToggleInventory2");
                 Close();
             }
         }
@@ -133,25 +137,38 @@ namespace AnoGame.Application.Inventory
             _confirmAction = uiMap.FindAction("Confirm", true);
             _confirmAction.performed += OnConfirmPerformed;
 
+            // Inventoryキーでも閉じられるようにする (Tab / Start)
+            // Inventoryキーでも閉じられるようにする (Tab / Start)
+            // 開いた瞬間の入力で即閉じないよう、1フレーム待ってから購読する
+            StartCoroutine(SubscribeInventoryCloseActionDelayed(uiMap));
+
             // 表示＆カーソル解放
-            _canvasGroup.alpha      = 1;
-            Cursor.lockState        = CursorLockMode.None;
-            Cursor.visible          = true;
+            _canvasGroup.alpha = 1;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         public void Hide()
         {
             // 非表示＆カーソルロック
-            _canvasGroup.alpha      = 0;
-            Cursor.lockState        = CursorLockMode.Locked;
-            Cursor.visible          = false;
+            _canvasGroup.alpha = 0;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
             // UI マップ購読解除
             _confirmAction.performed -= OnConfirmPerformed;
 
+            if (_inventoryCloseAction != null)
+            {
+                _inventoryCloseAction.performed -= OnCancelPerformed;
+                _inventoryCloseAction = null;
+            }
+
+
+
             _router.OnUnhandledCancel -= Close;
             _router.EndRouting();
-            
+
             // Player マップへ復帰
             _inputProvider.SwitchToPlayer();
 
@@ -184,7 +201,10 @@ namespace AnoGame.Application.Inventory
         }
 
         private void OnCancelPerformed(InputAction.CallbackContext ctx)
-            => Close();
+        {
+            if (_isModalOpen) return;
+            Close();
+        }
 
         private IEnumerator EnforceCursorHide()
         {
@@ -192,10 +212,10 @@ namespace AnoGame.Application.Inventory
             if (GameStateManager.Instance.CurrentState == GameState.Gameplay)
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible   = false;
+                Cursor.visible = false;
             }
         }
-        
+
         private void OpenConsumeConfirm(InventorySlot slot)
         {
             var displayName = string.IsNullOrEmpty(slot.LocalizedName)
@@ -207,7 +227,7 @@ namespace AnoGame.Application.Inventory
             // 下層UIを無効化（入力もレイキャストも通さない）
             if (_canvasGroup != null)
             {
-                _canvasGroup.interactable   = false;
+                _canvasGroup.interactable = false;
                 _canvasGroup.blocksRaycasts = false;
             }
 
@@ -351,7 +371,7 @@ namespace AnoGame.Application.Inventory
             foreach (var it in items) inv.AddItem(it);
             _inventoryViewer.UpdateInventory(inv);
 
-            
+
             Debug.Log($"[InventoryController] '{itemId}' を正常に消費し、イベントを実行しました (zone={zone.GetDebugName()})");
         }
 
@@ -395,7 +415,7 @@ namespace AnoGame.Application.Inventory
         private UnityEngine.UI.Selectable FindFirstSelectableUnder(GameObject root)
         {
             if (root == null) return null;
-            return root.GetComponentInChildren<UnityEngine.UI.Selectable>(includeInactive:false);
+            return root.GetComponentInChildren<UnityEngine.UI.Selectable>(includeInactive: false);
         }
 
         private void OnApplicationFocus(bool hasFocus)
@@ -417,6 +437,20 @@ namespace AnoGame.Application.Inventory
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+            }
+        }
+
+        private IEnumerator SubscribeInventoryCloseActionDelayed(InputActionMap uiMap)
+        {
+            yield return null; // 1フレーム待機
+
+            // 既に閉じてたりマップが変わってたら何もしない
+            if (GameStateManager.Instance.CurrentState != GameState.Inventory) yield break;
+
+            _inventoryCloseAction = uiMap.FindAction("Inventory", false);
+            if (_inventoryCloseAction != null)
+            {
+                _inventoryCloseAction.performed += OnCancelPerformed;
             }
         }
     }
