@@ -7,11 +7,15 @@ namespace AnoGame.Application.Direction.Timeline
     {
         // 状態キャッシュ用
         private bool _locked;
+        private TimelineEnemyEventLockProxy _lastProxy;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             var proxy = playerData as TimelineEnemyEventLockProxy;
             if (proxy == null) return;
+
+            // プロキシをキャッシュ（OnPlayableDestroy用）
+            _lastProxy = proxy;
 
             int inputCount = playable.GetInputCount();
 
@@ -84,7 +88,12 @@ namespace AnoGame.Application.Direction.Timeline
         public override void OnPlayableDestroy(Playable playable)
         {
             // 再生終端でロックを戻しておく
-            // （必要であれば、最後に見ていた proxy を覚えておき、EndLock を確実に打つ）
+            // Timeline停止時などに呼ばれる
+            if (_locked && _lastProxy != null)
+            {
+                _lastProxy.EndLock();
+                _locked = false;
+            }
         }
     }
 }
