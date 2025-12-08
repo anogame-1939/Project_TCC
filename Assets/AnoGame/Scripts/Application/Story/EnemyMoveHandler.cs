@@ -1,9 +1,7 @@
 using AnoGame.Application.Enemy;
-using AnoGame.Application.Enmemy.Control;
 using AnoGame.Application.Enemy.AI;
 using AnoGame.Application.Player.Control;
 using UnityEngine;
-using Unity.TinyCharacterController.Control;
 
 namespace AnoGame.Application.Story
 {
@@ -12,12 +10,8 @@ namespace AnoGame.Application.Story
         public void StartChase()
         {
             Debug.Log($"[EnemyMoveHandler] StartChase called. Time: {Time.time}");
-            // EnemySpawnManager.Instance.SetupToStoryMode();
-
-
 
             var enemy = EnemySpawnManager.Instance.CurrentEnemyInstance;
-            enemy.GetComponent<MoveNavmeshControl>().ResetAgent();
             if (enemy != null)
             {
                 Debug.Log($"[EnemyMoveHandler] CurrentEnemyInstance found: {enemy.name}");
@@ -51,23 +45,6 @@ namespace AnoGame.Application.Story
                 {
                     Debug.Log("[EnemyMoveHandler] Disabling PatrolSplineIntentProvider.");
                     patrolIntent.SetActive(false);
-                }
-
-                return;
-
-                // 3. Old System: Disable EnemyAIController
-                var ai = enemy.GetComponent<EnemyAIController>();
-                if (ai != null)
-                {
-                    Debug.Log($"[EnemyMoveHandler] EnemyAIController found. Disabling Legacy AI. IsChasing before: {ai.IsChasing}");
-                    ai.SetChasing(false);
-                    ai.SetStoryMode(false);
-                    ai.enabled = false; // Ensure it doesn't interfere
-                    Debug.Log($"[EnemyMoveHandler] EnemyAIController IsChasing after: {ai.IsChasing}, Enabled: {ai.enabled}");
-                }
-                else
-                {
-                    Debug.LogWarning("[EnemyMoveHandler] EnemyAIController NOT found on enemy.");
                 }
             }
             else
