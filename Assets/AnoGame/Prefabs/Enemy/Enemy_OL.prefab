@@ -295,13 +295,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2365655322038012229}
   - component: {fileID: 8486724571373039048}
-  - component: {fileID: 8237711469134898448}
-  - component: {fileID: 6182930195229746077}
-  - component: {fileID: 5085902700854131339}
   - component: {fileID: -910997268300491783}
   - component: {fileID: 3027689247613781079}
-  - component: {fileID: 1377983333902755919}
-  - component: {fileID: 8311000640156970895}
   - component: {fileID: 8545826120565574306}
   - component: {fileID: -8439374336953332058}
   - component: {fileID: 2003501855128678836}
@@ -375,62 +370,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.32999998, z: 0}
---- !u!114 &8237711469134898448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21501635e762343f1b16e2d5c7aed266, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _environmentLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  _mass: 1
-  _height: 0.5
-  _radius: 0.2
---- !u!114 &6182930195229746077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bc4954e2495401681e4dc93f6a28af6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _freezeAxis:
-    x: 0
-    y: 0
-    z: 0
-  Pushable: 0
-  _detectCollisions: 1
---- !u!114 &5085902700854131339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 241afe2e26a3f498e910e12b53c4dd1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _agent: {fileID: -8439374336953332058}
-  _speed: 3.5
-  TurnSpeed: 8
-  MovePriority: 1
-  TurnPriority: 1
-  OnArrivedAtDestination:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &-910997268300491783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,43 +410,6 @@ MonoBehaviour:
   turnBehavior: 1
   lookAtTarget: {fileID: 0}
   fixedAngle: 0
---- !u!114 &1377983333902755919
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 967b31edb33f14cdc942335ecb33f820, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _ambiguousDistance: 0.48999998
-  _preciseDistance: 0.02
-  _maxSlope: 60
-  _onChangeGroundObject:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &8311000640156970895
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a438fe455bc974e68babcfff4ef6d954, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gravityScale: 1
-  _onLanding:
-    m_PersistentCalls:
-      m_Calls: []
-  _onLeave:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!135 &8545826120565574306
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -751,7 +653,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   use2DFlip: 0
   spriteRenderer: {fileID: 3983856807045630392}
-  characterSettings: {fileID: 8237711469134898448}
+  characterSettings: {fileID: 0}
   useAngleSnap: 1
   snapStep: 45
 --- !u!114 &3949941853238961511
@@ -766,7 +668,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a70f55eba6898a34189ad47f99776f19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  move: {fileID: 5085902700854131339}
+  move: {fileID: 0}
   playerTag: Player
   boostedSpeed: 7
   revertSmoothing: 0
