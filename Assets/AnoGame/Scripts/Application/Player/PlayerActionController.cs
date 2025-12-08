@@ -14,6 +14,9 @@ namespace AnoGame.Application.Player.Control
         [SerializeField] private CharacterController _cc;
         [SerializeField] private MoveControl moveControl;
         [SerializeField] private Animator animator;
+        [SerializeField] private PlayerStamina stamina;
+        [SerializeField] private PlayerSpeedManager speedManager;
+        [SerializeField] private float sprintSpeedMultiplier = 1.5f;
 
         //──────────────────────────────────────────
         // ① IInputActionProvider を Inject で受け取る
@@ -22,7 +25,9 @@ namespace AnoGame.Application.Player.Control
 
         private bool isInputEnabled = true;
         private InputAction moveAction;
+        private InputAction sprintAction;
         private bool isKeyHeld = false;
+        private bool isSprintHeld = false;
 
         private void Awake()
         {
@@ -55,6 +60,16 @@ namespace AnoGame.Application.Player.Control
                 }
             }
 
+            if (stamina == null)
+            {
+                stamina = GetComponent<PlayerStamina>();
+            }
+
+            if (speedManager == null)
+            {
+                speedManager = GetComponent<PlayerSpeedManager>();
+            }
+
             //──────────────────────────────────────────
             // ② IInputActionProvider 経由で Player マップを有効化し、
             //     “Move” アクションを取得してキャッシュ
@@ -62,12 +77,19 @@ namespace AnoGame.Application.Player.Control
             // _inputProvider.SwitchToPlayer();
             var playerMap = _inputProvider.GetPlayerActionMap();
             moveAction = playerMap.FindAction("Move", throwIfNotFound: true);
+            sprintAction = playerMap.FindAction("Sprint", throwIfNotFound: false);
 
             //──────────────────────────────────────────
             // ③ キーの押下状態管理用イベントを登録
             //──────────────────────────────────────────
             moveAction.started += OnMoveStarted;
             moveAction.canceled += OnMoveCanceled;
+
+            if (sprintAction != null)
+            {
+                sprintAction.started += OnSprintStarted;
+                sprintAction.canceled += OnSprintCanceled;
+            }
         }
 
         private void Start()
@@ -96,6 +118,12 @@ namespace AnoGame.Application.Player.Control
                 moveAction.started -= OnMoveStarted;
                 moveAction.canceled -= OnMoveCanceled;
             }
+
+            if (sprintAction != null)
+            {
+                sprintAction.started -= OnSprintStarted;
+                sprintAction.canceled -= OnSprintCanceled;
+            }
         }
 
         private void Update()
@@ -111,6 +139,9 @@ namespace AnoGame.Application.Player.Control
                 }
                 animator.SetBool("IsMove", isMove);
             }
+
+            // スタミナ・スプリント処理
+            HandleSprint();
         }
 
         private void FixedUpdate()
@@ -120,6 +151,24 @@ namespace AnoGame.Application.Player.Control
             {
                 Vector2 inputValue = moveAction.ReadValue<Vector2>();
                 moveControl.Move(inputValue);
+            }
+        }
+
+        private void HandleSprint()
+        {
+            if (stamina == null || speedManager == null) return;
+
+            bool isSprinting = isSprintHeld && isKeyHeld && stamina.CanSprint();
+
+            if (isSprinting)
+            {
+                speedManager.RegisterMultiplier("Sprint", sprintSpeedMultiplier);
+                stamina.Consume();
+            }
+            else
+            {
+                speedManager.UnregisterMultiplier("Sprint");
+                // Consume()を呼ばなければPlayerStamina側でRecoveryタイマーが進む
             }
         }
 
@@ -134,6 +183,16 @@ namespace AnoGame.Application.Player.Control
         {
             isKeyHeld = false;
             moveControl.Move(Vector2.zero);
+        }
+
+        private void OnSprintStarted(InputAction.CallbackContext context)
+        {
+            isSprintHeld = true;
+        }
+
+        private void OnSprintCanceled(InputAction.CallbackContext context)
+        {
+            isSprintHeld = false;
         }
 
         /// <summary>
