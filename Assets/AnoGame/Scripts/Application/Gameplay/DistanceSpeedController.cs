@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.TinyCharacterController.Control;
+using UnityEngine.AI;
 
 namespace AnoGame.Application.Gameplay
 {
@@ -9,7 +9,7 @@ namespace AnoGame.Application.Gameplay
     public class DistanceSpeedController : MonoBehaviour
     {
         [Header("参照")]
-        [SerializeField] private MoveNavmeshControl move;      // 同じ敵ルートにある MoveNavmeshControl
+        [SerializeField] private NavMeshAgent agent;           // NavMeshAgentを直接参照
         [SerializeField] private string playerTag = "Player";  // プレイヤータグ
 
         [Header("速度設定")]
@@ -34,13 +34,13 @@ namespace AnoGame.Application.Gameplay
 
         void Reset()
         {
-            move = GetComponent<MoveNavmeshControl>();
+            agent = GetComponent<NavMeshAgent>();
         }
 
         void Awake()
         {
-            if (move == null) move = GetComponent<MoveNavmeshControl>();
-            baseSpeed = move.Speed;
+            if (agent == null) agent = GetComponent<NavMeshAgent>();
+            if (agent != null) baseSpeed = agent.speed;
             RecalcSqr();
         }
 
@@ -61,12 +61,13 @@ namespace AnoGame.Application.Gameplay
         {
             if (refreshLoop != null) StopCoroutine(refreshLoop);
             // 念のため速度を元に戻す
-            move.Speed = baseSpeed;
+            if (agent != null) agent.speed = baseSpeed;
             isBoosted = false;
         }
 
         void Update()
         {
+            if (agent == null) return;
             if (targets.Count == 0) { RevertToBaseImmediate(); return; }
 
             // 最も近いプレイヤーまでの水平距離
@@ -89,7 +90,7 @@ namespace AnoGame.Application.Gameplay
                 if (minSqr <= nearReturnSqr)
                     RevertToBaseSmooth();
                 else
-                    move.Speed = boostedSpeed; // 維持
+                    agent.speed = boostedSpeed; // 維持
             }
             else
             {
@@ -97,7 +98,7 @@ namespace AnoGame.Application.Gameplay
                 if (minSqr >= farBoostSqr)
                 {
                     isBoosted = true;
-                    move.Speed = boostedSpeed; // 必要ならここを補間に変える
+                    agent.speed = boostedSpeed; // 必要ならここを補間に変える
                 }
                 else
                 {
@@ -108,15 +109,17 @@ namespace AnoGame.Application.Gameplay
 
         private void RevertToBaseImmediate()
         {
-            if (isBoosted || !Mathf.Approximately(move.Speed, baseSpeed))
+            if (agent == null) return;
+            if (isBoosted || !Mathf.Approximately(agent.speed, baseSpeed))
             {
                 isBoosted = false;
-                move.Speed = baseSpeed;
+                agent.speed = baseSpeed;
             }
         }
 
         private void RevertToBaseSmooth()
         {
+            if (agent == null) return;
             if (revertSmoothing <= 0f)
             {
                 RevertToBaseImmediate();
@@ -124,8 +127,8 @@ namespace AnoGame.Application.Gameplay
             else
             {
                 // 単純な時間あたりの減速（補間）。必要なら MoveTowards で十分。
-                move.Speed = Mathf.MoveTowards(move.Speed, baseSpeed, revertSmoothing * Time.deltaTime);
-                if (Mathf.Approximately(move.Speed, baseSpeed)) isBoosted = false;
+                agent.speed = Mathf.MoveTowards(agent.speed, baseSpeed, revertSmoothing * Time.deltaTime);
+                if (Mathf.Approximately(agent.speed, baseSpeed)) isBoosted = false;
             }
         }
 

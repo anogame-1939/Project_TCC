@@ -1,22 +1,20 @@
 using UnityEngine;
 using UnityEngine.AI;
-using AnoGame.Application.Enemy.Control;
 
 namespace AnoGame.Application.Enemy.Animation
 {
     /// <summary>
     /// アニメ用のIsMove/LocomotionSpeedを更新するだけの軽量スクリプト。
     /// 速度ソース優先度:
-    ///   EnemyLocomotionHandler.Velocity → Rigidbody → Transform差分
+    ///   NavMeshAgent -> Rigidbody -> Transform差分
     /// </summary>
     [AddComponentMenu("AnoGame/Animation/" + nameof(BrainSpeedToIsMove))]
     public sealed class BrainSpeedToIsMove : MonoBehaviour
     {
         [Header("参照")]
         [SerializeField] private Animator animator;                       // 未指定なら自動取得
-        [SerializeField] private EnemyLocomotionHandler locomotionHandler; // New Main
+        [SerializeField] private NavMeshAgent agent;                      // メインの速度参照元
         [SerializeField] private Rigidbody rigidBody;                     // 任意
-        [SerializeField] private NavMeshAgent agent;                      // 最後の最後の参考にするなら
 
         [Header("Animator パラメータ")]
         [SerializeField] private string isMoveBoolParam = "IsMove";
@@ -38,23 +36,23 @@ namespace AnoGame.Application.Enemy.Animation
         void Reset()
         {
             animator ??= GetComponentInChildren<Animator>();
-            locomotionHandler ??= GetComponent<EnemyLocomotionHandler>();
-            rigidBody ??= GetComponentInChildren<Rigidbody>();
             agent ??= GetComponentInChildren<NavMeshAgent>();
+            rigidBody ??= GetComponentInChildren<Rigidbody>();
         }
 
         void Awake()
         {
             if (animator == null) animator = GetComponentInChildren<Animator>();
-            if (locomotionHandler == null) locomotionHandler = GetComponent<EnemyLocomotionHandler>();
-            if (rigidBody == null) rigidBody = GetComponentInChildren<Rigidbody>();
             if (agent == null) agent = GetComponentInChildren<NavMeshAgent>();
+            if (rigidBody == null) rigidBody = GetComponentInChildren<Rigidbody>();
         }
 
         void OnEnable()
         {
             _hasLastPos = false;
             _emaSpeed = 0f;
+            _hasLastPos = false; // Reset again just to be sure if paused/resumed
+            _lastPos = transform.position; // Initial position
         }
 
         void Update()
@@ -85,15 +83,15 @@ namespace AnoGame.Application.Enemy.Animation
         {
             if (_paused) return 0f;
 
-            // 0) EnemyLocomotionHandler (New Custom System)
-            if (locomotionHandler != null)
+            // 1) NavMeshAgent (Primary Source)
+            if (agent != null && agent.isActiveAndEnabled)
             {
-                var v = locomotionHandler.Velocity;
+                var v = agent.velocity;
                 if (planarOnly) v.y = 0f;
                 return v.magnitude;
             }
 
-            // 1) Rigidbody
+            // 2) Rigidbody
             if (rigidBody != null)
             {
                 var v = rigidBody.velocity;
@@ -101,15 +99,7 @@ namespace AnoGame.Application.Enemy.Animation
                 return v.magnitude;
             }
 
-            // 2) NavMeshAgent（本当に最後の参考。updatePosition=false等で当てにならない場合あり）
-            if (agent != null && agent.enabled)
-            {
-                var v = agent.velocity;
-                if (planarOnly) v.y = 0f;
-                return v.magnitude;
-            }
-
-            // 3) Transform 差分
+            // 3) Transform 差分 (Fallback)
             if (!_hasLastPos)
             {
                 _lastPos = transform.position;
