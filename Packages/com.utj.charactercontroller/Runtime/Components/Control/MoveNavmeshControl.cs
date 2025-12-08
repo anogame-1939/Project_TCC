@@ -350,7 +350,7 @@ namespace Unity.TinyCharacterController.Control
             // Re-apply settings
             if (_agent != null)
             {
-                _agent.transform.localPosition = Vector3.zero;
+                // _agent.transform.localPosition = Vector3.zero;
                 _agent.speed = _speed;
                 _agent.updatePosition = false;
                 _agent.updateRotation = false;

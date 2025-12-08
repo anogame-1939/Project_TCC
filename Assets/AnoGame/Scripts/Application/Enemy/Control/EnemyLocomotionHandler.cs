@@ -37,6 +37,9 @@ namespace AnoGame.Application.Enemy.Control
 
         private void Start()
         {
+            // イベント制御の初期化
+            eventLockControl.BeginLock();
+
             // 初期化時に強制的に設定を適用
             // （TCCのPrefab設定で agent.updatePosition が false になっている可能性が高いため）
             if (agent != null)
