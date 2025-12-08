@@ -1,6 +1,5 @@
 using UnityEngine;
 using AnoGame.Application.Damage;
-using System.Collections;
 
 namespace AnoGame.Application.Enemy
 {
@@ -8,8 +7,6 @@ namespace AnoGame.Application.Enemy
     {
         [SerializeField] bool _isActive = true;
         [SerializeField] private int damage = 1;
-
-        // イベント追加
 
         private void Awake()
         {
