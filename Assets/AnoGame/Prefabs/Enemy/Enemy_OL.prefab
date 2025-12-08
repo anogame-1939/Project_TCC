@@ -295,19 +295,15 @@ GameObject:
   m_Component:
   - component: {fileID: 2365655322038012229}
   - component: {fileID: 8486724571373039048}
+  - component: {fileID: 8545826120565574306}
   - component: {fileID: -910997268300491783}
   - component: {fileID: 3027689247613781079}
-  - component: {fileID: 8545826120565574306}
   - component: {fileID: -8439374336953332058}
-  - component: {fileID: 2003501855128678836}
-  - component: {fileID: 4183435016230059746}
-  - component: {fileID: 1190557266045678637}
-  - component: {fileID: -2493535432171837609}
-  - component: {fileID: 1434583519645761743}
-  - component: {fileID: 1555985007829630829}
   - component: {fileID: 3949941853238961511}
   - component: {fileID: 6490954179236640322}
-  - component: {fileID: -6838671714581490994}
+  - component: {fileID: 4183435016230059746}
+  - component: {fileID: 1190557266045678637}
+  - component: {fileID: 1555985007829630829}
   - component: {fileID: 1431485421636668416}
   - component: {fileID: 3905562830400558746}
   - component: {fileID: 6890212920349990426}
@@ -370,6 +366,27 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.32999998, z: 0}
+--- !u!135 &8545826120565574306
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.35
+  m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!114 &-910997268300491783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,27 +427,6 @@ MonoBehaviour:
   turnBehavior: 1
   lookAtTarget: {fileID: 0}
   fixedAngle: 0
---- !u!135 &8545826120565574306
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.35
-  m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!195 &-8439374336953332058
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -453,19 +449,47 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &2003501855128678836
+--- !u!114 &3949941853238961511
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e20b56793424649bf98e0220434b6f2c, type: 3}
+  m_Script: {fileID: 11500000, guid: a70f55eba6898a34189ad47f99776f19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnDistance: 5
+  agent: {fileID: 0}
+  playerTag: Player
+  boostedSpeed: 7
+  revertSmoothing: 0
+  farBoostDistance: 12
+  nearReturnDistance: 6
+  autoRefreshTargets: 1
+  refreshInterval: 1
+--- !u!114 &6490954179236640322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08d351ef8c23e104694d04a2ab25da82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 7665162067455944546}
+  agent: {fileID: -8439374336953332058}
+  rigidBody: {fileID: 0}
+  isMoveBoolParam: IsMove
+  locomotionSpeedParam: LocomotionSpeed
+  speedThreshold: 0.3
+  emaHalfLife: 0
+  planarOnly: 1
+  useFixedUpdate: 1
 --- !u!114 &4183435016230059746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,7 +497,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f251a41384cace45b7bf2b85bf61df0, type: 3}
   m_Name: 
@@ -564,78 +588,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   shadowScaleDuration: 2
---- !u!114 &-2493535432171837609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d1d94f36a1ed426da38aec7c1956c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hitDetector: {fileID: 4183435016230059746}
-  lifespan: {fileID: 1190557266045678637}
-  _eventData: {fileID: 0}
---- !u!114 &1434583519645761743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d021daeb50ad3c4581d6e25b0d55562, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterBrain: {fileID: 0}
-  moveControl: {fileID: 0}
-  playerTag: Player
-  speedThreshold: 0.1
-  animatorChildIndex: 0
-  animatorBoolParam: IsMove
-  locomotionSpeedParam: LocomotionSpeed
-  chaseAnimSpeedMult: 1
-  dashAnimSpeedMult: 1.6
-  isChasing: 0
-  isStoryMode: 0
-  behavior: 0
-  splineContainer: {fileID: 0}
-  arriveDistance: 0.5
-  waitAtKnotSeconds: 0
-  loopPatrol: 1
-  motionSampleInterval: 0.1
-  velocityEmaHalfLife: 0.3
-  predictionLeadTime: 0.6
-  aheadMinDistance: 3
-  aheadMaxDistance: 8
-  minPredictableSpeed: 0.2
-  navmeshSnapRadius: 1
-  minSeparationFromPlayer: 1.2
-  enableFrontBackRandom: 1
-  frontSpawnProbability: 0.65
-  backDistanceScale: 1.1
-  lateralAngleJitterDeg: 8
-  lateralOffsetMax: 1
-  dashPattern: 0
-  enableDash: 0
-  dashPreWaitSeconds: 2
-  dashPostWaitSeconds: 0.5
-  dashCooldownMinSeconds: 1
-  dashCooldownMaxSeconds: 3
-  dashDistance: 10
-  dashSpeed: 8
-  dashFaceTarget: 1
-  homingSpeedMultiplier: 0.7
-  homingTurnSharpness: 6
-  zigzagSpeedMultiplier: 0.6
-  zigzagMaxAngleDeg: 25
-  zigzagFrequencyHz: 3
-  controlFacingWhileChasing: 1
-  chaseTurnSharpness: 8
 --- !u!114 &1555985007829630829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,60 +608,6 @@ MonoBehaviour:
   characterSettings: {fileID: 0}
   useAngleSnap: 1
   snapStep: 45
---- !u!114 &3949941853238961511
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a70f55eba6898a34189ad47f99776f19, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 0}
-  playerTag: Player
-  boostedSpeed: 7
-  revertSmoothing: 0
-  farBoostDistance: 12
-  nearReturnDistance: 6
-  autoRefreshTargets: 1
-  refreshInterval: 1
---- !u!114 &6490954179236640322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08d351ef8c23e104694d04a2ab25da82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 7665162067455944546}
-  agent: {fileID: -8439374336953332058}
-  rigidBody: {fileID: 0}
-  isMoveBoolParam: IsMove
-  locomotionSpeedParam: LocomotionSpeed
-  speedThreshold: 0.3
-  emaHalfLife: 0
-  planarOnly: 1
-  useFixedUpdate: 1
---- !u!114 &-6838671714581490994
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f674cbe464f3ffc40bd63ee7c9e0582b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  splineContainer: {fileID: 0}
 --- !u!114 &1431485421636668416
 MonoBehaviour:
   m_ObjectHideFlags: 0
