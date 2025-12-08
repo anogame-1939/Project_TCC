@@ -143,7 +143,10 @@ namespace AnoGame.Application.Inventory
             StartCoroutine(SubscribeInventoryCloseActionDelayed(uiMap));
 
             // 表示＆カーソル解放
+            // 表示＆カーソル解放
             _canvasGroup.alpha = 1;
+            _canvasGroup.interactable = true;
+            _canvasGroup.blocksRaycasts = true;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
@@ -151,7 +154,10 @@ namespace AnoGame.Application.Inventory
         public void Hide()
         {
             // 非表示＆カーソルロック
+            // 非表示＆カーソルロック
             _canvasGroup.alpha = 0;
+            _canvasGroup.interactable = false;
+            _canvasGroup.blocksRaycasts = false;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 

@@ -108,8 +108,8 @@ namespace AnoGame.Application.Inventory
             var sel = slots.FirstOrDefault()?.GetComponent<Selectable>();
             if (sel != null)
             {
+                EventSystem.current.SetSelectedGameObject(null);
                 EventSystem.current.SetSelectedGameObject(sel.gameObject);
-                sel.Select();
             }
         }
 
