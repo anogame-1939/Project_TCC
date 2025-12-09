@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+using AnoGame.SLFBDebug;
+
 namespace AnoGame.EditorExtensions
 {
     public class UtilityLauncherWindow : EditorWindow
@@ -24,7 +26,7 @@ namespace AnoGame.EditorExtensions
         private List<UtilityTool> _tools;
         private Vector2 _scrollPosition;
 
-        [MenuItem("Tools/Utility Launcher")]
+        [MenuItem("AnoGame/Utility Launcher")]
         public static void ShowWindow()
         {
             GetWindow<UtilityLauncherWindow>("Utility Launcher");
@@ -53,6 +55,11 @@ namespace AnoGame.EditorExtensions
                     "PlayerPrefs削除 (Delete All PlayerPrefs)",
                     DeleteAllPlayerPrefs,
                     "全てのPlayerPrefsを削除します。実行前に確認ダイアログが出ます。"
+                ),
+                new UtilityTool(
+                    "Save Data Switcher",
+                    SavedataSwitcherWindow.ShowWindow,
+                    "セーブデータの切り替え・バックアップ・作成を行うウィンドウを開きます。"
                 )
             };
         }

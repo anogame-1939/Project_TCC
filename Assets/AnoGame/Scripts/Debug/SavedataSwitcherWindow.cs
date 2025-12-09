@@ -16,9 +16,9 @@ namespace AnoGame.SLFBDebug
         private int selectedIndex = -1;
         private Vector2 scroll;
         private bool makeBackup = true;
+        private string newSaveDataName = "";
 
-        [MenuItem("AnoGame/Tools/Savedata Switcher")]
-        private static void Open()
+        public static void ShowWindow()
         {
             var w = GetWindow<SavedataSwitcherWindow>("Savedata Switcher");
             w.Show();
@@ -74,6 +74,16 @@ namespace AnoGame.SLFBDebug
                     var fi = new FileInfo(dest);
                     EditorGUILayout.LabelField($"現在の savedata.json: {fi.Length} bytes, 更新 {fi.LastWriteTime:yyyy/MM/dd HH:mm:ss}");
                 }
+
+                EditorGUILayout.Space(4);
+                EditorGUILayout.BeginHorizontal();
+                newSaveDataName = EditorGUILayout.TextField("作成名: savedata_", newSaveDataName);
+                GUILayout.Label(".json");
+                if (GUILayout.Button("作成", GUILayout.Width(60)))
+                {
+                    CreateNewSaveData();
+                }
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUILayout.Space(6);
@@ -175,6 +185,47 @@ namespace AnoGame.SLFBDebug
             {
                 Debug.LogException(e);
                 EditorUtility.DisplayDialog("コピー失敗", $"エラー: {e.Message}", "OK");
+            }
+        }
+
+        private void CreateNewSaveData()
+        {
+            if (string.IsNullOrEmpty(newSaveDataName))
+            {
+                EditorUtility.DisplayDialog("エラー", "作成名を入力してください", "OK");
+                return;
+            }
+
+            var dest = Path.Combine(folderPath ?? "", "savedata.json");
+            if (!File.Exists(dest))
+            {
+                EditorUtility.DisplayDialog("エラー", "コピー元の savedata.json が見つかりません", "OK");
+                return;
+            }
+
+            var newFileName = $"savedata_{newSaveDataName}.json";
+            var newFilePath = Path.Combine(folderPath, newFileName);
+
+            if (File.Exists(newFilePath))
+            {
+                if (!EditorUtility.DisplayDialog("確認", $"{newFileName} は既に存在します。\n上書きしますか？", "はい", "いいえ"))
+                {
+                    return;
+                }
+            }
+
+            try
+            {
+                File.Copy(dest, newFilePath, overwrite: true);
+                AssetDatabase.Refresh();
+                ShowNotification(new GUIContent($"作成完了: {newFileName}"));
+                newSaveDataName = ""; // Reset input
+                Refresh();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorUtility.DisplayDialog("作成失敗", $"エラー: {e.Message}", "OK");
             }
         }
     }
