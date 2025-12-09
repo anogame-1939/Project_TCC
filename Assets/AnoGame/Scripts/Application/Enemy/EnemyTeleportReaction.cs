@@ -92,5 +92,60 @@ namespace AnoGame.Application.Enemy
             }
             return null;
         }
+        [Button]
+        public void WarpToNearPlayerSplinePoint()
+        {
+            var container = GetSplineContainer();
+            if (container == null)
+            {
+                Debug.LogWarning("SplineContainer is null");
+                return;
+            }
+
+            // プレイヤーを探す
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+            {
+                var stealth = FindFirstObjectByType<AnoGame.Application.Player.Controller.PlayerStealthController>();
+                if (stealth != null) player = stealth.gameObject;
+            }
+
+            if (player == null)
+            {
+                Debug.LogWarning("Player not found");
+                return;
+            }
+
+            Vector3 targetPos = player.transform.position;
+            Vector3 bestPos = targetPos;
+            float minDistSq = float.MaxValue;
+
+            // 調整用パラメータ
+            float samplingStep = 0.05f;
+
+            for (float t = 0; t <= 1.0f; t += samplingStep)
+            {
+                Vector3 worldPos = container.EvaluatePosition(t);
+
+                float distSq = Vector3.SqrMagnitude(worldPos - targetPos);
+                if (distSq < minDistSq)
+                {
+                    minDistSq = distSq;
+                    bestPos = worldPos;
+                }
+            }
+
+            if (_agent == null) _agent = GetComponent<NavMeshAgent>();
+
+            if (NavMesh.SamplePosition(bestPos, out NavMeshHit hit, 10.0f, NavMesh.AllAreas))
+            {
+                _agent.Warp(hit.position);
+                Debug.Log($"[EnemyTeleportReaction] Debug Warped to Near Player: {hit.position} (Dist: {Mathf.Sqrt(minDistSq)})");
+            }
+            else
+            {
+                Debug.LogWarning("Failed to find valid NavMesh position near spline point.");
+            }
+        }
     }
 }

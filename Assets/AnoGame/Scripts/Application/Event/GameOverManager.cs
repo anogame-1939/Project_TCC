@@ -28,6 +28,7 @@ namespace AnoGame.Application.Event
             _eventService = eventService;
         }
 
+        [Button]
         public void OnGameOver()
         {
             UnityEngine.Debug.Log("OnGameOver");
