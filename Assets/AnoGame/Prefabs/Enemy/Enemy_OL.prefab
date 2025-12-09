@@ -313,6 +313,7 @@ GameObject:
   - component: {fileID: 1796915948952402702}
   - component: {fileID: 5260855969895964056}
   - component: {fileID: 626229431214549771}
+  - component: {fileID: 8617595717906349681}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -774,6 +775,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   director: {fileID: 1796915948952402702}
+--- !u!114 &8617595717906349681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d549c64fcd2cb7e43bafe68f4f533e0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _patrolProvider: {fileID: 296865261083013438}
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0
@@ -955,7 +969,7 @@ AudioSource:
   Priority: 0
   DopplerLevel: 3.98
   MinDistance: 1
-  MaxDistance: 100
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0

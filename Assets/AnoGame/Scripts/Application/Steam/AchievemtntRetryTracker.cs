@@ -28,7 +28,7 @@ namespace AnoGame.Application.Steam
         private void HandleRetry()
         {
             _retryCount++;
-            if (_retryCount < _threshold)
+            if (_retryCount > _threshold)
             {
                 SteamStatsAndAchievements.Instance.ForceUnlockAchievement(Achievement.INDOMITABLE_SPIRIT);
             }

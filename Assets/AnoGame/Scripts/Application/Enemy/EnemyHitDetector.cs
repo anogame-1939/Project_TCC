@@ -10,7 +10,7 @@ namespace AnoGame.Application.Enemy
 
         private void Awake()
         {
-            Deactivate();
+            // Deactivate();
         }
         
         public void Activate()

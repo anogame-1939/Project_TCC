@@ -63,10 +63,13 @@ namespace AnoGame.Application.Player
 
             if (_currentLives <= 0)
             {
+                Debug.Log("[PlayerHealth] Player has died.", this);
+                _currentLives = _maxLives;
                 OnDeath();
             }
             else
             {
+                Debug.Log($"[PlayerHealth] Player took damage. Current Lives: {_currentLives}/{_maxLives}", this);
                 // まだライフが残っている場合は無敵時間開始
                 _isInvincible = true;
                 _invincibilityTimer = _invincibilityDuration;

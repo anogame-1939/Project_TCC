@@ -16,6 +16,8 @@ namespace AnoGame.Application.Enemy.AI
         [SerializeField, Min(0.05f)] private float arriveDistance = 0.5f;
         [SerializeField] private bool loop = true;
 
+        public SplineContainer Container => splineContainer;
+
         private int _currentIndex = 0;
         private Vector3 _currentWorld;
 
