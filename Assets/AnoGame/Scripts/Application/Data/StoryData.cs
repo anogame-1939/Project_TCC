@@ -41,6 +41,10 @@ namespace AnoGame.Application.Data
         public SceneReference mainMapScene;
         public List<ChapterData> chapters = new List<ChapterData>();
 
+        [Header("Event Settings")]
+        [Tooltip("List of Event IDs associated with this story. These events will be reset when the story is restarted.")]
+        public List<AnoGame.Data.EventData> associatedEvents = new List<AnoGame.Data.EventData>();
+
         [HideInInspector] public int currentStoryIndex = 0;
         [HideInInspector] public int currentChapterIndex = 0;
         [HideInInspector] public int currentSceneIndex = 0;
@@ -80,6 +84,7 @@ namespace AnoGame.Application.Data
             EditorGUILayout.PropertyField(serializedObject.FindProperty("storyName"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("mainMapScene"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("chapters"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("associatedEvents"), true);
 
             if (GUILayout.Button("Update Scene Paths"))
             {
@@ -145,7 +150,7 @@ namespace AnoGame.Application.Data
             {
                 foreach (var scene in chapter.scenes)
                 {
-                    if (!string.IsNullOrEmpty(scene.sceneReference.ScenePath) && 
+                    if (!string.IsNullOrEmpty(scene.sceneReference.ScenePath) &&
                         !addedScenePaths.Contains(scene.sceneReference.ScenePath))
                     {
                         buildScenes.Add(new EditorBuildSettingsScene(scene.sceneReference.ScenePath, true));

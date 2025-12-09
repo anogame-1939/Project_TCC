@@ -18,7 +18,7 @@ namespace AnoGame.Application.Story
         string[] ignoreScenes;
         public event Action<bool> StoryLoaded;
         public event Action<bool> ChapterLoaded;
-        
+
         [SerializeField]
         private List<StoryData> _storyDataList;
 
@@ -29,17 +29,18 @@ namespace AnoGame.Application.Story
         private ISceneLoader _sceneLoader;
         private List<UnityEngine.SceneManagement.Scene> _loadedStoryScenes = new List<UnityEngine.SceneManagement.Scene>();
         private SceneReference _mainMapScene;
-        
+
         // インスペクターでメインシーン名を設定
         [SerializeField]
         private string mainSceneName;
         private UnityEngine.SceneManagement.Scene _mainScene;
         public UnityEngine.SceneManagement.Scene MainScene => _mainScene;
-        
+
         private bool _isLoadingScene = false;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _sceneLoader = new SceneLoader();
             // GetActiveScene() は使わず、mainSceneName からシーンを取得する
             _mainScene = SceneManager.GetSceneByName(mainSceneName);
@@ -81,7 +82,7 @@ namespace AnoGame.Application.Story
                     Debug.Log($"{_mainMapScene.ScenePath} をアンロード");
 
                     // _sceneLoader.HideAllGameObjects(tmpMainScene);
-                    
+
                     _mainMapScene = storyData.mainMapScene;
                     await LoadScenesAsync(storyData.mainMapScene);
                     await _sceneLoader.UnloadSceneAsync(tmpMainScene);
@@ -104,10 +105,52 @@ namespace AnoGame.Application.Story
         public void UpdateGameData()
         {
             GameData gameData = GameManager2.Instance.CurrentGameData;
-            if (gameData.StoryProgress == null)
-            {
-            }
+            // if (gameData.StoryProgress == null)
+            // {
+            // }
             GameManager2.Instance.CurrentGameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
+        }
+
+        public async void ResetStoryProgress()
+        {
+            // 現在のストーリーデータを取得
+            _currentStoryIndex = GameManager2.Instance.CurrentGameData.StoryProgress.CurrentStoryIndex;
+
+            // 現在のストーリーの最初（Chapter 0）に戻す
+            _currentChapterIndex = 0;
+
+            // StoryDataを取得
+            if (_currentStoryIndex < 0 || _currentStoryIndex >= _storyDataList.Count)
+            {
+                Debug.LogError($"Invalid story index: {_currentStoryIndex}");
+                return;
+            }
+            StoryData currentStoryData = _storyDataList[_currentStoryIndex];
+
+            // 関連イベントIDを削除
+            // 関連イベントIDを削除
+            if (currentStoryData.associatedEvents != null)
+            {
+                foreach (AnoGame.Data.EventData eventData in currentStoryData.associatedEvents)
+                {
+                    if (eventData == null) continue;
+
+                    if (GameManager2.Instance.CurrentGameData.EventHistory.HasCompleted(eventData.EventId))
+                    {
+                        Debug.Log($"Resetting Event: {eventData.EventName} ({eventData.EventId})");
+                        GameManager2.Instance.CurrentGameData.RemoveClearedEvent(eventData.EventId);
+                    }
+                }
+            }
+
+            // ゲームデータを更新（StoryProgressをリセット）
+            UpdateGameData();
+
+            // 変更を保存 (GameManager2の実装に依存するが、ここでは保存処理が必要な場合を想定)
+            await GameManager2.Instance.SaveCurrentGameState();
+
+            // ストーリーをロードし直す
+            LoadStory(_currentStoryIndex, false);
         }
 
         public void StartStory()
@@ -153,7 +196,7 @@ namespace AnoGame.Application.Story
                     Debug.Log($"{_mainMapScene.ScenePath} をアンロード2");
 
                     // _sceneLoader.HideAllGameObjects(tmpMainScene);
-                    
+
                     _mainMapScene = storyData.mainMapScene;
                     await LoadScenesAsync(storyData.mainMapScene);
                     await _sceneLoader.UnloadSceneAsync(tmpMainScene);
@@ -249,7 +292,7 @@ namespace AnoGame.Application.Story
             yield return LoadNewSceneCoroutine();
 
             _isLoadingScene = false;
-            
+
             // チャプターのロード完了イベントを通知
             ChapterLoaded?.Invoke(useRetryPoint);
         }
@@ -258,7 +301,7 @@ namespace AnoGame.Application.Story
         {
             StoryData currentStory = _storyDataList[_currentStoryIndex];
             StoryData.SceneData currentScene = currentStory.chapters[_currentChapterIndex].scenes[0];
-            
+
             if (currentScene == null)
             {
                 Debug.Log("Current story completed or no more scenes available.");
@@ -269,7 +312,7 @@ namespace AnoGame.Application.Story
             try
             {
                 loadOperation = SceneManager.LoadSceneAsync(
-                    currentScene.sceneReference.ScenePath, 
+                    currentScene.sceneReference.ScenePath,
                     LoadSceneMode.Additive
                 );
             }
@@ -290,7 +333,7 @@ namespace AnoGame.Application.Story
             UnityEngine.SceneManagement.Scene newScene = SceneManager.GetSceneByPath(
                 currentScene.sceneReference.ScenePath
             );
-            
+
             if (newScene.IsValid())
             {
                 _loadedStoryScenes.Add(newScene);
@@ -307,7 +350,7 @@ namespace AnoGame.Application.Story
         {
             var scenesToUnload = new List<UnityEngine.SceneManagement.Scene>(_loadedStoryScenes);
             Debug.Log($"Starting to unload {scenesToUnload.Count} story scenes");
-            
+
             foreach (var scene in scenesToUnload)
             {
                 if (ignoreScenes.Contains(scene.name))
@@ -315,10 +358,10 @@ namespace AnoGame.Application.Story
                     continue;
                 }
                 if (!scene.isLoaded || !scene.IsValid())
-                    {
-                        Debug.Log($"Skipping scene {scene.path}: not loaded or invalid");
-                        continue;
-                    }
+                {
+                    Debug.Log($"Skipping scene {scene.path}: not loaded or invalid");
+                    continue;
+                }
 
                 AsyncOperation unloadOperation = null;
                 try

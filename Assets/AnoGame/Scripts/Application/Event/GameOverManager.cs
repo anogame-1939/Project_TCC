@@ -3,6 +3,7 @@ using System.Linq;
 using AnoGame.Application.Core;
 using AnoGame.Application.Enemy;
 using AnoGame.Application.Steam;
+using AnoGame.Application.Story;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
 using UniRx;
@@ -14,7 +15,7 @@ namespace AnoGame.Application.Event
     public class GameOverManager : SingletonMonoBehaviour<GameOverManager>
     {
         public event Action GameOver;
-        
+
         [Inject] private IInventoryService _inventoryService;
         [Inject] private IEventService _eventService;
         [Inject]
@@ -26,8 +27,8 @@ namespace AnoGame.Application.Event
             _inventoryService = inventoryService;
             _eventService = eventService;
         }
-        
-        public async void OnGameOver()
+
+        public void OnGameOver()
         {
             UnityEngine.Debug.Log("OnGameOver");
 
@@ -56,8 +57,15 @@ namespace AnoGame.Application.Event
             _inventoryService.SetItems(itemNames);
             UnityEngine.Debug.Log($"itemNames.Count:{itemNames.Count}");
 
-            // イベントをリセット
-            _eventService.SetClearedEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+            // イベントをリセット (StoryManager側で処理するように変更)
+            // _eventService.SetClearedEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
+
+            // ストーリー進行リセット処理呼び出し
+            StoryManager.Instance.ResetStoryProgress();
+
+            // イベントサービスへの反映はResetStoryProgress内でのデータ更新後に行われるべきだが、
+            // 即座に反映させるためにここで再設定するか、StoryManagerがリロードする際に同期されるか確認が必要。
+            // ResetStoryProgress内でデータのセーブ＆ロードを行う場合、ここのイベントセットは最新データに基づく必要がある。
         }
 
         public async void OnRetryGame()

@@ -55,6 +55,11 @@ namespace AnoGame.Domain.Data.Models
         {
             EventHistory.AddEvent(eventId);
         }
+
+        public void RemoveClearedEvent(string eventId)
+        {
+            EventHistory.RemoveEvent(eventId);
+        }
     }
 
     [Serializable]
@@ -151,10 +156,10 @@ namespace AnoGame.Domain.Data.Models
     {
         [JsonProperty]
         public int CurrentStoryIndex { get; private set; }
-        
+
         [JsonProperty]
         public int CurrentChapterIndex { get; private set; }
-        
+
         [JsonProperty]
         public int CurrentSceneIndex { get; private set; }
 
@@ -181,7 +186,7 @@ namespace AnoGame.Domain.Data.Models
     {
         [JsonProperty("Items")]
         private readonly List<InventoryItem> _items = new();
-        
+
         [JsonIgnore]
         public IReadOnlyList<InventoryItem> Items => _items.AsReadOnly();
 
@@ -216,10 +221,10 @@ namespace AnoGame.Domain.Data.Models
         public string Description { get; private set; }
         [JsonProperty]
         public string UniqueId { get; private set; }
-        
+
         [JsonProperty("UniqueIds")]
         private readonly List<string> _uniqueIds = new();
-        
+
         [JsonIgnore]
         public IReadOnlyList<string> UniqueIds => _uniqueIds.AsReadOnly();
 
@@ -248,7 +253,7 @@ namespace AnoGame.Domain.Data.Models
     {
         [JsonProperty("ClearedEvents")]
         private readonly HashSet<string> _clearedEvents = new();
-        
+
         [JsonIgnore]
         public IReadOnlyCollection<string> ClearedEvents => _clearedEvents;
 
@@ -265,6 +270,14 @@ namespace AnoGame.Domain.Data.Models
         public bool HasCompleted(string eventId)
         {
             return _clearedEvents.Contains(eventId);
+        }
+
+        public void RemoveEvent(string eventId)
+        {
+            if (_clearedEvents.Contains(eventId))
+            {
+                _clearedEvents.Remove(eventId);
+            }
         }
     }
 }

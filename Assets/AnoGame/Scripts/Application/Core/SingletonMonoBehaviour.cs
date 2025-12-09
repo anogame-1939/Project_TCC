@@ -14,26 +14,26 @@ namespace AnoGame.Application.Core
 			{
 				if (instance == null)
 				{
-					instance = (T) FindAnyObjectByType(typeof(T));
-					
+					instance = (T)FindAnyObjectByType(typeof(T));
+
 					if (instance == null)
 					{
-						Debug.LogWarning (typeof(T) + " is nothing");
+						Debug.LogWarning(typeof(T) + " is nothing");
 					}
 				}
-				
+
 				return instance;
 			}
 		}
-		
-		protected void Awake()
+
+		protected virtual void Awake()
 		{
-            if (CheckInstance() && _dontDestroy)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
+			if (CheckInstance() && _dontDestroy)
+			{
+				DontDestroyOnLoad(gameObject);
+			}
 		}
-		
+
 		protected bool CheckInstance()
 		{
 			if (instance == null)
