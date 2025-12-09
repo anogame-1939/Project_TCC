@@ -36,26 +36,51 @@ namespace AnoGame.Application.Enemy
         {
             if (_agent == null || _patrolProvider == null) return;
 
-            // 今回は、Warp処理を行う。ターゲット場所を決める。
-            WarpToRandomSplinePoint();
+            // プレイヤー（現在地）から最も遠い位置へワープ
+            WarpToFarthestSplinePoint();
         }
 
-        private void WarpToRandomSplinePoint()
+        private void WarpToFarthestSplinePoint()
         {
             var container = GetSplineContainer();
             if (container == null) return;
 
-            // ランダムな位置 (0.0 ~ 1.0)
-            float t = Random.value;
+            Vector3 currentPos = transform.position;
+            Vector3 bestPos = currentPos;
+            float maxDistSq = -1f;
 
-            // Spline上の座標を取得 (World座標)
-            Vector3 worldPos = container.EvaluatePosition(t);
+            // 5%刻みでサンプリングして、最も遠い地点を探す
+            // 精査が必要なら刻みを小さくする（例: 0.02f）
+            for (float t = 0; t <= 1.0f; t += 0.05f)
+            {
+                Vector3 worldPos = container.EvaluatePosition(t);
 
-            // NavMesh上の近い位置を探す (Splineが空中にあったりする場合の安全策)
-            if (NavMesh.SamplePosition(worldPos, out NavMeshHit hit, 5.0f, NavMesh.AllAreas))
+                // ヒットした時点での自分の位置からの距離
+                float distSq = Vector3.SqrMagnitude(worldPos - currentPos);
+                if (distSq > maxDistSq)
+                {
+                    maxDistSq = distSq;
+                    bestPos = worldPos;
+                }
+            }
+
+            // NavMesh上の近い位置を探す
+            if (NavMesh.SamplePosition(bestPos, out NavMeshHit hit, 5.0f, NavMesh.AllAreas))
             {
                 _agent.Warp(hit.position);
-                Debug.Log($"[EnemyTeleportReaction] Warped to {hit.position}");
+
+                // Agentを一時的に無効化
+                _agent.enabled = false;
+                Debug.Log($"[EnemyTeleportReaction] Warped to Farthest: {hit.position} (Dist: {Mathf.Sqrt(maxDistSq)}). Agent disabled for 15s.");
+
+                // 15秒後に有効化
+                Observable.Timer(System.TimeSpan.FromSeconds(15))
+                    .Subscribe(_ =>
+                    {
+                        if (_agent != null) _agent.enabled = true;
+                        Debug.Log("[EnemyTeleportReaction] Agent re-enabled.");
+                    })
+                    .AddTo(this);
             }
         }
 
