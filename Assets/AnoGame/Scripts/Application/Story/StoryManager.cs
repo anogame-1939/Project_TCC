@@ -150,6 +150,11 @@ namespace AnoGame.Application.Story
             await GameManager2.Instance.SaveCurrentGameState();
 
             // ストーリーをロードし直す
+            // LoadStory(_currentStoryIndex, false);
+        }
+
+        public void ReloadStoryScene()
+        {
             LoadStory(_currentStoryIndex, false);
         }
 

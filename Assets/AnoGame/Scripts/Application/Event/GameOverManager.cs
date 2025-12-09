@@ -72,6 +72,9 @@ namespace AnoGame.Application.Event
         {
             GameStateManager.Instance.SetState(GameState.Gameplay);
             MessageBroker.Default.Publish(new PlayerRetriedEvent());
+
+            // シーンをリロード
+            StoryManager.Instance.ReloadStoryScene();
         }
     }
 }
