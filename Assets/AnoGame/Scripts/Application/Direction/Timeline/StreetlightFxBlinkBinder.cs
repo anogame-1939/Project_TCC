@@ -58,14 +58,10 @@ namespace AnoGame.Application.Direction.Timeline
                 dict[fx.BindingId] = fx;
             }
 
-            Debug.Log($"StreetlightFxBlinkBinder: シーン内の StreetlightFxBlink を {dict.Count} 件発見");
-
             foreach (var output in director.playableAsset.outputs)
             {
-                Debug.Log($"StreetlightFxBlinkBinder: output {output.streamName}");
                 if (output.sourceObject is StreetlightFxBlinkTrack track)
                 {
-                    Debug.Log($"StreetlightFxBlinkBinder: これは StreetlightFxBlinkTrack");
                     var id = track.BindingId;
                     if (string.IsNullOrEmpty(id))
                         continue;
