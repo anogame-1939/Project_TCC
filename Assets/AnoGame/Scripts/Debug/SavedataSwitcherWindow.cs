@@ -116,6 +116,14 @@ namespace AnoGame.SLFBDebug
                         selectedIndex = i;
                         CopySelectedToDest();
                     }
+
+                    if (GUILayout.Button("削除", GUILayout.Width(60)))
+                    {
+                        if (EditorUtility.DisplayDialog("削除確認", $"{fi.Name} を削除しますか？\nこの操作は取り消せません。", "削除", "キャンセル"))
+                        {
+                            DeleteFile(fi.FullName);
+                        }
+                    }
                     EditorGUILayout.EndHorizontal();
                 }
 
@@ -226,6 +234,25 @@ namespace AnoGame.SLFBDebug
             {
                 Debug.LogException(e);
                 EditorUtility.DisplayDialog("作成失敗", $"エラー: {e.Message}", "OK");
+            }
+        }
+
+        private void DeleteFile(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    AssetDatabase.Refresh();
+                    ShowNotification(new GUIContent("削除しました"));
+                    Refresh();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorUtility.DisplayDialog("削除失敗", $"エラー: {e.Message}", "OK");
             }
         }
     }
