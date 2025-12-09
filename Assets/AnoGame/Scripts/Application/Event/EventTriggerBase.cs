@@ -46,11 +46,19 @@ namespace AnoGame.Application.Event
             InitializeEvents();
         }
 
+        [SerializeField] private List<EventData> supersededByEvents;
+
         protected virtual void InitializeEvents()
         {
             // クリア済みのイベント事項
             if (_eventService.IsEventCleared(eventData.EventId))
             {
+                // すでに上位のイベントが完了していたらDoneイベントを実行しない
+                if (supersededByEvents != null && supersededByEvents.Any(e => _eventService.IsEventCleared(e.EventId)))
+                {
+                    return;
+                }
+
                 OnDoneEvent();
             }
             // 未クリアならイベント登録
@@ -125,6 +133,11 @@ namespace AnoGame.Application.Event
                 {
                     observableCondition.OnConditionChanged -= StartEvent;
                 }
+
+                if (condition is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
             }
         }
 
@@ -146,7 +159,7 @@ namespace AnoGame.Application.Event
         {
             Debug.Log("OnCompleteEvent");
             // if (_eventProgressService.GetEventState(eventData.EventId) != EventState.InProgress)
-                // return;
+            // return;
 
             onEventFinish?.Invoke();
 
