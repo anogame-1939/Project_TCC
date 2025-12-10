@@ -45,6 +45,9 @@ namespace AnoGame.Application.Data
         [Tooltip("List of Event IDs associated with this story. These events will be reset when the story is restarted.")]
         public List<AnoGame.Data.EventData> associatedEvents = new List<AnoGame.Data.EventData>();
 
+        [Tooltip("List of Items associated with this story. These items will be removed when the story is restarted.")]
+        public List<AnoGame.Data.ItemData> associatedItems = new List<AnoGame.Data.ItemData>();
+
         [HideInInspector] public int currentStoryIndex = 0;
         [HideInInspector] public int currentChapterIndex = 0;
         [HideInInspector] public int currentSceneIndex = 0;
@@ -85,6 +88,7 @@ namespace AnoGame.Application.Data
             EditorGUILayout.PropertyField(serializedObject.FindProperty("mainMapScene"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("chapters"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("associatedEvents"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("associatedItems"), true);
 
             if (GUILayout.Button("Update Scene Paths"))
             {

@@ -9,6 +9,9 @@ using AnoGame.Domain.Data.Models;
 using AnoGame.Application.Core.Scene;
 using Cysharp.Threading.Tasks;
 using System.Linq;
+using VContainer;
+using AnoGame.Domain.Event.Services;
+using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Application.Story
 {
@@ -46,6 +49,19 @@ namespace AnoGame.Application.Story
             _mainScene = SceneManager.GetSceneByName(mainSceneName);
             GameManager2.Instance.LoadGameData += OnLoadGameData;
         }
+
+        [Inject]
+        public void Construct(
+            IEventService eventService,
+            IInventoryService inventoryService
+            )
+        {
+            _eventService = eventService;
+            _inventoryService = inventoryService;
+        }
+
+        private IEventService _eventService;
+        private IInventoryService _inventoryService;
 
         private void Start()
         {
@@ -143,8 +159,30 @@ namespace AnoGame.Application.Story
 
                     if (GameManager2.Instance.CurrentGameData.EventHistory.HasCompleted(eventData.EventId))
                     {
-                        Debug.Log($"Resetting Event: {eventData.EventName} ({eventData.EventId})");
                         GameManager2.Instance.CurrentGameData.RemoveClearedEvent(eventData.EventId);
+                        _eventService?.RemoveClearedEvent(eventData.EventId);
+                    }
+                }
+            }
+
+            // 関連アイテムを削除
+            if (currentStoryData.associatedItems != null)
+            {
+                var inventory = GameManager2.Instance.CurrentGameData.Inventory;
+                foreach (var itemData in currentStoryData.associatedItems)
+                {
+                    if (itemData == null) continue;
+
+                    // アイテム名で一致するものを探して削除
+                    var itemsToRemove = inventory.Items
+                        .Where(i => i.ItemName == itemData.ItemName)
+                        .ToList();
+
+                    foreach (var item in itemsToRemove)
+                    {
+                        Debug.Log($"Resetting Item: {item.ItemName}");
+                        inventory.RemoveItem(item.UniqueId);
+                        _inventoryService?.NotifyItemRemoved(item.ItemName);
                     }
                 }
             }
@@ -494,3 +532,4 @@ namespace AnoGame.Application.Story
         }
     }
 }
+

@@ -8,6 +8,7 @@ namespace AnoGame.Domain.Event.Services
         event Action LoadedClearEvent;
         void SetClearedEvents(HashSet<string> clearedEventIDs);
         bool IsEventCleared(string eventID);
+        void RemoveClearedEvent(string eventID);
         void RegisterStartEventHandler(string eventID, System.Action handler);
         void RegisterCompleteEventHandler(string eventID, System.Action handler);
         void RegisterFailedEventHandler(string eventID, System.Action handler);

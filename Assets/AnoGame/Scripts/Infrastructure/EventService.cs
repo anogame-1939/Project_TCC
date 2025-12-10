@@ -28,7 +28,12 @@ namespace AnoGame.Infrastructure.Services
         {
             return _clearedEvents.Contains(eventID);
         }
-        
+
+        public void RemoveClearedEvent(string eventID)
+        {
+            _clearedEvents.Remove(eventID);
+        }
+
         public void RegisterStartEventHandler(string eventID, Action handler)
         {
             if (!_startEventHandlers.ContainsKey(eventID))
@@ -71,6 +76,8 @@ namespace AnoGame.Infrastructure.Services
                 _cpmpleteEventHandlers[eventID].Remove(handler);
             }
         }
+
+
 
         public void UnregisterFailedEventHandler(string eventID, Action handler)
         {

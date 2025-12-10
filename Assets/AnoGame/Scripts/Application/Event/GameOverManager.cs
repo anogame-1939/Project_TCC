@@ -16,17 +16,7 @@ namespace AnoGame.Application.Event
     {
         public event Action GameOver;
 
-        [Inject] private IInventoryService _inventoryService;
-        [Inject] private IEventService _eventService;
-        [Inject]
-        public void Construct(
-            IInventoryService inventoryService,
-            IEventService eventService
-        )
-        {
-            _inventoryService = inventoryService;
-            _eventService = eventService;
-        }
+
 
         [Button]
         public void OnGameOver()
@@ -49,25 +39,8 @@ namespace AnoGame.Application.Event
 
         private async void ReloadData()
         {
-            // TODO:ここでストーリーデータの削除を行う必要がある
-            await GameManager2.Instance.ReloadDataAsync();
-
-            // アイテムをリセット
-            var itemNames = GameManager2.Instance.CurrentGameData.Inventory.Items
-                            .Select(x => x.ItemName)
-                            .ToHashSet();
-            _inventoryService.SetItems(itemNames);
-            UnityEngine.Debug.Log($"itemNames.Count:{itemNames.Count}");
-
-            // イベントをリセット (StoryManager側で処理するように変更)
-            // _eventService.SetClearedEvents(GameManager2.Instance.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
-
             // ストーリー進行リセット処理呼び出し
             StoryManager.Instance.ResetStoryProgress();
-
-            // イベントサービスへの反映はResetStoryProgress内でのデータ更新後に行われるべきだが、
-            // 即座に反映させるためにここで再設定するか、StoryManagerがリロードする際に同期されるか確認が必要。
-            // ResetStoryProgress内でデータのセーブ＆ロードを行う場合、ここのイベントセットは最新データに基づく必要がある。
         }
 
         public async void OnRetryGame()
