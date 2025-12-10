@@ -1,4 +1,5 @@
 using UnityEngine;
+using Newtonsoft.Json;
 using System;
 using Cysharp.Threading.Tasks;
 using AnoGame.Application.Core;
@@ -101,6 +102,7 @@ namespace AnoGame.Application
         public void ResetDataAsync()
         {
             _currentGameData = CreateNewGameData();
+            Debug.Log($"_currentGameData:{_currentGameData.ToString()}");
             // LoadGameData?.Invoke(_currentGameData);
         }
 
@@ -144,6 +146,27 @@ namespace AnoGame.Application
             titleSceneLoader.LoadNextScene();
 
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Log Current Game Data")]
+        public void LogCurrentGameData()
+        {
+            if (_currentGameData == null)
+            {
+                Debug.LogWarning("Current Game Data is null.");
+                return;
+            }
+
+            // Newtonsoft.Jsonを使って中身をダンプ
+            Debug.Log($"_currentGameData:{_currentGameData.StoryProgress.CurrentStoryIndex}, {_currentGameData.StoryProgress.CurrentChapterIndex}");
+            string json = JsonConvert.SerializeObject(_currentGameData, Formatting.Indented);
+            Debug.Log($"Current Game Data:\n{json}");
+
+            // クリップボードにコピー
+            GUIUtility.systemCopyBuffer = json;
+            Debug.Log("Copied Game Data to clipboard.");
+        }
+#endif
 
         private void OnApplicationQuit()
         {

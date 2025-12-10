@@ -157,7 +157,10 @@ namespace AnoGame.Application.Player.Control
             }
         }
 
-        public int TurnSpeed => 0;
+
+        [SerializeField] int _turnSpeed = 720;
+
+        public int TurnSpeed => _isActive ? _turnSpeed : 0;
 
         void Awake()
         {
