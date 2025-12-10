@@ -72,6 +72,12 @@ namespace AnoGame.Application.Story
             _currentStoryIndex = gameData.StoryProgress.CurrentStoryIndex;
             _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
 
+            if (AnoGame.Application.GameStateManager.Instance.CurrentState == AnoGame.Application.GameState.GameOver)
+            {
+                Debug.Log("Game Over: Skipping LoadCurrentScene in OnLoadGameData.");
+                return;
+            }
+
             StoryData storyData = _storyDataList[_currentStoryIndex];
             if (_mainMapScene != storyData.mainMapScene)
             {
