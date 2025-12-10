@@ -49,6 +49,7 @@ namespace AnoGame.Application.Event
 
         private async void ReloadData()
         {
+            // TODO:ここでストーリーデータの削除を行う必要がある
             await GameManager2.Instance.ReloadDataAsync();
 
             // アイテムをリセット
