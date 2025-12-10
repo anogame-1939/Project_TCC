@@ -473,7 +473,7 @@ namespace AnoGame.Application.Story
             return new StoryProgress
             (
                 _currentStoryIndex,
-                _storyDataList[_currentStoryIndex].currentChapterIndex
+                _currentChapterIndex
             );
         }
 
