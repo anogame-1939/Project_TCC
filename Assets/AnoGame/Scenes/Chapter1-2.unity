@@ -8612,37 +8612,13 @@ MonoBehaviour:
   eventData: {fileID: 11400000, guid: cf8a46426daae5f4babcc50c779bee23, type: 2}
   onPrepareEvent:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1224728601}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onEventStart:
     m_PersistentCalls:
       m_Calls: []
   onEventFinish:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1224728601}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 284172272}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -8658,18 +8634,6 @@ MonoBehaviour:
   onEventDone:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1224728601}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 284172272}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -8686,6 +8650,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &284172279
 MonoBehaviour:
@@ -9426,6 +9391,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &305497922
 MonoBehaviour:
@@ -9785,6 +9751,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &326888110
 MonoBehaviour:
@@ -20864,6 +20831,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &439524301
 MonoBehaviour:
@@ -32819,6 +32787,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
 --- !u!4 &708921626
 Transform:
   m_ObjectHideFlags: 0
@@ -33285,6 +33254,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &735793851
 MonoBehaviour:
@@ -36590,6 +36560,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &973292209
 MonoBehaviour:
@@ -38770,6 +38741,7 @@ GameObject:
   - component: {fileID: 1224728603}
   - component: {fileID: 1224728602}
   - component: {fileID: 1224728606}
+  - component: {fileID: 1224728607}
   m_Layer: 27
   m_Name: "\u8ABF\u3079\u308B_1"
   m_TagString: Untagged
@@ -39031,6 +39003,61 @@ MonoBehaviour:
     onDialogueSystemUnpause:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &1224728607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224728601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: 285ceb655fcd3264c883732b09659b8a, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1224728601}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1224728601}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents: []
+  supersededByEvents: []
+  _onStart: 0
 --- !u!1 &1232639037
 GameObject:
   m_ObjectHideFlags: 0
@@ -39325,6 +39352,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!1 &1235485446
 GameObject:
@@ -46348,6 +46376,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
 --- !u!4 &1407308178
 Transform:
   m_ObjectHideFlags: 0
@@ -47978,6 +48007,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &1550471605
 MonoBehaviour:
@@ -57077,18 +57107,6 @@ MonoBehaviour:
   onEventFinish:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1883453684}
-        m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-        m_MethodName: Log
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: "\u30D3\u30FC\u30EB\u30B1\u30FC\u30B9\u4F7F\u7528"
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 1883453686}
         m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
         m_MethodName: Enqueue
@@ -57128,22 +57146,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 0
-      - m_Target: {fileID: 1224728601}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onEventFailed:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!65 &1883453682
 BoxCollider:
@@ -57423,7 +57430,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
   onEventStart:
     m_PersistentCalls:
       m_Calls: []
@@ -57485,6 +57492,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   conditionComponents: []
+  supersededByEvents: []
   _onStart: 0
 --- !u!114 &1899380750
 MonoBehaviour:
