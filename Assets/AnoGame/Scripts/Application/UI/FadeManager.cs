@@ -34,22 +34,18 @@ namespace AnoGame.Application.UI
                 StopCoroutine(_fadeCoroutine);
             }
             _fadeCoroutine = StartCoroutine(FadeOutInRoutine(duration));
-
-
         }
 
         private IEnumerator FadeOutInRoutine(float duration)
         {
             var halfDuration = duration / 2;
-            yield return StartCoroutine(FadeRoutine(0f, 1f, halfDuration));
-
-
+            yield return FadeRoutine(0f, 1f, halfDuration);
 
             yield return new WaitForSeconds(halfDuration / 2);
 
-            yield return StartCoroutine(FadeRoutine(1f, 0f, halfDuration));
+            yield return FadeRoutine(1f, 0f, halfDuration);
 
-
+            _fadeCoroutine = null;
         }
 
         /// <summary>
@@ -62,7 +58,13 @@ namespace AnoGame.Application.UI
             {
                 StopCoroutine(_fadeCoroutine);
             }
-            _fadeCoroutine = StartCoroutine(FadeRoutine(1f, 0f, duration));
+            _fadeCoroutine = StartCoroutine(FadeInRoutine(duration));
+        }
+
+        private IEnumerator FadeInRoutine(float duration)
+        {
+            yield return FadeRoutine(1f, 0f, duration);
+            _fadeCoroutine = null;
         }
 
         /// <summary>
@@ -75,7 +77,13 @@ namespace AnoGame.Application.UI
             {
                 StopCoroutine(_fadeCoroutine);
             }
-            _fadeCoroutine = StartCoroutine(FadeRoutine(0f, 1f, duration));
+            _fadeCoroutine = StartCoroutine(FadeOutRoutine(duration));
+        }
+
+        private IEnumerator FadeOutRoutine(float duration)
+        {
+            yield return FadeRoutine(0f, 1f, duration);
+            _fadeCoroutine = null;
         }
 
         private IEnumerator FadeRoutine(float startRange, float endRange, float duration)
@@ -92,8 +100,6 @@ namespace AnoGame.Application.UI
             }
 
             _fadeImage.Range = endRange;
-            _fadeCoroutine = null;
-
         }
     }
 }
