@@ -43,8 +43,8 @@ public sealed class ItemEditorWindow : EditorWindow
     private ItemDatabase _itemDatabase;
 
     // ───────────── メニュー ─────────────
-    [MenuItem("Tools/ItemEditor")]
-    private static void Open()
+    // [MenuItem("Tools/ItemEditor")]
+    public static void ShowWindow()
     {
         var window = GetWindow<ItemEditorWindow>("Item Editor");
         window.minSize = new Vector2(480, 420);
@@ -58,13 +58,13 @@ public sealed class ItemEditorWindow : EditorWindow
             _draft = ScriptableObject.CreateInstance<ItemData>();
         }
         _so = new SerializedObject(_draft);
-        _spItemId        = _so.FindProperty("itemId");
-        _spItemName      = _so.FindProperty("itemName");
-        _spDescription   = _so.FindProperty("description");
-        _spAssetReference= _so.FindProperty("assetReference");
-        _spItemType      = _so.FindProperty("itemType");
-        _spIsStackable   = _so.FindProperty("isStackable");
-        _spMaxStackSize  = _so.FindProperty("maxStackSize");
+        _spItemId = _so.FindProperty("itemId");
+        _spItemName = _so.FindProperty("itemName");
+        _spDescription = _so.FindProperty("description");
+        _spAssetReference = _so.FindProperty("assetReference");
+        _spItemType = _so.FindProperty("itemType");
+        _spIsStackable = _so.FindProperty("isStackable");
+        _spMaxStackSize = _so.FindProperty("maxStackSize");
 
         _savePath = EditorPrefs.GetString(EDITORPREFS_PATH_KEY, DEFAULT_SAVE_PATH);
         // 初期は 1-1
@@ -90,13 +90,13 @@ public sealed class ItemEditorWindow : EditorWindow
         {
             GUILayout.Label("ItemData プロパティ", EditorStyles.boldLabel);
             _so.Update();
-            EditorGUILayout.PropertyField(_spItemId,        new GUIContent("Item Id"));
-            EditorGUILayout.PropertyField(_spItemName,      new GUIContent("Item Name"));
-            EditorGUILayout.PropertyField(_spDescription,   new GUIContent("Description"), GUILayout.MinHeight(48));
-            EditorGUILayout.PropertyField(_spAssetReference,new GUIContent("Asset Reference"));
-            EditorGUILayout.PropertyField(_spItemType,      new GUIContent("Item Type"));
-            EditorGUILayout.PropertyField(_spIsStackable,   new GUIContent("Is Stackable"));
-            EditorGUILayout.PropertyField(_spMaxStackSize,  new GUIContent("Max Stack Size"));
+            EditorGUILayout.PropertyField(_spItemId, new GUIContent("Item Id"));
+            EditorGUILayout.PropertyField(_spItemName, new GUIContent("Item Name"));
+            EditorGUILayout.PropertyField(_spDescription, new GUIContent("Description"), GUILayout.MinHeight(48));
+            EditorGUILayout.PropertyField(_spAssetReference, new GUIContent("Asset Reference"));
+            EditorGUILayout.PropertyField(_spItemType, new GUIContent("Item Type"));
+            EditorGUILayout.PropertyField(_spIsStackable, new GUIContent("Is Stackable"));
+            EditorGUILayout.PropertyField(_spMaxStackSize, new GUIContent("Max Stack Size"));
             _so.ApplyModifiedProperties();
         }
 

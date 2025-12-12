@@ -60,6 +60,16 @@ namespace AnoGame.EditorExtensions
                     "Save Data Switcher",
                     SavedataSwitcherWindow.ShowWindow,
                     "セーブデータの切り替え・バックアップ・作成を行うウィンドウを開きます。"
+                ),
+                new UtilityTool(
+                    "Item Editor",
+                    ItemEditorWindow.ShowWindow,
+                    "アイテムデータの作成・編集を行います。"
+                ),
+                new UtilityTool(
+                    "Event Editor",
+                    EventEditorWindow.ShowWindow,
+                    "イベントデータの作成・並べ替えを行います。"
                 )
             };
         }

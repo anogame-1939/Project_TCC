@@ -54,8 +54,8 @@ public sealed class EventEditorWindow : EditorWindow
     private ReorderableList _list;
     private Vector2 _listScroll;
 
-    [MenuItem("Tools/EventEditor")]
-    private static void Open()
+    // [MenuItem("Tools/EventEditor")]
+    public static void ShowWindow()
     {
         var w = GetWindow<EventEditorWindow>("Event Editor");
         w.minSize = new Vector2(520, 460);
@@ -135,10 +135,10 @@ public sealed class EventEditorWindow : EditorWindow
             GUILayout.Label("EventData プロパティ", EditorStyles.boldLabel);
 
             _so.Update();
-            EditorGUILayout.PropertyField(_spEventId,     new GUIContent("Event Id"));
-            EditorGUILayout.PropertyField(_spEventName,   new GUIContent("Event Name"));
+            EditorGUILayout.PropertyField(_spEventId, new GUIContent("Event Id"));
+            EditorGUILayout.PropertyField(_spEventName, new GUIContent("Event Name"));
             EditorGUILayout.PropertyField(_spDescription, new GUIContent("Description"), GUILayout.MinHeight(48));
-            EditorGUILayout.PropertyField(_spIsOneTime,   new GUIContent("Is One Time"));
+            EditorGUILayout.PropertyField(_spIsOneTime, new GUIContent("Is One Time"));
             _so.ApplyModifiedProperties();
         }
 
@@ -267,7 +267,7 @@ public sealed class EventEditorWindow : EditorWindow
             if (index < 0 || index >= _entries.Count) return;
             var e = _entries[index];
             rect.height = EditorGUIUtility.singleLineHeight;
-            EditorGUI.LabelField(rect, $"{index+1,2}. {e.chapter}-{e.section}.{e.branch:000}.{e.namePart}");
+            EditorGUI.LabelField(rect, $"{index + 1,2}. {e.chapter}-{e.section}.{e.branch:000}.{e.namePart}");
         };
         _list.onSelectCallback = l =>
         {
