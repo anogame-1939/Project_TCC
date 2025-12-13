@@ -58,29 +58,37 @@ namespace AnoGame.Application.Player
             // ライフ減少時のイベント（恐怖演出など）
             OnLifeLost?.Invoke();
 
-            // UniRxイベント発行
+            // UniRxイベント発行 (Existing)
             MessageBroker.Default.Publish(new PlayerLifeLostEvent(_currentLives, _maxLives));
 
             if (_currentLives <= 0)
             {
                 Debug.Log("[PlayerHealth] Player has died.", this);
+                int priorLives = _currentLives;
                 _currentLives = _maxLives;
-                OnDeath();
+
+                // Publish Death Event
+                MessageBroker.Default.Publish(new PlayerDeathEvent(priorLives, _maxLives));
+
+                // OnDeath() logic removal - logic moved to event listeners
+                // GameStateManager.Instance.SetState(GameState.GameOver); // Moved to listener or managed by GameOverManager
+                // GameOverManager.Instance.OnGameOver(); // Decoupled
             }
             else
             {
                 Debug.Log($"[PlayerHealth] Player took damage. Current Lives: {_currentLives}/{_maxLives}", this);
+
+                // Publish Miss Event
+                MessageBroker.Default.Publish(new PlayerMissEvent(_currentLives, _maxLives));
+
                 // まだライフが残っている場合は無敵時間開始
                 _isInvincible = true;
                 _invincibilityTimer = _invincibilityDuration;
             }
         }
 
-        private void OnDeath()
-        {
-            GameStateManager.Instance.SetState(GameState.GameOver);
-            GameOverManager.Instance.OnGameOver();
-        }
+        // Removed OnDeath method as it is no longer needed in this form
+        // private void OnDeath() { ... }
 
         // 回復メソッド（ライフ回復）
         public void Heal(int amount)
