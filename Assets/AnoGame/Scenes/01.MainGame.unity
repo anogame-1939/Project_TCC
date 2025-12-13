@@ -28803,6 +28803,7 @@ Transform:
   m_Children:
   - {fileID: 1816123984}
   - {fileID: 1851392714}
+  - {fileID: 733132098}
   - {fileID: 2027201290}
   - {fileID: 1749159982}
   m_Father: {fileID: 0}
@@ -37339,7 +37340,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 207.77791}
+  m_AnchoredPosition: {x: 0, y: 207.77786}
   m_SizeDelta: {x: 0, y: 486.223}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &660101641
@@ -40001,6 +40002,209 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8258954408556846641, guid: d5b53d9445402d843941acd5ff6c23d2, type: 3}
   m_PrefabInstance: {fileID: 729739268}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &733132092
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 733132098}
+  - component: {fileID: 733132093}
+  - component: {fileID: 733132094}
+  - component: {fileID: 733132097}
+  - component: {fileID: 733132096}
+  - component: {fileID: 733132095}
+  m_Layer: 0
+  m_Name: "\u521D\u56DE\u3001\u30CF\u30A4\u30C9\u305B\u305A\u306B\u30DF\u30B9"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &733132093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733132092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: 0b3536fac2ddf364286d4d94e1a5a917, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents:
+  - {fileID: 733132094}
+  supersededByEvents:
+  - {fileID: 11400000, guid: 31fecd2bb623a35459bcafc9391137d9, type: 2}
+  _onStart: 0
+--- !u!114 &733132094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733132092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c7a10163f4b8c4e82ca5a8f1163caa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _eventDataList:
+  - {fileID: 11400000, guid: cf8a46426daae5f4babcc50c779bee23, type: 2}
+--- !u!114 &733132095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733132092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c593457cd8105e148906690e1707c592, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trigger: 32
+  condition:
+    luaConditions: []
+    questConditions: []
+    acceptedTags: []
+    acceptedGameObjects: []
+    luaWizardIndex: -1
+    lastEvaluationValue: 0
+  setQuestState: 1
+  questName: 
+  questState: 0
+  setQuestEntryState: 0
+  questEntryNumber: 1
+  questEntryState: 0
+  setAnotherQuestEntryState: 0
+  anotherQuestEntryNumber: 1
+  anotherQuestEntryState: 0
+  luaCode: 
+  sequence: 
+  sequenceSpeaker: {fileID: 0}
+  sequenceListener: {fileID: 0}
+  waitOneFrameOnStartOrEnable: 1
+  alertMessage: 
+  textTable: {fileID: 0}
+  alertDuration: 0
+  sendMessages: []
+  barkSource: 0
+  barkConversation: 
+  barkEntryID: -1
+  barkEntryTitle: 
+  barkText: 
+  barkTextSequence: 
+  barker: {fileID: 0}
+  barkTarget: {fileID: 0}
+  barkOrder: 0
+  allowBarksDuringConversations: 0
+  skipBarkIfNoValidEntries: 0
+  cacheBarkLines: 0
+  conversation: "1\u56DE\u76EE\u306E\u30DF\u30B9"
+  conversationConversant: {fileID: 0}
+  conversationActor: {fileID: 0}
+  startConversationEntryID: -1
+  startConversationEntryTitle: 
+  overrideDialogueUI: {fileID: 0}
+  exclusive: 0
+  replace: 0
+  queue: 0
+  skipIfNoValidEntries: 0
+  preventRestartOnSameFrameEnded: 0
+  stopConversationOnTriggerExit: 0
+  marginToAllowTriggerExit: 0.2
+  stopConversationIfTooFar: 0
+  maxConversationDistance: 5
+  monitorConversationDistanceFrequency: 1
+  showCursorDuringConversation: 0
+  pauseGameDuringConversation: 0
+  setActiveActions: []
+  setEnabledActions: []
+  setAnimatorStateActions: []
+  onExecute:
+    m_PersistentCalls:
+      m_Calls: []
+  useConversationTitlePicker: 1
+  useBarkTitlePicker: 1
+  useQuestNamePicker: 1
+  selectedDatabase: {fileID: 11400000, guid: 98727bc873ff59a4caa1f95efb58c24f, type: 2}
+--- !u!320 &733132096
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733132092}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 0}
+  m_InitialState: 0
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings: []
+  m_ExposedReferences:
+    m_References: []
+--- !u!114 &733132097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733132092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playableDirector: {fileID: 733132096}
+--- !u!4 &733132098
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733132092}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 457343942}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &735389478
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -91065,7 +91269,7 @@ GameObject:
   - component: {fileID: 1851392715}
   - component: {fileID: 1851392718}
   m_Layer: 0
-  m_Name: PlayerDamageFeedbackPresenter
+  m_Name: "\u901A\u5E38\u306E\u30DF\u30B9\u6F14\u51FA"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95269,6 +95473,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1961940473}
   - component: {fileID: 1961940474}
+  - component: {fileID: 1961940475}
   m_Layer: 0
   m_Name: GameOverManager
   m_TagString: Untagged
@@ -95304,6 +95509,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dontDestroy: 0
+--- !u!114 &1961940475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961940472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceca3bc2bffa3d44b83ec3f5ad92479a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnMiss:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 733132093}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
+        m_MethodName: StartEvent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1972130037
 PrefabInstance:
   m_ObjectHideFlags: 0
