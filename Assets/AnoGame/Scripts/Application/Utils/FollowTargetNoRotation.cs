@@ -38,7 +38,7 @@ namespace AnoGame.Application.Utils
             if (_target == null) return;
 
             transform.position = _target.position + _offset;
-            transform.rotation = _initialRotation;
+            // transform.rotation = _initialRotation;
         }
     }
 }

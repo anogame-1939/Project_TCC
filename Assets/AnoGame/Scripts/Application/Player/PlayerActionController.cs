@@ -163,6 +163,7 @@ namespace AnoGame.Application.Player.Control
 
             if (isSprinting)
             {
+                speedManager.UnregisterMultiplier("StaminaRecovery"); // Fix: Ensure recovery penalty is removed
                 speedManager.RegisterMultiplier("Sprint", sprintSpeedMultiplier);
                 stamina.Consume();
             }
