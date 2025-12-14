@@ -18,6 +18,9 @@ namespace AnoGame.Application.Event
         [System.Serializable]
         public class SpecialMissScenario
         {
+            [Tooltip("このシナリオの名前（インスペクターでの識別用）")]
+            public string Name;
+
             [Tooltip("この特別シナリオが発生するために必要な条件")]
             public EventConditionComponent[] Conditions;
 
