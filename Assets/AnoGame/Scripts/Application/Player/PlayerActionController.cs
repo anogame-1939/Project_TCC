@@ -17,6 +17,7 @@ namespace AnoGame.Application.Player.Control
         [SerializeField] private PlayerStamina stamina;
         [SerializeField] private PlayerSpeedManager speedManager;
         [SerializeField] private float sprintSpeedMultiplier = 1.5f;
+        [SerializeField] private float recoverySpeedMultiplier = 0.5f;
 
         //──────────────────────────────────────────
         // ① IInputActionProvider を Inject で受け取る
@@ -165,9 +166,18 @@ namespace AnoGame.Application.Player.Control
                 speedManager.RegisterMultiplier("Sprint", sprintSpeedMultiplier);
                 stamina.Consume();
             }
+            // ──────────────────────────────────────────
+            // スタミナ回復中なら速度制限
+            // ──────────────────────────────────────────
+            else if (stamina.IsRecovering)
+            {
+                speedManager.UnregisterMultiplier("Sprint");
+                speedManager.RegisterMultiplier("StaminaRecovery", recoverySpeedMultiplier);
+            }
             else
             {
                 speedManager.UnregisterMultiplier("Sprint");
+                speedManager.UnregisterMultiplier("StaminaRecovery");
                 // Consume()を呼ばなければPlayerStamina側でRecoveryタイマーが進む
             }
         }

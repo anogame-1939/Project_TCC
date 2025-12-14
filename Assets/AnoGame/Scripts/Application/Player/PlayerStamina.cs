@@ -21,6 +21,7 @@ namespace AnoGame.Application.Player
         public float MaxStamina => maxStamina;
         public float CurrentStamina => currentStamina;
         public bool IsExhausted => isExhausted;
+        public bool IsRecovering => isRecovering;
 
         // Reactive property for UI if needed
         private ReactiveProperty<float> _currentStaminaRx;
