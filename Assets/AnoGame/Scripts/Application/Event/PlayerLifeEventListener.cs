@@ -33,6 +33,9 @@ namespace AnoGame.Application.Event
 
             [Tooltip("trueの場合、通常のOnMissイベントは実行されません")]
             public bool BlockStandardMiss = true;
+
+            [Tooltip("trueの場合、通常のOnMissイベントの後に実行されます")]
+            public bool ExecuteAfterStandardMiss = false;
         }
 
         [Header("Events")]
@@ -69,20 +72,15 @@ namespace AnoGame.Application.Event
 
         private void HandleMissEvent()
         {
+            var matchedScenarios = new List<SpecialMissScenario>();
             bool blocked = false;
 
+            // 1. Collect all matching scenarios and determine if blocked
             foreach (var scenario in _specialMissScenarios)
             {
                 if (CheckScenarioConditions(scenario))
                 {
-                    scenario.OnMiss?.Invoke();
-
-                    if (scenario.CompleteEventData != null && _eventService != null)
-                    {
-                        Debug.Log($"[PlayerLifeEventListener] Completing event: {scenario.CompleteEventData.EventId}");
-                        _eventService.TriggerEventComplete(scenario.CompleteEventData.EventId);
-                    }
-
+                    matchedScenarios.Add(scenario);
                     if (scenario.BlockStandardMiss)
                     {
                         blocked = true;
@@ -90,10 +88,40 @@ namespace AnoGame.Application.Event
                 }
             }
 
+            // 2. Execute Pre-Standard Scenarios
+            foreach (var scenario in matchedScenarios)
+            {
+                if (!scenario.ExecuteAfterStandardMiss)
+                {
+                    ExecuteScenario(scenario);
+                }
+            }
+
+            // 3. Execute Standard OnMiss
             if (!blocked)
             {
                 Debug.Log("[PlayerLifeEventListener] Standard OnMiss invoked.");
                 OnMiss?.Invoke();
+            }
+
+            // 4. Execute Post-Standard Scenarios
+            foreach (var scenario in matchedScenarios)
+            {
+                if (scenario.ExecuteAfterStandardMiss)
+                {
+                    ExecuteScenario(scenario);
+                }
+            }
+        }
+
+        private void ExecuteScenario(SpecialMissScenario scenario)
+        {
+            scenario.OnMiss?.Invoke();
+
+            if (scenario.CompleteEventData != null && _eventService != null)
+            {
+                Debug.Log($"[PlayerLifeEventListener] Completing event: {scenario.CompleteEventData.EventId}");
+                _eventService.TriggerEventComplete(scenario.CompleteEventData.EventId);
             }
         }
 
