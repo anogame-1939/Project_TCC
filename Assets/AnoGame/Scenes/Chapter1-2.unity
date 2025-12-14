@@ -33349,8 +33349,10 @@ GameObject:
   - component: {fileID: 729506396}
   - component: {fileID: 729506395}
   - component: {fileID: 729506394}
+  - component: {fileID: 729506398}
+  - component: {fileID: 729506397}
   m_Layer: 26
-  m_Name: HidePoint_3
+  m_Name: "HidePoint_\u6700\u521D\u306E\u30CF\u30A4\u30C9"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33400,6 +33402,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 0
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
+          AnoGame.Application
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnEnterHidden:
     m_PersistentCalls:
       m_Calls:
@@ -33431,6 +33446,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 0
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
+          AnoGame.Application
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnCanceled:
     m_PersistentCalls:
       m_Calls: []
@@ -33493,6 +33521,53 @@ Transform:
   - {fileID: 868397488}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &729506397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729506393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c7a10163f4b8c4e82ca5a8f1163caa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _eventDataList:
+  - {fileID: 11400000, guid: cf8a46426daae5f4babcc50c779bee23, type: 2}
+  _mustNotBeClearedEventDataList: []
+--- !u!114 &729506398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729506393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 0}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents:
+  - {fileID: 729506397}
+  supersededByEvents: []
+  _onStart: 0
 --- !u!4 &733236466 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538259220956459689, guid: 04a122351bf6b37449b00a4b87c72a23, type: 3}
