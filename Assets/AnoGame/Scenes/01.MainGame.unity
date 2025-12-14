@@ -28802,8 +28802,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1816123984}
-  - {fileID: 1851392714}
+  - {fileID: 1671672176}
   - {fileID: 733132098}
+  - {fileID: 1851392714}
   - {fileID: 2027201290}
   - {fileID: 1749159982}
   m_Father: {fileID: 0}
@@ -40045,8 +40046,20 @@ MonoBehaviour:
   onEventFinish:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 733132097}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
         m_MethodName: 
         m_Mode: 1
         m_Arguments:
@@ -40082,6 +40095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _eventDataList:
   - {fileID: 11400000, guid: cf8a46426daae5f4babcc50c779bee23, type: 2}
+  _mustNotBeClearedEventDataList: []
 --- !u!114 &733132095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40169,14 +40183,16 @@ PlayableDirector:
   m_GameObject: {fileID: 733132092}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 0}
+  m_PlayableAsset: {fileID: 11400000, guid: 9cf831a3a74850048a41adf396e110cd, type: 2}
   m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
   m_SceneBindings: []
   m_ExposedReferences:
-    m_References: []
+    m_References:
+    - 4a77987cf9ea0b84cbcfe0acfcba97f0: {fileID: 1851392713}
+    - c1a712077e431164f9d1f0eebd022408: {fileID: 733132095}
 --- !u!114 &733132097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83691,6 +83707,104 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8258954408556846641, guid: d5b53d9445402d843941acd5ff6c23d2, type: 3}
   m_PrefabInstance: {fileID: 1671463582}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1671672175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1671672176}
+  - component: {fileID: 1671672178}
+  - component: {fileID: 1671672177}
+  m_Layer: 0
+  m_Name: "\u30DF\u30B9\u6642\u306E\u51E6\u7406"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1671672176
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671672175}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 457343942}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1671672177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671672175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c7a10163f4b8c4e82ca5a8f1163caa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _eventDataList:
+  - {fileID: 11400000, guid: cf8a46426daae5f4babcc50c779bee23, type: 2}
+  _mustNotBeClearedEventDataList:
+  - {fileID: 11400000, guid: 0b3536fac2ddf364286d4d94e1a5a917, type: 2}
+--- !u!114 &1671672178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671672175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceca3bc2bffa3d44b83ec3f5ad92479a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnMiss:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 733132093}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
+        m_MethodName: StartEvent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  _specialMissScenarios:
+  - Conditions:
+    - {fileID: 1671672177}
+    OnMiss:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 733132093}
+          m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
+          m_MethodName: StartEvent
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    BlockStandardMiss: 1
 --- !u!1 &1673629925
 GameObject:
   m_ObjectHideFlags: 0
@@ -87626,7 +87740,7 @@ GameObject:
   - component: {fileID: 1749159982}
   - component: {fileID: 1749159983}
   m_Layer: 0
-  m_Name: "\u4F1A\u8A71-\u6B21\u306F\u306A\u3044\u6C17\u304C\u3059\u308B..."
+  m_Name: "~\u4F1A\u8A71-\u6B21\u306F\u306A\u3044\u6C17\u304C\u3059\u308B..."
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -91268,6 +91382,7 @@ GameObject:
   - component: {fileID: 1851392716}
   - component: {fileID: 1851392715}
   - component: {fileID: 1851392718}
+  - component: {fileID: 1851392719}
   m_Layer: 0
   m_Name: "\u901A\u5E38\u306E\u30DF\u30B9\u6F14\u51FA"
   m_TagString: Untagged
@@ -91383,6 +91498,37 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+--- !u!114 &1851392719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1851392713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 0}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents: []
+  supersededByEvents: []
+  _onStart: 0
 --- !u!1 &1854051327
 GameObject:
   m_ObjectHideFlags: 0
@@ -95473,7 +95619,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1961940473}
   - component: {fileID: 1961940474}
-  - component: {fileID: 1961940475}
   m_Layer: 0
   m_Name: GameOverManager
   m_TagString: Untagged
@@ -95509,36 +95654,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dontDestroy: 0
---- !u!114 &1961940475
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1961940472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceca3bc2bffa3d44b83ec3f5ad92479a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnMiss:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 733132093}
-        m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-        m_MethodName: StartEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnDeath:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &1972130037
 PrefabInstance:
   m_ObjectHideFlags: 0

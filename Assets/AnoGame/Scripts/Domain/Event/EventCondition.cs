@@ -9,13 +9,16 @@ namespace AnoGame.Domain.Event.Conditions
     {
         private readonly IEventService _eventService;
         private readonly List<string> _requiredEventIDs;
+        private readonly List<string> _excludedEventIDs;
 
         public event Action OnConditionChanged;
 
-        public MultipleEventCondition(IEventService eventService, IEnumerable<string> requiredEventIDs)
+        public MultipleEventCondition(IEventService eventService, IEnumerable<string> requiredEventIDs, IEnumerable<string> excludedEventIDs = null)
         {
             _eventService = eventService;
-            _requiredEventIDs = requiredEventIDs.ToList();
+            _requiredEventIDs = requiredEventIDs != null ? requiredEventIDs.ToList() : new List<string>();
+            _excludedEventIDs = excludedEventIDs != null ? excludedEventIDs.ToList() : new List<string>();
+
             // イベント状態がロード（または更新）されたときに条件変更を通知
             _eventService.LoadedClearEvent += HandleLoadedClearEvent;
         }
@@ -29,7 +32,18 @@ namespace AnoGame.Domain.Event.Conditions
         public bool IsSatisfied()
         {
             // 全ての指定されたイベントがクリアされているかチェック
-            return _requiredEventIDs.All(eventID => _eventService.IsEventCleared(eventID));
+            if (!_requiredEventIDs.All(eventID => _eventService.IsEventCleared(eventID)))
+            {
+                return false;
+            }
+
+            // 除外設定されたイベントのいずれか一つでもクリアされていたらFalse
+            if (_excludedEventIDs.Any(eventID => _eventService.IsEventCleared(eventID)))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public void Dispose()
