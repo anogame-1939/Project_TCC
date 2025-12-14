@@ -167,9 +167,10 @@ namespace AnoGame.Application.Player.Control
                 stamina.Consume();
             }
             // ──────────────────────────────────────────
-            // スタミナ回復中なら速度制限
+            // スタミナ枯渇中（exhausted）のみ速度制限
+            // 正常に回復している（枯渇していない）場合は制限しない
             // ──────────────────────────────────────────
-            else if (stamina.IsRecovering)
+            else if (stamina.IsExhausted)
             {
                 speedManager.UnregisterMultiplier("Sprint");
                 speedManager.RegisterMultiplier("StaminaRecovery", recoverySpeedMultiplier);

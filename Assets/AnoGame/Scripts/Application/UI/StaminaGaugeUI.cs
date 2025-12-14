@@ -11,6 +11,8 @@ namespace AnoGame.Application.UI
         [SerializeField] private Image gaugeImage;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private float fadeDuration = 0.5f;
+        [SerializeField] private Color normalColor = Color.white;
+        [SerializeField] private Color lowStaminaColor = Color.red;
 
         private float _maxStaminaStayTimer;
         private bool _isFadingOut;
@@ -21,7 +23,7 @@ namespace AnoGame.Application.UI
             if (playerStamina == null)
             {
                 // Try to find if not assigned
-                playerStamina = FindObjectOfType<PlayerStamina>();
+                playerStamina = FindFirstObjectByType<PlayerStamina>();
             }
 
             if (playerStamina != null)
@@ -62,7 +64,17 @@ namespace AnoGame.Application.UI
         {
             if (gaugeImage != null && max > 0)
             {
-                gaugeImage.fillAmount = current / max;
+                float ratio = current / max;
+                gaugeImage.fillAmount = ratio;
+
+                if (ratio < 1.0f / 3.0f)
+                {
+                    gaugeImage.color = lowStaminaColor;
+                }
+                else
+                {
+                    gaugeImage.color = normalColor;
+                }
             }
         }
 
