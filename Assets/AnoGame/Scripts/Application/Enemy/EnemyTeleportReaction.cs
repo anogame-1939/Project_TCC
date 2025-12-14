@@ -27,12 +27,12 @@ namespace AnoGame.Application.Enemy
             }
 
             // イベント購読
-            MessageBroker.Default.Receive<PlayerLifeLostEvent>()
+            MessageBroker.Default.Receive<PlayerMissEvent>()
                 .Subscribe(OnPlayerLifeLost)
                 .AddTo(this);
         }
 
-        private void OnPlayerLifeLost(PlayerLifeLostEvent e)
+        private void OnPlayerLifeLost(PlayerMissEvent e)
         {
             if (_agent == null || _patrolProvider == null) return;
 

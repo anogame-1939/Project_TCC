@@ -58,9 +58,6 @@ namespace AnoGame.Application.Player
             // ライフ減少時のイベント（恐怖演出など）
             OnLifeLost?.Invoke();
 
-            // UniRxイベント発行 (Existing)
-            MessageBroker.Default.Publish(new PlayerLifeLostEvent(_currentLives, _maxLives));
-
             if (_currentLives <= 0)
             {
                 Debug.Log("[PlayerHealth] Player has died.", this);

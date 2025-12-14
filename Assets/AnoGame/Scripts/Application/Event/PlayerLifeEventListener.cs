@@ -92,6 +92,7 @@ namespace AnoGame.Application.Event
 
             if (!blocked)
             {
+                Debug.Log("[PlayerLifeEventListener] Standard OnMiss invoked.");
                 OnMiss?.Invoke();
             }
         }
