@@ -4,6 +4,7 @@ using UnityEngine.Playables;
 
 namespace AnoGame.Application.Event
 {
+    [RequireComponent(typeof(PlayableDirector))]
     [Serializable]
     public class TimelineController : MonoBehaviour
     {

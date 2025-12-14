@@ -6,6 +6,7 @@ using VContainer;
 using AnoGame.Domain.Event;
 using AnoGame.Domain.Event.Conditions;
 using AnoGame.Domain.Event.Services;
+using AnoGame.Data;
 
 namespace AnoGame.Application.Event
 {
@@ -20,6 +21,9 @@ namespace AnoGame.Application.Event
         {
             [Tooltip("このシナリオの名前（インスペクターでの識別用）")]
             public string Name;
+
+            [Tooltip("このシナリオ実行時に完了扱いにするイベント")]
+            public EventData CompleteEventData;
 
             [Tooltip("この特別シナリオが発生するために必要な条件")]
             public EventConditionComponent[] Conditions;
@@ -72,6 +76,13 @@ namespace AnoGame.Application.Event
                 if (CheckScenarioConditions(scenario))
                 {
                     scenario.OnMiss?.Invoke();
+
+                    if (scenario.CompleteEventData != null && _eventService != null)
+                    {
+                        Debug.Log($"[PlayerLifeEventListener] Completing event: {scenario.CompleteEventData.EventId}");
+                        _eventService.TriggerEventComplete(scenario.CompleteEventData.EventId);
+                    }
+
                     if (scenario.BlockStandardMiss)
                     {
                         blocked = true;
