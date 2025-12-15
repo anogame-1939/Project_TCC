@@ -271,24 +271,21 @@ namespace AnoGame.Application.Player.Interaction
             }
         }
 
-        private bool CheckIfFound()
+        // ===== 内部：EventLockControl 検索と到着待ち =====
+
+        private static EventLockControl RequireEventLock(Transform actor)
         {
-            // 簡易実装: シーン内の EnemyBehaviorCoordinator を探し、Chase状態か確認
-            // ※複数体いる場合は「どれか1体でもChaseなら」とみなす
-            var coordinator = ForceFindCoordinator();
-            if (coordinator != null)
-            {
-                return coordinator.IsChasing;
-            }
-            return false;
+            var el = FindEventLock(actor);
+            if (el == null)
+                throw new System.InvalidOperationException($"EventLockControl が {actor?.name} に見つかりません。プレイヤー側に付与してください。");
+            return el;
         }
 
-        private AnoGame.Application.Direction.EnemyBehaviorCoordinator _cachedCoordinator;
-        private AnoGame.Application.Direction.EnemyBehaviorCoordinator ForceFindCoordinator()
+        private static EventLockControl FindEventLock(Transform actor)
         {
-            if (_cachedCoordinator == null)
-                _cachedCoordinator = UnityEngine.Object.FindFirstObjectByType<AnoGame.Application.Direction.EnemyBehaviorCoordinator>();
-            return _cachedCoordinator;
+            if (actor == null) return null;
+            // プレイヤー本体か親に付いている想定
+            return actor.GetComponent<EventLockControl>() ?? actor.GetComponentInParent<EventLockControl>();
         }
 
         public async UniTask CancelHideAsync(Transform actor, CancellationToken ct)
@@ -310,21 +307,39 @@ namespace AnoGame.Application.Player.Interaction
             await UniTask.Yield(PlayerLoopTiming.Update, ct);
         }
 
-        // ===== 内部：EventLockControl 検索と到着待ち =====
+        [Header("Detection")]
+        [Tooltip("退出時、この距離内に敵がいれば強制的に発見扱いにする")]
+        [SerializeField] private float forceDetectionRadius = 5.0f;
 
-        private static EventLockControl RequireEventLock(Transform actor)
+        private bool CheckIfFound()
         {
-            var el = FindEventLock(actor);
-            if (el == null)
-                throw new System.InvalidOperationException($"EventLockControl が {actor?.name} に見つかりません。プレイヤー側に付与してください。");
-            return el;
+            var coordinator = ForceFindCoordinator();
+            if (coordinator == null) return false;
+
+            // 1. 既にChase状態ならOut
+            if (coordinator.IsChasing) return true;
+
+            // 2. 距離チェック (指定範囲内に敵がいるなら強制発見)
+            // 隠れポイントがあればそこ基準、なければ自身の位置
+            var center = hidePoint != null ? hidePoint.position : transform.position;
+            float dist = Vector3.Distance(center, coordinator.transform.position);
+
+            if (dist <= forceDetectionRadius)
+            {
+                Debug.Log($"[HideSpot] 敵が近すぎるため強制発見！ Dist: {dist:F2} / Radius: {forceDetectionRadius}");
+                coordinator.NotifyFound(); // 敵側もChaseに遷移させる
+                return true;
+            }
+
+            return false;
         }
 
-        private static EventLockControl FindEventLock(Transform actor)
+        private AnoGame.Application.Direction.EnemyBehaviorCoordinator _cachedCoordinator;
+        private AnoGame.Application.Direction.EnemyBehaviorCoordinator ForceFindCoordinator()
         {
-            if (actor == null) return null;
-            // プレイヤー本体か親に付いている想定
-            return actor.GetComponent<EventLockControl>() ?? actor.GetComponentInParent<EventLockControl>();
+            if (_cachedCoordinator == null)
+                _cachedCoordinator = UnityEngine.Object.FindFirstObjectByType<AnoGame.Application.Direction.EnemyBehaviorCoordinator>();
+            return _cachedCoordinator;
         }
 
         private async UniTask WaitArriveAsync(Transform actor, Vector3 dest, CancellationToken ct)
@@ -345,6 +360,14 @@ namespace AnoGame.Application.Player.Interaction
         private void OnDrawGizmosSelected()
         {
             if (!showGizmos) return;
+
+            // Detection Radius (Red Wire)
+            var center = hidePoint != null ? hidePoint.position : transform.position;
+
+            // 範囲内なら赤（危険）、外なら通常...といってもEditorでは判定できないので常に赤枠で表示
+            Handles.color = new Color(1f, 0f, 0f, 0.4f);
+            Handles.DrawWireDisc(center, Vector3.up, forceDetectionRadius);
+            if (showLabels) Handles.Label(center + Vector3.right * forceDetectionRadius, $"DetectionArea ({forceDetectionRadius}m)");
 
             // 経路点（approachPath）を「null を除いて」集約
             System.Span<Transform> span = approachPath is { Length: > 0 }
