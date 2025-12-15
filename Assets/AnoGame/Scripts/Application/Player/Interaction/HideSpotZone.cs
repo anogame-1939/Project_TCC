@@ -82,6 +82,9 @@ namespace AnoGame.Application.Player.Interaction
             // 処理中は一切のインタラクションを受け付けない
             if (_isBusy) return false;
 
+            // [NEW] UsageLimiterによってロックされている場合
+            if (_forceLocked) return false;
+
             // 既に自分が隠れているなら「出る」を提示
             if (_occupant == actor)
             {
@@ -306,6 +309,49 @@ namespace AnoGame.Application.Player.Interaction
             MessageBroker.Default.Publish(new HideCanceled(actor, this));
             await UniTask.Yield(PlayerLoopTiming.Update, ct);
         }
+
+        // [NEW] 強制退出（イベント発火なし）
+        public async UniTask ForceExitHideAsync()
+        {
+            if (_occupant == null) return;
+            var actor = _occupant;
+
+            // 既存の処理を停止させるためにキャンセルを投げる必要があるが、UniTaskの場合難しい。
+            // 簡易的に _isBusy を無視して割り込む、あるいはフラグでイベント発火を抑制する。
+            // ここでは Release 相当のことを強制的に行い、プレイヤーのロックを解除する。
+
+            // ロック解除
+            Release(actor);
+
+            // インタラクション開放はUsageLimiter側で制御されるため、ここでは何もしない
+            // ただし、物理的に外に出す必要があるなら移動させる
+            if (exitPoint != null)
+            {
+                // ワープさせる
+                actor.position = exitPoint.position;
+            }
+            else
+            {
+                // その場（hidePoint）の少し横とか？一旦そのままでロック解除のみ
+            }
+
+            Debug.Log("[HideSpotZone] Forced Exit executed.");
+            await UniTask.Yield();
+        }
+
+        public void SetInteractable(bool active)
+        {
+            // InteractableZone の仕様上、gameObject.SetActive(false) するとZone自体が消えるので、
+            // 内部フラグで制御したいが、InteractableZoneには IsInteractable プロパティがない場合が多い。
+            // ここでは簡易的に Collider を切る、あるいは _isBusy を使い続ける（ロック用途）
+            // _isBusy を true に固定し続けるとハイドもできなくなる。
+            // しかし UsageLimiter は "LockSpot" として呼んでいるので、ハイドできないようにしたい。
+            // よって _isBusy = !active ではなく、専用の _isLocked フラグを設けるのが適切だが、
+            // InteractableZone の TryBuildOptions で弾くためのフラグが必要。
+            // ここでは _forceLocked フラグを追加して TryBuildOptions で見るように修正する。
+            _forceLocked = !active;
+        }
+        private bool _forceLocked;
 
         [Header("Detection")]
         [Tooltip("退出時、この距離内に敵がいれば強制的に発見扱いにする")]

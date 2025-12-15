@@ -1,7 +1,6 @@
 using UnityEngine;
 using AnoGame.Application.Core;
 using AnoGame.Application.Enemy.AI;
-using UnityEngine.Splines;
 using VContainer;
 using VContainer.Unity;
 

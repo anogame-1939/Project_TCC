@@ -71,10 +71,10 @@ namespace AnoGame.Application.Enemy
 
                 // Agentを一時的に無効化
                 _agent.enabled = false;
-                Debug.Log($"[EnemyTeleportReaction] Warped to Farthest: {hit.position} (Dist: {Mathf.Sqrt(maxDistSq)}). Agent disabled for 15s.");
+                Debug.Log($"[EnemyTeleportReaction] Warped to Farthest: {hit.position} (Dist: {Mathf.Sqrt(maxDistSq)}). Agent disabled for {disableDuration}s.");
 
-                // 15秒後に有効化
-                Observable.Timer(System.TimeSpan.FromSeconds(15))
+                _timerDisposable?.Dispose();
+                _timerDisposable = Observable.Timer(System.TimeSpan.FromSeconds(disableDuration))
                     .Subscribe(_ =>
                     {
                         if (_agent != null) _agent.enabled = true;
@@ -84,6 +84,21 @@ namespace AnoGame.Application.Enemy
             }
         }
 
+        public void CancelDisableTimer()
+        {
+            if (_timerDisposable != null)
+            {
+                _timerDisposable.Dispose();
+                _timerDisposable = null;
+                if (_agent != null) _agent.enabled = true;
+                Debug.Log("[EnemyTeleportReaction] Disable timer canceled. Agent re-enabled immediately.");
+            }
+        }
+
+        private System.IDisposable _timerDisposable;
+
+        [Header("Settings")]
+        [SerializeField] private float disableDuration = 15.0f;
         private SplineContainer GetSplineContainer()
         {
             if (_patrolProvider != null)
@@ -92,6 +107,7 @@ namespace AnoGame.Application.Enemy
             }
             return null;
         }
+
         [Button]
         public void WarpToNearPlayerSplinePoint()
         {
@@ -106,7 +122,7 @@ namespace AnoGame.Application.Enemy
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player == null)
             {
-                var stealth = FindFirstObjectByType<AnoGame.Application.Player.Controller.PlayerStealthController>();
+                var stealth = UnityEngine.Object.FindFirstObjectByType<AnoGame.Application.Player.Controller.PlayerStealthController>();
                 if (stealth != null) player = stealth.gameObject;
             }
 

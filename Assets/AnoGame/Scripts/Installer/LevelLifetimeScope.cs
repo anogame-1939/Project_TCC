@@ -63,6 +63,12 @@ namespace AnoGame.Application.Core
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(p));
             }
+
+            var hideLimiters = FindObjectsByType<AnoGame.Application.Player.Interaction.HideSpotUsageLimiter>(FindObjectsSortMode.None);
+            foreach (var limiter in hideLimiters)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(limiter));
+            }
         }
     }
 
