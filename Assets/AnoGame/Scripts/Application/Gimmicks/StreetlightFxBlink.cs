@@ -22,6 +22,9 @@ namespace AnoGame.Application.Gimmicks
         [SerializeField] private float spotOnIntensity = 1.2f;
         [SerializeField] private float spotOffIntensity = 0.0f;
 
+        [Header("Settings")]
+        [SerializeField, Range(0f, 1f)] private float standardBlend = 0.6f; // Editorで変更可能にする
+
         private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
         private MaterialPropertyBlock _mpb;
         private bool _masterEnabled = true;
@@ -84,8 +87,8 @@ namespace AnoGame.Application.Gimmicks
         /// </summary>
         private void ApplyVisual()
         {
-            // ロジック的に ON の時はちょい暗め (0.6)、OFF のときは 0
-            float t = (_masterEnabled && _logicalOn) ? 0.6f : 0f;
+            // ロジック的に ON の時は standardBlend (デフォルト0.6)、OFF のときは 0
+            float t = (_masterEnabled && _logicalOn) ? standardBlend : 0f;
             SetBlend(t);
         }
 
@@ -113,6 +116,86 @@ namespace AnoGame.Application.Gimmicks
         {
             StartFade(0f, duration);
             _logicalOn = false;
+        }
+
+        [Header("Blink Settings (Event Default)")]
+        [SerializeField] private float defaultBlinkInterval = 0.1f;
+        [SerializeField] private int defaultBlinkCount = 5;
+        [SerializeField] private float defaultFadeDuration = 0.5f;
+
+        /// <summary>
+        /// Update設定されたデフォルト値で点滅消灯する（UnityEvent用）
+        /// </summary>
+        public void BlinkOff()
+        {
+            BlinkOff(defaultBlinkInterval, defaultBlinkCount, defaultFadeDuration);
+        }
+
+        /// <summary>
+        /// 指定回数点滅してから消灯する (Script用)
+        /// blinkInterval: 点滅の1サイクル(ON->OFF)にかかる時間
+        /// count: 点滅回数
+        /// fadeDuration: 最後の消灯フェード時間
+        /// </summary>
+        public void BlinkOff(float blinkInterval, int count, float fadeDuration)
+        {
+            if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
+            _fadeRoutine = StartCoroutine(BlinkOffRoutine(blinkInterval, count, fadeDuration));
+            _logicalOn = false; // 最終的に消えるので論理OFF
+        }
+
+        private IEnumerator BlinkOffRoutine(float blinkInterval, int count, float fadeDuration)
+        {
+            // まずはパカパカさせる
+            for (int i = 0; i < count; i++)
+            {
+                // OFF
+                SetBlend(0f);
+                yield return new WaitForSeconds(blinkInterval * 0.5f);
+                // ON
+                SetBlend(1f);
+                yield return new WaitForSeconds(blinkInterval * 0.5f);
+            }
+
+            // 最後にフェードアウト
+            yield return FadeRoutine(0f, fadeDuration);
+        }
+
+        /// <summary>
+        /// Update設定されたデフォルト値で点滅点灯する（UnityEvent用）
+        /// </summary>
+        public void BlinkOn()
+        {
+            BlinkOn(defaultBlinkInterval, defaultBlinkCount, defaultFadeDuration);
+        }
+
+        /// <summary>
+        /// 指定回数点滅してから点灯する (Script用)
+        /// </summary>
+        public void BlinkOn(float blinkInterval, int count, float fadeDuration)
+        {
+            if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
+            _fadeRoutine = StartCoroutine(BlinkOnRoutine(blinkInterval, count, fadeDuration));
+            _logicalOn = true; // 最終的に点くので論理ON
+        }
+
+        private IEnumerator BlinkOnRoutine(float blinkInterval, int count, float fadeDuration)
+        {
+            // パカパカ
+            for (int i = 0; i < count; i++)
+            {
+                // OFF
+                SetBlend(0f);
+                yield return new WaitForSeconds(blinkInterval * 0.5f);
+                // ON
+                SetBlend(1f);
+                yield return new WaitForSeconds(blinkInterval * 0.5f);
+            }
+
+            // 最後にフェードイン (1.0へ)
+            // ※ ApplyVisual的には standardBlend になるべきかもしれないが、
+            //    既存の FadeOn が 1.0f になっているのでそれに合わせる
+            yield return FadeRoutine(1f, fadeDuration);
         }
 
         private void StartFade(float target, float duration)

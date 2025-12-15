@@ -349,13 +349,28 @@ namespace AnoGame.Application.Player.Interaction
             // よって _isBusy = !active ではなく、専用の _isLocked フラグを設けるのが適切だが、
             // InteractableZone の TryBuildOptions で弾くためのフラグが必要。
             // ここでは _forceLocked フラグを追加して TryBuildOptions で見るように修正する。
-            _forceLocked = !active;
+            if (_forceLocked != !active)
+            {
+                _forceLocked = !active;
+                if (active)
+                {
+                    OnSpotEnabled?.Invoke();
+                }
+                else
+                {
+                    OnCanceled?.Invoke();
+                }
+            }
         }
         private bool _forceLocked;
 
         [Header("Detection")]
         [Tooltip("退出時、この距離内に敵がいれば強制的に発見扱いにする")]
         [SerializeField] private float forceDetectionRadius = 5.0f;
+
+        [Header("Events (Additional)")]
+        [SerializeField]
+        private UnityEvent OnSpotEnabled;   // [NEW] 再有効化時
 
         private bool CheckIfFound()
         {
