@@ -3,6 +3,7 @@ using UniRx;
 using Cysharp.Threading.Tasks;
 using AnoGame.Application.Enemy;
 using AnoGame.Application.Player.Interaction;
+using AnoGame.Application.Direction;
 using VContainer;
 
 namespace AnoGame.Application.Player.Interaction
@@ -60,30 +61,42 @@ namespace AnoGame.Application.Player.Interaction
             Debug.Log("[HideSpotUsageLimiter] Penalty Triggered!");
             _currentUsage = 0; // カウンタはリセット
 
-            // 1. キラーをワープさせる
-            // Injectされた SpawnManager から取得
-            EnemyTeleportReaction reaction = null;
+            GameObject enemyObj = null;
+
+            // 1. キラーを特定
             if (_spawnManager != null && _spawnManager.CurrentEnemyInstance != null)
             {
-                reaction = _spawnManager.CurrentEnemyInstance.GetComponent<EnemyTeleportReaction>();
+                enemyObj = _spawnManager.CurrentEnemyInstance;
             }
-            // Fallback (一応インスタンスシングルトンも見る？)あるいは null ならスキップ
-            if (reaction == null && EnemySpawnManager.Instance != null && EnemySpawnManager.Instance.CurrentEnemyInstance != null)
+            // Fallback
+            else if (EnemySpawnManager.Instance != null && EnemySpawnManager.Instance.CurrentEnemyInstance != null)
             {
-                reaction = EnemySpawnManager.Instance.CurrentEnemyInstance.GetComponent<EnemyTeleportReaction>();
+                enemyObj = EnemySpawnManager.Instance.CurrentEnemyInstance;
             }
 
-            if (reaction != null)
+            // 2. キラーのアクション実行
+            if (enemyObj != null)
             {
-                reaction.CancelDisableTimer();
-                // 近くへワープ
-                reaction.WarpToNearPlayerSplinePoint();
+                // ワープ
+                var reaction = enemyObj.GetComponent<EnemyTeleportReaction>();
+                if (reaction != null)
+                {
+                    reaction.CancelDisableTimer();
+                    reaction.WarpToNearPlayerSplinePoint();
+                }
+
+                // [NEW] Chaseモードへ移行
+                var coordinator = enemyObj.GetComponent<EnemyBehaviorCoordinator>();
+                if (coordinator != null)
+                {
+                    coordinator.NotifyFound();
+                }
             }
 
-            // 2. 強制的に追い出す
+            // 3. 強制的に追い出す
             _hideSpot.ForceExitHideAsync().Forget();
 
-            // 3. ロックダウン
+            // 4. ロックダウン
             LockSpot(penaltyLockoutDuration).Forget();
         }
 
