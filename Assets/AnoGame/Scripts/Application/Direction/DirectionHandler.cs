@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using AnoGame.Application.Player.Control;
+using AnoGame.Application.Enemy;
 using AnoGame.Apllication.Direction;
 
 namespace AnoGame.Application.Direction
@@ -10,6 +11,7 @@ namespace AnoGame.Application.Direction
     {
         [Inject] EventLockControl _eventLockControl;
         [Inject] CinematicBars _cinematicBars;
+        [Inject] EnemySpawnManager _enemySpawnManager;
         [SerializeField] private GameStateHandler _gameStateHandler;
 
 
@@ -18,6 +20,17 @@ namespace AnoGame.Application.Direction
         {
             _gameStateHandler.SetInGameEvent();
             _eventLockControl.BeginLock();
+
+            Debug.Log($"[DirectionHandler] Enemy Instance: {_enemySpawnManager}");
+            Debug.Log($"[DirectionHandler] Enemy Instance: {_enemySpawnManager.CurrentEnemyInstance}");
+            if (_enemySpawnManager.CurrentEnemyInstance != null)
+            {
+                if (_enemySpawnManager.CurrentEnemyInstance.TryGetComponent<EventLockControl>(out var enemyEventLock))
+                {
+                    enemyEventLock.BeginLock();
+                }
+            }
+
             _cinematicBars.Show();
         }
 
@@ -26,6 +39,15 @@ namespace AnoGame.Application.Direction
         {
             _gameStateHandler.SetGameplay();
             _eventLockControl.EndLock();
+
+            if (_enemySpawnManager.CurrentEnemyInstance != null)
+            {
+                if (_enemySpawnManager.CurrentEnemyInstance.TryGetComponent<EventLockControl>(out var enemyEventLock))
+                {
+                    enemyEventLock.EndLock();
+                }
+            }
+
             _cinematicBars.Hide();
         }
     }
