@@ -19,13 +19,17 @@ namespace AnoGame.Application.Direction
         [SerializeField] InvestigateIntentProvider investigate;
         [SerializeField] ReturnToAnchorIntentProvider ret;
         [SerializeField] PatrolSplineIntentProvider patrol;
+        [SerializeField] SuspicionIntentProvider suspicion; // [NEW]
 
         [Header("Defaults")]
         [SerializeField] float defaultEncounterTTL = 2.0f;
         [SerializeField] float defaultInvestigateTTL = 3.0f;
+        [SerializeField] float defaultSuspicionTTL = 2.0f; // [NEW]
 
-        private enum State { Patrol, Chase, Investigate }
+        private enum State { Patrol, Chase, Investigate, Suspicion }
         private State _currentState = State.Patrol;
+
+        public bool IsChasing => _currentState == State.Chase; // [NEW] 外部確認用
 
         void Awake()
         {
@@ -42,6 +46,22 @@ namespace AnoGame.Application.Direction
 
                 _currentState = State.Patrol;
             };
+
+            // Suspicion 完了 -> Investigate
+            suspicion.OnExpired += () =>
+            {
+                Debug.Log($"[Coordinator] Suspicion expired. Transitioning to Investigate. (Time: {Time.time})");
+                Debug.Log("疑念晴れず -> 捜索開始");
+                _currentState = State.Investigate;
+                investigate.Activate(transform.position, defaultInvestigateTTL);
+            };
+
+            // [NEW] 自動登録: Routerに登録されていない可能性が高いため念のため登録
+            var router = GetComponent<MovementIntentRouter>();
+            if (router != null)
+            {
+                router.AddProvider(suspicion);
+            }
         }
 
         // === Timeline から呼ぶ（SignalReceiver の UnityEvent 1本でOK） ===
@@ -59,13 +79,17 @@ namespace AnoGame.Application.Direction
         public void NotifyLost(Vector3 lastSeen)
         {
             if (_currentState == State.Investigate) return;
+            if (_currentState == State.Suspicion) return;
 
-            Debug.Log("見失った！捜索モードへ移行");
-            _currentState = State.Investigate;
+            Debug.Log("見失った！疑惑モードへ移行");
+            _currentState = State.Suspicion;
 
-            chase.SetActive(false);                 // ★最重要：ChaseをOFF
+            chase.SetActive(false);
             ret.Deactivate();
-            investigate.Activate(lastSeen, defaultInvestigateTTL);
+            investigate.Deactivate();
+
+            // まずはその場(あるいはlastSeen)を注視
+            suspicion.Activate(lastSeen, defaultSuspicionTTL);
         }
 
 
@@ -77,6 +101,7 @@ namespace AnoGame.Application.Direction
             _currentState = State.Chase;
 
             investigate.Deactivate();
+            suspicion.Deactivate(); // [NEW]
             ret.Deactivate();
             chase.SetActive(true);                  // 再露見＝追跡へ
         }
@@ -89,6 +114,7 @@ namespace AnoGame.Application.Direction
             _currentState = State.Investigate;
 
             chase.SetActive(false);
+            suspicion.Deactivate(); // [NEW]
             ret.Deactivate();
             investigate.Activate(noisePosition, defaultInvestigateTTL);
         }
@@ -98,6 +124,7 @@ namespace AnoGame.Application.Direction
         {
             eventLock.Deactivate();
             investigate.Deactivate();
+            suspicion.Deactivate(); // [NEW]
             ret.Deactivate();
             chase.SetActive(false);
             _currentState = State.Patrol;

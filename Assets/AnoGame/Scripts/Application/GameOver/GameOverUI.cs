@@ -12,15 +12,25 @@ namespace AnoGame.Application.GameOver
         private void Awake()
         {
             GameOverManager.Instance.GameOver += ShowGameOverPanel;
-            HideGameOverPanel();
 
-            // DontDestroyOnLoad(this);
-            section.panel.SetActive(false);
+            // パネル自体はActiveにしておく（CanvasGroupで制御するため）
+            if (section.panel != null)
+            {
+                section.panel.SetActive(true);
+            }
+
+            HideGameOverPanel();
         }
 
         private void ShowGameOverPanel()
         {
-            section.panel.SetActive(true);
+            if (section.canvasGroup != null)
+            {
+                section.canvasGroup.alpha = 1f;
+                section.canvasGroup.interactable = true;
+                section.canvasGroup.blocksRaycasts = true;
+            }
+
             section.selectables[0].Select();
 
             // カーソルを表示する
@@ -31,13 +41,19 @@ namespace AnoGame.Application.GameOver
 
         private void HideGameOverPanel()
         {
-            section.panel.SetActive(false);
+            if (section.canvasGroup != null)
+            {
+                section.canvasGroup.alpha = 0f;
+                section.canvasGroup.interactable = false;
+                section.canvasGroup.blocksRaycasts = false;
+            }
+
             // ゲーム中はカーソルを非表示にする
             Cursor.visible = false;
             // 必要に応じてロック状態に戻す場合は以下も追加
             Cursor.lockState = CursorLockMode.Locked;
         }
-        
+
         public void OnClickRetryButton()
         {
             Debug.Log("Retry Button Clicked!");

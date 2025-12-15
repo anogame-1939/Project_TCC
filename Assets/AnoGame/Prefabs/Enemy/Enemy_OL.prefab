@@ -309,6 +309,7 @@ GameObject:
   - component: {fileID: 6890212920349990426}
   - component: {fileID: 296865261083013438}
   - component: {fileID: 8761270284036521345}
+  - component: {fileID: 6041571166220234701}
   - component: {fileID: 300162142529563162}
   - component: {fileID: 1796915948952402702}
   - component: {fileID: 5260855969895964056}
@@ -622,7 +623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 184fb2bb279d8ce46a31eef50839a5e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  locomotionHandler: {fileID: 0}
+  locomotionHandler: {fileID: -910997268300491783}
   providerBehaviours:
   - {fileID: 3905562830400558746}
   - {fileID: 6890212920349990426}
@@ -695,6 +696,23 @@ MonoBehaviour:
   splineContainer: {fileID: 0}
   arriveDistance: 0.5
   forceArriveDistance: 3
+--- !u!114 &6041571166220234701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3635d832187069746a68fa2cba11f81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  priority: 65
+  active: 0
+  lookTarget: {x: 0, y: 0, z: 0}
+  defaultTTL: 2
+  rotateSpeed: 5
 --- !u!114 &300162142529563162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -739,8 +757,10 @@ MonoBehaviour:
   investigate: {fileID: 300162142529563162}
   ret: {fileID: 8761270284036521345}
   patrol: {fileID: 296865261083013438}
+  suspicion: {fileID: 6041571166220234701}
   defaultEncounterTTL: 2
   defaultInvestigateTTL: 3
+  defaultSuspicionTTL: 2
 --- !u!114 &5260855969895964056
 MonoBehaviour:
   m_ObjectHideFlags: 0

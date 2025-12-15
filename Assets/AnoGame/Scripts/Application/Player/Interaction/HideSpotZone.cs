@@ -56,6 +56,11 @@ namespace AnoGame.Application.Player.Interaction
         // 既存：任意の外部接続フック
         [SerializeField]
         private UnityEvent EnterHide;
+        // [NEW] 退出時の分岐イベント
+        [SerializeField]
+        private UnityEvent OnExitFound;     // 見つかった状態で出た（あるいは出る直後に見つかった）
+        [SerializeField]
+        private UnityEvent OnExitSafe;      // 見つからずに出られた
 
 
         private Transform _occupant; // 占有者（1人用スポット）
@@ -249,6 +254,41 @@ namespace AnoGame.Application.Player.Interaction
             Debug.Log("退出完了2");
 
             MessageBroker.Default.Publish(new HideExited(actor, this));
+
+            // [NEW] 退出後の状況判定
+            // 1フレーム待って、敵のリアクション（Vision -> Coordinator）が回るのを待つ
+            await UniTask.Yield(PlayerLoopTiming.Update, ct);
+
+            if (CheckIfFound())
+            {
+                Debug.Log("見つかった状態で退出！");
+                OnExitFound?.Invoke();
+            }
+            else
+            {
+                Debug.Log("安全に退出");
+                OnExitSafe?.Invoke();
+            }
+        }
+
+        private bool CheckIfFound()
+        {
+            // 簡易実装: シーン内の EnemyBehaviorCoordinator を探し、Chase状態か確認
+            // ※複数体いる場合は「どれか1体でもChaseなら」とみなす
+            var coordinator = ForceFindCoordinator();
+            if (coordinator != null)
+            {
+                return coordinator.IsChasing;
+            }
+            return false;
+        }
+
+        private AnoGame.Application.Direction.EnemyBehaviorCoordinator _cachedCoordinator;
+        private AnoGame.Application.Direction.EnemyBehaviorCoordinator ForceFindCoordinator()
+        {
+            if (_cachedCoordinator == null)
+                _cachedCoordinator = UnityEngine.Object.FindFirstObjectByType<AnoGame.Application.Direction.EnemyBehaviorCoordinator>();
+            return _cachedCoordinator;
         }
 
         public async UniTask CancelHideAsync(Transform actor, CancellationToken ct)
