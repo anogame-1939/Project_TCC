@@ -47,7 +47,7 @@ namespace AnoGame.Application.Story
             _sceneLoader = new SceneLoader();
             // GetActiveScene() は使わず、mainSceneName からシーンを取得する
             _mainScene = SceneManager.GetSceneByName(mainSceneName);
-            GameManager2.Instance.LoadGameData += OnLoadGameData;
+            GameManager.Instance.LoadGameData += OnLoadGameData;
         }
 
         [Inject]
@@ -66,17 +66,17 @@ namespace AnoGame.Application.Story
         private void Start()
         {
             // ゲームデータがロード済みの場合、ロード済みのデータを使用してゲームを再開
-            if (GameManager2.Instance.DataLoaded)
+            if (GameManager.Instance.DataLoaded)
             {
-                OnLoadGameData(GameManager2.Instance.CurrentGameData);
+                OnLoadGameData(GameManager.Instance.CurrentGameData);
             }
         }
 
         private void OnDestroy()
         {
-            if (GameManager2.Instance != null)
+            if (GameManager.Instance != null)
             {
-                GameManager2.Instance.LoadGameData -= OnLoadGameData;
+                GameManager.Instance.LoadGameData -= OnLoadGameData;
             }
         }
 
@@ -126,17 +126,17 @@ namespace AnoGame.Application.Story
 
         public void UpdateGameData()
         {
-            GameData gameData = GameManager2.Instance.CurrentGameData;
+            GameData gameData = GameManager.Instance.CurrentGameData;
             // if (gameData.StoryProgress == null)
             // {
             // }
-            GameManager2.Instance.CurrentGameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
+            GameManager.Instance.CurrentGameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
         }
 
         public async void ResetStoryProgress()
         {
             // 現在のストーリーデータを取得
-            _currentStoryIndex = GameManager2.Instance.CurrentGameData.StoryProgress.CurrentStoryIndex;
+            _currentStoryIndex = GameManager.Instance.CurrentGameData.StoryProgress.CurrentStoryIndex;
 
             // 現在のストーリーの最初（Chapter 0）に戻す
             _currentChapterIndex = 0;
@@ -157,9 +157,9 @@ namespace AnoGame.Application.Story
                 {
                     if (eventData == null) continue;
 
-                    if (GameManager2.Instance.CurrentGameData.EventHistory.HasCompleted(eventData.EventId))
+                    if (GameManager.Instance.CurrentGameData.EventHistory.HasCompleted(eventData.EventId))
                     {
-                        GameManager2.Instance.CurrentGameData.RemoveClearedEvent(eventData.EventId);
+                        GameManager.Instance.CurrentGameData.RemoveClearedEvent(eventData.EventId);
                         _eventService?.RemoveClearedEvent(eventData.EventId);
                     }
                 }
@@ -168,7 +168,7 @@ namespace AnoGame.Application.Story
             // 関連アイテムを削除
             if (currentStoryData.associatedItems != null)
             {
-                var inventory = GameManager2.Instance.CurrentGameData.Inventory;
+                var inventory = GameManager.Instance.CurrentGameData.Inventory;
                 foreach (var itemData in currentStoryData.associatedItems)
                 {
                     if (itemData == null) continue;
@@ -190,8 +190,8 @@ namespace AnoGame.Application.Story
             // ゲームデータを更新（StoryProgressをリセット）
             UpdateGameData();
 
-            // 変更を保存 (GameManager2の実装に依存するが、ここでは保存処理が必要な場合を想定)
-            await GameManager2.Instance.SaveCurrentGameState();
+            // 変更を保存 (GameManagerの実装に依存するが、ここでは保存処理が必要な場合を想定)
+            await GameManager.Instance.SaveCurrentGameState();
 
             // ストーリーをロードし直す
             // LoadStory(_currentStoryIndex, false);

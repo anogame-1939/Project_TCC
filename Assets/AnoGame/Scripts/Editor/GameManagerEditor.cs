@@ -12,8 +12,8 @@ using AnoGame.Application.Story.Manager;
 
 namespace AnoGame.Editor
 {
-    [CustomEditor(typeof(GameManager2))]
-    public class GameManagerEditor2 : UnityEditor.Editor
+    [CustomEditor(typeof(GameManager))]
+    public class GameManagerEditor : UnityEditor.Editor
     {
         private bool showDebugOptions = true;
         private bool showStoryOptions = true;
@@ -53,7 +53,7 @@ namespace AnoGame.Editor
         private void DrawDebugOptions()
         {
             showDebugOptions = EditorGUILayout.Foldout(showDebugOptions, "Debug Options", true, EditorStyles.foldoutHeader);
-    
+
             if (showDebugOptions)
             {
                 EditorGUI.indentLevel++;
@@ -79,7 +79,7 @@ namespace AnoGame.Editor
                     {
                         // 保存
                         StoryStateManager.Instance.UpdatePlayerPosition();
-                        GameManager2.Instance.SaveData();
+                        GameManager.Instance.SaveData();
                     }
 
                     DrawCurrentGameData();
@@ -91,64 +91,64 @@ namespace AnoGame.Editor
 
         private void DrawGameStartOptions()
         {
-        showStartOptions = EditorGUILayout.Foldout(showStartOptions, "Game Start Options", true, EditorStyles.foldoutHeader);
-        
-        if (showStartOptions)
-        {
-            EditorGUI.indentLevel++;
+            showStartOptions = EditorGUILayout.Foldout(showStartOptions, "Game Start Options", true, EditorStyles.foldoutHeader);
 
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            if (showStartOptions)
             {
-                if (storyManager != null)
+                EditorGUI.indentLevel++;
+
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
-                    var stories = storyManager.GetStoryList();
-                    if (stories != null && stories.Count > 0)
+                    if (storyManager != null)
                     {
-                        for (int storyIndex = 0; storyIndex < stories.Count; storyIndex++)
+                        var stories = storyManager.GetStoryList();
+                        if (stories != null && stories.Count > 0)
                         {
-                            var story = stories[storyIndex];
-                            EditorGUILayout.LabelField($"Story: {story.storyName}", EditorStyles.boldLabel);
-
-                            EditorGUI.indentLevel++;
-                            for (int chapterIndex = 0; chapterIndex < story.chapters.Count; chapterIndex++)
+                            for (int storyIndex = 0; storyIndex < stories.Count; storyIndex++)
                             {
-                                var chapter = story.chapters[chapterIndex];
-                                EditorGUILayout.BeginHorizontal();
-                                EditorGUILayout.LabelField($"Chapter {chapterIndex}: {chapter.chapterName}");
+                                var story = stories[storyIndex];
+                                EditorGUILayout.LabelField($"Story: {story.storyName}", EditorStyles.boldLabel);
 
-                                // ボタンを横に2つ並べる
-                                if (GUILayout.Button("Start Point", GUILayout.Width(100)))
+                                EditorGUI.indentLevel++;
+                                for (int chapterIndex = 0; chapterIndex < story.chapters.Count; chapterIndex++)
                                 {
-                                    StartFromChapter(storyIndex, chapterIndex, false);
-                                    PlayerSpawnManager.Instance.OnChapterLoaded(false);
-                                    // EnemySpawnManager.Instance.OnChapterLoaded(false);
-                                    
-                                }
-                                if (GUILayout.Button("Retry Point", GUILayout.Width(100)))
-                                {
-                                    StartFromChapter(storyIndex, chapterIndex, true);
-                                    PlayerSpawnManager.Instance.OnChapterLoaded(true);
-                                }
+                                    var chapter = story.chapters[chapterIndex];
+                                    EditorGUILayout.BeginHorizontal();
+                                    EditorGUILayout.LabelField($"Chapter {chapterIndex}: {chapter.chapterName}");
 
-                                EditorGUILayout.EndHorizontal();
+                                    // ボタンを横に2つ並べる
+                                    if (GUILayout.Button("Start Point", GUILayout.Width(100)))
+                                    {
+                                        StartFromChapter(storyIndex, chapterIndex, false);
+                                        PlayerSpawnManager.Instance.OnChapterLoaded(false);
+                                        // EnemySpawnManager.Instance.OnChapterLoaded(false);
+
+                                    }
+                                    if (GUILayout.Button("Retry Point", GUILayout.Width(100)))
+                                    {
+                                        StartFromChapter(storyIndex, chapterIndex, true);
+                                        PlayerSpawnManager.Instance.OnChapterLoaded(true);
+                                    }
+
+                                    EditorGUILayout.EndHorizontal();
+                                }
+                                EditorGUI.indentLevel--;
+                                EditorGUILayout.Space(5);
                             }
-                            EditorGUI.indentLevel--;
-                            EditorGUILayout.Space(5);
+                        }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("No stories found in StoryManager", MessageType.Warning);
                         }
                     }
                     else
                     {
-                        EditorGUILayout.HelpBox("No stories found in StoryManager", MessageType.Warning);
+                        EditorGUILayout.HelpBox("StoryManager not found in the scene", MessageType.Error);
                     }
                 }
-                else 
-                {
-                    EditorGUILayout.HelpBox("StoryManager not found in the scene", MessageType.Error);
-                }
-            }
 
-            EditorGUI.indentLevel--;
-        }
+                EditorGUI.indentLevel--;
+            }
         }
 
         private void DrawCurrentGameData()
@@ -161,11 +161,11 @@ namespace AnoGame.Editor
 
                     EditorGUILayout.LabelField("Current Save Data:", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
-                    
+
                     // 基本情報
                     EditorGUILayout.LabelField($"Player Name: {_currentGameData.PlayerName}");
                     EditorGUILayout.LabelField($"Score: {_currentGameData.Score}");
-                    
+
                     // ストーリー進行状況
                     if (_currentGameData.StoryProgress != null)
                     {
@@ -189,7 +189,7 @@ namespace AnoGame.Editor
                             EditorGUILayout.Vector3Field("Current Position", position);
 
                             var rotation = _currentGameData.PlayerPosition.Rotation;
-                            EditorGUILayout.Vector4Field("Current Rotation", 
+                            EditorGUILayout.Vector4Field("Current Rotation",
                                 new Vector4(rotation.X, rotation.Y, rotation.Z, rotation.W));
 
                             EditorGUILayout.LabelField($"Current Map ID: {_currentGameData.PlayerPosition.CurrentMapId}");
@@ -197,13 +197,13 @@ namespace AnoGame.Editor
 
                             if (_currentGameData.PlayerPosition.LastCheckpointPosition.HasValue)
                             {
-                                EditorGUILayout.Vector3Field("Last Checkpoint Position", 
+                                EditorGUILayout.Vector3Field("Last Checkpoint Position",
                                     _currentGameData.PlayerPosition.LastCheckpointPosition.Value.ToVector3());
                             }
 
                             if (_currentGameData.PlayerPosition.RespawnPosition.HasValue)
                             {
-                                EditorGUILayout.Vector3Field("Respawn Position", 
+                                EditorGUILayout.Vector3Field("Respawn Position",
                                     _currentGameData.PlayerPosition.RespawnPosition.Value.ToVector3());
                             }
 
@@ -251,7 +251,7 @@ namespace AnoGame.Editor
 
         private void LoadCurrentGameData()
         {
-            var gameManager = GameManager2.Instance;
+            var gameManager = GameManager.Instance;
             if (gameManager != null)
             {
                 _currentGameData = gameManager.CurrentGameData;
@@ -261,7 +261,7 @@ namespace AnoGame.Editor
 
         private async void ResetSaveData()
         {
-            var gameManager = GameManager2.Instance;
+            var gameManager = GameManager.Instance;
             if (gameManager != null)
             {
                 gameManager.ResetDataAsync();

@@ -95,12 +95,12 @@ namespace AnoGame.Application.Story
             Transform targetPoint = _currentRetryPoint ?? GetRetryPoint();
 
             // 前回セーブした位置を保存
-            var currentGameData = GameManager2.instance.CurrentGameData;
+            var currentGameData = GameManager.instance.CurrentGameData;
 
             // リトライポイントが存在しない場合は前回セーブした位置からスポーンする
             if (targetPoint == null)
             {
-                var gameData = GameManager2.Instance.CurrentGameData;
+                var gameData = GameManager.Instance.CurrentGameData;
                 var playerPosition = gameData.PlayerPosition;
                 if (playerPosition != null)
                 {

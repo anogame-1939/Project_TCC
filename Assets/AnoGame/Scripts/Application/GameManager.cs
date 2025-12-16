@@ -10,7 +10,7 @@ using AnoGame.Application.Title;
 
 namespace AnoGame.Application
 {
-    public class GameManager2 : SingletonMonoBehaviour<GameManager2>
+    public class GameManager : SingletonMonoBehaviour<GameManager>
     {
 #if UNITY_EDITOR
         [SerializeField]

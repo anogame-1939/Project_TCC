@@ -108,8 +108,8 @@ namespace AnoGame.SLFBDebug
                     return;
                 }
 
-                // GameManager2のUpdateGameStateメソッドを呼び出して、現在のゲームデータを更新
-                GameManager2.Instance.UpdateGameState(loadedData);
+                // GameManagerのUpdateGameStateメソッドを呼び出して、現在のゲームデータを更新
+                GameManager.Instance.UpdateGameState(loadedData);
 
                 Debug.Log($"JSONファイル({filePath})からデータを読み込みました。");
             }
@@ -122,7 +122,7 @@ namespace AnoGame.SLFBDebug
         public void Save()
         {
             // StoryStateManager.Instance.UpdatePlayerPosition();
-            GameManager2.Instance.SaveData();
+            GameManager.Instance.SaveData();
 
             Debug.Log("保存");
 

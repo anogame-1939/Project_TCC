@@ -19,13 +19,13 @@ namespace AnoGame.Application.Story.Manager
         [SerializeField]
         private List<StorySpawnData> _storySpawnDataList = new List<StorySpawnData>();
 
-        private GameManager2 _gameManager;
+        private GameManager _gameManager;
         private StoryManager _storyManager;
 
         protected override void Awake()
         {
             base.Awake();
-            _gameManager = GameManager2.Instance;
+            _gameManager = GameManager.Instance;
             _storyManager = StoryManager.Instance;
 
             // StoryManagerのチャプターロードイベントを購読
@@ -75,7 +75,7 @@ namespace AnoGame.Application.Story.Manager
 
             if (useRetryPoint)
             {
-                var gameData = GameManager2.Instance.CurrentGameData;
+                var gameData = GameManager.Instance.CurrentGameData;
                 var playerPosition = gameData.PlayerPosition;
 
                 // ここでリトライポイントへのスポーンなどの処理が必要なら追加

@@ -19,7 +19,7 @@ namespace AnoGame.Application.Event
         public void Save()
         {
             StoryStateManager.Instance.UpdatePlayerPosition();
-            GameManager2.Instance.SaveData();
+            GameManager.Instance.SaveData();
 
             Debug.Log("保存");
 

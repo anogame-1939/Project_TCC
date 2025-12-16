@@ -10,7 +10,7 @@ namespace AnoGame.Application.Core
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<IGameDataRepository, GameDataRepository>(Lifetime.Singleton);
-            builder.RegisterComponentInHierarchy<GameManager2>();
+            builder.RegisterComponentInHierarchy<GameManager>();
         }
     }
 

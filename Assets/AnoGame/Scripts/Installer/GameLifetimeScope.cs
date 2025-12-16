@@ -68,7 +68,7 @@ namespace AnoGame.Application.Core
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();
 
-            builder.RegisterComponentInHierarchy<GameManager2>();
+            builder.RegisterComponentInHierarchy<GameManager>();
             builder.RegisterComponentInHierarchy<GameOverManager>();
 
             // EventTriggerBaseを継承したコンポーネントの検索と登録

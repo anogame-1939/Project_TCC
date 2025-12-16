@@ -11,10 +11,10 @@ namespace AnoGame.Application.Event
     /// </summary>
     public class EventManager
     {
-        private readonly GameManager2 _gameManager;
+        private readonly GameManager _gameManager;
 
         [Inject]
-        public EventManager(GameManager2 gameManager)
+        public EventManager(GameManager gameManager)
         {
             Debug.Log("EventManager initialized");
             _gameManager = gameManager;

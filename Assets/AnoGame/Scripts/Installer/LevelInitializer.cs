@@ -8,13 +8,13 @@ namespace AnoGame.Application.Core
     public class LevelInitializer : IStartable
     {
         // private readonly IInventoryService _itemCollectionService;
-        private readonly GameManager2 _gameManager;
+        private readonly GameManager _gameManager;
         private readonly IEventService _eventService;
         private readonly IInventoryService _inventoryService;
 
         public LevelInitializer(
             // IInventoryService itemCollectionService,
-            GameManager2 gameManager,
+            GameManager gameManager,
             IEventService eventService,
             IInventoryService inventoryService
             )
