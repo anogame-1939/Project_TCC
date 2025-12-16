@@ -53,7 +53,6 @@ namespace AnoGame.Application.Core
             builder.Register<IInventoryService, InventoryService>(Lifetime.Singleton);
             builder.Register<IConsumeZoneResolver, ConsumeZoneResolver>(Lifetime.Singleton);
 
-            builder.Register<GameManager>(Lifetime.Singleton);
 
             // インベントリマネージャの登録
             builder.Register<InventoryManager>(Lifetime.Singleton);
@@ -66,13 +65,8 @@ namespace AnoGame.Application.Core
             builder.Register<ISettingsDataRepository, SettingsDataRepository>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<SettingsManager>();
 
-            // シングルトンへの注入を有効にする
-            // builder.RegisterComponentInHierarchy<GameManager>();
-
             // コンポーネントの登録
             builder.RegisterComponentInHierarchy<ItemCollector>();
-
-            // builder.Register<GameManager2>(Lifetime.Singleton);
 
             builder.RegisterComponentInHierarchy<GameManager2>();
             builder.RegisterComponentInHierarchy<GameOverManager>();
