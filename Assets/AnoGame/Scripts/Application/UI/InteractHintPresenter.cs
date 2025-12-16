@@ -1,8 +1,6 @@
-using System.Linq;
 using UniRx;
 using UnityEngine;
 using AnoGame.Application.Player.Interaction;
-using AnoGame.Application.UI; // InteractHintFollower
 
 namespace AnoGame.Application.UI
 {
@@ -36,7 +34,7 @@ namespace AnoGame.Application.UI
                     Debug.Log($"[UI] InteractablesNearbyChanged: HasAny={e.HasAny}", this);
                     if (!follower) return;
                     if (e.HasAny) follower.ShowHint();
-                    else          follower.HideHint();
+                    else follower.HideHint();
                 })
                 .AddTo(_disposables);
 
@@ -70,9 +68,30 @@ namespace AnoGame.Application.UI
                     }
                 })
                 .AddTo(_disposables);
+            // GameState変更監視
+            if (GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+            }
         }
 
-        private void OnDisable() => _disposables.Clear();
+        private void OnDisable()
+        {
+            _disposables.Clear();
+            if (GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            }
+        }
+
+        private void OnGameStateChanged(GameState newState)
+        {
+            // Gameplay以外になったら強制非表示
+            if (newState != GameState.Gameplay)
+            {
+                if (follower) follower.HideHint();
+            }
+        }
 
         /// <summary>
         /// InteractionOption.Source から UI アンカー Transform を推定

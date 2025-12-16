@@ -78,6 +78,18 @@ namespace AnoGame.Application.Player
 
         private void Update()
         {
+            // check GameState
+            if (GameStateManager.Instance.CurrentState != GameState.Gameplay)
+            {
+                // If we were previously interacting or had candidates, clear them immediately
+                if (_hasNearby || _candidates.Count > 0 || _running.HasValue)
+                {
+                    ForceClearInteraction();
+                }
+                _scanTimer = 0f; // Reset timer so we scan immediately upon return (optional)
+                return;
+            }
+
             // 一定間隔でスキャン（負荷を抑える）
             _scanTimer += Time.deltaTime;
             if (_scanTimer >= scanInterval)
@@ -86,8 +98,36 @@ namespace AnoGame.Application.Player
                 RefreshCandidates();
                 ResolveBest();
             }
+        }
 
+        private void ForceClearInteraction()
+        {
+            if (_running.HasValue)
+            {
+                _running.Value.Cancel?.Invoke();
+                UniRx.MessageBroker.Default.Publish(
+                     new InteractionCanceled(transform, _running.Value.Kind, CancelReason.Interrupted, source: null));
+                _running = null;
+            }
 
+            _candidates.Clear();
+            _bestHold = null;
+            _bestQuick = null;
+            _optionsBuffer.Clear();
+
+            if (_hasNearby)
+            {
+                _hasNearby = false;
+                UniRx.MessageBroker.Default.Publish(new InteractablesNearbyChanged
+                {
+                    Actor = transform,
+                    HasAny = false
+                });
+            }
+            // Focus も外れた扱いにするなら InteractionFocusChanged(null) も投げるべきだが
+            // Presenterは InteractablesNearbyChanged(false) で HideHint するので一旦OK
+            // 必要に応じて追加
+            UniRx.MessageBroker.Default.Publish(new InteractionFocusChanged { Current = null });
         }
 
 
@@ -178,6 +218,8 @@ namespace AnoGame.Application.Player
 
         private void OnInteractPerformed(InputAction.CallbackContext ctx)
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Gameplay) return;
+
             D($"Input: Interact performed ({ctx.interaction?.GetType().Name ?? "Press"})");
 
 

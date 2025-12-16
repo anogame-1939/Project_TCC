@@ -40,6 +40,14 @@ namespace AnoGame.Application.Enemy.Control
             // イベント制御の初期化
             eventLockControl.BeginLock();
 
+            // GameState変更通知の購読
+            if (GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+                // 初期状態の適用
+                OnGameStateChanged(GameStateManager.Instance.CurrentState);
+            }
+
             // 初期化時に強制的に設定を適用
             // （TCCのPrefab設定で agent.updatePosition が false になっている可能性が高いため）
             if (agent != null)
@@ -174,6 +182,23 @@ namespace AnoGame.Application.Enemy.Control
             else
             {
                 transform.position = position;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (GameStateManager.Instance != null)
+            {
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            }
+        }
+
+        private void OnGameStateChanged(GameState state)
+        {
+            if (agent != null)
+            {
+                // Gameplay状態でないときはNavMeshAgentを無効化する
+                agent.enabled = state == GameState.Gameplay;
             }
         }
     }
