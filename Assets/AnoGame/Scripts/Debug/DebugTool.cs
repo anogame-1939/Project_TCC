@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace AnoGame.SLFBDebug
 {
     public class DebugTool : MonoBehaviour
     {
+        [SerializeField] bool enableSelectedObject = true;
         // CanvasGroup コンポーネントを保持
         private CanvasGroup targetCanvasGroup;
 
@@ -20,6 +22,7 @@ namespace AnoGame.SLFBDebug
 
         void Update()
         {
+            if (enableSelectedObject) Debug.Log($"現在選択中のオブジェクト = {EventSystem.current.currentSelectedGameObject}");
             // '.'キーが押されたらトグル
             if (Input.GetKeyDown(KeyCode.Period))
             {
