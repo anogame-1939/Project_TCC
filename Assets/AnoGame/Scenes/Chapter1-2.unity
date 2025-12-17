@@ -71687,11 +71687,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -71701,6 +71701,10 @@ PrefabInstance:
       propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1264577661}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 157326627}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -71726,6 +71730,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 157326627}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: Enqueue
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
       value: StartEvent
       objectReference: {fileID: 0}
@@ -71746,12 +71754,20 @@ PrefabInstance:
       value: Enqueue
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: AnoGame.Application.Event.TimelineController, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
       value: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
       value: AnoGame.Application.Event.TimelineController, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
