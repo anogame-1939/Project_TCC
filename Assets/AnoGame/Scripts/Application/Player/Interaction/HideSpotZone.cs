@@ -310,33 +310,47 @@ namespace AnoGame.Application.Player.Interaction
             await UniTask.Yield(PlayerLoopTiming.Update, ct);
         }
 
-        // [NEW] 強制退出（イベント発火なし）
+        // [NEW] 強制退出（イベント発火なし -> ありに変更）
         public async UniTask ForceExitHideAsync()
         {
             if (_occupant == null) return;
             var actor = _occupant;
+            var ct = this.GetCancellationTokenOnDestroy();
 
-            // 既存の処理を停止させるためにキャンセルを投げる必要があるが、UniTaskの場合難しい。
-            // 簡易的に _isBusy を無視して割り込む、あるいはフラグでイベント発火を抑制する。
-            // ここでは Release 相当のことを強制的に行い、プレイヤーのロックを解除する。
+            Debug.Log("[HideSpotZone] ForceExitHideAsync Started.");
 
-            // ロック解除
+            // 1. 退出移動（MoveOutAsync）
+            await MoveOutAsync(actor, ct);
+
+            // 2. イベント発行
+            MessageBroker.Default.Publish(new HideExited(actor, this));
+
+            // 3. ロック解除
             Release(actor);
 
-            // インタラクション開放はUsageLimiter側で制御されるため、ここでは何もしない
-            // ただし、物理的に外に出す必要があるなら移動させる
-            if (exitPoint != null)
-            {
-                // ワープさせる
-                actor.position = exitPoint.position;
-            }
-            else
-            {
-                // その場（hidePoint）の少し横とか？一旦そのままでロック解除のみ
-            }
+            Debug.Log("[HideSpotZone] ForceExitHideAsync Completed.");
+        }
 
-            Debug.Log("[HideSpotZone] Forced Exit executed.");
-            await UniTask.Yield();
+        private async UniTask MoveOutAsync(Transform actor, CancellationToken ct)
+        {
+            if (approachPath == null || approachPath.Length == 0) return;
+
+            var el = FindEventLock(actor);
+            if (el == null) return;
+
+            el.LookFaceMove();
+
+            // MoveIntoAsync は path[0] -> path[end] -> hidePoint の順
+            // なので MoveOutAsync は hidePoint(現在地) -> path[end] -> ... -> path[0] の順で戻る
+
+            for (int i = approachPath.Length - 1; i >= 0; i--)
+            {
+                var p = approachPath[i];
+                if (p == null) continue;
+
+                el.MoveToPoint(p.position, moveSpeed, stopDistance);
+                await WaitArriveAsync(actor, p.position, ct);
+            }
         }
 
         public void SetInteractable(bool active)
