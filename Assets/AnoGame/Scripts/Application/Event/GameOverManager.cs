@@ -1,13 +1,11 @@
 using System;
-using System.Linq;
+using UnityEngine;
 using AnoGame.Application.Core;
 using AnoGame.Application.Enemy;
 using AnoGame.Application.Steam;
 using AnoGame.Application.Story;
-using AnoGame.Domain.Event.Services;
-using AnoGame.Domain.Inventory.Services;
 using UniRx;
-using VContainer;
+using AnoGame.Domain.Event;
 
 
 namespace AnoGame.Application.Event
@@ -16,9 +14,6 @@ namespace AnoGame.Application.Event
     {
         public event Action GameOver;
 
-
-
-        [Button]
         public void OnGameOver()
         {
             UnityEngine.Debug.Log("OnGameOver");
@@ -51,5 +46,13 @@ namespace AnoGame.Application.Event
             // シーンをリロード
             StoryManager.Instance.ReloadStoryScene();
         }
+
+#if UNITY_EDITOR
+        [Button]
+        public void DebugPlayerDeath()
+        {
+            MessageBroker.Default.Publish(new PlayerDeathEvent(0, 2));
+        }
+#endif
     }
 }
