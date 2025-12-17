@@ -5,10 +5,10 @@ using UnityEngine.Playables;
 namespace AnoGame.Application.Event
 {
     [Serializable]
-    public class TimelineTask
+    public class TimelineTask : ITimelineTask
     {
         public PlayableDirector Director { get; private set; }
-        public Action OnCompleted;  // 終了時に呼ばれる任意のコールバック
+        public Action OnCompleted { get; set; }  // 終了時に呼ばれる任意のコールバック
 
         public TimelineTask(PlayableDirector director, Action onCompleted = null)
         {

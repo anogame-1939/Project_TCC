@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using AnoGame.Application.Core;
 using UniRx;
 using UnityEngine.Events;
@@ -11,7 +12,7 @@ namespace AnoGame.Application.Event
     /// </summary>
     public class TimelineQueueManager : SingletonMonoBehaviour<TimelineQueueManager>
     {
-        private readonly Queue<TimelineTask> _queue = new();
+        private readonly Queue<ITimelineTask> _queue = new();
         private bool _isPlaying;
 
         // 追加: 「今シリーズ中かどうか」
@@ -24,7 +25,7 @@ namespace AnoGame.Application.Event
         /// <summary>
         /// タイムラインをキューに追加する。再生中でなければすぐ再生。
         /// </summary>
-        public void Enqueue(TimelineTask task)
+        public void Enqueue(ITimelineTask task)
         {
             if (task == null) return;
 
@@ -56,9 +57,12 @@ namespace AnoGame.Application.Event
             // タスクが終わったら次へ
             task.OnCompleted += () =>
             {
+                UnityEngine.Debug.Log("Task completed.");
                 _isPlaying = false;
                 PlayNext();
             };
+
+            UnityEngine.Debug.Log("Playing task..." +task.GetType().Name);
 
             task.Play();
         }

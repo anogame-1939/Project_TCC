@@ -4,6 +4,8 @@ using AnoGame.Data;
 using AnoGame.Domain.Inventory.Models;
 using UnityEngine;
 using VContainer;
+using UniRx;
+using AnoGame.Messages;
 
 namespace AnoGame.Application.Inventory
 {
@@ -19,8 +21,13 @@ namespace AnoGame.Application.Inventory
 
         public void AddItem(ItemData itemData)
         {
-            _inventoryManager.AddItem(itemData);
-            
+            if (_inventoryManager.AddItem(itemData))
+            {
+                // UI表示のためにイベント発行
+                // UniqueIdは新規取得扱いとして適当なものを生成、もしくは空でもUI表示には影響しないはず
+                var uniqueId = System.Guid.NewGuid().ToString();
+                UniRx.MessageBroker.Default.Publish(new AnoGame.Messages.ItemCollected(itemData, 1, uniqueId, transform));
+            }
         }
     }
 }
