@@ -409,6 +409,13 @@ namespace AnoGame.Application.Player.Interaction
             return false;
         }
 
+        public bool IsEnemyNear(Vector3 targetPos)
+        {
+            var center = hidePoint != null ? hidePoint.position : transform.position;
+            float dist = Vector3.Distance(center, targetPos);
+            return dist <= forceDetectionRadius;
+        }
+
         private AnoGame.Application.Direction.EnemyBehaviorCoordinator _cachedCoordinator;
         private AnoGame.Application.Direction.EnemyBehaviorCoordinator ForceFindCoordinator()
         {

@@ -81,8 +81,16 @@ namespace AnoGame.Application.Player.Interaction
                 var reaction = enemyObj.GetComponent<EnemyTeleportReaction>();
                 if (reaction != null)
                 {
-                    reaction.CancelDisableTimer();
-                    reaction.WarpToNearPlayerSplinePoint();
+                    // [NEW] 既に近くにいる場合はワープしない（不自然な移動を防ぐ）
+                    if (!_hideSpot.IsEnemyNear(enemyObj.transform.position))
+                    {
+                        reaction.CancelDisableTimer();
+                        reaction.WarpToNearPlayerSplinePoint();
+                    }
+                    else
+                    {
+                        Debug.Log("[HideSpotUsageLimiter] Enemy is already near. Skip Warp.");
+                    }
                 }
 
                 // [NEW] Chaseモードへ移行
