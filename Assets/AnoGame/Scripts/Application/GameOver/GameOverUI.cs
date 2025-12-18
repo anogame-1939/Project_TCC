@@ -54,7 +54,7 @@ namespace AnoGame.Application.GameOver
             Cursor.lockState = CursorLockMode.Locked;
         }
 
-        public void OnClickRetryButton()
+        public void Retry()
         {
             Debug.Log("Retry Button Clicked!");
             HideGameOverPanel();
