@@ -22,7 +22,7 @@ namespace AnoGame.Application.Event
             }
             _isEnqueued = true;
             Debug.Log($"TimelineController: Enqueueing timeline...{_playableDirector.name}", this);
-            TimelineQueueManager.Instance.Enqueue(new TimelineTask(_playableDirector));
+            TimelineQueueManager.Instance.Enqueue(new TimelineTask(_playableDirector, ResetEnqueueFlag));
         }
         // Enqueue完了時に呼び出すことで再度Enqueue可能にする
         public void ResetEnqueueFlag()

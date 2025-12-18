@@ -66,7 +66,11 @@ namespace AnoGame.Application.Event
 
             // Subscribe to PlayerDeathEvent
             MessageBroker.Default.Receive<PlayerDeathEvent>()
-                .Subscribe(_ => OnDeath?.Invoke())
+                .Subscribe(_ => 
+                {
+                    Debug.Log("[PlayerLifeEventListener] PlayerDeathEvent received. Invoking OnDeath.");
+                    OnDeath?.Invoke();
+                })
                 .AddTo(this);
         }
 
