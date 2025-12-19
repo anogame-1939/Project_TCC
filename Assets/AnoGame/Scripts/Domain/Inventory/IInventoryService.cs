@@ -12,7 +12,8 @@ namespace AnoGame.Domain.Inventory.Services
         bool HasItem(string itemName);
         bool ConsumeItem(string itemId, int quantity = 1,
                         UnityEngine.GameObject user = null,
-                        UnityEngine.Vector3? usePos = null);
+                        UnityEngine.Vector3? usePos = null,
+                        bool consume = true);
 
         void NotifyItemAdded(string itemName);
 

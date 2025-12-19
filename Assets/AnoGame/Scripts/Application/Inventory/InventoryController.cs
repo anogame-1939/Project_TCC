@@ -346,7 +346,7 @@ namespace AnoGame.Application.Inventory
             Debug.Log($"[InventoryController] '{itemId}' を消費予定. Zone={zone.GetDebugName()} Reason={reason}");
 
             // 2) 最終審級：InventoryService に可否を委譲（在庫や他条件）
-            var serviceOk = _inventoryService.ConsumeItem(itemId, 1, player, usePos);
+            var serviceOk = _inventoryService.ConsumeItem(itemId, 1, player, usePos, item.IsConsumable);
             if (!serviceOk)
             {
                 Debug.LogWarning($"[InventoryController] '{itemId}' 消費失敗: 在庫不足/サービスNG");
@@ -369,13 +369,16 @@ namespace AnoGame.Application.Inventory
                 return;
             }
 
-            // 4) ここまで来たら成功：UI在庫の見た目を更新し、成功イベントを発火
-            _inventoryManager.RemoveItem(itemId);
+            // 4) ここまで来たら成功：必要ならUI在庫の見た目を更新し、成功イベントを発火
+            if (item.IsConsumable)
+            {
+                _inventoryManager.RemoveItem(itemId);
 
-            var items = _inventoryManager.GetInventory();
-            var inv = new AnoGame.Domain.Data.Models.Inventory();
-            foreach (var it in items) inv.AddItem(it);
-            _inventoryViewer.UpdateInventory(inv);
+                var items = _inventoryManager.GetInventory();
+                var inv = new AnoGame.Domain.Data.Models.Inventory();
+                foreach (var it in items) inv.AddItem(it);
+                _inventoryViewer.UpdateInventory(inv);
+            }
 
 
             Debug.Log($"[InventoryController] '{itemId}' を正常に消費し、イベントを実行しました (zone={zone.GetDebugName()})");

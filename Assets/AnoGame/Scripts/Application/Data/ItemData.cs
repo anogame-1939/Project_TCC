@@ -15,6 +15,7 @@ namespace AnoGame.Data
         [SerializeField] private ItemType itemType;  // アイテムの種類を管理するenum
         [SerializeField] private bool isStackable = true;  // スタック可能かどうか
         [SerializeField] private int maxStackSize = 99;    // 最大スタック数
+        [SerializeField] private bool isConsumable = true; // 消費するかどうか
 
         public string ItemName => itemName;
         public string Description => description;
@@ -22,6 +23,7 @@ namespace AnoGame.Data
         public ItemType ItemType => itemType;
         public bool IsStackable => isStackable;
         public int MaxStackSize => maxStackSize;
+        public bool IsConsumable => isConsumable;
 
 #if UNITY_EDITOR
         private void OnValidate()

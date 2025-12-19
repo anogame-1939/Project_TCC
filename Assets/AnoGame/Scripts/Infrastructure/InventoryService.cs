@@ -45,7 +45,7 @@ namespace AnoGame.Infrastructure.Services
             OnItemRemoved?.Invoke(itemName);
         }
 
-        public bool ConsumeItem(string itemId, int quantity = 1, GameObject user = null, Vector3? usePos = null)
+        public bool ConsumeItem(string itemId, int quantity = 1, GameObject user = null, Vector3? usePos = null, bool consume = true)
         {
             if (!_itemNames.Contains(itemId)) return false;
 
@@ -56,9 +56,13 @@ namespace AnoGame.Infrastructure.Services
             var args = new ItemConsumedArgs(itemId, quantity, user, pos);
             OnItemConsumed?.Invoke(args);
 
-            // ※ 数量があるなら Dictionary 化して decrement
-            _itemNames.Remove(itemId);
-            OnItemRemoved?.Invoke(itemId);
+            if (consume)
+            {
+                // ※ 数量があるなら Dictionary 化して decrement
+                _itemNames.Remove(itemId);
+                OnItemRemoved?.Invoke(itemId);
+            }
+
             return true;
         }
 

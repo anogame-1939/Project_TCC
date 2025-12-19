@@ -221,6 +221,8 @@ namespace AnoGame.Domain.Data.Models
         public string Description { get; private set; }
         [JsonProperty]
         public string UniqueId { get; private set; }
+        [JsonProperty]
+        public bool IsConsumable { get; private set; }
 
         [JsonProperty("UniqueIds")]
         private readonly List<string> _uniqueIds = new();
@@ -233,12 +235,13 @@ namespace AnoGame.Domain.Data.Models
         {
         }
 
-        public InventoryItem(string itemName, int quantity, string description, string uniqueId)
+        public InventoryItem(string itemName, int quantity, string description, string uniqueId, bool isConsumable = true)
         {
             ItemName = itemName;
             Quantity = quantity;
             Description = description;
             UniqueId = uniqueId;
+            IsConsumable = isConsumable;
         }
 
         public void AddQuantity(int amount)

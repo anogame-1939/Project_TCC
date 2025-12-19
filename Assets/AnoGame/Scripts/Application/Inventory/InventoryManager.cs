@@ -17,7 +17,7 @@ namespace AnoGame.Application.Inventory
 
         [Inject]
         public InventoryManager(
-            GameManager gameManager, 
+            GameManager gameManager,
             IInventoryService inventoryService)
         {
             _gameManager = gameManager;
@@ -89,7 +89,8 @@ namespace AnoGame.Application.Inventory
                 itemName: itemData.ItemName,
                 quantity: quantity,
                 description: itemData.Description,
-                uniqueId: System.Guid.NewGuid().ToString() // 新しいユニークIDを生成
+                uniqueId: System.Guid.NewGuid().ToString(), // 新しいユニークIDを生成
+                isConsumable: itemData.IsConsumable
             );
 
             inventory.AddItem(newItem);
@@ -146,7 +147,8 @@ namespace AnoGame.Application.Inventory
                 itemName: collectableItem.ItemData.ItemName,
                 quantity: collectableItem.Quantity,
                 description: collectableItem.ItemData.Description,
-                uniqueId: collectableItem.UniqueId
+                uniqueId: collectableItem.UniqueId,
+                isConsumable: collectableItem.ItemData.IsConsumable
             );
 
             inventory.AddItem(newItem);

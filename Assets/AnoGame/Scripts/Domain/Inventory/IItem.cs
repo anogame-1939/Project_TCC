@@ -5,5 +5,6 @@ namespace AnoGame.Domain.Inventory.Models
         string ItemName { get; }
         bool IsStackable { get; }
         int MaxStackSize { get; }
+        bool IsConsumable { get; }
     }
 }
