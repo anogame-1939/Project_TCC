@@ -34,6 +34,9 @@ namespace AnoGame.Application.Event
 
             [Header("開始後の挙動")]
             public bool completeInstantly = false; // InstantEventTrigger不要で即クリアしたい場合
+            public bool executeLimitOnce = true;
+
+            [HideInInspector] public bool isExecuted = false; // 実行済みフラグ
         }
 
         [SerializeField] private List<ConsumeRule> _rules = new();
@@ -70,20 +73,38 @@ namespace AnoGame.Application.Event
         public bool CanConsumeNow(string itemId, GameObject user, Vector3 usePos, out string reason)
         {
             reason = null;
-            var anyRule = false;
+            var anyRuleMatch = false;
+            var alreadyExecuted = false;
+
             foreach (var rule in _rules)
             {
                 if (string.IsNullOrEmpty(rule.itemId)) continue;
                 if (!string.Equals(rule.itemId, itemId, StringComparison.Ordinal)) continue;
-                anyRule = true;
+                anyRuleMatch = true;
+
+                if (rule.executeLimitOnce && rule.isExecuted)
+                {
+                    alreadyExecuted = true;
+                    continue;
+                }
 
                 var args = new ItemConsumedArgs(itemId, 1, user, usePos);
                 if (CheckProximity(rule, args)) return true;
             }
 
-            reason = anyRule
-                ? "距離が遠いか、遮蔽物があります。近づいてから使用してください。"
-                : "このアイテムではここで実行できるイベントがありません。";
+            if (!anyRuleMatch)
+            {
+                reason = "このアイテムではここで実行できるイベントがありません。";
+            }
+            else if (alreadyExecuted)
+            {
+                reason = "このアイテムは既に使用済みです。";
+            }
+            else
+            {
+                reason = "距離が遠いか、遮蔽物があります。近づいてから使用してください。";
+            }
+
             return false;
         }
 
@@ -114,7 +135,12 @@ namespace AnoGame.Application.Event
                 if (string.IsNullOrEmpty(rule.itemId)) continue;
                 if (!string.Equals(args.ItemId, rule.itemId, StringComparison.Ordinal)) continue;
 
+                if (rule.executeLimitOnce && rule.isExecuted) continue;
+
                 if (!CheckProximity(rule, args)) continue;
+
+                // 実行フラグ
+                rule.isExecuted = true;
 
                 // 実行：Trigger優先、なければEventService
                 var trigger = rule.eventTriggerOverride;
@@ -131,6 +157,7 @@ namespace AnoGame.Application.Event
                 else
                 {
                     if (_logDebug) Debug.LogWarning("[EventOnConsume] ルールにイベント未指定");
+                    rule.isExecuted = false; // 実行に失敗した（指定がなかった）ので戻す
                     continue;
                 }
 

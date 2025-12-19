@@ -33,6 +33,10 @@ namespace AnoGame.Application.Objects
         public UniTask FadeOut(float? duration = null, CancellationToken ct = default)
             => FadeTo(0f, duration ?? defaultDuration, ct);
 
+        public void PlayFadeIn(float duration) => FadeIn(duration).Forget();
+        public void PlayFadeOut(float duration) => FadeOut(duration).Forget();
+        public void PlayFadeTo(float dst) => FadeTo(dst, defaultDuration).Forget();
+
         public async UniTask FadeTo(float dst, float duration, CancellationToken ct = default)
         {
             duration = Mathf.Max(0.0001f, duration);
