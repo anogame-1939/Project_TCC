@@ -39,6 +39,7 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.LogWarning($"[SpriteResolveController] SpriteRendererが見つかりません: {gameObject.name}");
             }
+            StopAllEffects();
         }
 
         #region UnityEvent / Public API
@@ -48,6 +49,7 @@ namespace AnoGame.Application.Enemy
         /// </summary>
         public void SetResolve(float amount)
         {
+            // Debug.Log($"[SpriteResolveController] {gameObject.name} SetResolve: {amount}"); // 大量に出るためコメントリザーブ
             foreach (var sr in _spriteRenderers)
             {
                 Material mat = sr.material;
@@ -102,31 +104,52 @@ namespace AnoGame.Application.Enemy
         /// <summary>
         /// タイムライン等から毎フレーム進捗を受け取り、エフェクトの再生・停止を制御する。
         /// </summary>
-        public void HandleEffect(float progress, bool playEffect, float customPlayThreshold = -1f, float customStopThreshold = -1f)
+        public void HandleEffectByProgress(float progress, float pThresh, float sThresh)
         {
-            if (!playEffect || disappearEffect == null)
-            {
-                if (_isEffectPlaying)
-                {
-                    disappearEffect?.Stop();
-                    _isEffectPlaying = false;
-                }
-                return;
-            }
-
-            float pThresh = customPlayThreshold >= 0 ? customPlayThreshold : playThreshold;
-            float sThresh = customStopThreshold >= 0 ? customStopThreshold : stopThreshold;
+            if (disappearEffect == null) return;
 
             if (!_isEffectPlaying && progress >= pThresh && progress < sThresh)
             {
-                disappearEffect.Play();
-                _isEffectPlaying = true;
+                PlayEffect(progress, pThresh, sThresh);
             }
             else if (_isEffectPlaying && (progress >= sThresh || progress < pThresh))
             {
-                disappearEffect.Stop();
-                _isEffectPlaying = false;
+                StopEffect(progress, pThresh, sThresh);
             }
+        }
+
+        public void PlayEffect(float progress = -1f, float p = -1f, float s = -1f)
+        {
+            if (disappearEffect == null || _isEffectPlaying) return;
+
+            string info = progress >= 0 ? $"(Progress: {progress}, P: {p}, S: {s})" : "(Forced)";
+            Debug.Log($"[SpriteResolveController] {gameObject.name} Particle PLAY {info}");
+
+            disappearEffect.Play();
+            _isEffectPlaying = true;
+        }
+
+        public void SetParticleColor(Color color)
+        {
+            if (disappearEffect == null) return;
+            var main = disappearEffect.main;
+            main.startColor = color;
+        }
+
+        public void StopEffect(float progress = -1f, float p = -1f, float s = -1f)
+        {
+            if (disappearEffect == null || !_isEffectPlaying) return;
+
+            string info = progress >= 0 ? $"(Progress: {progress}, P: {p}, S: {s})" : "(Forced)";
+            Debug.Log($"[SpriteResolveController] {gameObject.name} Particle STOP {info}");
+
+            disappearEffect.Stop();
+            _isEffectPlaying = false;
+        }
+
+        public void StopAllEffects()
+        {
+            StopEffect();
         }
 
         #endregion
@@ -153,8 +176,8 @@ namespace AnoGame.Application.Enemy
                 float currentVal = Mathf.Lerp(startResolve, targetResolve, t);
                 SetResolve(currentVal);
 
-                // エフェクト制御
-                HandleEffect(t, true);
+                // エフェクト制御 (進行度ベースで実行)
+                HandleEffectByProgress(t, playThreshold, stopThreshold);
 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
@@ -206,15 +229,6 @@ namespace AnoGame.Application.Enemy
         {
             if (shadowObjects == null) return;
             foreach (var sh in shadowObjects) sh.transform.localScale = Vector3.zero;
-        }
-
-        public void StopAllEffects()
-        {
-            if (disappearEffect != null)
-            {
-                disappearEffect.Stop();
-                _isEffectPlaying = false;
-            }
         }
 
         #endregion

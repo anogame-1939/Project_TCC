@@ -14,8 +14,12 @@ namespace AnoGame.Application.Direction.Timeline
             if (controller == null) return;
 
             int inputCount = playable.GetInputCount();
-            float totalWeight = 0f;
+            float totalResolveWeight = 0f;
             float blendedResolve = 0f;
+
+            EnemyResolveBehaviour bestParticleClip = null;
+            float maxParticleWeight = -1f;
+            float bestParticleT = 0f;
 
             for (int i = 0; i < inputCount; i++)
             {
@@ -25,27 +29,59 @@ namespace AnoGame.Application.Direction.Timeline
                 var playableInput = (ScriptPlayable<EnemyResolveBehaviour>)playable.GetInput(i);
                 var behaviour = playableInput.GetBehaviour();
 
-                // クリップの進行度（0〜1）を算出
                 double duration = playableInput.GetDuration();
                 double time = playableInput.GetTime();
                 float t = (duration > 0) ? (float)(time / duration) : 1f;
                 t = Mathf.Clamp01(t);
 
-                // カーブを適用して補完
-                float curveT = behaviour.curve != null ? behaviour.curve.Evaluate(t) : t;
-                float currentAmount = Mathf.Lerp(behaviour.startAmount, behaviour.endAmount, curveT);
+                // --- Resolve Control ---
+                if (behaviour.resolveControl)
+                {
+                    float curveT = behaviour.curve != null ? behaviour.curve.Evaluate(t) : t;
+                    float currentAmount = Mathf.Lerp(behaviour.startAmount, behaviour.endAmount, curveT);
+                    blendedResolve += currentAmount * weight;
+                    totalResolveWeight += weight;
+                }
 
-                blendedResolve += currentAmount * weight;
-                totalWeight += weight;
-
-                // エフェクト制御 (ウェイトが最大のものを優先するなどのロジックも考えられるが、ここでは単純に各クリップからHandleを呼ぶ)
-                // SpriteResolveController 側で複数の呼び出しに対する整合性を取る（最後に呼ばれたものが勝つ、または再生中フラグで管理）
-                controller.HandleEffect(t, behaviour.playEffect, behaviour.playThreshold, behaviour.stopThreshold);
+                // --- Particle Control (Find winner) ---
+                if (behaviour.particleControl && weight > maxParticleWeight)
+                {
+                    maxParticleWeight = weight;
+                    bestParticleClip = behaviour;
+                    bestParticleT = t;
+                }
             }
 
-            if (totalWeight > 0f)
+            // Apply Resolve
+            if (totalResolveWeight > 0f)
             {
                 controller.SetResolve(blendedResolve);
+            }
+
+            // Apply Particle Logic
+            if (bestParticleClip != null)
+            {
+                // 色を適用
+                controller.SetParticleColor(bestParticleClip.particleColor);
+
+                switch (bestParticleClip.particleAction)
+                {
+                    case ParticleAction.PlayAtThreshold:
+                        controller.HandleEffectByProgress(bestParticleT, bestParticleClip.playThreshold, bestParticleClip.stopThreshold);
+                        break;
+                    case ParticleAction.ForcePlay:
+                        controller.PlayEffect();
+                        break;
+                    case ParticleAction.ForceStop:
+                        controller.StopEffect();
+                        break;
+                }
+
+                // クリップ終了時の停止処理
+                if (bestParticleClip.stopAtClipEnd && bestParticleT >= 1f - Time.deltaTime) // ほぼ終了
+                {
+                    controller.StopEffect();
+                }
             }
         }
     }

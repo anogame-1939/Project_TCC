@@ -53,6 +53,7 @@ MonoBehaviour:
   kind: 1
   useClipDuration: 1
   duration: 0.5
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &-3104032321964325513
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -100,6 +101,7 @@ MonoBehaviour:
   kind: 0
   useClipDuration: 1
   duration: 0.5
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,12 +119,152 @@ MonoBehaviour:
   - {fileID: 7083536675631981972}
   - {fileID: 2301349758633575022}
   - {fileID: 2164366031974821576}
+  - {fileID: 7899712070821134465}
   m_FixedDuration: 0
   m_EditorSettings:
     m_Framerate: 60
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: 0}
+--- !u!114 &366873529137570550
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a253fc8fac608af4fac745a0d48c6dbe, type: 3}
+  m_Name: Warp Enemy Proxy Track (1)
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 7899712070821134465}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: 1446796448578283031}
+    m_Duration: 2.216666666666667
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 366873529137570550}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: WarpPlayableAsset
+  m_Markers:
+    m_Objects: []
+--- !u!114 &1446796448578283031
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dd06ced263a8114798d77f9a1af4910, type: 3}
+  m_Name: WarpPlayableAsset(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  target:
+    exposedName: b46e165452ded3a4aa5f0079d54db8a3
+    defaultValue: {fileID: 0}
+  worldPosition: {x: 0, y: 0, z: 0}
+  useTarget: 1
+  facing: 0
+  worldFacingDirection: {x: 0, y: 0, z: 0}
+  lookAt:
+    exposedName: 646350e5ab9085b419a41207ffc12929
+    defaultValue: {fileID: 0}
+  beginLockBeforeWarp: 0
+  endLockAfterWarp: 0
+--- !u!114 &1679654929191940079
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c052a6ed228a2cf41a3ee34e23588cfe, type: 3}
+  m_Name: Path Lock Enemy Proxy Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 1
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 7899712070821134465}
+  m_Children: []
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
 --- !u!114 &2164366031974821576
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -323,7 +465,7 @@ MonoBehaviour:
   m_Time: 2.7333333333333334
   m_Retroactive: 0
   m_EmitOnce: 0
-  m_Asset: {fileID: 11400000, guid: 8f7ece7e5439e77449325803607c7ace, type: 2}
+  m_Asset: {fileID: 0}
 --- !u!114 &5760711385004744505
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -434,6 +576,31 @@ MonoBehaviour:
     m_Objects: []
   newClipLengthScale: 0.3333333333333333
   minNewClipSeconds: 0.25
+--- !u!114 &7899712070821134465
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0fc6f5187a81dc47999eefade6f0935, type: 3}
+  m_Name: "OL\u306E\u5236\u5FA1\u30C8\u30E9\u30C3\u30AF"
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children:
+  - {fileID: 366873529137570550}
+  - {fileID: 1679654929191940079}
+  m_Clips: []
+  m_Markers:
+    m_Objects: []
 --- !u!114 &8597492090673089731
 MonoBehaviour:
   m_ObjectHideFlags: 1
