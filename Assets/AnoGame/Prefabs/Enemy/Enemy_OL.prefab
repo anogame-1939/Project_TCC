@@ -302,6 +302,7 @@ GameObject:
   - component: {fileID: 3949941853238961511}
   - component: {fileID: 6490954179236640322}
   - component: {fileID: 4183435016230059746}
+  - component: {fileID: -8529906306038707259}
   - component: {fileID: 1190557266045678637}
   - component: {fileID: 1555985007829630829}
   - component: {fileID: 1431485421636668416}
@@ -507,29 +508,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isActive: 1
   damage: 1
---- !u!114 &1190557266045678637
+--- !u!114 &-8529906306038707259
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 070c9411b272c4e03bdba48b4561adbf, type: 3}
+  m_Script: {fileID: 11500000, guid: b28575fb9bb703641ae99d1a13c0a3c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minLifespan: 5
-  maxLifespan: 15
-  _fadeOutDuration: 2
-  _particleFadeOutDuration: 1.5
+  _defaultDuration: 1
   fadeInEffect: {fileID: 254705652436619575}
   fadeoutEffect: {fileID: 8488500754575862900}
   disappearEffect: {fileID: 1406783810240878792}
   fadeInPlayThreshold: 0.2
   fadeInStopThreshold: 0.8
-  fadeOutPlayThreshold: 0.221
-  fadeOutStopThreshold: 0.537
+  fadeOutPlayThreshold: 0.2
+  fadeOutStopThreshold: 0.8
   shadowObjects:
   - {fileID: 1502214921408271829}
   - {fileID: 3030159178595364516}
@@ -539,8 +537,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -570,19 +568,10 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.7334313
-      value: 0.34540385
-      inSlope: 1.3544357
-      outSlope: 1.3544357
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -590,7 +579,22 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  shadowScaleDuration: 2
+  shadowScaleDuration: 0.35
+--- !u!114 &1190557266045678637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 070c9411b272c4e03bdba48b4561adbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minLifespan: 5
+  maxLifespan: 15
+  _fadeOutDuration: 2
 --- !u!114 &1555985007829630829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -809,6 +813,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _patrolProvider: {fileID: 296865261083013438}
+  disableDuration: 15
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0

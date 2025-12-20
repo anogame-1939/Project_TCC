@@ -45,6 +45,7 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(eventOnConsume));
             }
 
+
             // builder.RegisterEntryPoint<LevelInitializer>();
             var proxies = FindObjectsByType<TimelineEventLockProxy>(FindObjectsSortMode.None);
             foreach (var p in proxies)
@@ -54,6 +55,12 @@ namespace AnoGame.Application.Core
 
             var enemyProxies = FindObjectsByType<TimelineEnemyEventLockProxy>(FindObjectsSortMode.None);
             foreach (var p in enemyProxies)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(p));
+            }
+
+            var timelineEnemyResolveProxies = FindObjectsByType<TimelineEnemyResolveProxy>(FindObjectsSortMode.None);
+            foreach (var p in timelineEnemyResolveProxies)
             {
                 builder.RegisterBuildCallback(resolver => resolver.Inject(p));
             }

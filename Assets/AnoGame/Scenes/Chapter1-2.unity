@@ -4576,19 +4576,7 @@ MonoBehaviour:
         m_Calls: []
     onConversationEnd:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 569869562}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:
@@ -37393,6 +37381,7 @@ GameObject:
   - component: {fileID: 623907638}
   - component: {fileID: 623907637}
   - component: {fileID: 623907636}
+  - component: {fileID: 623907639}
   m_Layer: 27
   m_Name: "\u6F14\u51FA-OL\u304C\u51FA\u73FE\u2192\u6210\u4ECF"
   m_TagString: Untagged
@@ -37534,7 +37523,7 @@ PlayableDirector:
   m_GameObject: {fileID: 623907634}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 9516b73abf730cf44804b1d88e663fe3, type: 2}
+  m_PlayableAsset: {fileID: 11400000, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
   m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
@@ -37556,9 +37545,20 @@ PlayableDirector:
     value: {fileID: 0}
   - key: {fileID: -4134226771969880218, guid: 9516b73abf730cf44804b1d88e663fe3, type: 2}
     value: {fileID: 623907636}
+  - key: {fileID: -501399470010576559, guid: 9516b73abf730cf44804b1d88e663fe3, type: 2}
+    value: {fileID: 623907639}
+  - key: {fileID: -2046753567610554060, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 338764139}
+  - key: {fileID: 503102219070874574, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 1325905139}
+  - key: {fileID: -5420716272021537678, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 623907636}
+  - key: {fileID: 8674827358060320049, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 623907639}
   m_ExposedReferences:
     m_References:
     - a76f3bb1b38201d4c9fb5a4bbd8999bb: {fileID: 1467373026}
+    - 2fc703794b217274fb0ddcffa963dfd6: {fileID: 1766016249}
     - 231dafe0d65253b419be024e7bcfe264: {fileID: 1467373026}
     - 0335d65270064ec43b0311fa80acf43c: {fileID: 1467373026}
     - da279e829aca7244f9c3456058588257: {fileID: 1462105655}
@@ -37567,12 +37567,26 @@ PlayableDirector:
     - d437a47650ea9674caea67b05cb61b6d: {fileID: 1467373026}
     - fbed7bbd74e0e874a9b68b5e85131aab: {fileID: 1462105655}
     - 32ce919f799f6024996c9098614b104e: {fileID: 1468933712}
+    - d36ef4fe1d0026e48ac9ab74b2c182ea: {fileID: 66325254}
     - 9c3ce3ed72a1a0745ab8aed4ab156b0f: {fileID: 66325254}
     - 32c90146b56aaec4bbd085611d98f2e9: {fileID: 0}
     - 4cd80049235945f48bc1bee39a16c06e: {fileID: 1766016249}
     - b4f3c94d2c2b39c49bfb7b103806500d: {fileID: 1462105655}
+    - 0cb80c29d8280404e898fb0a6f8867c8: {fileID: 120438299}
     - c1de59a411d980544abc8a1a496b27c1: {fileID: 120438299}
     - 2a0df8b4d6a46c04ca39deac9d12a7af: {fileID: 1462105655}
+--- !u!114 &623907639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623907634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae835735171a37f42893a30ac5a00826, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &626099710
 GameObject:
   m_ObjectHideFlags: 3
