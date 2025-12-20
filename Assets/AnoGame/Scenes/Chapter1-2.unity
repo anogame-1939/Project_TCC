@@ -4537,7 +4537,7 @@ GameObject:
   - component: {fileID: 120438299}
   - component: {fileID: 120438298}
   m_Layer: 0
-  m_Name: "\u4F1A\u8A71-\u30A2\u30D1\u30FC\u30C8\u306E\u9375"
+  m_Name: "\u4F1A\u8A71-EP1\u30A8\u30F3\u30C7\u30A3\u30F3\u30B0"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14058,7 +14058,7 @@ GameObject:
   - component: {fileID: 352167988}
   - component: {fileID: 352167987}
   m_Layer: 0
-  m_Name: StoryController->1-3
+  m_Name: StoryController->2-0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14087,12 +14087,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 352167986}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 19.517, y: 1.0500001, z: -65.25626}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 4.4069195, y: 1.0500001, z: -14.103297}
+  m_LocalScale: {x: 0.07283321, y: 1, z: 0.5263158}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 569869563}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &354579714
 GameObject:
@@ -35968,6 +35968,7 @@ Transform:
   - {fileID: 1766016249}
   - {fileID: 66325254}
   - {fileID: 120438297}
+  - {fileID: 352167988}
   m_Father: {fileID: 1199658818}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &569869564
@@ -37548,13 +37549,21 @@ PlayableDirector:
   - key: {fileID: -501399470010576559, guid: 9516b73abf730cf44804b1d88e663fe3, type: 2}
     value: {fileID: 623907639}
   - key: {fileID: -2046753567610554060, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
-    value: {fileID: 338764139}
+    value: {fileID: 1325905139}
   - key: {fileID: 503102219070874574, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
     value: {fileID: 1325905139}
   - key: {fileID: -5420716272021537678, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
     value: {fileID: 623907636}
   - key: {fileID: 8674827358060320049, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
     value: {fileID: 623907639}
+  - key: {fileID: 3264712915023521575, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 449741529492234224, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 982771357}
+  - key: {fileID: -7178159759275161130, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 83172803}
+  - key: {fileID: 8653748433332878582, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
+    value: {fileID: 83172803}
   m_ExposedReferences:
     m_References:
     - a76f3bb1b38201d4c9fb5a4bbd8999bb: {fileID: 1467373026}
@@ -37567,6 +37576,7 @@ PlayableDirector:
     - d437a47650ea9674caea67b05cb61b6d: {fileID: 1467373026}
     - fbed7bbd74e0e874a9b68b5e85131aab: {fileID: 1462105655}
     - 32ce919f799f6024996c9098614b104e: {fileID: 1468933712}
+    - 98e571b09a883d243b27f1f572f5811d: {fileID: 0}
     - d36ef4fe1d0026e48ac9ab74b2c182ea: {fileID: 66325254}
     - 9c3ce3ed72a1a0745ab8aed4ab156b0f: {fileID: 66325254}
     - 32c90146b56aaec4bbd085611d98f2e9: {fileID: 0}
@@ -78586,15 +78596,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Events:
     m_Signals:
-    - {fileID: 11400000, guid: 8f7ece7e5439e77449325803607c7ace, type: 2}
     - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
+    - {fileID: 11400000, guid: 90668b5df759d694f9c2e78f69cce7ea, type: 2}
+    - {fileID: 11400000, guid: 112285bc885b5a141ad450986d0eff19, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1887847808}
-          m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
-            PixelCrushers.DialogueSystem
-          m_MethodName: OnUse
+        - m_Target: {fileID: 352167987}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.StoryController, AnoGame.Application
+          m_MethodName: LoadStory
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -78605,31 +78615,9 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
     - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 297600892}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
-          m_MethodName: StartChase
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 284172278}
-          m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-          m_MethodName: StartEvent
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
+        m_Calls: []
+    - m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &986790682
 GameObject:
   m_ObjectHideFlags: 0
@@ -126035,7 +126023,6 @@ SceneRoots:
   - {fileID: 1235485448}
   - {fileID: 364651352816316542}
   - {fileID: 2056516697}
-  - {fileID: 352167988}
   - {fileID: 1392682876}
   - {fileID: 1137514917}
   - {fileID: 63810941}

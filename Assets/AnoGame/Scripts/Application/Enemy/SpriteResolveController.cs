@@ -14,15 +14,11 @@ namespace AnoGame.Application.Enemy
         [SerializeField] private float _defaultDuration = 1f;
 
         [Header("Effects")]
-        [SerializeField] private ParticleSystem fadeInEffect;
-        [SerializeField] private ParticleSystem fadeoutEffect;
         [SerializeField] private ParticleSystem disappearEffect;
 
         [Header("Thresholds (0-1)")]
-        [SerializeField, Range(0f, 1f)] private float fadeInPlayThreshold = 0.2f;
-        [SerializeField, Range(0f, 1f)] private float fadeInStopThreshold = 0.8f;
-        [SerializeField, Range(0f, 1f)] private float fadeOutPlayThreshold = 0.2f;
-        [SerializeField, Range(0f, 1f)] private float fadeOutStopThreshold = 0.8f;
+        [SerializeField, Range(0f, 1f)] private float playThreshold = 0.2f;
+        [SerializeField, Range(0f, 1f)] private float stopThreshold = 0.8f;
 
         [Header("Shadows")]
         [SerializeField] private GameObject[] shadowObjects;
@@ -34,6 +30,7 @@ namespace AnoGame.Application.Enemy
         private const string OutlineColorProperty = "_OutlineColor";
 
         private SpriteRenderer[] _spriteRenderers;
+        private bool _isEffectPlaying = false;
 
         private void Awake()
         {
@@ -102,6 +99,36 @@ namespace AnoGame.Application.Enemy
         public void TriggerFadeIn(PartialFadeSettings settings) => PlayFadeInAsync(settings).Forget();
         public void TriggerFadeOut(PartialFadeSettings settings) => PlayFadeOutAsync(settings).Forget();
 
+        /// <summary>
+        /// タイムライン等から毎フレーム進捗を受け取り、エフェクトの再生・停止を制御する。
+        /// </summary>
+        public void HandleEffect(float progress, bool playEffect, float customPlayThreshold = -1f, float customStopThreshold = -1f)
+        {
+            if (!playEffect || disappearEffect == null)
+            {
+                if (_isEffectPlaying)
+                {
+                    disappearEffect?.Stop();
+                    _isEffectPlaying = false;
+                }
+                return;
+            }
+
+            float pThresh = customPlayThreshold >= 0 ? customPlayThreshold : playThreshold;
+            float sThresh = customStopThreshold >= 0 ? customStopThreshold : stopThreshold;
+
+            if (!_isEffectPlaying && progress >= pThresh && progress < sThresh)
+            {
+                disappearEffect.Play();
+                _isEffectPlaying = true;
+            }
+            else if (_isEffectPlaying && (progress >= sThresh || progress < pThresh))
+            {
+                disappearEffect.Stop();
+                _isEffectPlaying = false;
+            }
+        }
+
         #endregion
 
         #region Internal Logic
@@ -111,13 +138,9 @@ namespace AnoGame.Application.Enemy
             SetOutlineColor(settings.outlineColor);
 
             float duration = settings.duration > 0 ? settings.duration : _defaultDuration;
-            float startAlpha = isIn ? 1f : (1f - GetCurrentResolve()); // 簡易化
             float targetResolve = isIn ? (1f - settings.targetAlpha) : settings.targetAlpha;
-
-            // 実際のリゾルブ値の開始と終了
             float startResolve = GetCurrentResolve();
 
-            bool played = false, stopped = false;
             float elapsed = 0f;
 
             // 影と並列実行
@@ -131,33 +154,7 @@ namespace AnoGame.Application.Enemy
                 SetResolve(currentVal);
 
                 // エフェクト制御
-                if (isIn)
-                {
-                    if (!played && t >= fadeInPlayThreshold && fadeInEffect != null)
-                    {
-                        fadeInEffect.Play();
-                        played = true;
-                    }
-                    if (!stopped && t >= fadeInStopThreshold && fadeInEffect != null)
-                    {
-                        fadeInEffect.Stop();
-                        stopped = true;
-                    }
-                }
-                else
-                {
-                    var effect = settings.isNormal ? fadeoutEffect : disappearEffect;
-                    if (!played && t >= fadeOutPlayThreshold && effect != null)
-                    {
-                        effect.Play();
-                        played = true;
-                    }
-                    if (!stopped && t >= fadeOutStopThreshold && effect != null)
-                    {
-                        effect.Stop();
-                        stopped = true;
-                    }
-                }
+                HandleEffect(t, true);
 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
@@ -213,9 +210,11 @@ namespace AnoGame.Application.Enemy
 
         public void StopAllEffects()
         {
-            if (fadeInEffect != null) fadeInEffect.Stop();
-            if (fadeoutEffect != null) fadeoutEffect.Stop();
-            if (disappearEffect != null) disappearEffect.Stop();
+            if (disappearEffect != null)
+            {
+                disappearEffect.Stop();
+                _isEffectPlaying = false;
+            }
         }
 
         #endregion

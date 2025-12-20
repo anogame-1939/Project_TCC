@@ -16,6 +16,7 @@ namespace AnoGame.Application.Direction.Timeline
         public bool useClipDuration = true;
 
         [Min(0f)] public float duration = 0.5f;
+        public Color color = Color.black;
 
         // 連続再生やブレンドは不要なのでミニマム
         public ClipCaps clipCaps => ClipCaps.None;
@@ -27,6 +28,7 @@ namespace AnoGame.Application.Direction.Timeline
             behaviour.kind = kind;
             behaviour.useClipDuration = useClipDuration;
             behaviour.durationOverride = duration;
+            behaviour.color = color;
             return playable;
         }
     }

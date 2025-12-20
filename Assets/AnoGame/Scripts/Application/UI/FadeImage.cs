@@ -67,6 +67,15 @@ namespace AnoGame.Application.UI
 			material.SetColor("_Color", color);
 		}
 
+		public void SetColor(Color color)
+		{
+			this.color = color;
+			if (material != null)
+			{
+				material.SetColor("_Color", color);
+			}
+		}
+
 #if UNITY_EDITOR
 		protected override void OnValidate()
 		{

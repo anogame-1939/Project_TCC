@@ -27,12 +27,13 @@ namespace AnoGame.Application.UI
         /// 指定した秒数かけてフェードインを行います
         /// </summary>
         /// <param name="duration">フェードにかかる時間(秒)</param>
-        public void FadeOutIn(float duration)
+        public void FadeOutIn(float duration, Color? color = null)
         {
             if (_fadeCoroutine != null)
             {
                 StopCoroutine(_fadeCoroutine);
             }
+            if (color.HasValue) _fadeImage.SetColor(color.Value);
             _fadeCoroutine = StartCoroutine(FadeOutInRoutine(duration));
         }
 
@@ -52,12 +53,13 @@ namespace AnoGame.Application.UI
         /// 指定した秒数かけてフェードインを行います
         /// </summary>
         /// <param name="duration">フェードにかかる時間(秒)</param>
-        public void FadeIn(float duration)
+        public void FadeIn(float duration, Color? color = null)
         {
             if (_fadeCoroutine != null)
             {
                 StopCoroutine(_fadeCoroutine);
             }
+            if (color.HasValue) _fadeImage.SetColor(color.Value);
             _fadeCoroutine = StartCoroutine(FadeInRoutine(duration));
         }
 
@@ -71,12 +73,13 @@ namespace AnoGame.Application.UI
         /// 指定した秒数かけてフェードアウトを行います
         /// </summary>
         /// <param name="duration">フェードにかかる時間(秒)</param>
-        public void FadeOut(float duration)
+        public void FadeOut(float duration, Color? color = null)
         {
             if (_fadeCoroutine != null)
             {
                 StopCoroutine(_fadeCoroutine);
             }
+            if (color.HasValue) _fadeImage.SetColor(color.Value);
             _fadeCoroutine = StartCoroutine(FadeOutRoutine(duration));
         }
 

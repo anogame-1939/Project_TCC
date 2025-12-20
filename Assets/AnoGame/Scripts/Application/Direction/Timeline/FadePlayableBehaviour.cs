@@ -8,6 +8,7 @@ namespace AnoGame.Application.Direction.Timeline
         public FadeClipKind kind;
         public bool useClipDuration = true;
         public float durationOverride = 0.5f;
+        public Color color = Color.black;
 
         private bool _fired;
 
@@ -30,9 +31,9 @@ namespace AnoGame.Application.Direction.Timeline
 
                 switch (kind)
                 {
-                    case FadeClipKind.In: handler.FadeIn(duration); break;
-                    case FadeClipKind.Out: handler.FadeOut(duration); break;
-                    case FadeClipKind.OutIn: handler.FadeOutIn(duration); break;
+                    case FadeClipKind.In: handler.FadeIn(duration, color); break;
+                    case FadeClipKind.Out: handler.FadeOut(duration, color); break;
+                    case FadeClipKind.OutIn: handler.FadeOutIn(duration, color); break;
                 }
             }
         }

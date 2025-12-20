@@ -37,6 +37,10 @@ namespace AnoGame.Application.Direction.Timeline
 
                 blendedResolve += currentAmount * weight;
                 totalWeight += weight;
+
+                // エフェクト制御 (ウェイトが最大のものを優先するなどのロジックも考えられるが、ここでは単純に各クリップからHandleを呼ぶ)
+                // SpriteResolveController 側で複数の呼び出しに対する整合性を取る（最後に呼ばれたものが勝つ、または再生中フラグで管理）
+                controller.HandleEffect(t, behaviour.playEffect, behaviour.playThreshold, behaviour.stopThreshold);
             }
 
             if (totalWeight > 0f)
