@@ -22,16 +22,23 @@ namespace AnoGame.Application.Direction.Timeline
                 float weight = playable.GetInputWeight(i);
                 if (weight <= 0f) continue;
 
-                var playbleInput = (ScriptPlayable<EnemyResolveBehaviour>)playable.GetInput(i);
-                var behaviour = playbleInput.GetBehaviour();
+                var playableInput = (ScriptPlayable<EnemyResolveBehaviour>)playable.GetInput(i);
+                var behaviour = playableInput.GetBehaviour();
 
-                blendedResolve += behaviour.resolveAmount * weight;
+                // クリップの進行度（0〜1）を算出
+                double duration = playableInput.GetDuration();
+                double time = playableInput.GetTime();
+                float t = (duration > 0) ? (float)(time / duration) : 1f;
+                t = Mathf.Clamp01(t);
+
+                // カーブを適用して補完
+                float curveT = behaviour.curve != null ? behaviour.curve.Evaluate(t) : t;
+                float currentAmount = Mathf.Lerp(behaviour.startAmount, behaviour.endAmount, curveT);
+
+                blendedResolve += currentAmount * weight;
                 totalWeight += weight;
             }
 
-            // ブレンドされたリゾルブ値を適用
-            // ウェイトの合計が1未満の場合の挙動（補完するか、デフォルト値に戻すか）は
-            // プロジェクトの要件に合わせる必要があるが、ここでは単純に適用する。
             if (totalWeight > 0f)
             {
                 controller.SetResolve(blendedResolve);

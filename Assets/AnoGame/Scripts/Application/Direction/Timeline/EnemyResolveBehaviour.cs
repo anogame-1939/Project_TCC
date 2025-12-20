@@ -8,6 +8,11 @@ namespace AnoGame.Application.Direction.Timeline
     public sealed class EnemyResolveBehaviour : PlayableBehaviour
     {
         [Range(0f, 1f)]
-        public float resolveAmount;
+        public float startAmount = 0f;
+
+        [Range(0f, 1f)]
+        public float endAmount = 1f;
+
+        public AnimationCurve curve = AnimationCurve.Linear(0, 0, 1, 1);
     }
 }
