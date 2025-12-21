@@ -25552,7 +25552,7 @@ PlayableDirector:
     - b46e165452ded3a4aa5f0079d54db8a3: {fileID: 1766016249}
     - 99f147ec6902167428b49a3597fb1194: {fileID: 66325254}
     - 951b053e4f3a31e44a6efb9445c9e359: {fileID: 0}
-    - c6d17e6548ba9da4d9cdf6be340b6874: {fileID: 0}
+    - c6d17e6548ba9da4d9cdf6be340b6874: {fileID: 1030847604}
     - c1de59a411d980544abc8a1a496b27c1: {fileID: 1820860983}
 --- !u!1 &535747504
 GameObject:
@@ -78655,8 +78655,8 @@ MonoBehaviour:
   m_Events:
     m_Signals:
     - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
-    - {fileID: 11400000, guid: 90668b5df759d694f9c2e78f69cce7ea, type: 2}
-    - {fileID: 11400000, guid: 112285bc885b5a141ad450986d0eff19, type: 2}
+    - {fileID: 11400000, guid: ce46b255c18bdfb498ae73c023a442b7, type: 2}
+    - {fileID: 11400000, guid: ef2d015743edef74faab243476b64e2e, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -78673,9 +78673,35 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
     - m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1844276547}
+          m_TargetAssemblyTypeName: AnoGame.Application.UI.FlashbackUIController,
+            AnoGame.Application
+          m_MethodName: ShowFlashback
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 21300000, guid: 3f924b98c07bc4f5295ad23572b5d0e7, type: 3}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Sprite, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     - m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1844276547}
+          m_TargetAssemblyTypeName: AnoGame.Application.UI.FlashbackUIController,
+            AnoGame.Application
+          m_MethodName: HideFlashback
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &986790682
 GameObject:
   m_ObjectHideFlags: 0
@@ -104626,7 +104652,7 @@ MonoBehaviour:
     onConversationStart:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1887847807}
+        - m_Target: {fileID: 623907637}
           m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController,
             AnoGame.Application
           m_MethodName: Enqueue
@@ -104641,20 +104667,7 @@ MonoBehaviour:
           m_CallState: 2
     onConversationEnd:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 623907637}
-          m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController,
-            AnoGame.Application
-          m_MethodName: Enqueue
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:
@@ -105758,6 +105771,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1844276547 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7336159414962673463, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
+  m_PrefabInstance: {fileID: 297600886}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e485a1148987fbe41ae8cf43379c6a82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1846381070
 GameObject:
   m_ObjectHideFlags: 3
@@ -106868,7 +106892,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1887847806
 Transform:
   m_ObjectHideFlags: 0
