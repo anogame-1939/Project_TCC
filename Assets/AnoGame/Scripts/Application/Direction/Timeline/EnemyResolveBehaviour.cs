@@ -20,6 +20,7 @@ namespace AnoGame.Application.Direction.Timeline
         [Range(0f, 1f)] public float startAmount = 0f;
         [Range(0f, 1f)] public float endAmount = 1f;
         public AnimationCurve curve = AnimationCurve.Linear(0, 0, 1, 1);
+        [ColorUsage(true, true)] public Color outlineColor = Color.red;
 
         [Header("Particle Control")]
         public bool particleControl = false;

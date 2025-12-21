@@ -16,6 +16,7 @@ namespace AnoGame.Application.Direction.Timeline
             int inputCount = playable.GetInputCount();
             float totalResolveWeight = 0f;
             float blendedResolve = 0f;
+            Color blendedOutlineColor = Color.clear;
 
             EnemyResolveBehaviour bestParticleClip = null;
             float maxParticleWeight = -1f;
@@ -40,6 +41,10 @@ namespace AnoGame.Application.Direction.Timeline
                     float curveT = behaviour.curve != null ? behaviour.curve.Evaluate(t) : t;
                     float currentAmount = Mathf.Lerp(behaviour.startAmount, behaviour.endAmount, curveT);
                     blendedResolve += currentAmount * weight;
+
+                    // アウトラインカラーのブレンド
+                    blendedOutlineColor += behaviour.outlineColor * weight;
+
                     totalResolveWeight += weight;
                 }
 
@@ -56,6 +61,7 @@ namespace AnoGame.Application.Direction.Timeline
             if (totalResolveWeight > 0f)
             {
                 controller.SetResolve(blendedResolve);
+                controller.SetOutlineColor(blendedOutlineColor);
             }
 
             // Apply Particle Logic
