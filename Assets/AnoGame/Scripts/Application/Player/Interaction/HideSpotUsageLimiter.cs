@@ -2,37 +2,47 @@ using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
 using AnoGame.Application.Enemy;
-using AnoGame.Application.Player.Interaction;
 using AnoGame.Application.Direction;
 using VContainer;
+using System.Threading;
 
 namespace AnoGame.Application.Player.Interaction
 {
     /// <summary>
     /// ハイドスポットの連続使用を制限・ペナルティを与えるコンポーネント
+    /// （最大数ランダム + 時間経過による回復）
     /// </summary>
     [RequireComponent(typeof(HideSpotZone))]
     public class HideSpotUsageLimiter : MonoBehaviour
     {
         [Header("Settings")]
-        [SerializeField] private int maxUsageCount = 3;
-        [SerializeField] private float usageResetTime = 60.0f; // 未使用ならリセットする機能があってもいいが、要望は「3回」なのでシンプルに
-        [SerializeField] private float penaltyLockoutDuration = 30.0f;
+        [Tooltip("開始時の最大使用可能回数のランダム最小値")]
+        [SerializeField] private int minRandomLimit = 1;
+        [Tooltip("開始時の最大使用可能回数のランダム最大値")]
+        [SerializeField] private int maxRandomLimit = 3;
 
-        // [Header("References")]
-        // [SerializeField] private EnemyTeleportReaction enemyReaction; // Injectするので削除orコメントアウト
+        [Tooltip("1回分の使用回数が回復するまでの時間（秒）")]
+        [SerializeField] private float recoveryInterval = 10.0f;
+
+        [SerializeField] private float penaltyLockoutDuration = 30.0f;
 
         [Inject]
         private EnemySpawnManager _spawnManager;
 
         private HideSpotZone _hideSpot;
-        private int _currentUsage;
-        private System.IDisposable _resetTimer;
+
+        // 現在の最大容量（ランダムで決定される）
+        private int _currentMaxUsage;
+        // 現在の残り使用回数
+        private int _remainingUsage;
+
         private bool _isLocked;
+        private CancellationTokenSource _recoveryCts;
 
         private void Awake()
         {
             _hideSpot = GetComponent<HideSpotZone>();
+            RandomizeUsageLimit();
         }
 
         private void OnEnable()
@@ -43,23 +53,100 @@ namespace AnoGame.Application.Player.Interaction
                 .AddTo(this);
         }
 
+        private void OnDisable()
+        {
+            StopRecovery();
+        }
+
+        /// <summary>
+        /// 外部から使用回数を再設定・ランダマイズする
+        /// </summary>
+        public void RandomizeUsageLimit()
+        {
+            // Random.Range(int min, int max) is exclusive for max.
+            // If we want 1 to 3 inclusive, we need Random.Range(1, 4).
+            int nextMax = Random.Range(minRandomLimit, maxRandomLimit + 1);
+            SetUsageLimit(nextMax);
+        }
+
+        /// <summary>
+        /// 外部から使用回数を固定値で設定する
+        /// </summary>
+        public void SetUsageLimit(int count)
+        {
+            _currentMaxUsage = Mathf.Max(1, count);
+            _remainingUsage = _currentMaxUsage;
+            StopRecovery(); // Reset recovery state
+
+            Debug.Log($"[HideSpotUsageLimiter] Limit Set: {_currentMaxUsage} (Remaining: {_remainingUsage})");
+        }
+
         private void OnHideBegan()
         {
-            if (_isLocked) return; // 本来はInteractできないはずだが念のため
+            if (_isLocked) return;
 
-            _currentUsage++;
-            Debug.Log($"[HideSpotUsageLimiter] Usage: {_currentUsage}/{maxUsageCount}");
+            // まず消費する
+            _remainingUsage--;
+            Debug.Log($"[HideSpotUsageLimiter] Used! Remaining: {_remainingUsage}/{_currentMaxUsage}");
 
-            if (_currentUsage >= maxUsageCount)
+            // 0未満になったらペナルティ（つまり残り0の状態で入ったらアウト）
+            if (_remainingUsage < 0)
             {
                 ExecutePenalty();
+                return;
+            }
+
+            // 回復タイマーが動いていなければ開始
+            if (_recoveryCts == null)
+            {
+                StartRecovery();
+            }
+        }
+
+        private void StartRecovery()
+        {
+            StopRecovery();
+            _recoveryCts = new CancellationTokenSource();
+            RecoveryRoutine(_recoveryCts.Token).Forget();
+        }
+
+        private void StopRecovery()
+        {
+            if (_recoveryCts != null)
+            {
+                _recoveryCts.Cancel();
+                _recoveryCts.Dispose();
+                _recoveryCts = null;
+            }
+        }
+
+        private async UniTaskVoid RecoveryRoutine(CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                // 満タンなら終了
+                if (_remainingUsage >= _currentMaxUsage)
+                {
+                    _remainingUsage = _currentMaxUsage;
+                    _recoveryCts = null; // 自己終了
+                    return;
+                }
+
+                await UniTask.Delay(System.TimeSpan.FromSeconds(recoveryInterval), cancellationToken: ct);
+
+                _remainingUsage++;
+                Debug.Log($"[HideSpotUsageLimiter] Recovered! Remaining: {_remainingUsage}/{_currentMaxUsage}");
             }
         }
 
         private void ExecutePenalty()
         {
             Debug.Log("[HideSpotUsageLimiter] Penalty Triggered!");
-            _currentUsage = 0; // カウンタはリセット
+            // ペナルティなので残量は0にしておく
+            _remainingUsage = 0;
+
+            // ロック中も回復タイマーは動かす（ロック明けに少しでも回復しているように）
+            StartRecovery();
 
             GameObject enemyObj = null;
 
@@ -81,7 +168,6 @@ namespace AnoGame.Application.Player.Interaction
                 var reaction = enemyObj.GetComponent<EnemyTeleportReaction>();
                 if (reaction != null)
                 {
-                    // [NEW] 既に近くにいる場合はワープしない（不自然な移動を防ぐ）
                     if (!_hideSpot.IsEnemyNear(enemyObj.transform.position))
                     {
                         reaction.CancelDisableTimer();
@@ -93,7 +179,7 @@ namespace AnoGame.Application.Player.Interaction
                     }
                 }
 
-                // [NEW] Chaseモードへ移行
+                // Chaseモードへ移行
                 var coordinator = enemyObj.GetComponent<EnemyBehaviorCoordinator>();
                 if (coordinator != null)
                 {
@@ -111,7 +197,7 @@ namespace AnoGame.Application.Player.Interaction
         private async UniTaskVoid LockSpot(float duration)
         {
             _isLocked = true;
-            _hideSpot.SetInteractable(false); // HideSpotZone に SetInteractable が必要
+            _hideSpot.SetInteractable(false);
             Debug.Log($"[HideSpotUsageLimiter] Spot Locked for {duration}s");
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(duration), cancellationToken: this.GetCancellationTokenOnDestroy());
@@ -120,5 +206,19 @@ namespace AnoGame.Application.Player.Interaction
             _hideSpot.SetInteractable(true);
             Debug.Log("[HideSpotUsageLimiter] Spot Unlocked");
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Randomize Limit")]
+        private void DebugRandomize()
+        {
+            RandomizeUsageLimit();
+        }
+
+        [ContextMenu("Execute Penalty")]
+        private void DebugPenalty()
+        {
+            ExecutePenalty();
+        }
+#endif
     }
 }
