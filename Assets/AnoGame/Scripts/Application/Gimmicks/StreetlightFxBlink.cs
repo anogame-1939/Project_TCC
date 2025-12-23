@@ -132,6 +132,23 @@ namespace AnoGame.Application.Gimmicks
         }
 
         /// <summary>
+        /// 指定秒数（duration）点滅してから消灯する（UnityEvent用 helper）
+        /// 点滅回数（count）は duration / defaultBlinkInterval から自動計算されます。
+        /// </summary>
+        /// <param name="duration">点滅し続ける時間（秒）</param>
+        public void BlinkOffDuration(float duration)
+        {
+            if (defaultBlinkInterval <= 0.001f)
+            {
+                BlinkOff(defaultBlinkInterval, 1, defaultFadeDuration);
+                return;
+            }
+            int count = Mathf.FloorToInt(duration / defaultBlinkInterval);
+            if (count < 1) count = 1;
+            BlinkOff(defaultBlinkInterval, count, defaultFadeDuration);
+        }
+
+        /// <summary>
         /// 指定回数点滅してから消灯する (Script用)
         /// blinkInterval: 点滅の1サイクル(ON->OFF)にかかる時間
         /// count: 点滅回数

@@ -9,6 +9,7 @@ namespace AnoGame.Application.Player.Interaction
     /// <summary>
     /// クールタイム付きのInspectZone
     /// </summary>
+    [RequireComponent(typeof(BoxCollider))]
     public class CooldownInspectZone : InteractableZone
     {
         [Header("Settings")]
@@ -19,12 +20,25 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField] private float cooldownDuration = 5.0f;
 
         [Header("Events")]
+        [Tooltip("インタラクト成功時に実行されるイベント")]
         public UnityEvent OnInspected;         // 成功時
+
+        [Tooltip("クールタイム中のインタラクト時に実行されるイベント")]
         public UnityEvent OnCooldownInteract;  // クールタイム中のインタラクト時
+
+        [Tooltip("クールタイムが終了した瞬間に実行されるイベント")]
         public UnityEvent OnCooldownComplete;  // クールタイム終了時
 
         private bool _isCooldown = false;
         private CancellationTokenSource _cts;
+
+        private void Reset()
+        {
+            if (TryGetComponent<Collider>(out var col))
+            {
+                col.isTrigger = true;
+            }
+        }
 
         private void OnDisable()
         {
