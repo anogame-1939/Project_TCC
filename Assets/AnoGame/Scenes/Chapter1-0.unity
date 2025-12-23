@@ -197,17 +197,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &450530662 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 35224682289664217, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
-  m_PrefabInstance: {fileID: 457343941}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b12448e9a16af34a8a87997945f2b35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &457343941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -990,19 +979,6 @@ MonoBehaviour:
     onConversationEnd:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 450530662}
-          m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
-            AnoGame.Application
-          m_MethodName: EndEvent
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
         - m_Target: {fileID: 784335109}
           m_TargetAssemblyTypeName: AnoGame.Story.StoryController, AnoGame.Story
           m_MethodName: LoadChapter
@@ -1345,17 +1321,106 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1725572899 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6871539816348813892, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
-  m_PrefabInstance: {fileID: 457343941}
+--- !u!1 &1754827000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1754827004}
+  - component: {fileID: 1754827003}
+  - component: {fileID: 1754827002}
+  - component: {fileID: 1754827001}
+  m_Layer: 0
+  m_Name: "Timeline_\u795E\u793E\u3078\u884C\u3053\u3046"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1754827001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754827000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d205f025553f9f447a5ff9d0f64ec7cf, type: 3}
+  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playableDirector: {fileID: 1754827003}
+--- !u!114 &1754827002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754827000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: 2b99d8ca8033276439e91192782b199d, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 5486094461938385386}
+          m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
+            Assembly-CSharp-firstpass
+          m_MethodName: OnUse
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!320 &1754827003
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754827000}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: 3227d87e407f8014994876eb22251720, type: 2}
+  m_InitialState: 0
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings:
+  - key: {fileID: 8762637133860838425, guid: 5bc6d7fb2fb9d5047aed077f7c8dc9d8, type: 2}
+    value: {fileID: 1754827002}
+  m_ExposedReferences:
+    m_References:
+    - 248193584c77b234f9e985a8d8fd4395: {fileID: 5486094461938385386}
+    - 37e843dd3092b1548b9a494e1ac5c5b8: {fileID: 3745719537351532466}
+    - 5fef37cf87a34f5409f399fa3850a5a9: {fileID: 1165675401}
+--- !u!4 &1754827004
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754827000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1955804211
 GameObject:
   m_ObjectHideFlags: 0
@@ -1388,43 +1453,6 @@ MonoBehaviour:
   startEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1725572899}
-        m_TargetAssemblyTypeName: AnoGame.Application.GameStateHandler, AnoGame.Application
-        m_MethodName: SetInGameEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
-      - m_Target: {fileID: 450530662}
-        m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
-          AnoGame.Application
-        m_MethodName: StatEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1499885553}
         m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
         m_MethodName: Enqueue
@@ -1495,7 +1523,6 @@ GameObject:
   - component: {fileID: 2577331246474313070}
   - component: {fileID: 3745719537351532466}
   - component: {fileID: 3745719537351532467}
-  - component: {fileID: 3745719537351532468}
   m_Layer: 0
   m_Name: "\u4F1A\u8A71\u30FC\u6700\u521D\u306E\u4F1A\u8A71"
   m_TagString: Untagged
@@ -1615,18 +1642,6 @@ MonoBehaviour:
     onConversationEnd:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1499885551}
-          m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-          m_MethodName: Play
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
         - m_Target: {fileID: 457343942}
           m_TargetAssemblyTypeName: AnoGame.Application.Inventory.InventoryHandler,
             AnoGame.Application
@@ -1638,31 +1653,6 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 5486094461938385386}
-          m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
-            Assembly-CSharp-firstpass
-          m_MethodName: OnUse
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
-        - m_Target: {fileID: 3745719537351532468}
-          m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-          m_MethodName: Log
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: aaa
             m_BoolArgument: 0
           m_CallState: 2
     runOnConversationEndEventsAtEndOfFrame: 0
@@ -1724,18 +1714,6 @@ MonoBehaviour:
     onDialogueSystemUnpause:
       m_PersistentCalls:
         m_Calls: []
---- !u!114 &3745719537351532468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 612316417966452373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a0de4cb1d084e458a791bc6f7097fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5486094461938385386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1840,7 +1818,6 @@ GameObject:
   - component: {fileID: 6219244041640758205}
   - component: {fileID: 5486094461938385386}
   - component: {fileID: 8109834585786964934}
-  - component: {fileID: 8109834585786964935}
   m_Layer: 0
   m_Name: "\u4F1A\u8A71-\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3"
   m_TagString: Untagged
@@ -1864,46 +1841,22 @@ MonoBehaviour:
     onConversationStart:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8109834585786964935}
-          m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-          m_MethodName: Log
-          m_Mode: 5
+        - m_Target: {fileID: 457343942}
+          m_TargetAssemblyTypeName: AnoGame.Application.Inventory.InventoryHandler,
+            AnoGame.Application
+          m_MethodName: AddItem
+          m_Mode: 2
           m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_ObjectArgument: {fileID: 11400000, guid: 2cb1dc94a733d664cac6c1a5dd7952dc, type: 2}
+            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.ItemData, AnoGame.Application
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: www
+            m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
     onConversationEnd:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-          m_MethodName: Play
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
-        - m_Target: {fileID: 1165675401}
-          m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
-            Assembly-CSharp-firstpass
-          m_MethodName: OnUse
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:
@@ -1963,18 +1916,6 @@ MonoBehaviour:
     onDialogueSystemUnpause:
       m_PersistentCalls:
         m_Calls: []
---- !u!114 &8109834585786964935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8109834585786964933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a0de4cb1d084e458a791bc6f7097fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1986,6 +1927,7 @@ SceneRoots:
   - {fileID: 1499885552}
   - {fileID: 2577331246474313070}
   - {fileID: 6219244041640758205}
+  - {fileID: 1754827004}
   - {fileID: 1165675399}
   - {fileID: 784335110}
   - {fileID: 592107421}
