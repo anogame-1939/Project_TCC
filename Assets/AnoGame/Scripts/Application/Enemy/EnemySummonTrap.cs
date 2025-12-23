@@ -35,6 +35,16 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
+            // 4. Set State (Moved up for early check preference, but logic wise: Check existing state first)
+            var coordinator = enemy.GetComponent<EnemyBehaviorCoordinator>();
+
+            // [NEW] Chase中ならワープしない
+            if (coordinator != null && coordinator.IsChasing)
+            {
+                Debug.Log("[EnemySummonTrap] Summon skipped because enemy is already Chasing.");
+                return;
+            }
+
             // 1. Warp
             var agent = enemy.GetComponent<NavMeshAgent>();
             if (agent != null)
@@ -62,10 +72,9 @@ namespace AnoGame.Application.Enemy
             // 3. Freeze (Optional)
             // いきなり動くと不自然な場合があるので少し止める処理などを挟む余地
 
-            // 4. Set State
+            // 4. Force Chase
             if (forceChase)
             {
-                var coordinator = enemy.GetComponent<EnemyBehaviorCoordinator>();
                 if (coordinator != null)
                 {
                     coordinator.NotifyFound();

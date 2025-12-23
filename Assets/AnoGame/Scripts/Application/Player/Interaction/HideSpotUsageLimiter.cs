@@ -164,23 +164,32 @@ namespace AnoGame.Application.Player.Interaction
             // 2. キラーのアクション実行
             if (enemyObj != null)
             {
-                // ワープ
-                var reaction = enemyObj.GetComponent<EnemyTeleportReaction>();
-                if (reaction != null)
+                var coordinator = enemyObj.GetComponent<EnemyBehaviorCoordinator>();
+                bool isChasing = (coordinator != null && coordinator.IsChasing);
+
+                // ワープ (Chase中でなければ)
+                if (!isChasing)
                 {
-                    if (!_hideSpot.IsEnemyNear(enemyObj.transform.position))
+                    var reaction = enemyObj.GetComponent<EnemyTeleportReaction>();
+                    if (reaction != null)
                     {
-                        reaction.CancelDisableTimer();
-                        reaction.WarpToNearPlayerSplinePoint();
+                        if (!_hideSpot.IsEnemyNear(enemyObj.transform.position))
+                        {
+                            reaction.CancelDisableTimer();
+                            reaction.WarpToNearPlayerSplinePoint();
+                        }
+                        else
+                        {
+                            Debug.Log("[HideSpotUsageLimiter] Enemy is already near. Skip Warp.");
+                        }
                     }
-                    else
-                    {
-                        Debug.Log("[HideSpotUsageLimiter] Enemy is already near. Skip Warp.");
-                    }
+                }
+                else
+                {
+                    Debug.Log("[HideSpotUsageLimiter] Enemy is already Chasing. Skip Warp.");
                 }
 
                 // Chaseモードへ移行
-                var coordinator = enemyObj.GetComponent<EnemyBehaviorCoordinator>();
                 if (coordinator != null)
                 {
                     coordinator.NotifyFound();

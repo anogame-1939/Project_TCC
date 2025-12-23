@@ -81,6 +81,18 @@ namespace AnoGame.Application.Enemy
                 return;
             }
 
+            // Chaseモードへ
+            var coordinator = enemy.GetComponent<EnemyBehaviorCoordinator>();
+            if (coordinator != null)
+            {
+                // [NEW] 既にChase中ならワープせず終了
+                if (coordinator.IsChasing)
+                {
+                    Debug.Log("[EnemyAmbushTrigger] Ambush skipped because enemy is already Chasing.");
+                    return;
+                }
+            }
+
             var agent = enemy.GetComponent<NavMeshAgent>();
             if (agent != null)
             {
@@ -93,8 +105,6 @@ namespace AnoGame.Application.Enemy
                 enemy.transform.rotation = target.rotation;
             }
 
-            // Chaseモードへ
-            var coordinator = enemy.GetComponent<EnemyBehaviorCoordinator>();
             if (coordinator != null)
             {
                 coordinator.NotifyFound();

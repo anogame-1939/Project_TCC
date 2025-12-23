@@ -21,6 +21,11 @@ namespace AnoGame.Application.Direction
         [SerializeField] PatrolSplineIntentProvider patrol;
         [SerializeField] SuspicionIntentProvider suspicion; // [NEW]
 
+        [Header("Events")]
+        [SerializeField] public UnityEngine.Events.UnityEvent OnChaseStart;
+        [SerializeField] public UnityEngine.Events.UnityEvent OnChaseEnd;
+        [SerializeField] public UnityEngine.Events.UnityEvent OnSuspicion;
+
         [Header("Defaults")]
         [SerializeField] float defaultEncounterTTL = 2.0f;
         [SerializeField] float defaultInvestigateTTL = 3.0f;
@@ -38,6 +43,7 @@ namespace AnoGame.Application.Direction
             {
                 Debug.Log("見失った！");
                 // まずChaseは止めておく（安全）
+                if (_currentState == State.Chase) OnChaseEnd?.Invoke();
                 chase.SetActive(false);
                 // 帰投を開始（最近傍のKnotへ）
                 ret.ActivateToNearest();   // ★ ここが Deactivate ではなく Activate
@@ -73,6 +79,7 @@ namespace AnoGame.Application.Direction
             eventLock.Deactivate();       // 内部で NavMesh 再開＋ELock解除
             chase.SetActive(true);
             _currentState = State.Chase;
+            OnChaseStart?.Invoke();
         }
 
         // === ゲーム側（Perception等）から呼ぶ ===
@@ -82,7 +89,9 @@ namespace AnoGame.Application.Direction
             if (_currentState == State.Suspicion) return;
 
             Debug.Log("見失った！疑惑モードへ移行");
+            if (_currentState == State.Chase) OnChaseEnd?.Invoke();
             _currentState = State.Suspicion;
+            OnSuspicion?.Invoke();
 
             chase.SetActive(false);
             ret.Deactivate();
@@ -99,6 +108,7 @@ namespace AnoGame.Application.Direction
 
             Debug.Log("発見！追跡開始");
             _currentState = State.Chase;
+            OnChaseStart?.Invoke();
 
             investigate.Deactivate();
             suspicion.Deactivate(); // [NEW]
@@ -126,6 +136,7 @@ namespace AnoGame.Application.Direction
             investigate.Deactivate();
             suspicion.Deactivate(); // [NEW]
             ret.Deactivate();
+            if (_currentState == State.Chase) OnChaseEnd?.Invoke();
             chase.SetActive(false);
             _currentState = State.Patrol;
         }
