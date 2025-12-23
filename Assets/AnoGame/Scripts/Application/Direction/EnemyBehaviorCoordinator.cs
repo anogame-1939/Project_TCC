@@ -25,6 +25,7 @@ namespace AnoGame.Application.Direction
         [SerializeField] public UnityEngine.Events.UnityEvent OnChaseStart;
         [SerializeField] public UnityEngine.Events.UnityEvent OnChaseEnd;
         [SerializeField] public UnityEngine.Events.UnityEvent OnSuspicion;
+        [SerializeField] public UnityEngine.Events.UnityEvent OnSuspicionEnd;
 
         [Header("Defaults")]
         [SerializeField] float defaultEncounterTTL = 2.0f;
@@ -35,6 +36,8 @@ namespace AnoGame.Application.Direction
         private State _currentState = State.Patrol;
 
         public bool IsChasing => _currentState == State.Chase; // [NEW] 外部確認用
+        public bool IsSuspicion => _currentState == State.Suspicion;
+
 
         void Awake()
         {
@@ -57,6 +60,7 @@ namespace AnoGame.Application.Direction
             suspicion.OnExpired += () =>
             {
                 Debug.Log($"[Coordinator] Suspicion expired. Transitioning to Investigate. (Time: {Time.time})");
+                OnSuspicionEnd?.Invoke();
                 Debug.Log("疑念晴れず -> 捜索開始");
                 _currentState = State.Investigate;
                 investigate.Activate(transform.position, defaultInvestigateTTL);
@@ -107,6 +111,7 @@ namespace AnoGame.Application.Direction
             if (_currentState == State.Chase) return;
 
             Debug.Log("発見！追跡開始");
+            if (_currentState == State.Suspicion) OnSuspicionEnd?.Invoke();
             _currentState = State.Chase;
             OnChaseStart?.Invoke();
 
@@ -121,6 +126,7 @@ namespace AnoGame.Application.Direction
             if (_currentState == State.Chase) return;
 
             Debug.Log($"音を感知！ {noisePosition} を調査しに行きます");
+            if (_currentState == State.Suspicion) OnSuspicionEnd?.Invoke();
             _currentState = State.Investigate;
 
             chase.SetActive(false);
@@ -134,6 +140,7 @@ namespace AnoGame.Application.Direction
         {
             eventLock.Deactivate();
             investigate.Deactivate();
+            if (_currentState == State.Suspicion) OnSuspicionEnd?.Invoke();
             suspicion.Deactivate(); // [NEW]
             ret.Deactivate();
             if (_currentState == State.Chase) OnChaseEnd?.Invoke();
