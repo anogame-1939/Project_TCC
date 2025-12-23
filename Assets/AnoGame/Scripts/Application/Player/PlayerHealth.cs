@@ -24,7 +24,34 @@ namespace AnoGame.Application.Player
 
         private void Start()
         {
-            _currentLives = _maxLives;
+            // 初期化時に現在のデータを反映
+            if (GameManager.Instance.CurrentGameData != null)
+            {
+                SetHealth(GameManager.Instance.CurrentGameData.CurrentHealth);
+            }
+            else
+            {
+                SetHealth(_maxLives);
+            }
+
+            // データロードイベントを購読して、後からデータがロード/リセットされた場合にも対応
+            GameManager.Instance.LoadGameData += OnGameDataLoaded;
+        }
+
+        private void OnDestroy()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadGameData -= OnGameDataLoaded;
+            }
+        }
+
+        private void OnGameDataLoaded(AnoGame.Domain.Data.Models.GameData gameData)
+        {
+            if (gameData != null)
+            {
+                SetHealth(gameData.CurrentHealth);
+            }
         }
 
         private void Update()
@@ -55,6 +82,10 @@ namespace AnoGame.Application.Player
                 _currentLives = Mathf.Max(0, _currentLives - 1);
             }
 
+            // Update Game Data
+            GameManager.Instance.UpdateCurrentHealth(_currentLives);
+            GameManager.Instance.SaveData();
+
             // ライフ減少時のイベント（恐怖演出など）
             OnLifeLost?.Invoke();
 
@@ -66,6 +97,10 @@ namespace AnoGame.Application.Player
 
                 // Publish Death Event
                 MessageBroker.Default.Publish(new PlayerDeathEvent(priorLives, _maxLives));
+
+                // Reset Health in GameData on Death (so next load starts with full health)
+                GameManager.Instance.UpdateCurrentHealth(_maxLives);
+                GameManager.Instance.SaveData();
 
                 // OnDeath() logic removal - logic moved to event listeners
                 // GameStateManager.Instance.SetState(GameState.GameOver); // Moved to listener or managed by GameOverManager
@@ -95,6 +130,13 @@ namespace AnoGame.Application.Player
 
             // ライフを回復する（最大値を超えないようにする）
             _currentLives = Mathf.Min(_maxLives, _currentLives + amount);
+        }
+
+        // 外部からライフをセットする
+        public void SetHealth(int amount)
+        {
+            _currentLives = Mathf.Clamp(amount, 0, _maxLives);
+            // Debug.Log($"[PlayerHealth] Health set to {_currentLives}");
         }
     }
 }

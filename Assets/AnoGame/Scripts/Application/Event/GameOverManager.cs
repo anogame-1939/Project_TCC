@@ -40,6 +40,9 @@ namespace AnoGame.Application.Event
 
         public async void OnRetryGame()
         {
+            GameManager.Instance.IncrementRetryCount();
+            await GameManager.Instance.SaveCurrentGameState();
+
             GameStateManager.Instance.SetState(GameState.Gameplay);
             MessageBroker.Default.Publish(new PlayerRetriedEvent());
 

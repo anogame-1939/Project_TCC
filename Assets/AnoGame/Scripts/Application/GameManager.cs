@@ -65,7 +65,7 @@ namespace AnoGame.Application
             _dataLoaded = true;
         }
 
-        private GameData CreateNewGameData()
+        private GameData CreateNewGameData(int retryCount = 0)
         {
             var position = new Position3D(28.9f, 0, -124.332f); // 初期位置
             var rotation = new Rotation3D(0, 225.071f, 0, 1); // デフォルトの回転
@@ -85,7 +85,9 @@ namespace AnoGame.Application
                 storyProgress: new StoryProgress(0, 0),
                 inventory: new AnoGame.Domain.Data.Models.Inventory(), // 新しい空のインベントリを作成
                 position: playerPosition,
-                eventHistory: new EventHistory() // 新しい空のイベント履歴を作成
+                eventHistory: new EventHistory(), // 新しい空のイベント履歴を作成
+                currentHealth: 2,
+                retryCount: retryCount
             );
         }
 
@@ -101,9 +103,10 @@ namespace AnoGame.Application
         /// </summary>
         public void ResetDataAsync()
         {
-            _currentGameData = CreateNewGameData();
+            int currentRetryCount = _currentGameData != null ? _currentGameData.RetryCount : 0;
+            _currentGameData = CreateNewGameData(currentRetryCount);
             Debug.Log($"_currentGameData:{_currentGameData.ToString()}");
-            // LoadGameData?.Invoke(_currentGameData);
+            LoadGameData?.Invoke(_currentGameData);
         }
 
         public void UpdateGameState(GameData newGameData)
@@ -114,6 +117,22 @@ namespace AnoGame.Application
         public void AddItem()
         {
 
+        }
+
+        public void UpdateCurrentHealth(int health)
+        {
+            if (_currentGameData != null)
+            {
+                _currentGameData.UpdateCurrentHealth(health);
+            }
+        }
+
+        public void IncrementRetryCount()
+        {
+            if (_currentGameData != null)
+            {
+                _currentGameData.IncrementRetryCount();
+            }
         }
 
         public void SaveData()

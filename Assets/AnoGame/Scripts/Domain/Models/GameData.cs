@@ -20,6 +20,10 @@ namespace AnoGame.Domain.Data.Models
         public PlayerPosition PlayerPosition { get; private set; }
         [JsonProperty]
         public EventHistory EventHistory { get; private set; }
+        [JsonProperty]
+        public int CurrentHealth { get; private set; }
+        [JsonProperty]
+        public int RetryCount { get; private set; }
 
         [JsonConstructor]
         public GameData()
@@ -31,7 +35,9 @@ namespace AnoGame.Domain.Data.Models
             StoryProgress storyProgress,
             Inventory inventory,
             PlayerPosition position,
-            EventHistory eventHistory)
+            EventHistory eventHistory,
+            int currentHealth = 2,
+            int retryCount = 0)
         {
             Score = score;
             PlayerName = playerName;
@@ -39,6 +45,8 @@ namespace AnoGame.Domain.Data.Models
             Inventory = inventory;
             PlayerPosition = position;
             EventHistory = eventHistory;
+            CurrentHealth = currentHealth;
+            RetryCount = retryCount;
         }
 
         public void UpdateStoryProgress(StoryProgress storyProgress)
@@ -59,6 +67,16 @@ namespace AnoGame.Domain.Data.Models
         public void RemoveClearedEvent(string eventId)
         {
             EventHistory.RemoveEvent(eventId);
+        }
+
+        public void UpdateCurrentHealth(int health)
+        {
+            CurrentHealth = health;
+        }
+
+        public void IncrementRetryCount()
+        {
+            RetryCount++;
         }
     }
 
