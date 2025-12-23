@@ -38,5 +38,27 @@ namespace AnoGame.Application.Direction
             _rb.drag = drag;
             _rb.angularDrag = drag * 0.5f;
         }
+        /// <summary>
+        /// 指定したTransformから離れる方向に転がす
+        /// </summary>
+        /// <param name="from">転がす力の発生源（プレイヤーなど）</param>
+        public void RollFrom(Transform from)
+        {
+            if (from == null) return;
+
+            // 自身と対象の位置関係から方向を算出（Y軸は無視して水平方向のみ）
+            Vector3 direction = transform.position - from.position;
+            direction.y = 0f;
+
+            // 重なっている場合などはfromの向いている方向にする
+            if (direction.sqrMagnitude < 0.001f)
+            {
+                direction = from.forward;
+                direction.y = 0f;
+            }
+
+            rollDirection = direction.normalized;
+            RollOnce();
+        }
     }
 }
