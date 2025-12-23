@@ -12411,6 +12411,8 @@ PlayableDirector:
     value: {fileID: 297600888}
   - key: {fileID: 6505799321644411476, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
     value: {fileID: 284172282}
+  - key: {fileID: 2731971872814437139, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
+    value: {fileID: 773832713}
   m_ExposedReferences:
     m_References:
     - fb30efc9092110645b046df9dec71d31: {fileID: 2018438733}
@@ -47579,7 +47581,7 @@ GameObject:
   - component: {fileID: 773832712}
   - component: {fileID: 773832713}
   m_Layer: 0
-  m_Name: "\u6C4E\u7528SG"
+  m_Name: SG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47614,59 +47616,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Events:
     m_Signals:
-    - {fileID: 11400000, guid: 152278c7dbc3b7a49b00d16580a4e6d7, type: 2}
     - {fileID: 11400000, guid: 522a92ddb360bd740ad260c04d10f9ad, type: 2}
     - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 90862590}
-          m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
-            Assembly-CSharp-firstpass
-          m_MethodName: OnUse
-          m_Mode: 1
+        - m_Target: {fileID: 297600892}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: SetEnemyInputBlocked
+          m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
-            m_BoolArgument: 0
+            m_BoolArgument: 1
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1260031604}
-          m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
-            AnoGame.Application
-          m_MethodName: StatEvent
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1260031604}
-          m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
-            AnoGame.Application
-          m_MethodName: EndEvent
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 284172278}
-          m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-          m_MethodName: StartEvent
-          m_Mode: 1
+        - m_Target: {fileID: 297600892}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: SetEnemyInputBlocked
+          m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -68603,6 +68575,17 @@ PlayableDirector:
   m_ExposedReferences:
     m_References:
     - c1de59a411d980544abc8a1a496b27c1: {fileID: 347779392}
+--- !u!114 &887966228 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7153716557999534528, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+  m_PrefabInstance: {fileID: 6079993046500225130}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &888296212
 GameObject:
   m_ObjectHideFlags: 0
@@ -128675,11 +128658,27 @@ PrefabInstance:
       value: "HidePoint_\u6700\u521D\u306E\u30CF\u30A4\u30C9"
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: forceDetectionRadius
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.size
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnEnterHidden.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
@@ -128697,7 +128696,11 @@ PrefabInstance:
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1260031604}
+      objectReference: {fileID: 887966228}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 683393170}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
@@ -128705,6 +128708,18 @@ PrefabInstance:
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -128723,17 +128738,21 @@ PrefabInstance:
       value: Enqueue
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: StartEvent
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
       value: StartEvent
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1260031604}
+      objectReference: {fileID: 1317160699}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 1317160698}
+      objectReference: {fileID: 1317160704}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
       value: 2
@@ -128743,8 +128762,24 @@ PrefabInstance:
       value: Enqueue
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetTimeScale
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ResetPriority
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
       value: AnoGame.Application.Event.TimelineController, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnExitSafe.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
@@ -128753,6 +128788,14 @@ PrefabInstance:
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
       value: AnoGame.Application.Event.TimelineController, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AnoGame.Application.Event.TimeScaleModifier, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: OnBeginApproach.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.Event.CinemachinePriorityModifier, AnoGame.Application
       objectReference: {fileID: 0}
     - target: {fileID: 1992021701924334423, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: OnCanceled.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName

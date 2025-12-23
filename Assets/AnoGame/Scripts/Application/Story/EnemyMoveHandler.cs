@@ -1,6 +1,7 @@
 using AnoGame.Application.Enemy;
 using AnoGame.Application.Enemy.AI;
 using AnoGame.Application.Player.Control;
+using AnoGame.Application.Direction;
 using UnityEngine;
 
 namespace AnoGame.Application.Story
@@ -131,6 +132,20 @@ namespace AnoGame.Application.Story
             if (playerForcedTransformMover == null) return;
 
             playerForcedTransformMover.FaceTarget(target);
+        }
+
+        // [NEW] 外部入力を一時的にブロックする（Timeline等から呼び出し用）
+        public void SetEnemyInputBlocked(bool blocked)
+        {
+            EventLockControl ctrl = FindActiveEnemyEventLock();
+            if (ctrl == null) return;
+
+            var coordinator = ctrl.GetComponent<EnemyBehaviorCoordinator>();
+            if (coordinator != null)
+            {
+                Debug.Log($"[EnemyMoveHandler] SetEnemyInputBlocked({blocked}) called.");
+                coordinator.SetInputBlocked(blocked);
+            }
         }
     }
 }
