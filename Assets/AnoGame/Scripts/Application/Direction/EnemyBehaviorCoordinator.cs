@@ -34,6 +34,7 @@ namespace AnoGame.Application.Direction
 
         private enum State { Patrol, Chase, Investigate, Suspicion }
         private State _currentState = State.Patrol;
+        private bool _isInputBlocked = false; // [NEW] 外部入力ブロック用
 
         public bool IsChasing => _currentState == State.Chase; // [NEW] 外部確認用
         public bool IsSuspicion => _currentState == State.Suspicion;
@@ -89,6 +90,7 @@ namespace AnoGame.Application.Direction
         // === ゲーム側（Perception等）から呼ぶ ===
         public void NotifyLost(Vector3 lastSeen)
         {
+            if (_isInputBlocked) return;
             if (_currentState == State.Investigate) return;
             if (_currentState == State.Suspicion) return;
 
@@ -108,6 +110,7 @@ namespace AnoGame.Application.Direction
 
         public void NotifyFound()
         {
+            if (_isInputBlocked) return;
             if (_currentState == State.Chase) return;
 
             Debug.Log("発見！追跡開始");
@@ -123,6 +126,7 @@ namespace AnoGame.Application.Direction
 
         public void NotifyNoiseHeard(Vector3 noisePosition)
         {
+            if (_isInputBlocked) return;
             if (_currentState == State.Chase) return;
 
             Debug.Log($"音を感知！ {noisePosition} を調査しに行きます");
@@ -138,6 +142,7 @@ namespace AnoGame.Application.Direction
         // 任意：強制中断
         public void AbortAll()
         {
+            _isInputBlocked = false; // Abort時はブロック解除
             eventLock.Deactivate();
             investigate.Deactivate();
             if (_currentState == State.Suspicion) OnSuspicionEnd?.Invoke();
@@ -146,6 +151,11 @@ namespace AnoGame.Application.Direction
             if (_currentState == State.Chase) OnChaseEnd?.Invoke();
             chase.SetActive(false);
             _currentState = State.Patrol;
+        }
+        // [NEW] 外部入力を一時的にブロックする
+        public void SetInputBlocked(bool blocked)
+        {
+            _isInputBlocked = blocked;
         }
     }
 }

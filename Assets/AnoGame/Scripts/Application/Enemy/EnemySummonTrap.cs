@@ -95,6 +95,7 @@ namespace AnoGame.Application.Enemy
             {
                 if (coordinator != null)
                 {
+                    coordinator.SetInputBlocked(true);
                     StartCoroutine(WaitAndNotifyFound(coordinator, freezeDuration));
                 }
             }
@@ -107,6 +108,7 @@ namespace AnoGame.Application.Enemy
             Debug.Log("[EnemySummonTrap] Notifying EnemyBehaviorCoordinator of player found.");
             if (coordinator != null)
             {
+                coordinator.SetInputBlocked(false);
                 coordinator.NotifyFound();
             }
         }

@@ -91,6 +91,22 @@ namespace AnoGame.Application.Audio
             }
         }
 
+        /// <summary>
+        /// 即時停止
+        /// </summary>
+        [ContextMenu("Stop Immediate")]
+        public void StopImmediate()
+        {
+            if (_stopFadeCoroutine != null) StopCoroutine(_stopFadeCoroutine);
+            _isRunning = false;
+
+            if (_audioSource != null)
+            {
+                _audioSource.Stop();
+                _audioSource.volume = 0f;
+            }
+        }
+
         private System.Collections.IEnumerator FadeOutAndStop(float duration)
         {
             float startVol = _audioSource.volume;
