@@ -16,6 +16,24 @@ namespace AnoGame.Application.Enemy
         [Tooltip("テレポート後の硬直時間（秒）")]
         [SerializeField] private float freezeDuration = 1.0f;
 
+        [Header("Random Summon Settings")]
+        [SerializeField] private Transform[] summonPoints;
+
+        /// <summary>
+        /// 登録された summonPoints からランダムな位置を選んでキラーを召喚する
+        /// </summary>
+        public void SummonRandom()
+        {
+            if (summonPoints == null || summonPoints.Length == 0)
+            {
+                Debug.LogWarning("[EnemySummonTrap] SummonPoints is empty.");
+                return;
+            }
+
+            int index = Random.Range(0, summonPoints.Length);
+            Summon(summonPoints[index]);
+        }
+
         /// <summary>
         /// 指定したターゲット位置へキラーをテレポートさせ、発見状態にする
         /// </summary>

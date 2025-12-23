@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using AnoGame.Application.Direction;
+using UnityEngine.Events;
 
 namespace AnoGame.Application.Enemy
 {
@@ -18,6 +19,9 @@ namespace AnoGame.Application.Enemy
 
         [Tooltip("待ち伏せ出現候補地点リスト")]
         [SerializeField] private List<Transform> ambushPoints = new List<Transform>();
+
+        [Header("Events")]
+        [SerializeField] private UnityEvent onAmbushExecute;
 
         [Header("Debug")]
         [SerializeField] private int _currentLimit;
@@ -57,6 +61,7 @@ namespace AnoGame.Application.Enemy
         {
             _isTriggered = true;
             Debug.Log("[EnemyAmbushTrigger] Ambush Triggered!");
+            onAmbushExecute?.Invoke();
 
             if (ambushPoints == null || ambushPoints.Count == 0)
             {
