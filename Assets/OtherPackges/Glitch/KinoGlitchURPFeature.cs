@@ -22,12 +22,14 @@ namespace Kino
         {
             readonly string _tag;
             readonly Material _mat;
+            readonly Func<Camera, Material> _materialResolver; // Material resolver
             RTHandle _tmp;
 
-            public FullscreenPass(string tag, Material mat, RenderPassEvent evt)
+            public FullscreenPass(string tag, Material mat, RenderPassEvent evt, Func<Camera, Material> materialResolver = null)
             {
                 _tag = tag;
                 _mat = mat;
+                _materialResolver = materialResolver;
                 renderPassEvent = evt;
 
                 ConfigureInput(ScriptableRenderPassInput.Color);
@@ -44,13 +46,21 @@ namespace Kino
 
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
-                if (_mat == null) return;
+                // Material resolution logic
+                Material materialToUse = _mat;
+                if (_materialResolver != null)
+                {
+                    var resolved = _materialResolver(renderingData.cameraData.camera);
+                    if (resolved != null) materialToUse = resolved;
+                }
+
+                if (materialToUse == null) return;
 
                 // ★ Base カメラのみ実行（Overlay で null が出やすい）
                 if (renderingData.cameraData.renderType != CameraRenderType.Base) return;
 
                 // （任意）Editor のプレビューや SceneView では実行しない
-                if (renderingData.cameraData.isPreviewCamera || renderingData.cameraData.isSceneViewCamera) return;
+                // if (renderingData.cameraData.isPreviewCamera || renderingData.cameraData.isSceneViewCamera) return;
 
                 var cmd = CommandBufferPool.Get(_tag);
                 var renderer = renderingData.cameraData.renderer;
@@ -73,7 +83,7 @@ namespace Kino
                 }
 
                 // 以降は今まで通り
-                Blitter.BlitCameraTexture(cmd, src, _tmp, _mat, 0);
+                Blitter.BlitCameraTexture(cmd, src, _tmp, materialToUse, 0);
                 Blitter.BlitCameraTexture(cmd, _tmp, src);
 
                 context.ExecuteCommandBuffer(cmd);
@@ -91,7 +101,9 @@ namespace Kino
         public override void Create()
         {
             if (settings.runAnalog)
-                _analogPass = new FullscreenPass(settings.passName + "_Analog", settings.analogMaterial, settings.injectionPoint);
+                _analogPass = new FullscreenPass(settings.passName + "_Analog", settings.analogMaterial, settings.injectionPoint,
+                    cam => cam.GetComponent<AnalogGlitch>()?.RuntimeMaterial
+                );
             if (settings.runDigital)
                 _digitalPass = new FullscreenPass(settings.passName + "_Digital", settings.digitalMaterial, settings.injectionPoint);
         }

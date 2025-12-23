@@ -15,29 +15,67 @@ namespace Kino
         [Header("Assign the SAME material as URP Feature (Analog)")]
         public Material targetMaterial; // ← 追加
 
+        Material _runtimeMaterial;
+        public Material RuntimeMaterial
+        {
+            get
+            {
+                if (_runtimeMaterial == null && targetMaterial != null)
+                {
+                    _runtimeMaterial = new Material(targetMaterial);
+                }
+                return _runtimeMaterial;
+            }
+        }
+
         float _verticalJumpTime;
+
+        void OnEnable()
+        {
+            // Ensure runtime material is created
+            if (targetMaterial != null)
+            {
+                _runtimeMaterial = new Material(targetMaterial);
+            }
+        }
+
+        void OnDisable()
+        {
+            if (_runtimeMaterial != null)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(_runtimeMaterial);
+                }
+                else
+                {
+                    DestroyImmediate(_runtimeMaterial);
+                }
+                _runtimeMaterial = null;
+            }
+        }
 
         void LateUpdate()
         {
-            if (targetMaterial == null) return;
+            if (RuntimeMaterial == null) return;
 
             _verticalJumpTime += Time.deltaTime * _verticalJump * 11.3f;
 
             var sl_thresh = Mathf.Clamp01(1.0f - _scanLineJitter * 1.2f);
             var sl_disp = 0.002f + Mathf.Pow(_scanLineJitter, 3) * 0.05f;
 
-            targetMaterial.SetVector("_ScanLineJitter", new Vector2(sl_disp, sl_thresh));
-            targetMaterial.SetVector("_VerticalJump", new Vector2(_verticalJump, _verticalJumpTime));
-            targetMaterial.SetFloat("_HorizontalShake", _horizontalShake * 0.2f);
-            targetMaterial.SetVector("_ColorDrift", new Vector2(_colorDrift * 0.04f, Time.time * 606.11f));
+            RuntimeMaterial.SetVector("_ScanLineJitter", new Vector2(sl_disp, sl_thresh));
+            RuntimeMaterial.SetVector("_VerticalJump", new Vector2(_verticalJump, _verticalJumpTime));
+            RuntimeMaterial.SetFloat("_HorizontalShake", _horizontalShake * 0.2f);
+            RuntimeMaterial.SetVector("_ColorDrift", new Vector2(_colorDrift * 0.04f, Time.time * 606.11f));
         }
-        
+
         public void SetParams(float scan, float vjump, float hshake, float drift)
         {
             _scanLineJitter = scan;
-            _verticalJump   = vjump;
-            _horizontalShake= hshake;
-            _colorDrift     = drift;
+            _verticalJump = vjump;
+            _horizontalShake = hshake;
+            _colorDrift = drift;
         }
 
     }

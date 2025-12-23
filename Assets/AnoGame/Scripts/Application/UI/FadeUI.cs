@@ -53,8 +53,18 @@ namespace AnoGame.Application.UI
 
 		[SerializeField] Texture texture = null;
 
+		private void Awake()
+		{
+			if (mat != null)
+			{
+				mat = new Material(mat);
+			}
+		}
+
 		private void UpdateMaskCutout(float range)
 		{
+			if (mat == null) return;
+
 			mat.SetFloat("_Range", range);
 
 			UnityEngine.Graphics.Blit(texture, rt, mat);
