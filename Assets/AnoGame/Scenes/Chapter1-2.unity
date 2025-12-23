@@ -69849,7 +69849,7 @@ MonoBehaviour:
   allowBarksDuringConversations: 0
   skipBarkIfNoValidEntries: 0
   cacheBarkLines: 0
-  conversation: "1.0.2_\u5BB6\u306B\u5E30\u308D\u3046"
+  conversation: "\u300C\u3042\u300D-\u7F36\u3092\u8E74\u98DB\u3070\u3057\u305F"
   conversationConversant: {fileID: 0}
   conversationActor: {fileID: 0}
   startConversationEntryID: -1
@@ -85699,7 +85699,7 @@ GameObject:
   - component: {fileID: 1220151401}
   - component: {fileID: 1220151400}
   - component: {fileID: 1220151402}
-  - component: {fileID: 1220151403}
+  - component: {fileID: 1220151404}
   m_Layer: 27
   m_Name: "\u30C8\u30E9\u30C3\u30D7-\u7F36\u3092\u8E74\u98DB\u3070\u3059"
   m_TagString: Untagged
@@ -85762,7 +85762,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1220151403
+--- !u!114 &1220151404
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -85771,24 +85771,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1220151399}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb8fa11a56776a54e8e8329a55d00b3d, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a3135759b09c474f91e183f732b638b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onTriggerEnter:
+  onTriggerEnterAlways:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1220151400}
-        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySummonTrap, AnoGame.Application
-        m_MethodName: Summon
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 441594251}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 915078931}
         m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
         m_MethodName: Play
@@ -85813,6 +85801,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onTriggerEnterIfNotChasing:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1220151400}
+        m_TargetAssemblyTypeName: AnoGame.Application.Enemy.EnemySummonTrap, AnoGame.Application
+        m_MethodName: Summon
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 441594251}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 808436398}
         m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
         m_MethodName: Enqueue
@@ -85825,6 +85828,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _disableDistance: 20
 --- !u!1 &1220633887
 GameObject:
   m_ObjectHideFlags: 0
