@@ -17,6 +17,7 @@ namespace AnoGame.Application.Gimmicks
         [Header("Events")]
         [Tooltip("Chase中かどうかにかかわらず常に実行される")]
         [SerializeField] private UnityEvent onTriggerEnterAlways;
+        [SerializeField] private UnityEvent<Transform> onTriggerEnterAlwaysWithTransform;
 
         [Tooltip("Chase中でない時のみ実行される")]
         [SerializeField] private UnityEvent onTriggerEnterIfNotChasing;
@@ -57,6 +58,7 @@ namespace AnoGame.Application.Gimmicks
         {
             // 常に実行
             onTriggerEnterAlways?.Invoke();
+            onTriggerEnterAlwaysWithTransform?.Invoke(_targetPlayer);
 
             // Chaseチェック
             if (!IsEnemyChasing())

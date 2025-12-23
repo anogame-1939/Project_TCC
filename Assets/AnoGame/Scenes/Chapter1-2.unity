@@ -32203,6 +32203,17 @@ MonoBehaviour:
   useBarkTitlePicker: 1
   useQuestNamePicker: 1
   selectedDatabase: {fileID: 11400000, guid: 98727bc873ff59a4caa1f95efb58c24f, type: 2}
+--- !u!114 &553482652 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8748853030799421650, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+  m_PrefabInstance: {fileID: 1764107347354019368}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7caf44556140d2419cc3ae558c35f4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &556200471
 GameObject:
   m_ObjectHideFlags: 0
@@ -128178,6 +128189,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\u30C8\u30E9\u30C3\u30D7-\u7F36\u3092\u8E74\u98DB\u3070\u3059"
       objectReference: {fileID: 0}
+    - target: {fileID: 1217863397555697552, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: freezeDuration
+      value: 3000
+      objectReference: {fileID: 0}
     - target: {fileID: 1546128012030199708, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.92
@@ -128217,6 +128232,74 @@ PrefabInstance:
     - target: {fileID: 1546128012030199708, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlways.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlways.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlways.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: RollFrom
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 553482652}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 553482652}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: RollFrom
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: RollFrom
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AnoGame.Application.Direction.CanRoller, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AnoGame.Application.Direction.CanRoller, AnoGame.Application
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlways.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Transform, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844074938706862366, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
+      propertyPath: onTriggerEnterAlwaysWithTransform.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Transform, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3101258648417417881, guid: a8b8ead145af04f4ea530ae6fd6cbeb9, type: 3}
       propertyPath: m_LocalPosition.y

@@ -120,6 +120,7 @@ namespace AnoGame.Application.Enemy
 
         public void PlayEffect(float progress = -1f, float p = -1f, float s = -1f)
         {
+            Debug.Log($"[SpriteResolveController] {gameObject.name} PlayEffect called. Progress: {progress}, P: {p}, S: {s}");
             if (disappearEffect == null || _isEffectPlaying) return;
 
             string info = progress >= 0 ? $"(Progress: {progress}, P: {p}, S: {s})" : "(Forced)";
@@ -138,6 +139,7 @@ namespace AnoGame.Application.Enemy
 
         public void StopEffect(float progress = -1f, float p = -1f, float s = -1f)
         {
+            Debug.Log($"[SpriteResolveController] disappearEffect: {disappearEffect},  _isEffectPlaying: {_isEffectPlaying}");
             if (disappearEffect == null || !_isEffectPlaying) return;
 
             string info = progress >= 0 ? $"(Progress: {progress}, P: {p}, S: {s})" : "(Forced)";

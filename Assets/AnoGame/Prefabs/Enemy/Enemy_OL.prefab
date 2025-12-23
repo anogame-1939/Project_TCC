@@ -526,6 +526,19 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 3916235954427694636}
+          m_TargetAssemblyTypeName: AnoGame.Application.Audio.HeartbeatController,
+            AnoGame.Application
+          m_MethodName: Play
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     - m_PersistentCalls:
         m_Calls: []
 --- !u!1 &6501753142316256685
@@ -677,6 +690,7 @@ MonoBehaviour:
   maxVolume: 1
   minPitch: 1
   maxPitch: 2
+  stopFadeDuration: 1
 --- !u!1 &6570182574523846188
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,6 +789,7 @@ GameObject:
   - component: {fileID: 5260855969895964056}
   - component: {fileID: 626229431214549771}
   - component: {fileID: 8617595717906349681}
+  - component: {fileID: 7102531767552669179}
   m_Layer: 14
   m_Name: Enemy_OL
   m_TagString: Enemy
@@ -1321,6 +1336,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _patrolProvider: {fileID: 296865261083013438}
   disableDuration: 15
+--- !u!114 &7102531767552669179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092537996067713669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d70ca6c092e8226449d3c8a5f69d2b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onMistake:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1313837163056371305}
+        m_TargetAssemblyTypeName: AnoGame.Application.Audio.BGMControlWrapper, AnoGame.Application
+        m_MethodName: Stop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5940970895400421707}
+        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+        m_MethodName: Stop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8797535649828227321
 GameObject:
   m_ObjectHideFlags: 0

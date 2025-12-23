@@ -95,8 +95,19 @@ namespace AnoGame.Application.Enemy
             {
                 if (coordinator != null)
                 {
-                    coordinator.NotifyFound();
+                    StartCoroutine(WaitAndNotifyFound(coordinator, freezeDuration));
                 }
+            }
+        }
+
+        private System.Collections.IEnumerator WaitAndNotifyFound(EnemyBehaviorCoordinator coordinator, float delay)
+        {
+            Debug.Log($"[EnemySummonTrap] Waiting for {delay} seconds before notifying found.");
+            yield return new WaitForSeconds(delay);
+            Debug.Log("[EnemySummonTrap] Notifying EnemyBehaviorCoordinator of player found.");
+            if (coordinator != null)
+            {
+                coordinator.NotifyFound();
             }
         }
 

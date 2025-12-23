@@ -26,7 +26,12 @@ namespace AnoGame.Application.Audio
         [Tooltip("最も近い時のピッチ（速い）")]
         [SerializeField] private float maxPitch = 2.0f;
 
+        [Header("Fade Settings")]
+        [SerializeField] private float stopFadeDuration = 1.0f;
+
         private AudioSource _audioSource;
+        private bool _isRunning = false;
+        private Coroutine _stopFadeCoroutine;
 
         private void Awake()
         {
@@ -42,9 +47,73 @@ namespace AnoGame.Application.Audio
             }
         }
 
+        /// <summary>
+        /// 心音制御を開始する
+        /// </summary>
+        [ContextMenu("Play")]
+        public void Play()
+        {
+            if (_stopFadeCoroutine != null) StopCoroutine(_stopFadeCoroutine);
+            _isRunning = true;
+            _audioSource.volume = 0f; // Reset volume to 0 to fade in naturally by Update
+            // Start playing immediately if not playing, though volume will be updated in Update
+            if (!_audioSource.isPlaying) _audioSource.Play();
+        }
+
+        /// <summary>
+        /// 心音制御を停止する（フェードアウト付き・設定値を使用）
+        /// </summary>
+        [ContextMenu("Stop")]
+        public void Stop()
+        {
+            Stop(stopFadeDuration);
+        }
+
+        /// <summary>
+        /// 心音制御を停止する（フェードアウト時間指定）
+        /// UnityEvent（Dynamic Float）対応
+        /// </summary>
+        /// <param name="duration"></param>
+        public void Stop(float duration)
+        {
+            if (!_isRunning) return; // Already stopped or stopping
+            _isRunning = false;
+
+            if (gameObject.activeInHierarchy)
+            {
+                if (_stopFadeCoroutine != null) StopCoroutine(_stopFadeCoroutine);
+                _stopFadeCoroutine = StartCoroutine(FadeOutAndStop(duration));
+            }
+            else
+            {
+                _audioSource.Stop();
+                _audioSource.volume = 0f;
+            }
+        }
+
+        private System.Collections.IEnumerator FadeOutAndStop(float duration)
+        {
+            float startVol = _audioSource.volume;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                _audioSource.volume = Mathf.Lerp(startVol, 0f, t);
+                yield return null;
+            }
+
+            _audioSource.volume = 0f;
+            _audioSource.Stop();
+        }
+
         private void Update()
         {
             if (playerTransform == null || _audioSource == null) return;
+
+            // 停止中（フェードアウト含む）はUpdateでの音量制御を行わない
+            if (!_isRunning) return;
 
             float distance = Vector3.Distance(transform.position, playerTransform.position);
 
