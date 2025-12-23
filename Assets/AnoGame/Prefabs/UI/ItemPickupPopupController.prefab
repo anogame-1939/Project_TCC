@@ -420,9 +420,13 @@ MonoBehaviour:
   iconImage: {fileID: 79612064794178582}
   nameText: {fileID: 5092784425669531466}
   descText: {fileID: 6429657189151225538}
+  startDelay: 0.5
   fadeIn: 1.5
   stay: 4
   fadeOut: 1.5
+  _startEvent:
+    m_PersistentCalls:
+      m_Calls: []
   _getEvent:
     m_PersistentCalls:
       m_Calls:
@@ -438,6 +442,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _endEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &4211023055304463156
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -893,7 +900,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

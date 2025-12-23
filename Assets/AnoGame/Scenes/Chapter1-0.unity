@@ -1331,7 +1331,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1754827004}
   - component: {fileID: 1754827003}
-  - component: {fileID: 1754827002}
   - component: {fileID: 1754827001}
   m_Layer: 0
   m_Name: "Timeline_\u795E\u793E\u3078\u884C\u3053\u3046"
@@ -1353,37 +1352,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playableDirector: {fileID: 1754827003}
---- !u!114 &1754827002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1754827000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Events:
-    m_Signals:
-    - {fileID: 11400000, guid: 2b99d8ca8033276439e91192782b199d, type: 2}
-    m_Events:
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 5486094461938385386}
-          m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
-            Assembly-CSharp-firstpass
-          m_MethodName: OnUse
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!320 &1754827003
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -1400,7 +1368,7 @@ PlayableDirector:
   m_InitialTime: 0
   m_SceneBindings:
   - key: {fileID: 8762637133860838425, guid: 5bc6d7fb2fb9d5047aed077f7c8dc9d8, type: 2}
-    value: {fileID: 1754827002}
+    value: {fileID: 0}
   m_ExposedReferences:
     m_References:
     - 248193584c77b234f9e985a8d8fd4395: {fileID: 5486094461938385386}
@@ -1641,20 +1609,7 @@ MonoBehaviour:
         m_Calls: []
     onConversationEnd:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 457343942}
-          m_TargetAssemblyTypeName: AnoGame.Application.Inventory.InventoryHandler,
-            AnoGame.Application
-          m_MethodName: AddItem
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 11400000, guid: 2cb1dc94a733d664cac6c1a5dd7952dc, type: 2}
-            m_ObjectArgumentAssemblyTypeName: AnoGame.Data.ItemData, AnoGame.Application
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:
@@ -1856,7 +1811,20 @@ MonoBehaviour:
           m_CallState: 2
     onConversationEnd:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1754827001}
+          m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController,
+            AnoGame.Application
+          m_MethodName: Enqueue
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     runOnConversationEndEventsAtEndOfFrame: 0
     onConversationCancelled:
       m_PersistentCalls:

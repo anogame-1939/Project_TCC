@@ -3,6 +3,7 @@ using AnoGame.Application.Enemy.AI;
 using AnoGame.Application.Player.Control;
 using AnoGame.Application.Direction;
 using UnityEngine;
+using AnoGame.Application.Audio;
 
 namespace AnoGame.Application.Story
 {
@@ -145,6 +146,15 @@ namespace AnoGame.Application.Story
             {
                 Debug.Log($"[EnemyMoveHandler] SetEnemyInputBlocked({blocked}) called.");
                 coordinator.SetInputBlocked(blocked);
+            }
+        }
+
+        public void StopHeartbeat()
+        {
+            var heartbeatController = FindAnyObjectByType<HeartbeatController>();
+            if (heartbeatController != null)
+            {
+                heartbeatController.StopImmediate();
             }
         }
     }
