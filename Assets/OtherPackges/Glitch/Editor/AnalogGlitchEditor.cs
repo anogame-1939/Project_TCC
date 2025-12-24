@@ -20,6 +20,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -38,13 +39,13 @@ namespace Kino
 
         void OnEnable()
         {
-            _scanLineJitter   = serializedObject.FindProperty("_scanLineJitter");
-            _verticalJump     = serializedObject.FindProperty("_verticalJump");
-            _horizontalShake  = serializedObject.FindProperty("_horizontalShake");
-            _colorDrift       = serializedObject.FindProperty("_colorDrift");
+            _scanLineJitter = serializedObject.FindProperty("_scanLineJitter");
+            _verticalJump = serializedObject.FindProperty("_verticalJump");
+            _horizontalShake = serializedObject.FindProperty("_horizontalShake");
+            _colorDrift = serializedObject.FindProperty("_colorDrift");
 
             // ★ 追加
-            _targetMaterial   = serializedObject.FindProperty("targetMaterial");
+            _targetMaterial = serializedObject.FindProperty("targetMaterial");
         }
 
         public override void OnInspectorGUI()
@@ -66,3 +67,4 @@ namespace Kino
         }
     }
 }
+#endif

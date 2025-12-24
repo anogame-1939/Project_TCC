@@ -1,4 +1,5 @@
 //
+#if UNITY_EDITOR
 // KinoGlitch - Video glitch effect
 //
 // Copyright (C) 2015 Keijiro Takahashi
@@ -33,7 +34,7 @@ namespace Kino
 
         void OnEnable()
         {
-            _intensity      = serializedObject.FindProperty("_intensity");
+            _intensity = serializedObject.FindProperty("_intensity");
             _targetMaterial = serializedObject.FindProperty("targetMaterial"); // ★ 追加
         }
 
@@ -48,3 +49,4 @@ namespace Kino
         }
     }
 }
+#endif
