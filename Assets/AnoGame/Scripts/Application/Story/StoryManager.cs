@@ -261,7 +261,7 @@ namespace AnoGame.Application.Story
             LoadCurrentScene(useRetryPoint);
         }
 
-        public void LoadChapter(int chapterIndex, bool useRetryPoint = false)
+        public void LoadChapter(int chapterIndex, bool useRetryPoint = false, bool enableFade = false)
         {
             _currentChapterIndex = chapterIndex;
             StoryData currentStory = _storyDataList[_currentStoryIndex];
@@ -270,7 +270,7 @@ namespace AnoGame.Application.Story
                 Debug.LogError($"Invalid chapter index: {chapterIndex}");
                 return;
             }
-            LoadCurrentScene(useRetryPoint);
+            LoadCurrentScene(useRetryPoint, enableFade);
         }
 
         public void LoadChapter2(int chapterIndex, bool useRetryPoint = false)
@@ -310,13 +310,13 @@ namespace AnoGame.Application.Story
             LoadCurrentScene(true);
         }
 
-        private void LoadCurrentScene(bool useRetryPoint = false)
+        private void LoadCurrentScene(bool useRetryPoint = false, bool enableFade = false)
         {
             Debug.Log($"LoadCurrentScene:{useRetryPoint}");
-            StartCoroutine(LoadSceneCoroutine(useRetryPoint));
+            StartCoroutine(LoadSceneCoroutine(useRetryPoint, enableFade));
         }
 
-        private IEnumerator LoadSceneCoroutine(bool useRetryPoint)
+        private IEnumerator LoadSceneCoroutine(bool useRetryPoint, bool enableFade)
         {
             // 変更後：インスペクターで設定した mainSceneName からシーンを取得して待機
             UnityEngine.SceneManagement.Scene scene = SceneManager.GetSceneByName(mainSceneName);
@@ -337,8 +337,19 @@ namespace AnoGame.Application.Story
 
             _isLoadingScene = true;
 
+            if (enableFade)
+            {
+                AnoGame.Application.UI.FadeManager.Instance.FadeOut(0.5f);
+                yield return new WaitForSeconds(0.5f);
+            }
+
             yield return UnloadCurrentScenesCoroutine();
             yield return LoadNewSceneCoroutine();
+
+            if (enableFade)
+            {
+                AnoGame.Application.UI.FadeManager.Instance.FadeIn(0.5f);
+            }
 
             _isLoadingScene = false;
 

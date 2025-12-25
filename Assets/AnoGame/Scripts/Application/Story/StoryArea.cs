@@ -11,6 +11,9 @@ namespace AnoGame.Application.Story
         [SerializeField]
         int _chapterIndex = 0;
 
+        [SerializeField]
+        private bool _fadeOnEnter = false;
+
         void Start()
         {
 #if UNITY_EDITOR
@@ -38,7 +41,7 @@ namespace AnoGame.Application.Story
             {
                 Debug.Log("プレイヤーがトリガー内に入りました");
                 // ここにプレイヤーが入った時の処理を書きます
-                StoryManager.Instance.LoadChapter(_chapterIndex);
+                StoryManager.Instance.LoadChapter(_chapterIndex, false, _fadeOnEnter);
                 StoryManager.Instance.UpdateGameData();
             }
         }
