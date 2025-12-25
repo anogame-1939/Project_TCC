@@ -39,7 +39,7 @@ namespace AnoGame.Application.Enemy
             {
                 Debug.LogWarning($"[SpriteResolveController] SpriteRendererが見つかりません: {gameObject.name}");
             }
-            StopAllEffects();
+            disappearEffect.Stop();
         }
 
         #region UnityEvent / Public API
