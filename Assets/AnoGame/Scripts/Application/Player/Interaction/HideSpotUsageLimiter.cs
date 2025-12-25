@@ -26,6 +26,8 @@ namespace AnoGame.Application.Player.Interaction
 
         [SerializeField] private float penaltyLockoutDuration = 30.0f;
 
+        [SerializeField] private bool isActive = true;
+
         [Inject]
         private EnemySpawnManager _spawnManager;
 
@@ -81,8 +83,14 @@ namespace AnoGame.Application.Player.Interaction
             Debug.Log($"[HideSpotUsageLimiter] Limit Set: {_currentMaxUsage} (Remaining: {_remainingUsage})");
         }
 
+        public void SetActive(bool active)
+        {
+            isActive = active;
+        }
+
         private void OnHideBegan()
         {
+            if (!isActive) return;
             if (_isLocked) return;
 
             // まず消費する

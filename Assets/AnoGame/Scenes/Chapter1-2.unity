@@ -5514,7 +5514,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1186403059563207165, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
   m_PrefabInstance: {fileID: 6079993046500225130}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6079993046500225131}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
@@ -88971,6 +88971,7 @@ MonoBehaviour:
   maxRandomLimit: 3
   recoveryInterval: 10
   penaltyLockoutDuration: 30
+  isActive: 1
 --- !u!4 &1339953359 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538259220956459689, guid: 04a122351bf6b37449b00a4b87c72a23, type: 3}
@@ -95783,6 +95784,108 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04a122351bf6b37449b00a4b87c72a23, type: 3}
+--- !u!1 &1438229035
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1438229036}
+  - component: {fileID: 1438229037}
+  m_Layer: 26
+  m_Name: "\u30CF\u30A4\u30C9\u56DE\u6570\u3092\u9650\u5B9A-\u92CF\u3092\u898B\u3064\u3051\u3066\u304B\u3089"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1438229036
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438229035}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6079993046500225138}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1438229037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438229035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: 5c44cf0803d514a46ae6faa06ec7dfd1, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6079993046500225132}
+        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
+          AnoGame.Application
+        m_MethodName: SetUsageLimit
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6079993046500225132}
+        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
+          AnoGame.Application
+        m_MethodName: RandomizeUsageLimit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6079993046500225132}
+        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
+          AnoGame.Application
+        m_MethodName: RandomizeUsageLimit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents: []
+  supersededByEvents: []
+  _onStart: 0
 --- !u!1 &1452221038
 GameObject:
   m_ObjectHideFlags: 0
@@ -96426,6 +96529,125 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2029387609}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1510131603
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1510131604}
+  - component: {fileID: 1510131606}
+  - component: {fileID: 1510131605}
+  m_Layer: 26
+  m_Name: "\u30CF\u30A4\u30C9\u56DE\u6570\u9650\u5B9A\u3057\u306A\u3044-\u521D\u56DE\u30C1\u30A7\u30A4\u30B9\u7D42\u308F\u308B\u307E\u3067"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1510131604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510131603}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6079993046500225138}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1510131605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510131603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c7a10163f4b8c4e82ca5a8f1163caa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _eventDataList: []
+  _mustNotBeClearedEventDataList:
+  - {fileID: 11400000, guid: 5c44cf0803d514a46ae6faa06ec7dfd1, type: 2}
+--- !u!114 &1510131606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510131603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: cf8a46426daae5f4babcc50c779bee23, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6079993046500225132}
+        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
+          AnoGame.Application
+        m_MethodName: SetUsageLimit
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 99
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6079993046500225132}
+        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
+          AnoGame.Application
+        m_MethodName: SetUsageLimit
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6079993046500225132}
+        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
+          AnoGame.Application
+        m_MethodName: SetUsageLimit
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents:
+  - {fileID: 1510131605}
+  supersededByEvents: []
+  _onStart: 0
 --- !u!1 &1515148593
 GameObject:
   m_ObjectHideFlags: 0
@@ -105016,6 +105238,7 @@ MonoBehaviour:
   maxRandomLimit: 3
   recoveryInterval: 10
   penaltyLockoutDuration: 30
+  isActive: 1
 --- !u!1 &1702870003
 GameObject:
   m_ObjectHideFlags: 3
@@ -128748,100 +128971,45 @@ PrefabInstance:
       propertyPath: onEventFinish.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 1317160704}
+    - target: {fileID: 8008560982151267495, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: _mustNotBeClearedEventDataList.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8008560982151267495, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: '_mustNotBeClearedEventDataList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 31fecd2bb623a35459bcafc9391137d9, type: 2}
+    - target: {fileID: 8008560982151267495, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: '_mustNotBeClearedEventDataList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 0b3536fac2ddf364286d4d94e1a5a917, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1054399531014544604, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3353406344760109590, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6079993046500225133}
+      addedObject: {fileID: 1510131604}
+    - targetCorrespondingSourceObject: {fileID: 3353406344760109590, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1438229036}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
---- !u!1 &6079993046500225131 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1054399531014544604, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
-  m_PrefabInstance: {fileID: 6079993046500225130}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6079993046500225132 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8211500916768731198, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
   m_PrefabInstance: {fileID: 6079993046500225130}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6079993046500225131}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93caacee7d5ec7f40a63c5bac68a04f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6079993046500225133
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+--- !u!4 &6079993046500225138 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3353406344760109590, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+  m_PrefabInstance: {fileID: 6079993046500225130}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6079993046500225131}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventData: {fileID: 11400000, guid: 5c44cf0803d514a46ae6faa06ec7dfd1, type: 2}
-  onPrepareEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6079993046500225132}
-        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
-          AnoGame.Application
-        m_MethodName: SetUsageLimit
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEventStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventFinish:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6079993046500225132}
-        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
-          AnoGame.Application
-        m_MethodName: RandomizeUsageLimit
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEventDone:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6079993046500225132}
-        m_TargetAssemblyTypeName: AnoGame.Application.Player.Interaction.HideSpotUsageLimiter,
-          AnoGame.Application
-        m_MethodName: RandomizeUsageLimit
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onEventFailed:
-    m_PersistentCalls:
-      m_Calls: []
-  conditionComponents: []
-  supersededByEvents: []
-  _onStart: 0
 --- !u!1 &6502949214308672805
 GameObject:
   m_ObjectHideFlags: 0
@@ -129124,6 +129292,7 @@ MonoBehaviour:
   maxRandomLimit: 3
   recoveryInterval: 10
   penaltyLockoutDuration: 30
+  isActive: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

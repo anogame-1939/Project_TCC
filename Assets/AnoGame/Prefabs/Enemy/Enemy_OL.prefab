@@ -701,7 +701,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8377093950825799899}
   - component: {fileID: 1433233649997212885}
-  - component: {fileID: 1617435357970162405}
   m_Layer: 0
   m_Name: "TL-\u30AD\u30E9\u30FC\u3068\u906D\u9047"
   m_TagString: Untagged
@@ -745,19 +744,6 @@ PlayableDirector:
     value: {fileID: 6268074893191571193}
   m_ExposedReferences:
     m_References: []
---- !u!114 &1617435357970162405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6570182574523846188}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playableDirector: {fileID: 1433233649997212885}
 --- !u!1 &7092537996067713669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1266,6 +1252,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1433233649997212885}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Stop
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnSuspicion:
     m_PersistentCalls:
       m_Calls: []
@@ -1355,6 +1353,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: AnoGame.Application.Audio.HeartbeatController,
           AnoGame.Application
         m_MethodName: StopImmediate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1433233649997212885}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Stop
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
