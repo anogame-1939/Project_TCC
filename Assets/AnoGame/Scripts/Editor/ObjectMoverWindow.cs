@@ -1,20 +1,32 @@
 using UnityEngine;
 using UnityEditor;
+using System.Runtime.InteropServices;
 
 namespace AnoGame.Scripts.Editor
 {
     public class ObjectMoverWindow : EditorWindow
     {
         private bool _isActive = false;
-        private bool _isPlayerMode = false; // New: Local space movement
-        private float _forwardOffset = 0f; // New: Rotation offset
+        private bool _isPlayerMode = false;
+        private float _forwardOffset = 0f;
         private float _moveSpeed = 0.5f;
         private bool _useCollision = false;
         private float _collisionBuffer = 0.1f;
         private LayerMask _collisionMask = -1;
 
-        // Track pressed keys for smooth/diagonal movement
-        private readonly System.Collections.Generic.HashSet<KeyCode> _pressedKeys = new System.Collections.Generic.HashSet<KeyCode>();
+        // Windows API for global key state
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
+
+        private const int VK_W = 0x57;
+        private const int VK_A = 0x41;
+        private const int VK_S = 0x53;
+        private const int VK_D = 0x44;
+        private const int VK_Q = 0x51;
+        private const int VK_E = 0x45;
+        private const int VK_SHIFT = 0x10;
+
+        private double _lastUpdateTime = 0;
 
         [MenuItem("Tools/Object Mover")]
         public static void ShowWindow()
@@ -24,24 +36,25 @@ namespace AnoGame.Scripts.Editor
 
         private void OnEnable()
         {
-            SceneView.duringSceneGui += OnSceneGUI;
+            // We use EditorApplication.update to polling input globally
+            EditorApplication.update += OnEditorUpdate;
+            _lastUpdateTime = EditorApplication.timeSinceStartup;
         }
 
         private void OnDisable()
         {
-            SceneView.duringSceneGui -= OnSceneGUI;
-            _pressedKeys.Clear();
+            EditorApplication.update -= OnEditorUpdate;
         }
 
         private void OnGUI()
         {
-            GUILayout.Label("WASD Object Mover", EditorStyles.boldLabel);
+            GUILayout.Label("WASD Object Mover (Global)", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Works in Scene View AND Game View (Edit Mode)", EditorStyles.miniLabel);
 
             EditorGUI.BeginChangeCheck();
             _isActive = EditorGUILayout.Toggle("Active", _isActive);
             if (EditorGUI.EndChangeCheck())
             {
-                _pressedKeys.Clear(); // Reset keys when toggling
                 SceneView.RepaintAll();
             }
 
@@ -71,134 +84,132 @@ namespace AnoGame.Scripts.Editor
 
             EditorGUILayout.Space();
             GUILayout.Label("Controls:", EditorStyles.miniLabel);
-            GUILayout.Label("W / S : Forward / Backward", EditorStyles.miniLabel);
-            GUILayout.Label("A / D : Left / Right", EditorStyles.miniLabel);
-            GUILayout.Label("Q / E : Up / Down (World)", EditorStyles.miniLabel);
-            GUILayout.Label("Shift : 3x Speed", EditorStyles.miniLabel);
+            GUILayout.Label("W/A/S/D : Move", EditorStyles.miniLabel);
+            GUILayout.Label("Q / E : Up / Down", EditorStyles.miniLabel);
+            GUILayout.Label("Shift : Fast", EditorStyles.miniLabel);
         }
 
-        private void OnSceneGUI(SceneView sceneView)
+        private void OnEditorUpdate()
         {
-            if (!_isActive || Selection.activeTransform == null)
+            if (!_isActive || Selection.activeTransform == null) return;
+
+            // Only update if Scene View or Game View has focus to avoid accidents
+            EditorWindow focused = EditorWindow.focusedWindow;
+            if (focused == null) return;
+
+            // "SceneView" and "PlayModeView" (Game View) are what we care about.
+            string winType = focused.GetType().Name;
+
+            // Debug.Log(winType); 
+            // Standard names: "SceneView", "GameView" (may vary in versions, usually GameView)
+
+            bool isScene = winType == "SceneView";
+            bool isGame = winType == "GameView" || winType == "PlayModeView"; // some versions use PlayModeView?
+
+            // Actually, in newer Unity versions it is often UnityEditor.GameView
+            // Simple check:
+            if (!isScene && !focused.titleContent.text.Contains("Game") && !focused.titleContent.text.Contains("Scene"))
+            {
+                // Safety: If not focused on Scene or Game, don't move.
                 return;
-
-            Event e = Event.current;
-
-            // Handle Key Events to update state
-            if (e.type == EventType.KeyDown)
-            {
-                if (IsMoveKey(e.keyCode))
-                {
-                    if (_pressedKeys.Add(e.keyCode))
-                    {
-                        e.Use();
-                    }
-                }
-            }
-            else if (e.type == EventType.KeyUp)
-            {
-                if (IsMoveKey(e.keyCode))
-                {
-                    if (_pressedKeys.Remove(e.keyCode))
-                    {
-                        e.Use();
-                    }
-                }
             }
 
-            // Execute movement if keys are pressed
-            // We use generic event or repaint to drive the "update" loop in SceneView
-            if (_pressedKeys.Count > 0)
-            {
-                MoveObject(sceneView.camera);
+            double currentTime = EditorApplication.timeSinceStartup;
+            float dt = (float)(currentTime - _lastUpdateTime);
+            _lastUpdateTime = currentTime;
 
-                // Force continuous updates while moving
-                sceneView.Repaint();
+            // Cap dt to prevent huge jumps after lag/compile
+            if (dt > 0.1f) dt = 0.1f;
+
+            // Check Keys using Windows API
+            // GetAsyncKeyState returns short. High bit set means pressed.
+            bool w = (GetAsyncKeyState(VK_W) & 0x8000) != 0;
+            bool a = (GetAsyncKeyState(VK_A) & 0x8000) != 0;
+            bool s = (GetAsyncKeyState(VK_S) & 0x8000) != 0;
+            bool d = (GetAsyncKeyState(VK_D) & 0x8000) != 0;
+            bool q = (GetAsyncKeyState(VK_Q) & 0x8000) != 0;
+            bool e = (GetAsyncKeyState(VK_E) & 0x8000) != 0;
+            bool shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+
+            if (!w && !a && !s && !d && !q && !e) return;
+
+            // Logic similar to before
+            MoveObject(dt, w, s, a, d, q, e, shift);
+
+            // Force repaint if in scene view to see update smooth
+            if (isScene)
+            {
+                // Repaint focused SceneView
+                (focused as SceneView)?.Repaint();
             }
         }
 
-        private bool IsMoveKey(KeyCode k)
-        {
-            return k == KeyCode.W || k == KeyCode.S ||
-                   k == KeyCode.A || k == KeyCode.D ||
-                   k == KeyCode.Q || k == KeyCode.E;
-        }
-
-        private void MoveObject(Camera cam)
+        private void MoveObject(float dt, bool w, bool s, bool a, bool d, bool q, bool e, bool shift)
         {
             Vector3 moveDir = Vector3.zero;
+            Transform target = Selection.activeTransform;
+
             Vector3 forward, right;
 
-            if (_isPlayerMode && Selection.activeTransform != null)
+            if (_isPlayerMode)
             {
-                // Local space relative to object
-                // Apply rotation offset
                 Quaternion offset = Quaternion.Euler(0, _forwardOffset, 0);
-                forward = offset * Selection.activeTransform.forward;
-                right = offset * Selection.activeTransform.right;
-                // Typically we don't flatten Y for genuine local movement (like spaceship),
-                // but for "Character" movement usually we move on XZ plane.
-                // User asked for "Forward vector projected to keys", implies local direction.
-                // Let's use full forward for now, it's safer for general "Object Mover".
-                // Wait, user said "WASD... W/S: Front/Back... A/D: Left/Right... based on the set object vector".
-                // I will use Transform.Forward and Transform.Right directly.
+                forward = offset * target.forward;
+                right = offset * target.right;
             }
             else
             {
                 // Camera Relative
-                forward = cam.transform.forward;
-                right = cam.transform.right;
-                forward.y = 0;
-                right.y = 0;
-                forward.Normalize();
-                right.Normalize();
+                // Which camera?
+                // If in SceneView, use scene camera. 
+                // If in GameView, use Main Camera.
+
+                Camera refCam = null;
+                if (EditorWindow.focusedWindow.GetType().Name == "SceneView")
+                {
+                    refCam = SceneView.lastActiveSceneView.camera;
+                }
+                else
+                {
+                    refCam = Camera.main; // Game View main camera if valid
+                }
+
+                if (refCam != null)
+                {
+                    forward = refCam.transform.forward;
+                    right = refCam.transform.right;
+                    forward.y = 0;
+                    right.y = 0;
+                    forward.Normalize();
+                    right.Normalize();
+                }
+                else
+                {
+                    forward = Vector3.forward;
+                    right = Vector3.right;
+                }
             }
 
-            if (_pressedKeys.Contains(KeyCode.W)) moveDir += forward;
-            if (_pressedKeys.Contains(KeyCode.S)) moveDir -= forward;
-            if (_pressedKeys.Contains(KeyCode.D)) moveDir += right;
-            if (_pressedKeys.Contains(KeyCode.A)) moveDir -= right;
-            if (_pressedKeys.Contains(KeyCode.Q)) moveDir += Vector3.up; // Always World Up for convenience? Or Local Up? let's stick to World Up for Q/E as "Elevation"
-            if (_pressedKeys.Contains(KeyCode.E)) moveDir += Vector3.down;
+            if (w) moveDir += forward;
+            if (s) moveDir -= forward;
+            if (d) moveDir += right;
+            if (a) moveDir -= right;
+            if (q) moveDir += Vector3.up;
+            if (e) moveDir += Vector3.down;
 
             if (moveDir == Vector3.zero) return;
 
             moveDir.Normalize();
-
-            float speed = _moveSpeed;
-            if (Event.current.shift) speed *= 3f;
-
-            // Time.deltaTime doesn't exist reliably in Editor OnSceneGUI context like PlayMode.
-            // We can use calculated delta time or fixed step.
-            // Since Repaint() is called, it depends on refresh rate.
-            // Let's use a small fixed multiplier or try to estimate.
-            // approx 0.02f (60fps) is a safe bet for "per tick" feel,
-            // or we use LastEditorTime.
-            float dt = 0.02f;
-
-            Vector3 delta = moveDir * (speed * dt); // Scale speed significantly since it's per-frame-ish
-
-            // Speed factor needs to be higher if we use 0.02, previously it was discrete keydown.
-            // Previous code: delta = moveDir * speed. (One big step per KeyDown).
-            // Now continuous: speed * 0.02.
-            // To keep "Speed = 1.0" feeling similar, we might need to boost the multiplier.
-            // Let's just use the speed value directly but realize it's per-tick now.
-            // A slider 0.1 to 10 is fine.
-
-            Transform target = Selection.activeTransform;
-            Vector3 startPos = target.position;
-            Vector3 endPos = startPos + delta;
+            float speed = _moveSpeed * (shift ? 3f : 1f);
+            Vector3 delta = moveDir * (speed * dt);
 
             if (_useCollision)
             {
-                if (!CheckCollision(target, startPos, delta))
-                {
-                    return; // Bloced
-                }
+                if (!CheckCollision(target, target.position, delta)) return;
             }
 
             Undo.RecordObject(target, "Move Object");
-            target.position = endPos;
+            target.position += delta;
         }
 
         private bool CheckCollision(Transform target, Vector3 startPos, Vector3 delta)
@@ -227,7 +238,6 @@ namespace AnoGame.Scripts.Editor
                     return false;
                 }
             }
-
             return true;
         }
     }
