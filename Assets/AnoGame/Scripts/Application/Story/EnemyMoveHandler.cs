@@ -157,5 +157,53 @@ namespace AnoGame.Application.Story
                 heartbeatController.StopImmediate();
             }
         }
+
+        // ---------------------------------------------------------
+        // Warp Methods (New)
+        // ---------------------------------------------------------
+
+        public void Warp(Transform target)
+        {
+            if (target == null) return;
+            WarpToPosition(target.position, target.rotation);
+        }
+
+        public void WarpAndStartChase(Transform target)
+        {
+            Warp(target);
+            StartChase();
+        }
+
+        private void WarpToPosition(Vector3 position, Quaternion rotation)
+        {
+            var enemy = EnemySpawnManager.Instance.CurrentEnemyInstance;
+            if (enemy == null) return;
+
+            Debug.Log($"[EnemyMoveHandler] Warping enemy to {position}");
+
+            // 1. Try EventLockControl (Best for TCC/Event integration)
+            var eventLock = enemy.GetComponent<EventLockControl>();
+            if (eventLock != null)
+            {
+                // TryWarp handles TCC Warp internally
+                if (eventLock.TryWarp(position, rotation))
+                {
+                    return;
+                }
+            }
+
+            // 2. Try NavMeshAgent
+            var agent = enemy.GetComponent<UnityEngine.AI.NavMeshAgent>();
+            if (agent != null)
+            {
+                agent.Warp(position);
+                enemy.transform.rotation = rotation;
+                return;
+            }
+
+            // 3. Fallback: Transform
+            enemy.transform.position = position;
+            enemy.transform.rotation = rotation;
+        }
     }
 }
