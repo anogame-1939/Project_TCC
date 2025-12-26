@@ -32,7 +32,7 @@ namespace AnoGame.Application.Event
             ReloadData();
         }
 
-        private async void ReloadData()
+        private void ReloadData()
         {
             // ストーリー進行リセット処理呼び出し
             StoryManager.Instance.ResetStoryProgress();

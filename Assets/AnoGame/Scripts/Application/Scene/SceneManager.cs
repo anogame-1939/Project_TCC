@@ -24,7 +24,7 @@ namespace AnoGame.Application.Scene
         // 起動時に無視するシーン名をキャッシュ
         private string _ignoreSceneName;
 
-        private void Awake()
+        protected override void Awake()
         {
             // 現在読み込まれているシーンを無視対象として保持
             _ignoreSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
@@ -48,7 +48,7 @@ namespace AnoGame.Application.Scene
 
                 // NOTE:Steam向けの言語設定処理
                 var lang = GetCurrentSceneIndex();
-                Localizer.LocalizationManager.GetInstance().ChangeLocale(lang); 
+                Localizer.LocalizationManager.GetInstance().ChangeLocale(lang);
 
                 // シーン読み込み完了時に、無視対象＋新規シーン以外をアンロード
                 // await UnloadOtherScenesAsync(sceneName, ct);
@@ -78,63 +78,63 @@ namespace AnoGame.Application.Scene
             {
                 // ---- ここから：あなたの14言語に直結させるケース ----
 
-                case "schinese":         return 0;
+                case "schinese": return 0;
 
-                case "tchinese":         return 1;
+                case "tchinese": return 1;
 
                 // English
-                case "english":          return 2;
+                case "english": return 2;
 
                 // Finnish
-                case "finnish":          return 3;
+                case "finnish": return 3;
 
                 // French
-                case "french":           return 4;
+                case "french": return 4;
 
                 // German
-                case "german":           return 5;
+                case "german": return 5;
 
                 // Indonesian
-                case "indonesian":       return 7;
+                case "indonesian": return 7;
 
                 // Italian
-                case "italian":          return 8;
+                case "italian": return 8;
 
                 // Japanese
-                case "japanese":         return 9;
+                case "japanese": return 9;
 
                 // Korean（APIは "koreana"）
-                case "koreana":          return 10;
+                case "koreana": return 10;
 
                 // Portuguese（どちらでも pt 扱いに寄せる）
                 case "portuguese":
-                case "brazilian":        return 11;
+                case "brazilian": return 11;
 
                 // Russian
-                case "russian":          return 12;
+                case "russian": return 12;
 
                 // Spanish（LATAM も同じスロットへ寄せる）
                 case "spanish":
-                case "latam":            return 13;
+                case "latam": return 13;
 
                 // ---- ここまで：14言語の直接対応 ----
                 // 以降：API が返し得る他言語（未対応は英語へフォールバック）
 
-                case "arabic":           return EN;
-                case "bulgarian":        return EN;
-                case "czech":            return EN;
-                case "danish":           return EN;
-                case "dutch":            return EN;
-                case "greek":            return EN;
-                case "hungarian":        return EN;
-                case "norwegian":        return EN;
-                case "polish":           return EN;
-                case "romanian":         return EN;
-                case "swedish":          return EN;
-                case "thai":             return EN; // 必要なら 14言語に昇格させてOK
-                case "turkish":          return EN;
-                case "ukrainian":        return EN;
-                case "vietnamese":       return EN;
+                case "arabic": return EN;
+                case "bulgarian": return EN;
+                case "czech": return EN;
+                case "danish": return EN;
+                case "dutch": return EN;
+                case "greek": return EN;
+                case "hungarian": return EN;
+                case "norwegian": return EN;
+                case "polish": return EN;
+                case "romanian": return EN;
+                case "swedish": return EN;
+                case "thai": return EN; // 必要なら 14言語に昇格させてOK
+                case "turkish": return EN;
+                case "ukrainian": return EN;
+                case "vietnamese": return EN;
 
                 default:
                     return EN;
@@ -177,7 +177,7 @@ namespace AnoGame.Application.Scene
             for (int i = total - 1; i >= 0; i--)
             {
                 var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
-                if (!scene.isLoaded) 
+                if (!scene.isLoaded)
                     continue;
 
                 var name = scene.name;

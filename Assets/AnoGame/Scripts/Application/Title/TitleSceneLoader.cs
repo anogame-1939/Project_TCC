@@ -49,7 +49,7 @@ namespace AnoGame.Application.Title
             }
 
             // 新シーン上に存在するEventSystemを全て削除
-            foreach (var ev in FindObjectsOfType<EventSystem>())
+            foreach (var ev in FindObjectsByType<EventSystem>(FindObjectsSortMode.None))
             {
                 // 現在アクティブな新シーンに属している場合のみ対象とする
                 if (ev.gameObject.scene == newScene)

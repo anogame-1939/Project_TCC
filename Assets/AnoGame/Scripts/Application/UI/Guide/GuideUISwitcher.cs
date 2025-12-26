@@ -17,9 +17,9 @@ namespace AnoGame.UI.Guide
         [SerializeField] private Sprite keyboardSprite;   // キーボード用スプライト
 
         [Header("Fade")]
-        [SerializeField] private float fadeInDuration  = 0.25f;
+        [SerializeField] private float fadeInDuration = 0.25f;
         [SerializeField] private float fadeOutDuration = 0.25f;
-        [SerializeField] private bool  useUnscaledTime = true;
+        [SerializeField] private bool useUnscaledTime = true;
 
         [Header("Rules")]
         [SerializeField] private bool showOnlyInGameplay = true; // Gameplay 中のみ表示
@@ -48,7 +48,7 @@ namespace AnoGame.UI.Guide
                 Debug.LogWarning("[GuideUISwitcher] padSprite / keyboardSprite のいずれかが未設定です。");
             }
 
-            _playerInput = FindObjectOfType<PlayerInput>();
+            _playerInput = FindFirstObjectByType<PlayerInput>();
             if (_playerInput == null)
             {
                 Debug.LogError("[GuideUISwitcher] PlayerInput が見つかりません。");
@@ -57,14 +57,14 @@ namespace AnoGame.UI.Guide
 
             _group = EnsureCanvasGroup(baseImage);
             _group.blocksRaycasts = false;
-            _group.interactable  = false;
+            _group.interactable = false;
 
             HideImmediate(); // 初期は非表示
         }
 
         private void OnEnable()
         {
-            if (_playerInput == null) _playerInput = FindObjectOfType<PlayerInput>();
+            if (_playerInput == null) _playerInput = FindFirstObjectByType<PlayerInput>();
             if (_playerInput != null)
                 _playerInput.onControlsChanged += OnControlsChanged;
         }

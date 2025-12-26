@@ -28,7 +28,7 @@ namespace AnoGame.Application.UI
         [Tooltip("右端で待つ時間（秒）")]
         private float waitDuration = 1f;     // 右端で待つ時間（秒）
 
-        protected void Awake()
+        protected override void Awake()
         {
             base.Awake();
             // 最初にアンカー位置をキャッシュ

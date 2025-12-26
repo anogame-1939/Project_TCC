@@ -38,9 +38,9 @@ namespace AnoGame.Application.UI
         private int currentIndex = 0;
 
         // ★ スクロールバーを左右に動かす量（0～1の間で）
-        [SerializeField] private float scrollIncrement = 0.1f;
-        private float nextScrollTime = 0f;
-        private float coolTime = 0.1f;
+        // [SerializeField] private float scrollIncrement = 0.1f; // Unused
+        // private float nextScrollTime = 0f; // Unused
+        // private float coolTime = 0.1f; // Unused
 
         private void Awake()
         {
@@ -50,15 +50,15 @@ namespace AnoGame.Application.UI
             // UI の ActionMap を取得しておく
             var uiMap = _inputProvider.GetUIActionMap();
 
-            selectAction  = uiMap.FindAction("Select",  throwIfNotFound: true);
+            selectAction = uiMap.FindAction("Select", throwIfNotFound: true);
             confirmAction = uiMap.FindAction("Confirm", throwIfNotFound: true);
-            cancelAction  = uiMap.FindAction("Cancel",  throwIfNotFound: true);
+            cancelAction = uiMap.FindAction("Cancel", throwIfNotFound: true);
 
             // イベント登録
-            selectAction.started     += OnSelectPerformed;
-            selectAction.performed   += OnSelectPerformed;
-            confirmAction.performed  += OnConfirmPerformed;
-            cancelAction.performed   += OnCancelPerformed;
+            selectAction.started += OnSelectPerformed;
+            selectAction.performed += OnSelectPerformed;
+            confirmAction.performed += OnConfirmPerformed;
+            cancelAction.performed += OnCancelPerformed;
         }
 
         public async void TemporarilyDisable()
@@ -83,7 +83,7 @@ namespace AnoGame.Application.UI
                 cancelAction.Disable();
             }
         }
-        
+
         public void EnableInput()
         {
             if (selectAction != null)
@@ -99,7 +99,7 @@ namespace AnoGame.Application.UI
                 cancelAction.Enable();
             }
         }
-        
+
 
         private void OnDestroy()
         {
@@ -236,7 +236,7 @@ namespace AnoGame.Application.UI
             {
                 var target = currentSection.selectables[currentIndex];
                 Vector2 offset = currentSection.cursorOffset;
-                cursorImage.transform.position 
+                cursorImage.transform.position
                     = target.transform.position + (Vector3)offset;
 
                 Debug.Log("Selected: " + target.gameObject.name);

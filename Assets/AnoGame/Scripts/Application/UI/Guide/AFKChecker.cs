@@ -33,8 +33,8 @@ namespace AnoGame.UI.Guide
 
         private void Reset()
         {
-            moveControl = FindObjectOfType<MoveControl>();
-            guide = FindObjectOfType<GuideUISwitcher>();
+            moveControl = FindFirstObjectByType<MoveControl>();
+            guide = FindFirstObjectByType<GuideUISwitcher>();
         }
 
         private void OnEnable()
@@ -62,7 +62,7 @@ namespace AnoGame.UI.Guide
         {
             if (moveControl == null)
             {
-                moveControl = FindObjectOfType<MoveControl>();
+                moveControl = FindFirstObjectByType<MoveControl>();
                 if (moveControl == null)
                 {
                     Debug.LogError("[AFKChecker] MoveControl が見つかりません。");
@@ -90,7 +90,7 @@ namespace AnoGame.UI.Guide
                 }
 
                 // 🔸マウスクリック・パッド入力もAFK解除したい場合
-                if (Mouse.current != null && 
+                if (Mouse.current != null &&
                     (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame))
                 {
                     MarkActive();

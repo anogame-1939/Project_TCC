@@ -29,7 +29,6 @@ namespace AnoGame.Application.Enemy.AI
         public event Action OnDeactivated;
 
         private float _expireAt;
-        private bool _hasTarget;
 
         // IIntentProvider
         public bool IsActive()
@@ -74,7 +73,6 @@ namespace AnoGame.Application.Enemy.AI
         public void Activate(Vector3 targetPos, float ttl = -1f)
         {
             lookTarget = targetPos;
-            _hasTarget = true;
             active = true;
 
             float t = (ttl > 0f) ? ttl : defaultTTL;
@@ -85,7 +83,6 @@ namespace AnoGame.Application.Enemy.AI
         {
             if (!active) return;
             active = false;
-            _hasTarget = false;
 
             if (expired)
             {

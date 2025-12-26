@@ -70,9 +70,9 @@ namespace AnoGame.Application.Gameplay
 
         // 内部
         private readonly List<GameObject> pool = new List<GameObject>();
-        private int nextIndex = 0;
+        // private int nextIndex = 0; // Unused
         private Coroutine spawnRoutine;
-        private float timeAcc;
+        // private float timeAcc; // Unused
 
         // Player 自動再取得用（ターゲットが消えた場合に備える）
         private float reacquireTimer;
@@ -176,7 +176,7 @@ namespace AnoGame.Application.Gameplay
 
         private IEnumerator SpawnLoop()
         {
-            timeAcc = 0f;
+            // timeAcc = 0f;
 
             // 最初に即時スポーンしたい場合はここで一度呼ぶ
             yield return null;

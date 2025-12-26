@@ -15,7 +15,7 @@ namespace AnoGame.Application.Direction.Timeline
         [Tooltip("true: クリップ長をフェード時間にする / false: 下のdurationを使う")]
         public bool useClipDuration = true;
 
-        [Min(0f)] public float duration = 0.5f;
+        [Min(0f)] public new float duration = 0.5f;
         public Color color = Color.black;
 
         [Tooltip("クリップ終了時にフェード状態を維持するか")]

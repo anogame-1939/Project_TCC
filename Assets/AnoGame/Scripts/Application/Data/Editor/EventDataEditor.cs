@@ -38,6 +38,7 @@ namespace AnoGame.Data.Editor
             if (GUILayout.Button("GUIDを生成/再割当"))
             {
                 GenerateGuidForTargets(onlyIfEmpty: false);
+                return;
             }
             if (GUILayout.Button("空欄ならGUID自動生成"))
             {

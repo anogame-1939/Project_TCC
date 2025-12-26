@@ -25,7 +25,7 @@ namespace AnoGame.Application.Gimmicks
 
         [Header("タイミング")]
         [SerializeField, Min(0f)] float _stopDuration = 1.0f;        // 可視維持
-        [SerializeField, Min(0f)] float _disappearDuration = 0.35f;  // 未使用なら0でOK
+        // [SerializeField, Min(0f)] float _disappearDuration = 0.35f;  // Unused
 
         [Header("フェード")]
         [SerializeField, Min(0f)] float _fadeIn = 0.2f;
@@ -196,7 +196,7 @@ namespace AnoGame.Application.Gimmicks
                 await AppearAtAsync(pos); // 再度フェードイン
             }
             catch (OperationCanceledException) { /* シーン破棄・再命令 */ }
-            finally { BusyExit(); }  
+            finally { BusyExit(); }
         }
 
         private void CancelReappear()
@@ -215,7 +215,7 @@ namespace AnoGame.Application.Gimmicks
         }
 
         private void BusyEnter() => _busyRef++;
-        private void BusyExit()  => _busyRef = Mathf.Max(0, _busyRef - 1);
+        private void BusyExit() => _busyRef = Mathf.Max(0, _busyRef - 1);
 
         // ===== トリガーで発火する「罠の本編」 =====
 
@@ -248,7 +248,7 @@ namespace AnoGame.Application.Gimmicks
                 _lastAppearPos = _trapObject.transform.position;
 
                 _animator?.SetBool(ANIM_IS_APPEAR, true);
-                if (_particleObject != null ) _particleObject.Play();
+                if (_particleObject != null) _particleObject.Play();
 
                 // ★ 発火SE（AudioSource と Clip が両方設定されていれば再生）
                 if (_audioSource != null && _sfxOnFire != null)
@@ -259,7 +259,7 @@ namespace AnoGame.Application.Gimmicks
                 await UniTask.Delay(TimeSpan.FromSeconds(_stopDuration), DelayType.DeltaTime, PlayerLoopTiming.Update, ct);
 
                 _animator?.SetBool(ANIM_IS_APPEAR, false);
-                if (_particleObject != null ) _particleObject.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                if (_particleObject != null) _particleObject.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
                 if (_fader != null) await _fader.FadeOut(_fadeOut, ct);
 
