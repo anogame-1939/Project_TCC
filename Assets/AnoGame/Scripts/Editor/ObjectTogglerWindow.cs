@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace AnoGame.EditorExtensions
@@ -17,6 +18,7 @@ namespace AnoGame.EditorExtensions
         private List<TrackedObjectData> trackedObjects = new List<TrackedObjectData>();
         private const string PREFS_KEY = "ObjectToggler_TrackedObjects";
         private Vector2 scrollPosition;
+        private ReorderableList _reorderableList;
 
         [MenuItem("Tools/Object Toggler")]
         public static void ShowWindow()
@@ -27,13 +29,113 @@ namespace AnoGame.EditorExtensions
         private void OnEnable()
         {
             Load();
+            InitializeReorderableList();
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            Undo.undoRedoPerformed += OnUndoRedo;
         }
 
         private void OnDisable()
         {
             Save();
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            Undo.undoRedoPerformed -= OnUndoRedo;
+        }
+
+        private void OnUndoRedo()
+        {
+            Repaint();
+        }
+
+        private void InitializeReorderableList()
+        {
+            _reorderableList = new ReorderableList(trackedObjects, typeof(TrackedObjectData), true, true, true, true);
+
+            _reorderableList.drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(rect, "Tracked Objects");
+            };
+
+            _reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+            {
+                if (index < 0 || index >= trackedObjects.Count) return;
+
+                var item = trackedObjects[index];
+                rect.y += 2;
+
+                // Columns layout
+                float currentX = rect.x;
+                float height = EditorGUIUtility.singleLineHeight;
+
+                // Ping Button (Width 45)
+                Rect pingRect = new Rect(currentX, rect.y, 45, height);
+                if (GUI.Button(pingRect, "Ping", EditorStyles.miniButton))
+                {
+                    PingObject(item);
+                }
+                currentX += 50; // 45 + 5 padding
+
+                // Resolve Object
+                GameObject obj = ResolveObject(item);
+                bool objectFound = obj != null;
+
+                if (objectFound && item.cachedName != obj.name)
+                {
+                    item.cachedName = obj.name;
+                }
+
+                // Active Toggle (Width 20)
+                Rect activeRect = new Rect(currentX, rect.y, 20, height);
+                bool currentObjActive = objectFound ? obj.activeSelf : false;
+
+                EditorGUI.BeginDisabledGroup(!objectFound);
+                bool newActive = EditorGUI.Toggle(activeRect, currentObjActive);
+                if (objectFound && newActive != currentObjActive)
+                {
+                    Undo.RecordObject(obj, "Toggle Active");
+                    obj.SetActive(newActive);
+                }
+                EditorGUI.EndDisabledGroup();
+                currentX += 25;
+
+                // PlayON Toggle (Width 40)
+                Rect playOnRect = new Rect(currentX, rect.y, 50, height);
+                // Label for checkbox? No, just checkbox. Let's add tooltip or something? 
+                // Space is tight. Just the checkbox.
+                // Or maybe text "Play"?
+
+                // Let's match the header: "PlayON"
+                bool newForce = EditorGUI.ToggleLeft(playOnRect, new GUIContent("Play", "Force Active On Play"), item.forceActiveOnPlay);
+                if (newForce != item.forceActiveOnPlay)
+                {
+                    item.forceActiveOnPlay = newForce;
+                    Save();
+                }
+                currentX += 50;
+
+                // Name
+                Rect nameRect = new Rect(currentX, rect.y, rect.width - (currentX - rect.x), height);
+                string displayName = objectFound ? obj.name : $"{item.cachedName} (Missing)";
+                EditorGUI.LabelField(nameRect, displayName, objectFound ? EditorStyles.label : EditorStyles.wordWrappedLabel);
+            };
+
+            _reorderableList.onAddCallback = (ReorderableList list) =>
+            {
+                AddSelected();
+            };
+
+            _reorderableList.onRemoveCallback = (ReorderableList list) =>
+            {
+                if (list.index >= 0 && list.index < trackedObjects.Count)
+                {
+                    trackedObjects.RemoveAt(list.index);
+                    Save();
+                }
+            };
+
+            _reorderableList.onReorderCallbackWithDetails = (ReorderableList list, int oldIndex, int newIndex) =>
+            {
+                Save();
+            };
         }
 
         private void OnPlayModeStateChanged(PlayModeStateChange state)
@@ -44,30 +146,53 @@ namespace AnoGame.EditorExtensions
                 {
                     if (item.forceActiveOnPlay)
                     {
-                        if (GlobalObjectId.TryParse(item.globalObjectId, out GlobalObjectId gid))
+                        GameObject obj = ResolveObject(item);
+                        if (obj != null && !obj.activeSelf)
                         {
-                            var obj = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(gid) as GameObject;
-                            if (obj != null && !obj.activeSelf)
-                            {
-                                obj.SetActive(true);
-                            }
+                            obj.SetActive(true);
                         }
                     }
                 }
+            }
+        }
 
-                // If we modified something, we might want to ensure it's saved/handled before play starts?
-                // Actually, simple SetActive is enough. 
-                // However, since we are exiting edit mode, these changes might persist or be reset depending on exactly when they happen vs scene save.
-                // Usually changing before play starts (ExitingEditMode) means it enters play mode with that state.
-                // If the user didn't save the scene, it might prompt? or just apply. 
+        private GameObject ResolveObject(TrackedObjectData item)
+        {
+            if (GlobalObjectId.TryParse(item.globalObjectId, out GlobalObjectId gid))
+            {
+                return GlobalObjectId.GlobalObjectIdentifierToObjectSlow(gid) as GameObject;
+            }
+            return null;
+        }
+
+        private void PingObject(TrackedObjectData item)
+        {
+            GameObject obj = ResolveObject(item);
+            if (obj != null)
+            {
+                EditorGUIUtility.PingObject(obj);
+                Selection.activeObject = obj;
+            }
+            else
+            {
+                Debug.LogWarning($"Object '{item.cachedName}' not found or unloaded.");
             }
         }
 
         private void OnGUI()
         {
+            GUILayout.Label("Object Toggler (Drag to Reorder)", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+
             DrawControlPanel();
             EditorGUILayout.Space();
-            DrawObjectList();
+
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            if (_reorderableList != null)
+            {
+                _reorderableList.DoLayoutList();
+            }
+            EditorGUILayout.EndScrollView();
         }
 
         private void DrawControlPanel()
@@ -102,113 +227,9 @@ namespace AnoGame.EditorExtensions
             EditorGUILayout.EndVertical();
         }
 
-        private void DrawObjectList()
-        {
-            EditorGUILayout.LabelField("Tracked Objects", EditorStyles.boldLabel);
-
-            // Header
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("", GUILayout.Width(45)); // Ping
-            EditorGUILayout.LabelField("Active", GUILayout.Width(45));
-            EditorGUILayout.LabelField("PlayON", GUILayout.Width(50));
-            EditorGUILayout.LabelField("Name", GUILayout.ExpandWidth(true));
-            EditorGUILayout.LabelField("", GUILayout.Width(25)); // X
-            EditorGUILayout.EndHorizontal();
-
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-
-            for (int i = 0; i < trackedObjects.Count; i++)
-            {
-                var item = trackedObjects[i];
-                DrawObjectRow(item, i);
-            }
-
-            EditorGUILayout.EndScrollView();
-        }
-
-        private void DrawObjectRow(TrackedObjectData item, int index)
-        {
-            EditorGUILayout.BeginHorizontal("box");
-
-            // Resolve Object
-            GameObject obj = null;
-            if (GlobalObjectId.TryParse(item.globalObjectId, out GlobalObjectId gid))
-            {
-                obj = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(gid) as GameObject;
-            }
-
-            bool objectFound = obj != null;
-
-            // Ping Button
-            if (GUILayout.Button("Ping", GUILayout.Width(45)))
-            {
-                if (objectFound)
-                {
-                    EditorGUIUtility.PingObject(obj);
-                    Selection.activeObject = obj;
-                }
-                else
-                {
-                    Debug.LogWarning($"Object '{item.cachedName}' not found or unloaded.");
-                }
-            }
-
-            // Toggle Active
-            bool isActive = false;
-
-            if (objectFound)
-            {
-                isActive = obj.activeSelf;
-            }
-
-            EditorGUI.BeginDisabledGroup(!objectFound);
-
-            // Active Toggle
-            bool newActive = EditorGUILayout.Toggle(isActive, GUILayout.Width(45));
-            if (objectFound && newActive != isActive)
-            {
-                Undo.RecordObject(obj, "Toggle Active");
-                obj.SetActive(newActive);
-            }
-
-            // Force Active On Play Toggle
-            bool newForceActive = EditorGUILayout.Toggle(item.forceActiveOnPlay, GUILayout.Width(50));
-            if (newForceActive != item.forceActiveOnPlay)
-            {
-                item.forceActiveOnPlay = newForceActive;
-                Save(); // Save preference change immediately
-            }
-
-            EditorGUI.EndDisabledGroup();
-
-            // Object Name Label
-            string displayName = objectFound ? obj.name : $"{item.cachedName} (Missing)";
-            if (objectFound)
-            {
-                // Update cached name if changed
-                if (item.cachedName != obj.name)
-                {
-                    item.cachedName = obj.name;
-                    // We don't save immediately for name changes to avoid perf hit, 
-                    // but it will save on close/add/remove.
-                }
-            }
-
-            EditorGUILayout.LabelField(displayName, GUILayout.ExpandWidth(true));
-
-            // Remove Button
-            if (GUILayout.Button("X", GUILayout.Width(25)))
-            {
-                trackedObjects.RemoveAt(index);
-                Save();
-                GUIUtility.ExitGUI(); // Stop drawing this frame since list changed
-            }
-
-            EditorGUILayout.EndHorizontal();
-        }
-
         private void AddSelected()
         {
+            bool added = false;
             foreach (var obj in Selection.objects)
             {
                 if (obj == null) continue;
@@ -231,23 +252,25 @@ namespace AnoGame.EditorExtensions
                         cachedName = go.name,
                         forceActiveOnPlay = false
                     });
+                    added = true;
                 }
             }
-            Save();
+            if (added)
+            {
+                Save();
+                Repaint();
+            }
         }
 
         private void SetAllActive(bool active)
         {
             foreach (var item in trackedObjects)
             {
-                if (GlobalObjectId.TryParse(item.globalObjectId, out GlobalObjectId gid))
+                GameObject obj = ResolveObject(item);
+                if (obj != null && obj.activeSelf != active)
                 {
-                    var obj = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(gid) as GameObject;
-                    if (obj != null && obj.activeSelf != active)
-                    {
-                        Undo.RecordObject(obj, active ? "Set Active" : "Set Inactive");
-                        obj.SetActive(active);
-                    }
+                    Undo.RecordObject(obj, active ? "Set Active" : "Set Inactive");
+                    obj.SetActive(active);
                 }
             }
         }
@@ -269,6 +292,7 @@ namespace AnoGame.EditorExtensions
                     trackedObjects = wrapper.items;
                 }
             }
+            if (trackedObjects == null) trackedObjects = new List<TrackedObjectData>();
         }
 
         [System.Serializable]
