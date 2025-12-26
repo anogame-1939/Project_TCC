@@ -9,6 +9,12 @@ namespace AnoGame.Application.Event
     /// </summary>
     public class TimelineQueueManager : SingletonMonoBehaviour<TimelineQueueManager>
     {
+        public struct TimelineSkipAvailabilityChanged
+        {
+            public bool IsAvailable;
+            public TimelineSkipAvailabilityChanged(bool isAvailable) => IsAvailable = isAvailable;
+        }
+
         private readonly Queue<ITimelineTask> _queue = new();
         private bool _isPlaying;
 
@@ -88,6 +94,7 @@ namespace AnoGame.Application.Event
 
             _sequenceActive = true;
             OnSequenceStarted?.Invoke();
+            UniRx.MessageBroker.Default.Publish(new TimelineSkipAvailabilityChanged(true));
         }
 
         private void EndSequenceIfNeeded()
@@ -96,6 +103,7 @@ namespace AnoGame.Application.Event
 
             _sequenceActive = false;
             OnSequenceFinished?.Invoke();
+            UniRx.MessageBroker.Default.Publish(new TimelineSkipAvailabilityChanged(false));
         }
 
         public void SkipCurrentSequence()
