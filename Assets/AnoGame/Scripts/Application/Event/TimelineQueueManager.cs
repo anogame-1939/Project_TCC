@@ -151,5 +151,14 @@ namespace AnoGame.Application.Event
             _isSkipping = false;
             EndSequenceIfNeeded();
         }
+
+#if UNITY_EDITOR
+        [Button]
+        private void Skip()
+        {
+            SkipCurrentSequence();
+        }
+#endif
+
     }
 }

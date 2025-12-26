@@ -21,8 +21,6 @@ namespace AnoGame.Application.Direction
             _gameStateHandler.SetInGameEvent();
             _eventLockControl.BeginLock();
 
-            Debug.Log($"[DirectionHandler] Enemy Instance: {_enemySpawnManager}");
-            Debug.Log($"[DirectionHandler] Enemy Instance: {_enemySpawnManager.CurrentEnemyInstance}");
             if (_enemySpawnManager.CurrentEnemyInstance != null)
             {
                 if (_enemySpawnManager.CurrentEnemyInstance.TryGetComponent<EventLockControl>(out var enemyEventLock))

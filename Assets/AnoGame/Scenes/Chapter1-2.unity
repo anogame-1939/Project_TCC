@@ -12332,7 +12332,6 @@ GameObject:
   - component: {fileID: 284172279}
   - component: {fileID: 284172278}
   - component: {fileID: 284172277}
-  - component: {fileID: 284172276}
   - component: {fileID: 284172275}
   - component: {fileID: 284172273}
   - component: {fileID: 284172274}
@@ -12362,13 +12361,37 @@ MonoBehaviour:
   OnSkip:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 297600892}
+        m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+        m_MethodName: WarpAndStartChase
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1462105655}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 0
+      - m_Target: {fileID: 284172278}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
+        m_MethodName: StartEvent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1337273243}
+        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -12465,18 +12488,6 @@ PlayableDirector:
     - 2c46ee047dd5d3c42aead661925e970c: {fileID: 986790683}
     - 4d36dd9bf4f78a64a94e60bdb94f9ded: {fileID: 1306740938}
     - cc5424b6bbc8cb94bafecb30805e3dc0: {fileID: 1046226364}
---- !u!114 &284172276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 284172272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a0de4cb1d084e458a791bc6f7097fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!82 &284172277
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12772,6 +12783,7 @@ Transform:
   - {fileID: 337357559}
   - {fileID: 877018020}
   - {fileID: 104923945}
+  - {fileID: 1337273242}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &284172282
@@ -12826,18 +12838,6 @@ MonoBehaviour:
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
-        - m_Target: {fileID: 1596661651}
-          m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-          m_MethodName: 
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -13251,7 +13251,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 912642633394794230, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
   m_PrefabInstance: {fileID: 297600886}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596661651}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a5a43bd28f6a48a423636d43d8316, type: 3}
@@ -89050,6 +89050,62 @@ MonoBehaviour:
   recoveryInterval: 10
   penaltyLockoutDuration: 30
   isActive: 1
+--- !u!1 &1337273241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1337273242}
+  - component: {fileID: 1337273243}
+  m_Layer: 0
+  m_Name: "TImeline-\u30B9\u30AD\u30C3\u30D7\u7528"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1337273242
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337273241}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 284172281}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!320 &1337273243
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337273241}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: 244a85b06b47b3a47a5cd71ca7ab60d9, type: 2}
+  m_InitialState: 0
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings:
+  - key: {fileID: 2731971872814437139, guid: 244a85b06b47b3a47a5cd71ca7ab60d9, type: 2}
+    value: {fileID: 773832713}
+  - key: {fileID: 1594457369474775805, guid: 244a85b06b47b3a47a5cd71ca7ab60d9, type: 2}
+    value: {fileID: 338764139}
+  - key: {fileID: 6260012825160726105, guid: 244a85b06b47b3a47a5cd71ca7ab60d9, type: 2}
+    value: {fileID: 338764139}
+  m_ExposedReferences:
+    m_References:
+    - 5393c51167c5a1e4e92a6d03ffc7a33d: {fileID: 1462105655}
 --- !u!4 &1339953359 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1538259220956459689, guid: 04a122351bf6b37449b00a4b87c72a23, type: 3}
@@ -98390,11 +98446,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 735793853}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1596661651 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5601170780326599541, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
-  m_PrefabInstance: {fileID: 297600886}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1599273173
 GameObject:
   m_ObjectHideFlags: 0
