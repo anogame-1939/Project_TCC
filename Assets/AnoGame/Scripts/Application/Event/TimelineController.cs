@@ -24,6 +24,19 @@ namespace AnoGame.Application.Event
             Debug.Log($"TimelineController: Enqueueing timeline...{_playableDirector.name}", this);
             TimelineQueueManager.Instance.Enqueue(new TimelineTask(_playableDirector, ResetEnqueueFlag));
         }
+
+        [Header("スキップ時に強制適用する状態変更処理")]
+        public UnityEngine.Events.UnityEvent OnSkip;
+
+        /// <summary>
+        /// スキップ実行。登録されたイベントを発火させる。
+        /// </summary>
+        public void PerformSkip()
+        {
+            Debug.Log($"TimelineController: PerformSkip for {_playableDirector.name}", this);
+            OnSkip?.Invoke();
+        }
+
         // Enqueue完了時に呼び出すことで再度Enqueue可能にする
         public void ResetEnqueueFlag()
         {

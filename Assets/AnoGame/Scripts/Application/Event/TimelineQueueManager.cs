@@ -14,6 +14,9 @@ namespace AnoGame.Application.Event
 
         // 追加: 「今シリーズ中かどうか」
         private bool _sequenceActive;
+        private bool _isSkipping;
+
+        private ITimelineTask _currentTask;
 
         // 追加: 外からも差し込めるようにしておくと便利
         public UnityEvent OnSequenceStarted;
@@ -29,7 +32,7 @@ namespace AnoGame.Application.Event
             _queue.Enqueue(task);
 
             // 何も再生していなければ今すぐ再生
-            if (!_isPlaying)
+            if (!_isPlaying && !_isSkipping)
             {
                 // ←ここが「シリーズ開始」のタイミング
                 StartSequenceIfNeeded();
@@ -39,6 +42,8 @@ namespace AnoGame.Application.Event
 
         private void PlayNext()
         {
+            if (_isSkipping) return;
+
             // もうキューが空なら終了処理
             if (_queue.Count == 0)
             {
@@ -49,19 +54,20 @@ namespace AnoGame.Application.Event
 
             _isPlaying = true;
 
-            var task = _queue.Dequeue();
+            _currentTask = _queue.Dequeue();
 
             // タスクが終わったら次へ
-            task.OnCompleted += () =>
+            _currentTask.OnCompleted += () =>
             {
                 UnityEngine.Debug.Log("Task completed.");
                 _isPlaying = false;
+                _currentTask = null;
                 PlayNext();
             };
 
-            UnityEngine.Debug.Log("Playing task..." +task.GetType().Name);
+            UnityEngine.Debug.Log("Playing task..." + _currentTask.GetType().Name);
 
-            task.Play();
+            _currentTask.Play();
         }
 
         /// <summary>
@@ -90,6 +96,60 @@ namespace AnoGame.Application.Event
 
             _sequenceActive = false;
             OnSequenceFinished?.Invoke();
+        }
+
+        public void SkipCurrentSequence()
+        {
+            if (!_sequenceActive || _isSkipping) return;
+            StartCoroutine(SkipCoroutine());
+        }
+
+        private System.Collections.IEnumerator SkipCoroutine()
+        {
+            _isSkipping = true;
+
+            // フェードアウト
+            const float fadeTime = 0.5f;
+            AnoGame.Application.UI.FadeManager.Instance.FadeOut(fadeTime);
+            yield return new UnityEngine.WaitForSeconds(fadeTime);
+
+            // まず状態強制を適用
+            // 現在実行中のものも含めて、ControllerがあればSkip実行
+            if (_currentTask is TimelineTask t && t.Director != null)
+            {
+                var controller = t.Director.GetComponent<TimelineController>();
+                if (controller != null)
+                {
+                    controller.PerformSkip();
+                }
+                t.Director.Stop(); // これでPlayNextが呼ばれるが、isSkippingで弾かれる
+            }
+            _currentTask = null;
+
+            // キューに残っているものも同様に処理
+            while (_queue.Count > 0)
+            {
+                var task = _queue.Dequeue();
+                if (task is TimelineTask tt && tt.Director != null)
+                {
+                    var c = tt.Director.GetComponent<TimelineController>();
+                    if (c != null)
+                    {
+                        c.PerformSkip();
+                    }
+                }
+                // 再生せずに飛ばすので、OnCompleted（ResetEnqueueFlagなど）は手動で呼ぶ
+                task.OnCompleted?.Invoke();
+            }
+
+            // フェードイン
+            yield return null; // 1フレ待って状態反映を確実にする
+            AnoGame.Application.UI.FadeManager.Instance.FadeIn(fadeTime);
+
+            // シリーズ終了
+            _isPlaying = false;
+            _isSkipping = false;
+            EndSequenceIfNeeded();
         }
     }
 }
