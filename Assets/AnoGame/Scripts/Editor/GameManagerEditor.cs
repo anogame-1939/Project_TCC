@@ -16,7 +16,7 @@ namespace AnoGame.Editor
     public class GameManagerEditor : UnityEditor.Editor
     {
         private bool showDebugOptions = true;
-        private bool showStoryOptions = true;
+        // private bool showStoryOptions = true; // Unused
         private bool showStartOptions = true;
         private bool showPositionData = true;
         private Vector2 scrollPosition;
@@ -30,7 +30,7 @@ namespace AnoGame.Editor
             StartPoint,
             RetryPoint
         }
-        private StartPointType selectedStartType = StartPointType.StartPoint;
+        // private StartPointType selectedStartType = StartPointType.StartPoint; // Unused
 
         private void OnEnable()
         {
@@ -259,7 +259,7 @@ namespace AnoGame.Editor
             }
         }
 
-        private async void ResetSaveData()
+        private void ResetSaveData()
         {
             var gameManager = GameManager.Instance;
             if (gameManager != null)

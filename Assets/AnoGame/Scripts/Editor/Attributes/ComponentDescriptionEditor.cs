@@ -1,7 +1,6 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using AnoGame.Application.Direction;
 using AnoGame.Application.Direction; // For EncounterDirector
 
 namespace AnoGame.Scripts.Editor.Attributes

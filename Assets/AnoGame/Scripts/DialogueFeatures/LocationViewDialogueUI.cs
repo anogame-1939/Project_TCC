@@ -8,8 +8,9 @@ namespace AnoGame.Apllication.DialogueFeatures
     {
         [SerializeField] private Image locationImage;
 
-        private void Start()
+        public override void Start()
         {
+            base.Start();
             // シーン読み込み時にManagerに自身を登録
             LocationViewManager.Instance.Initialize(this);
         }
