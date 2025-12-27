@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using AnoGame.Domain.Data.Models;
-using VContainer;
 using Cysharp.Threading.Tasks;
 using UnityEngine.EventSystems;
 
@@ -21,6 +20,7 @@ namespace AnoGame.Application.Inventory
         [SerializeField] private int maxVisibleSlots = 16; // 4x4
         [SerializeField] private Button nextPageButton;
         [SerializeField] private Button prevPageButton;
+        [SerializeField] private Button backButton;
 
         private IReadOnlyList<InventoryItem> _allItems = new List<InventoryItem>();
         private Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
@@ -53,9 +53,70 @@ namespace AnoGame.Application.Inventory
                     slot.Clear();
                     slots.Add(slot);
                 }
+                // SetupGridNavigation(slots); // Removed, called in UpdateVisibleItems
                 pageSlots.Add(slots);
                 // 最初は 0 ページだけアクティブ、それ以外は非表示
                 contentParents[page].gameObject.SetActive(page == currentPage);
+            }
+        }
+
+        private void SetupGridNavigation(List<InventorySlot> slots, int activeItemCount)
+        {
+            // 4x4想定
+            int columns = 4;
+            int count = slots.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                var selectable = slots[i].GetComponent<Selectable>();
+                if (selectable == null) continue;
+
+                Navigation nav = new Navigation();
+                nav.mode = Navigation.Mode.Explicit;
+
+                // Up
+                if (i >= columns)
+                    nav.selectOnUp = slots[i - columns].GetComponent<Selectable>();
+                else
+                    nav.selectOnUp = backButton; // 最上段 -> BackButton
+
+                // Down
+                // 指定された数より下の行にアイテムがない、あるいは最下段の場合は BackButton へ
+                if (i + columns < activeItemCount)
+                    nav.selectOnDown = slots[i + columns].GetComponent<Selectable>();
+                else
+                    nav.selectOnDown = backButton; // 最下段 or 下にアイテムなし -> BackButton
+
+                // Left
+                if (i % columns != 0)
+                    nav.selectOnLeft = slots[i - 1].GetComponent<Selectable>();
+                else
+                    nav.selectOnLeft = prevPageButton; // 左端 -> PrevButton
+
+                // Right
+                if ((i + 1) % columns != 0)
+                    nav.selectOnRight = slots[i + 1].GetComponent<Selectable>();
+                else
+                    nav.selectOnRight = nextPageButton; // 右端 -> NextButton
+
+                selectable.navigation = nav;
+            }
+
+            // BackButton の Navigation 設定
+            if (backButton != null && activeItemCount > 0)
+            {
+                var nav = backButton.navigation;
+                nav.mode = Navigation.Mode.Explicit;
+
+                // 上を押したら、有効アイテムの最後（右下）へ
+                var lastSlot = slots[activeItemCount - 1].GetComponent<Selectable>();
+                if (lastSlot != null) nav.selectOnUp = lastSlot;
+
+                // 下を押したら、最初のスロット（左上）へ
+                var firstSlot = slots[0].GetComponent<Selectable>();
+                if (firstSlot != null) nav.selectOnDown = firstSlot;
+
+                backButton.navigation = nav;
             }
         }
 
@@ -103,6 +164,14 @@ namespace AnoGame.Application.Inventory
                     }
                 }
             }
+
+            // ページ内の有効アイテム数を計算してナビゲーションを設定
+            int activeCount = 0;
+            for (int i = 0; i < slots.Count; i++)
+            {
+                if (startIndex + i < _allItems.Count) activeCount++;
+            }
+            SetupGridNavigation(slots, activeCount);
 
             // フォーカス更新
             var sel = slots.FirstOrDefault()?.GetComponent<Selectable>();
