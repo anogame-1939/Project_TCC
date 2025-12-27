@@ -46,6 +46,8 @@ namespace AnoGame.Application.Event
             InitializeEvents();
         }
 
+        [SerializeField] protected bool checkConditionsOnDone = false;
+
         [SerializeField] private List<EventData> supersededByEvents;
 
         protected virtual void InitializeEvents()
@@ -57,6 +59,20 @@ namespace AnoGame.Application.Event
                 if (supersededByEvents != null && supersededByEvents.Any(e => _eventService.IsEventCleared(e.EventId)))
                 {
                     return;
+                }
+
+                if (checkConditionsOnDone)
+                {
+                    // 条件が初期化されていない場合は初期化
+                    if (_conditions.Count == 0)
+                    {
+                        InitializeConditions();
+                    }
+
+                    if (!CheckConditions())
+                    {
+                        return;
+                    }
                 }
 
                 OnDoneEvent();
