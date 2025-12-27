@@ -22,7 +22,9 @@ namespace AnoGame.Application.Event
             }
             _isEnqueued = true;
             Debug.Log($"TimelineController: Enqueueing timeline...{_playableDirector.name}", this);
-            TimelineQueueManager.Instance.Enqueue(new TimelineTask(_playableDirector, ResetEnqueueFlag));
+
+            bool canSkip = OnSkip != null && OnSkip.GetPersistentEventCount() > 0;
+            TimelineQueueManager.Instance.Enqueue(new TimelineTask(_playableDirector, ResetEnqueueFlag, canSkip));
         }
 
         [Header("スキップ時に強制適用する状態変更処理")]

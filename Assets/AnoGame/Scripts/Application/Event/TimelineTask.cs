@@ -8,12 +8,14 @@ namespace AnoGame.Application.Event
     public class TimelineTask : ITimelineTask
     {
         public PlayableDirector Director { get; private set; }
+        public bool IsSkipAvailable { get; private set; }
         public Action OnCompleted { get; set; }  // 終了時に呼ばれる任意のコールバック
 
-        public TimelineTask(PlayableDirector director, Action onCompleted = null)
+        public TimelineTask(PlayableDirector director, Action onCompleted = null, bool isSkipAvailable = false)
         {
             Director = director;
             OnCompleted = onCompleted;
+            IsSkipAvailable = isSkipAvailable;
         }
 
         /// <summary>

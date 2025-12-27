@@ -73,6 +73,9 @@ namespace AnoGame.Application.Event
 
             UnityEngine.Debug.Log("Playing task..." + _currentTask.GetType().Name);
 
+            // スキップ可否を通知
+            UniRx.MessageBroker.Default.Publish(new TimelineSkipAvailabilityChanged(_currentTask.IsSkipAvailable));
+
             _currentTask.Play();
         }
 
@@ -94,7 +97,8 @@ namespace AnoGame.Application.Event
 
             _sequenceActive = true;
             OnSequenceStarted?.Invoke();
-            UniRx.MessageBroker.Default.Publish(new TimelineSkipAvailabilityChanged(true));
+            // 最初はfalseで、Task再生時に更新する
+            // UniRx.MessageBroker.Default.Publish(new TimelineSkipAvailabilityChanged(true));
         }
 
         private void EndSequenceIfNeeded()
