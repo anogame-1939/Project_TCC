@@ -12,6 +12,7 @@ namespace AnoGame.Application.Inventory
         private readonly int _quantity;
 
         public Action OnCompleted { get; set; }
+        public bool IsSkipAvailable => false;
 
         public ItemPickupTask(ItemPickupView view, ItemData itemData, int quantity)
         {

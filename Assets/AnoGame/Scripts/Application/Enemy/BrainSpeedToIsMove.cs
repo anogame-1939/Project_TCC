@@ -19,6 +19,8 @@ namespace AnoGame.Application.Enemy.Animation
         [Header("Animator パラメータ")]
         [SerializeField] private string isMoveBoolParam = "IsMove";
         [SerializeField] private string locomotionSpeedParam = "LocomotionSpeed"; // 空なら更新しない
+        [SerializeField] private float minLocomotionSpeed = 0.6f;
+        [SerializeField] private float maxLocomotionSpeed = 1.2f;
 
         [Header("判定/平滑化")]
         [SerializeField, Min(0f)] private float speedThreshold = 0.05f;   // これ超えたら移動扱い
@@ -76,7 +78,10 @@ namespace AnoGame.Application.Enemy.Animation
             animator.SetBool(isMoveBoolParam, isMoving);
 
             if (!string.IsNullOrEmpty(locomotionSpeedParam))
-                animator.SetFloat(locomotionSpeedParam, smooth);
+            {
+                float clampedSpeed = Mathf.Clamp(smooth, minLocomotionSpeed, maxLocomotionSpeed);
+                animator.SetFloat(locomotionSpeedParam, clampedSpeed);
+            }
         }
 
         private float GetSpeed(float dt)
