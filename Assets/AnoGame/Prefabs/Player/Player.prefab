@@ -275,8 +275,6 @@ GameObject:
   - component: {fileID: 5285330736456516}
   - component: {fileID: 4816037483512829592}
   - component: {fileID: 3678492858026541029}
-  - component: {fileID: 4457415746930714228}
-  - component: {fileID: 3665104980316722342}
   - component: {fileID: 4797001328486349674}
   - component: {fileID: 3569770092304302671}
   - component: {fileID: 1847861480865570380}
@@ -390,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 544f06851df4541118f7b8a4095fe306, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 3.5
+  _moveSpeed: 3
   _turnSpeed: 15
   _brakePower: 12
   _accelerator: 6
@@ -501,69 +499,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37a839c66d2314adda27423a6770518d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4457415746930714228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275751613919431604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 963d6358c55a0f44d8de57bee560f184, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useDefaultGUI: 1
-  guiSkin: {fileID: 0}
-  guiStyleName: label
-  alignment: 1
-  color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  textStyle: 1
-  textStyleColor: {r: 0, g: 0, b: 0, a: 1}
-  m_defaultUseMessage: (spacebar to interact)
-  useKey: 32
-  useButton: Fire2
-  enableTouch: 0
-  touchArea:
-    origin: 0
-    alignment: 0
-    x:
-      scale: 0
-      value: 0
-    y:
-      scale: 0
-      value: 0
-    width:
-      scale: 0
-      value: 0
-    height:
-      scale: 0
-      value: 0
-    minPixelWidth: 0
-    minPixelHeight: 0
-  broadcastToChildren: 1
-  actorTransform: {fileID: 0}
-  onSelectedUsable:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeselectedUsable:
-    m_PersistentCalls:
-      m_Calls: []
-  usablesInRange: []
---- !u!114 &3665104980316722342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275751613919431604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42f17d3292d455242a47944a59dea99c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tagSpecificElements: []
-  layerSpecificElements: []
 --- !u!114 &4797001328486349674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,6 +583,7 @@ MonoBehaviour:
   stamina: {fileID: 3861763874115308583}
   speedManager: {fileID: 5360727773768778097}
   sprintSpeedMultiplier: 1.5
+  recoverySpeedMultiplier: 0.5
 --- !u!114 &2031240152823824659
 MonoBehaviour:
   m_ObjectHideFlags: 0
