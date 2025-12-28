@@ -1,9 +1,10 @@
-// Presentation/Inventory/ItemPickupView.cs
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace AnoGame.Application.Inventory
 {
@@ -36,11 +37,16 @@ namespace AnoGame.Application.Inventory
             // 文言
             nameText.text = quantity > 1 ? $"{data.ItemName} ×{quantity}" : data.ItemName;
             descText.text = data.Description ?? string.Empty;
+            
+            AsyncOperationHandle<Sprite> handle = default;
+            bool handleIsValid = false;
 
             // アイコンロード（AssetReferenceSprite 推奨）
             if (data.AssetReference != null && data.AssetReference.RuntimeKeyIsValid())
             {
-                var handle = data.AssetReference.LoadAssetAsync<Sprite>();
+                // AssetReference自体に状態を持たせないよう、Addressables経由でロードする
+                handle = Addressables.LoadAssetAsync<Sprite>(data.AssetReference);
+                handleIsValid = true;
                 iconImage.sprite = await handle.Task;
             }
             else
@@ -60,7 +66,10 @@ namespace AnoGame.Application.Inventory
             await FadeTo(1f, 0f, fadeOut);
 
             // アンロード
-            if (data.AssetReference != null) data.AssetReference.ReleaseAsset();
+            if (handleIsValid)
+            {
+                Addressables.Release(handle);
+            }
             gameObject.SetActive(false);
             _busy = false;
 
