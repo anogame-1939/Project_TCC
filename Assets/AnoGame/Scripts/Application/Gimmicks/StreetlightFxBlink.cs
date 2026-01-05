@@ -79,6 +79,26 @@ namespace AnoGame.Application.Gimmicks
                 var mat = bulbRenderer.sharedMaterial;
                 if (mat != null) mat.EnableKeyword("_EMISSION");
             }
+
+            UpdateVLB();
+        }
+
+        [Header("VLB Integration")]
+        [SerializeField] private VLB.VolumetricLightBeamAbstractBase vlb;
+
+        private void UpdateVLB()
+        {
+            if (vlb == null) return;
+
+            // SD/HD specific update call
+            if (vlb is VLB.VolumetricLightBeamSD sd)
+            {
+                sd.UpdateAfterManualPropertyChange();
+            }
+            else if (vlb is VLB.VolumetricLightBeamHD hd)
+            {
+                hd.UpdateAfterManualPropertyChange();
+            }
         }
 
         /// <summary>
