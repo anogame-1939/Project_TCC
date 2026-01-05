@@ -13,10 +13,12 @@ using UnityEditor;
 namespace AnoGame.Application.Story
 {
     public class PlayerSpawnManager : SingletonMonoBehaviour<PlayerSpawnManager>
-    {   
+    {
         private const string TAG_START_POINT = "StartPoint";
         private const string TAG_RETRY_POINT = "RetryPoint";
         private Transform _currentRetryPoint;
+        private Vector3? _explicitRetryPosition;
+        private Quaternion? _explicitRetryRotation;
 
         private Transform GetStartPoint()
         {
@@ -91,6 +93,17 @@ namespace AnoGame.Application.Story
         // 外部から呼び出し専用のリトライポイントワープ
         public void SpawnPlayerAtRetryPoint()
         {
+            // まず明示的なリトライ位置が設定されているか確認
+            if (_explicitRetryPosition.HasValue)
+            {
+                var rotation = _explicitRetryRotation ?? Quaternion.identity;
+                WarpPlayerTo(_explicitRetryPosition.Value, rotation);
+
+                // 使用後はクリアする? 一応残しておくか、ケースバイケースだが
+                // 今回はStoryManagerから毎回セットされる想定なので、そのままでOK
+                return;
+            }
+
             // リトライポイント取得
             Transform targetPoint = _currentRetryPoint ?? GetRetryPoint();
 
@@ -114,7 +127,7 @@ namespace AnoGame.Application.Story
                 WarpPlayerTo(targetPoint.position, targetPoint.rotation);
             }
         }
-        
+
 
         private void SpawnPlayer(GameData gameData)
         {
@@ -175,6 +188,13 @@ namespace AnoGame.Application.Story
 
             _currentRetryPoint = retryPointObj.transform;
             Debug.Log("現在位置をリトライポイントとして設定しました。");
+        }
+
+        public void SetExplicitRetryPoint(Vector3 position, Quaternion rotation)
+        {
+            _explicitRetryPosition = position;
+            _explicitRetryRotation = rotation;
+            Debug.Log($"Explicit retry point set to {position}.");
         }
 
 #if UNITY_EDITOR

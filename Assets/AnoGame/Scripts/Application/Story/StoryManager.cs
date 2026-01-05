@@ -136,18 +136,25 @@ namespace AnoGame.Application.Story
         public async void ResetStoryProgress()
         {
             // 現在のストーリーデータを取得
+            // 現在のストーリーデータを取得
             _currentStoryIndex = GameManager.Instance.CurrentGameData.StoryProgress.CurrentStoryIndex;
 
-            // 現在のストーリーの最初（Chapter 0）に戻す
-            _currentChapterIndex = 0;
-
-            // StoryDataを取得
             if (_currentStoryIndex < 0 || _currentStoryIndex >= _storyDataList.Count)
             {
                 Debug.LogError($"Invalid story index: {_currentStoryIndex}");
                 return;
             }
             StoryData currentStoryData = _storyDataList[_currentStoryIndex];
+
+            // リトライ時はStoryDataに設定されているChapterから再開する
+            _currentChapterIndex = currentStoryData.retryChapterIndex;
+
+            // リトライ位置を設定
+            // PositionがZeroの場合は設定されていないとみなす（必要に応じてフラグ管理でも良いが簡略化）
+            if (currentStoryData.retryPosition != Vector3.zero)
+            {
+                PlayerSpawnManager.Instance.SetExplicitRetryPoint(currentStoryData.retryPosition, Quaternion.Euler(currentStoryData.retryRotationEuler));
+            }
 
             // 関連イベントIDを削除
             // 関連イベントIDを削除
@@ -193,13 +200,29 @@ namespace AnoGame.Application.Story
             // 変更を保存 (GameManagerの実装に依存するが、ここでは保存処理が必要な場合を想定)
             await GameManager.Instance.SaveCurrentGameState();
 
-            // ストーリーをロードし直す
-            // LoadStory(_currentStoryIndex, false);
+            // ストーリーをロードし直す (useRetryPoint = true でリトライポイントを使用)
+            // GameOverManager.OnRetryGame() で ReloadStoryScene() が呼ばれるが、
+            // そちらは初期状態で呼び出される。
+            // ここで呼び出すのではなく、GameOverManagerの流れに任せるか？
+            // GameOverManager.OnRetryGame -> ReloadStoryScene -> LoadStory(..., false)
+            // になっているので、ReloadStorySceneの内容を変えるべきか、あるいはここでロードするか。
+            // GameOverManager.OnRetryGameのフローを確認すると、
+            // 1. Save 2. State=Gameplay 3. ReloadStoryScene
+            // となっている。ReloadStorySceneは LoadStory(current, false) を呼んでいる。
+            // これを true に変える必要がある。
+            // あるいは ResetStoryProgress 内ではロードせず、パラメータセットだけ行うのが責務。
+            // GameOverManager が ReloadData() -> ResetStoryProgress() を呼んでいる。
+            // その後 OnRetryGame() が呼ばれるわけではなく、ボタン押下で OnRetryGame() が呼ばれる。
+            // GameOverManager.OnGameOver() -> ReloadData() -> ResetStoryProgress()
+            // つまりゲームオーバーになった時点で「次はここから」という状態にセットしておくのが正しい。
+
+            // 実際のロードは GameOverManager.OnRetryGame() -> ReloadStoryScene() で行われる。
         }
 
         public void ReloadStoryScene()
         {
-            LoadStory(_currentStoryIndex, false);
+            // リトライ扱いなので useRetryPoint = true でロードする
+            LoadStory(_currentStoryIndex, true);
         }
 
         public void StartStory()

@@ -48,6 +48,16 @@ namespace AnoGame.Application.Data
         [Tooltip("List of Items associated with this story. These items will be removed when the story is restarted.")]
         public List<AnoGame.Data.ItemData> associatedItems = new List<AnoGame.Data.ItemData>();
 
+        [Header("Retry Settings")]
+        [Tooltip("The chapter index to restart from upon retry.")]
+        public int retryChapterIndex = 0;
+
+        [Tooltip("The position to spawn the player at upon retry.")]
+        public Vector3 retryPosition;
+
+        [Tooltip("The rotation (euler angles) to spawn the player with upon retry.")]
+        public Vector3 retryRotationEuler;
+
         [HideInInspector] public int currentStoryIndex = 0;
         [HideInInspector] public int currentChapterIndex = 0;
         [HideInInspector] public int currentSceneIndex = 0;
@@ -89,6 +99,12 @@ namespace AnoGame.Application.Data
             EditorGUILayout.PropertyField(serializedObject.FindProperty("chapters"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("associatedEvents"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("associatedItems"), true);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Retry Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("retryChapterIndex"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("retryPosition"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("retryRotationEuler"));
 
             if (GUILayout.Button("Update Scene Paths"))
             {
