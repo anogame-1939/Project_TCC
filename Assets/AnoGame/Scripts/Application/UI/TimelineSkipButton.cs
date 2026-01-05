@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using AnoGame.Application.Event;
 using VContainer;
 using AnoGame.Application.Input;
-using UnityEngine.InputSystem;
 
 namespace AnoGame.Application.UI
 {
@@ -16,6 +15,7 @@ namespace AnoGame.Application.UI
         [SerializeField] private float _fadeDuration = 0.5f;
         [SerializeField] private float _cooldown = 1.0f;
         [SerializeField] private float _longPressDuration = 1.0f;
+        [SerializeField] private Image _skipProgressImage;
 
         private CanvasGroup _canvasGroup;
         private CompositeDisposable _disposables = new CompositeDisposable();
@@ -68,16 +68,40 @@ namespace AnoGame.Application.UI
 
                 if (confirmAction != null)
                 {
+                    float currentPressTime = 0f;
+                    bool hasSkipped = false;
+
                     Observable.EveryUpdate()
-                        .Select(_ => confirmAction.IsPressed())
-                        .DistinctUntilChanged()
-                        .Select(isPressed => isPressed
-                            ? Observable.Timer(System.TimeSpan.FromSeconds(_longPressDuration), Scheduler.MainThreadIgnoreTimeScale)
-                            : Observable.Empty<long>())
-                        .Switch()
                         .Subscribe(_ =>
                         {
-                            TimelineQueueManager.Instance.SkipCurrentSequence();
+                            bool isPressed = confirmAction.IsPressed();
+
+                            if (isPressed && !hasSkipped)
+                            {
+                                currentPressTime += Time.unscaledDeltaTime;
+                                if (_skipProgressImage != null)
+                                {
+                                    _skipProgressImage.fillAmount = Mathf.Clamp01(currentPressTime / _longPressDuration);
+                                }
+
+                                if (currentPressTime >= _longPressDuration)
+                                {
+                                    TimelineQueueManager.Instance.SkipCurrentSequence();
+                                    hasSkipped = true;
+                                    // スキップ確定後は見た目をリセットしておく（あるいは次回表示まで維持でも良いが、ここではリセット）
+                                    if (_skipProgressImage != null) _skipProgressImage.fillAmount = 0f;
+                                }
+                            }
+                            else
+                            {
+                                // 離した、あるいはスキップ完了後
+                                if (!isPressed)
+                                {
+                                    currentPressTime = 0f;
+                                    hasSkipped = false;
+                                    if (_skipProgressImage != null) _skipProgressImage.fillAmount = 0f;
+                                }
+                            }
                         })
                         .AddTo(_disposables);
                 }
