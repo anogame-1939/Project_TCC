@@ -44,6 +44,25 @@ namespace AnoGame.Application.Gimmicks
                 spotOnIntensity = spotLight.intensity;
             }
 
+            // VLBの初期Multiplierを保持しておく（点滅計算用）
+            // "standardBlend" (通常0.6) の状態でInspector設定値に見えるように補正する
+            // つまり、Inspector値 = Max * 0.6  => Max = Inspector値 / 0.6
+            if (vlb != null)
+            {
+                float currentMult = 1.0f;
+                if (vlb is VLB.VolumetricLightBeamSD sd) currentMult = sd.intensityMultiplier;
+                else if (vlb is VLB.VolumetricLightBeamHD hd) currentMult = hd.intensityMultiplier;
+
+                if (standardBlend > 0.001f)
+                {
+                    _vlbMaxMultiplier = currentMult / standardBlend;
+                }
+                else
+                {
+                    _vlbMaxMultiplier = currentMult;
+                }
+            }
+
             ApplyVisual();
         }
 
@@ -92,18 +111,23 @@ namespace AnoGame.Application.Gimmicks
 
         [Header("VLB Integration")]
         [SerializeField] private VLB.VolumetricLightBeamAbstractBase vlb;
+        private float _vlbMaxMultiplier = 1.0f;
 
         private void UpdateVLB()
         {
             if (vlb == null) return;
 
+            float newMult = _vlbMaxMultiplier * _currentBlend;
+
             // SD/HD specific update call
             if (vlb is VLB.VolumetricLightBeamSD sd)
             {
+                sd.intensityMultiplier = newMult;
                 sd.UpdateAfterManualPropertyChange();
             }
             else if (vlb is VLB.VolumetricLightBeamHD hd)
             {
+                hd.intensityMultiplier = newMult;
                 hd.UpdateAfterManualPropertyChange();
             }
         }
