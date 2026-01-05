@@ -3,6 +3,9 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using AnoGame.Application.Event;
+using VContainer;
+using AnoGame.Application.Input;
+using UnityEngine.InputSystem;
 
 namespace AnoGame.Application.UI
 {
@@ -12,9 +15,13 @@ namespace AnoGame.Application.UI
         [SerializeField] private Button _button;
         [SerializeField] private float _fadeDuration = 0.5f;
         [SerializeField] private float _cooldown = 1.0f;
+        [SerializeField] private float _longPressDuration = 1.0f;
 
         private CanvasGroup _canvasGroup;
         private CompositeDisposable _disposables = new CompositeDisposable();
+
+        [Inject]
+        private IInputActionProvider _inputProvider;
 
         private void Awake()
         {
@@ -51,6 +58,29 @@ namespace AnoGame.Application.UI
                         TimelineQueueManager.Instance.SkipCurrentSequence();
                     })
                     .AddTo(_disposables);
+            }
+
+            // Confirm長押しによるスキップ
+            if (_inputProvider != null)
+            {
+                var uiMap = _inputProvider.GetUIActionMap();
+                var confirmAction = uiMap?.FindAction("Confirm");
+
+                if (confirmAction != null)
+                {
+                    Observable.EveryUpdate()
+                        .Select(_ => confirmAction.IsPressed())
+                        .DistinctUntilChanged()
+                        .Select(isPressed => isPressed
+                            ? Observable.Timer(System.TimeSpan.FromSeconds(_longPressDuration), Scheduler.MainThreadIgnoreTimeScale)
+                            : Observable.Empty<long>())
+                        .Switch()
+                        .Subscribe(_ =>
+                        {
+                            TimelineQueueManager.Instance.SkipCurrentSequence();
+                        })
+                        .AddTo(_disposables);
+                }
             }
         }
 
