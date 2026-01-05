@@ -44,26 +44,31 @@ namespace AnoGame.Application.Gimmicks
                 spotOnIntensity = spotLight.intensity;
             }
 
-            // VLB Initialization
-            // HD: intensityMultiplier < 0 means "Manual Mode (Don't sync with Light)". We must respect this.
-            if (vlb is VLB.VolumetricLightBeamSD sd)
+            if (vlb != null)
             {
-                _isVlbSyncMode = sd.intensityFromLight;
-                if (_isVlbSyncMode) _vlbBaseMultiplier = sd.intensityMultiplier;
-                else _vlbBaseIntensity = sd.intensityGlobal;
-            }
-            else if (vlb is VLB.VolumetricLightBeamHD hd)
-            {
-                _isVlbSyncMode = hd.intensityMultiplier >= 0f;
-                if (_isVlbSyncMode)
+                _dustParticles = vlb.GetComponent<VLB.VolumetricDustParticles>();
+
+                // VLB Initialization
+                // HD: intensityMultiplier < 0 means "Manual Mode (Don't sync with Light)". We must respect this.
+                if (vlb is VLB.VolumetricLightBeamSD sd)
                 {
-                    _vlbBaseMultiplier = hd.intensityMultiplier;
+                    _isVlbSyncMode = sd.intensityFromLight;
+                    if (_isVlbSyncMode) _vlbBaseMultiplier = sd.intensityMultiplier;
+                    else _vlbBaseIntensity = sd.intensityGlobal;
                 }
-                else
+                else if (vlb is VLB.VolumetricLightBeamHD hd)
                 {
-                    // Manual Mode (Stored as negative multiplier in HD)
-                    _vlbBaseMultiplier = hd.intensityMultiplier; // Keep the negative value as config
-                    _vlbBaseIntensity = hd.intensity;
+                    _isVlbSyncMode = hd.intensityMultiplier >= 0f;
+                    if (_isVlbSyncMode)
+                    {
+                        _vlbBaseMultiplier = hd.intensityMultiplier;
+                    }
+                    else
+                    {
+                        // Manual Mode (Stored as negative multiplier in HD)
+                        _vlbBaseMultiplier = hd.intensityMultiplier; // Keep the negative value as config
+                        _vlbBaseIntensity = hd.intensity;
+                    }
                 }
             }
 
@@ -119,10 +124,16 @@ namespace AnoGame.Application.Gimmicks
         private bool _isVlbSyncMode = true;
         private float _vlbBaseIntensity = 1.0f;
         private float _vlbBaseMultiplier = 1.0f;
+        private VLB.VolumetricDustParticles _dustParticles;
 
         private void UpdateVLB()
         {
             if (vlb == null) return;
+
+            if (_dustParticles != null)
+            {
+                _dustParticles.alphaAdditionalRuntime = _currentBlend;
+            }
 
             if (_isVlbSyncMode)
             {
