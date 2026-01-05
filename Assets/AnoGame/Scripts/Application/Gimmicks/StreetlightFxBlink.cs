@@ -37,6 +37,13 @@ namespace AnoGame.Application.Gimmicks
         private void Awake()
         {
             if (_mpb == null) _mpb = new MaterialPropertyBlock();
+
+            // Lightコンポーネントの設定値をON時の強度として採用する
+            if (spotLight != null)
+            {
+                spotOnIntensity = spotLight.intensity;
+            }
+
             ApplyVisual();
         }
 
