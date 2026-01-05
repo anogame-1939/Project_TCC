@@ -45,22 +45,10 @@ namespace AnoGame.Application.Gimmicks
             }
 
             // VLBの初期Multiplierを保持しておく（点滅計算用）
-            // "standardBlend" (通常0.6) の状態でInspector設定値に見えるように補正する
-            // つまり、Inspector値 = Max * 0.6  => Max = Inspector値 / 0.6
+            // 初期値を1.0に固定し、tの値をそのままMultiplierとして適用するシンプルスタイル
             if (vlb != null)
             {
-                float currentMult = 1.0f;
-                if (vlb is VLB.VolumetricLightBeamSD sd) currentMult = sd.intensityMultiplier;
-                else if (vlb is VLB.VolumetricLightBeamHD hd) currentMult = hd.intensityMultiplier;
-
-                if (standardBlend > 0.001f)
-                {
-                    _vlbMaxMultiplier = currentMult / standardBlend;
-                }
-                else
-                {
-                    _vlbMaxMultiplier = currentMult;
-                }
+                _vlbMaxMultiplier = 1.0f;
             }
 
             ApplyVisual();

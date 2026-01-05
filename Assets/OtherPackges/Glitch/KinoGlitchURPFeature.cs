@@ -38,6 +38,11 @@ namespace Kino
             public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
             {
                 var desc = renderingData.cameraData.cameraTargetDescriptor;
+
+                // Fix: Skip if the camera doesn't have a valid color buffer (e.g. Depth-only cameras from VLB)
+                if (desc.graphicsFormat == UnityEngine.Experimental.Rendering.GraphicsFormat.None)
+                    return;
+
                 desc.depthBufferBits = 0;
                 RenderingUtils.ReAllocateIfNeeded(
                     ref _tmp, in desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: $"{_tag}_Tmp"
