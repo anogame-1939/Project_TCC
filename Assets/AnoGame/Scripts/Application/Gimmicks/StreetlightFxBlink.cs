@@ -44,11 +44,27 @@ namespace AnoGame.Application.Gimmicks
                 spotOnIntensity = spotLight.intensity;
             }
 
-            // VLBの初期Multiplierを保持しておく（点滅計算用）
-            // 初期値を1.0に固定し、tの値をそのままMultiplierとして適用するシンプルスタイル
-            if (vlb != null)
+            // VLB Initialization
+            // HD: intensityMultiplier < 0 means "Manual Mode (Don't sync with Light)". We must respect this.
+            if (vlb is VLB.VolumetricLightBeamSD sd)
             {
-                _vlbMaxMultiplier = 1.0f;
+                _isVlbSyncMode = sd.intensityFromLight;
+                if (_isVlbSyncMode) _vlbBaseMultiplier = sd.intensityMultiplier;
+                else _vlbBaseIntensity = sd.intensityGlobal;
+            }
+            else if (vlb is VLB.VolumetricLightBeamHD hd)
+            {
+                _isVlbSyncMode = hd.intensityMultiplier >= 0f;
+                if (_isVlbSyncMode)
+                {
+                    _vlbBaseMultiplier = hd.intensityMultiplier;
+                }
+                else
+                {
+                    // Manual Mode (Stored as negative multiplier in HD)
+                    _vlbBaseMultiplier = hd.intensityMultiplier; // Keep the negative value as config
+                    _vlbBaseIntensity = hd.intensity;
+                }
             }
 
             ApplyVisual();
@@ -99,24 +115,48 @@ namespace AnoGame.Application.Gimmicks
 
         [Header("VLB Integration")]
         [SerializeField] private VLB.VolumetricLightBeamAbstractBase vlb;
-        private float _vlbMaxMultiplier = 1.0f;
+
+        private bool _isVlbSyncMode = true;
+        private float _vlbBaseIntensity = 1.0f;
+        private float _vlbBaseMultiplier = 1.0f;
 
         private void UpdateVLB()
         {
             if (vlb == null) return;
 
-            float newMult = _vlbMaxMultiplier * _currentBlend;
+            if (_isVlbSyncMode)
+            {
+                // Sync Mode: Modulate Multiplier
+                // Intensity is controlled by Light * Multiplier
+                float newMult = _vlbBaseMultiplier * _currentBlend;
 
-            // SD/HD specific update call
-            if (vlb is VLB.VolumetricLightBeamSD sd)
-            {
-                sd.intensityMultiplier = newMult;
-                sd.UpdateAfterManualPropertyChange();
+                if (vlb is VLB.VolumetricLightBeamSD sd)
+                {
+                    sd.intensityMultiplier = newMult;
+                    sd.UpdateAfterManualPropertyChange();
+                }
+                else if (vlb is VLB.VolumetricLightBeamHD hd)
+                {
+                    hd.intensityMultiplier = newMult;
+                    hd.UpdateAfterManualPropertyChange();
+                }
             }
-            else if (vlb is VLB.VolumetricLightBeamHD hd)
+            else
             {
-                hd.intensityMultiplier = newMult;
-                hd.UpdateAfterManualPropertyChange();
+                // Manual Mode: Modulate Intensity directly
+                // Multiplier should not be touched (or kept negative for HD) to avoid re-enabling Sync
+                float newIntensity = _vlbBaseIntensity * _currentBlend;
+
+                if (vlb is VLB.VolumetricLightBeamSD sd)
+                {
+                    sd.intensityGlobal = newIntensity;
+                    sd.UpdateAfterManualPropertyChange();
+                }
+                else if (vlb is VLB.VolumetricLightBeamHD hd)
+                {
+                    hd.intensity = newIntensity;
+                    hd.UpdateAfterManualPropertyChange();
+                }
             }
         }
 
