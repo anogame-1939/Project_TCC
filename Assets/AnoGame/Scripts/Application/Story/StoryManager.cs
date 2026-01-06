@@ -256,9 +256,8 @@ namespace AnoGame.Application.Story
         public async void LoadStory(int storyIndex, bool useRetryPoint = false)
         {
             _currentStoryIndex = storyIndex;
-            _currentChapterIndex = 0;
-
             StoryData storyData = _storyDataList[_currentStoryIndex];
+            _currentChapterIndex = storyData.retryChapterIndex;
             if (_mainMapScene != storyData.mainMapScene)
             {
                 SceneReference tmpMainScene;
