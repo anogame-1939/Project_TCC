@@ -68803,22 +68803,9 @@ MonoBehaviour:
           m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1260031604}
-          m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
-            AnoGame.Application
-          m_MethodName: EndEvent
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 1883453680}
-          m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-          m_MethodName: StartEvent
+        - m_Target: {fileID: 259663634}
+          m_TargetAssemblyTypeName: AnoGame.Application.Event.SaveHandler, AnoGame.Application
+          m_MethodName: Save
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -109769,7 +109756,6 @@ GameObject:
   - component: {fileID: 1883453677}
   - component: {fileID: 1883453676}
   - component: {fileID: 1883453680}
-  - component: {fileID: 1883453684}
   - component: {fileID: 1883453685}
   - component: {fileID: 1883453686}
   m_Layer: 0
@@ -109953,6 +109939,8 @@ PlayableDirector:
     value: {fileID: 297600888}
   - key: {fileID: -8511189238028845931, guid: aa4d53e149f08ef458312ae8f9e3d375, type: 2}
     value: {fileID: 1883453685}
+  - key: {fileID: -9173031192973264443, guid: aa4d53e149f08ef458312ae8f9e3d375, type: 2}
+    value: {fileID: 888296213}
   m_ExposedReferences:
     m_References:
     - f7bd4c33997568943840325fb7edab6e: {fileID: 2127495733}
@@ -110077,18 +110065,6 @@ Transform:
   - {fileID: 1349730448}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1883453684
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1883453675}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a0de4cb1d084e458a791bc6f7097fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1883453685
 MonoBehaviour:
   m_ObjectHideFlags: 0
