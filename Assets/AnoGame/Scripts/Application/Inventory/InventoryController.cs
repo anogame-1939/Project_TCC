@@ -8,6 +8,8 @@ using AnoGame.Application.Event;
 using AnoGame.Domain.Inventory.Services;
 using PixelCrushers.DialogueSystem;
 using UnityEngine.Events;
+using Localizer;
+using Cysharp.Threading.Tasks;
 
 namespace AnoGame.Application.Inventory
 {
@@ -222,12 +224,8 @@ namespace AnoGame.Application.Inventory
             }
         }
 
-        private void OpenConsumeConfirm(InventorySlot slot)
+        private async void OpenConsumeConfirm(InventorySlot slot)
         {
-            var displayName = string.IsNullOrEmpty(slot.LocalizedName)
-                ? slot.CurrentItem.ItemName
-                : slot.LocalizedName;
-
             _isModalOpen = true; // モーダル運用の場合
 
             // 下層UIを無効化（入力もレイキャストも通さない）
@@ -240,8 +238,40 @@ namespace AnoGame.Application.Inventory
             // 現在の選択を保存（キャンセル時に復帰する）
             _lastSelectedGO = EventSystem.current?.currentSelectedGameObject;
 
+            string titleText;
+            try
+            {
+                // 1. フォーマット文字列を取得
+                // キー例: "Inventory.ConfirmUse" -> "{0} を使用しますか？"
+                var manager = LocalizationManager.GetInstance();
+                var formatStr = await manager.GetLocalizedText("Inventory.ConfirmUse");
+
+                // 2. 表示名を決定（ローカライズ名があればそれを、なければアイテム名を）
+                var displayName = string.IsNullOrEmpty(slot.LocalizedName)
+                    ? slot.CurrentItem.ItemName
+                    : slot.LocalizedName;
+
+                // 3. C#の標準機能で置換 ({0} の部分に displayName が入る)
+                // FormattedText.Parseを通すのは、太字(<b>)などのタグが含まれる場合に有効
+                titleText = string.Format(formatStr, displayName);
+
+                // もしフォーマット文字列自体に [em1] などのDialogue System用タグが含まれる場合は
+                // string.Formatした後に Parse します
+                titleText = FormattedText.Parse(titleText).text;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[InventoryController] Localization failed: {e.Message}");
+
+                // フォールバック
+                var displayName = string.IsNullOrEmpty(slot.LocalizedName)
+                    ? slot.CurrentItem.ItemName
+                    : slot.LocalizedName;
+                titleText = $"{displayName} を使用しますか？";
+            }
+
             _confirmDialog.Show(
-                title: $"{displayName} を使用しますか？",
+                title: titleText,
                 onYes: () =>
                 {
                     var nextSel = ComputeNextSelectable(slot);
