@@ -76,6 +76,12 @@ namespace AnoGame.Application.Player.Interaction
         [SerializeField] private Color exitColor = new(1f, 0.9f, 0.2f, 1f);   // 黄
         [SerializeField] private Color invalidColor = new(1f, 0.3f, 0.3f, 0.8f); // 赤
 
+        [Header("Visual")]
+        [SerializeField] private Color playerHideColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+        [SerializeField] private float fadeDuration = 0.25f;
+
+        private Color? _originalColor; // 元の色を保持
+
         // ===== 入口：オプション提示 =====
         public override bool TryBuildOptions(Transform actor, System.Collections.Generic.List<InteractionOption> buffer)
         {
@@ -170,6 +176,9 @@ namespace AnoGame.Application.Player.Interaction
             // 念のためロック解除（他の演出で既にOFFにしていれば無害）
             var el = FindEventLock(actor);
             if (el != null) el.EndLock();
+
+            // 色を戻す（念のため）
+            RestoreColorInstant(actor);
         }
 
         public bool StillValidFor(Transform actor)
@@ -226,6 +235,9 @@ namespace AnoGame.Application.Player.Interaction
             el.Freeze();
             // el.LookKeep();
 
+            // 色変更フェードアウト
+            await FadeColorAsync(actor, playerHideColor, fadeDuration, ct);
+
             OnEnterHidden?.Invoke();
             MessageBroker.Default.Publish(new HideBegan(actor, this));
 
@@ -239,6 +251,12 @@ namespace AnoGame.Application.Player.Interaction
 
             OnExitHidden?.Invoke();
 
+            // 色復帰フェードイン（移動開始と同時に行うか、完了してからか…ここでは並列で良さそうだが、移動中に戻るのが自然）
+            // 移動と並列にフェードしたいので、Forgetせずにawaitしない...いや、
+            // MoveToPointしてる間にフェードしたい。
+            // 簡易的に、移動開始前にフェード開始して、移動メソッドを呼ぶ。
+            var fadeTask = RestoreColorAsync(actor, fadeDuration, ct);
+
             Debug.Log("退出開始");
             // 出口指定があればそこへ
             if (exitPoint != null)
@@ -250,6 +268,9 @@ namespace AnoGame.Application.Player.Interaction
                 await WaitArriveAsync(actor, exitPoint.position, ct);
             }
             Debug.Log("退出完了");
+
+            // フェード完了待ち（もし移動より長ければ）
+            await fadeTask;
 
             // ロック解除して完了
             el.EndLock();
@@ -305,6 +326,9 @@ namespace AnoGame.Application.Player.Interaction
             // 状況に応じて少しだけ戻す/微演出を入れる場合はここに
             // ここでは即解除のみ
             if (el != null) el.EndLock();
+
+            // 色を即戻す
+            RestoreColorInstant(actor);
 
             MessageBroker.Default.Publish(new HideCanceled(actor, this));
             await UniTask.Yield(PlayerLoopTiming.Update, ct);
@@ -435,6 +459,115 @@ namespace AnoGame.Application.Player.Interaction
                 p.y = 0f; dest.y = 0f;
                 if ((p - dest).sqrMagnitude <= sq) break;
                 await UniTask.Yield(PlayerLoopTiming.Update, ct);
+            }
+        }
+
+        // ===== 内部：SpriteRenderer Helper & Fading =====
+
+        private SpriteRenderer RequireSpriteRenderer(Transform actor)
+        {
+            if (actor == null) return null;
+
+            // 1. 自身
+            var sr = actor.GetComponent<SpriteRenderer>();
+            if (sr != null) return sr;
+
+            // 2. 自身以下の子供 (Inactive含む)
+            sr = actor.GetComponentInChildren<SpriteRenderer>(true);
+            if (sr != null) return sr;
+
+            // 3. 親方向 (EventLockControlがあるルート) からの全体検索
+            var el = FindEventLock(actor);
+            if (el != null)
+            {
+                // ルートから検索 (Inactive含む)
+                sr = el.transform.GetComponentInChildren<SpriteRenderer>(true);
+            }
+
+            return sr;
+        }
+
+        private async UniTask FadeColorAsync(Transform actor, Color targetColor, float duration, CancellationToken ct)
+        {
+            var sr = RequireSpriteRenderer(actor);
+            if (sr == null) return;
+
+            // 初回なら元の色を保存
+            if (!_originalColor.HasValue)
+            {
+                // Materialの色を取得 (_Colorプロパティを想定)
+                if (sr.material.HasProperty("_Color"))
+                {
+                    _originalColor = sr.material.color;
+                }
+                else
+                {
+                    _originalColor = Color.white;
+                }
+            }
+
+            var startColor = sr.material.HasProperty("_Color") ? sr.material.color : Color.white;
+            float elapsed = 0f;
+
+            while (elapsed < duration && !ct.IsCancellationRequested)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                if (sr.material.HasProperty("_Color"))
+                {
+                    sr.material.color = Color.Lerp(startColor, targetColor, t);
+                }
+                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+            }
+            if (!ct.IsCancellationRequested)
+            {
+                if (sr.material.HasProperty("_Color"))
+                {
+                    sr.material.color = targetColor;
+                }
+            }
+        }
+
+        private async UniTask RestoreColorAsync(Transform actor, float duration, CancellationToken ct)
+        {
+            var sr = RequireSpriteRenderer(actor);
+            if (sr == null) return;
+
+            var target = _originalColor ?? Color.white;
+            var startColor = sr.material.HasProperty("_Color") ? sr.material.color : Color.white;
+
+            float elapsed = 0f;
+
+            while (elapsed < duration && !ct.IsCancellationRequested)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                if (sr.material.HasProperty("_Color"))
+                {
+                    sr.material.color = Color.Lerp(startColor, target, t);
+                }
+                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+            }
+            if (!ct.IsCancellationRequested)
+            {
+                if (sr.material.HasProperty("_Color"))
+                {
+                    sr.material.color = target;
+                }
+            }
+        }
+
+        private void RestoreColorInstant(Transform actor)
+        {
+            var sr = RequireSpriteRenderer(actor);
+            if (sr == null) return;
+
+            if (_originalColor.HasValue)
+            {
+                if (sr.material.HasProperty("_Color"))
+                {
+                    sr.material.color = _originalColor.Value;
+                }
             }
         }
 

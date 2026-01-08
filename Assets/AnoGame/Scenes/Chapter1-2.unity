@@ -1700,6 +1700,8 @@ MonoBehaviour:
   hideColor: {r: 0.2, g: 1, b: 0.2, a: 1}
   exitColor: {r: 1, g: 0.9, b: 0.2, a: 1}
   invalidColor: {r: 1, g: 0.3, b: 0.3, a: 0.8}
+  playerHideColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  fadeDuration: 0.25
   forceDetectionRadius: 5
   OnSpotEnabled:
     m_PersistentCalls:
@@ -58327,7 +58329,7 @@ Transform:
   m_GameObject: {fileID: 836331189}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.024, y: 0, z: -0}
+  m_LocalPosition: {x: -0.04, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -105426,7 +105428,7 @@ Transform:
   m_GameObject: {fileID: 1659388583}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.024, y: 0, z: -2.685}
+  m_LocalPosition: {x: -0.04, y: 0, z: -2.685}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -129769,6 +129771,14 @@ PrefabInstance:
       propertyPath: OnSpotEnabled.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 2316190991455554519, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.008
+      objectReference: {fileID: 0}
+    - target: {fileID: 2316190991455554519, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.832
+      objectReference: {fileID: 0}
     - target: {fileID: 2552597974876698892, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: m_InitialState
       value: 0
@@ -129816,6 +129826,14 @@ PrefabInstance:
     - target: {fileID: 4263736836447316000, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: conversation
       value: "\u3048\uFF1F"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5280593636663635586, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.008
+      objectReference: {fileID: 0}
+    - target: {fileID: 5280593636663635586, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.31
       objectReference: {fileID: 0}
     - target: {fileID: 6150375083527586948, guid: 281222793ef96e842b46e88f58c9820d, type: 3}
       propertyPath: onEventDone.m_PersistentCalls.m_Calls.Array.data[0].m_Target
