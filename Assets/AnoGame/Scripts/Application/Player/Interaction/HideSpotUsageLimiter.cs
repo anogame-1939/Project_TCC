@@ -80,6 +80,11 @@ namespace AnoGame.Application.Player.Interaction
             _remainingUsage = _currentMaxUsage;
             StopRecovery(); // Reset recovery state
 
+            if (!_isLocked)
+            {
+                _hideSpot.SetInteractable(true);
+            }
+
             Debug.Log($"[HideSpotUsageLimiter] Limit Set: {_currentMaxUsage} (Remaining: {_remainingUsage})");
         }
 
@@ -96,6 +101,11 @@ namespace AnoGame.Application.Player.Interaction
             // まず消費する
             _remainingUsage--;
             Debug.Log($"[HideSpotUsageLimiter] Used! Remaining: {_remainingUsage}/{_currentMaxUsage}");
+
+            if (_remainingUsage == 0)
+            {
+                _hideSpot.SetInteractable(false);
+            }
 
             // 0未満になったらペナルティ（つまり残り0の状態で入ったらアウト）
             if (_remainingUsage < 0)
@@ -144,6 +154,11 @@ namespace AnoGame.Application.Player.Interaction
 
                 _remainingUsage++;
                 Debug.Log($"[HideSpotUsageLimiter] Recovered! Remaining: {_remainingUsage}/{_currentMaxUsage}");
+
+                if (!_isLocked)
+                {
+                    _hideSpot.SetInteractable(true);
+                }
             }
         }
 
