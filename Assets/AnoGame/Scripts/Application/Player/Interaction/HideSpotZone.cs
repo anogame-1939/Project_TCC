@@ -88,6 +88,9 @@ namespace AnoGame.Application.Player.Interaction
             // 処理中は一切のインタラクションを受け付けない
             if (_isBusy) return false;
 
+            // [NEW] UsageLimiterによってロックされている場合
+            if (_forceLocked) return false;
+
             // 既に自分が隠れているなら「出る」を提示
             if (_occupant == actor)
             {
@@ -102,9 +105,6 @@ namespace AnoGame.Application.Player.Interaction
                 });
                 return true;
             }
-
-            // [NEW] UsageLimiterによってロックされている場合
-            if (_forceLocked) return false;
 
             if (!InDistance(actor) || !InAngle(actor) || !HasLoS(actor)) return false;
 
