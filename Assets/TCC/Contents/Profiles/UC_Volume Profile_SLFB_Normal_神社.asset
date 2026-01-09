@@ -46,6 +46,46 @@ MonoBehaviour:
   bladeRotation:
     m_OverrideState: 0
     m_Value: 22
+--- !u!114 &-5078455675022708410
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
+  m_Name: Tonemapping
+  m_EditorClassIdentifier: 
+  active: 1
+  mode:
+    m_OverrideState: 1
+    m_Value: 1
+  neutralHDRRangeReductionMode:
+    m_OverrideState: 0
+    m_Value: 2
+  acesPreset:
+    m_OverrideState: 1
+    m_Value: 3
+  hueShiftAmount:
+    m_OverrideState: 1
+    m_Value: 0
+  detectPaperWhite:
+    m_OverrideState: 1
+    m_Value: 0
+  paperWhite:
+    m_OverrideState: 1
+    m_Value: 300
+  detectBrightnessLimits:
+    m_OverrideState: 1
+    m_Value: 1
+  minNits:
+    m_OverrideState: 1
+    m_Value: 0.005
+  maxNits:
+    m_OverrideState: 1
+    m_Value: 1000
 --- !u!114 &-3566536066529014778
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -80,19 +120,19 @@ MonoBehaviour:
     m_Value: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.51
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 1.84
   scatter:
     m_OverrideState: 1
-    m_Value: 0.43000004
+    m_Value: 0.766
   clamp:
     m_OverrideState: 0
     m_Value: 65472
   tint:
-    m_OverrideState: 0
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 0.5476825, b: 0, a: 1}
   highQualityFiltering:
     m_OverrideState: 0
     m_Value: 1
@@ -104,11 +144,11 @@ MonoBehaviour:
     m_Value: 6
   dirtTexture:
     m_OverrideState: 1
-    m_Value: {fileID: 2800000, guid: fa8db8449607a894784ca47e396902ad, type: 3}
+    m_Value: {fileID: 2800000, guid: cda7d01dc7fcaac4ba086767186641fb, type: 3}
     dimension: 1
   dirtIntensity:
     m_OverrideState: 1
-    m_Value: 4.89
+    m_Value: 0.77
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,7 +159,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
-  m_Name: UC_Volume Profile_SLFB_Normal 1
+  m_Name: "UC_Volume Profile_SLFB_Normal_\u795E\u793E"
   m_EditorClassIdentifier: 
   components:
   - {fileID: -2733815684657015075}
@@ -127,6 +167,7 @@ MonoBehaviour:
   - {fileID: -7656384037199214833}
   - {fileID: -3566536066529014778}
   - {fileID: 8031475747409668794}
+  - {fileID: -5078455675022708410}
 --- !u!114 &920536019767173300
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -167,7 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9392aacf3349be549bb1fd9eece49154, type: 3}
   m_Name: ButoVolumetricFog
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 1
@@ -181,10 +222,10 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 160
   maxDistanceVolumetric:
-    m_OverrideState: 0
-    m_Value: 64
-  depthRatio:
     m_OverrideState: 1
+    m_Value: 100.67
+  depthRatio:
+    m_OverrideState: 0
     m_Value: 2
   temporalAALighting:
     m_OverrideState: 0
@@ -194,18 +235,18 @@ MonoBehaviour:
     m_Value: 0.05
   fogDensity:
     m_OverrideState: 1
-    m_Value: 0.85
+    m_Value: 1.11
   anisotropy:
     m_OverrideState: 0
     m_Value: 0.2
   lightIntensity:
     m_OverrideState: 0
-    m_Value: 1
+    m_Value: 0
   densityInLight:
-    m_OverrideState: 0
-    m_Value: 1
+    m_OverrideState: 1
+    m_Value: 1.1
   densityInShadow:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   overrideDefaultMaxLightDistance:
     m_OverrideState: 0
@@ -221,13 +262,13 @@ MonoBehaviour:
     m_Value: 10
   litColor:
     m_OverrideState: 1
-    m_Value: {r: 0.014373059, g: 0, b: 0.5471698, a: 1}
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   shadowedColor:
-    m_OverrideState: 1
-    m_Value: {r: 1, g: 0, b: 0, a: 1}
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   emitColor:
     m_OverrideState: 0
-    m_Value: {r: 0, g: 0.0036665804, b: 0.21698111, a: 1}
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   colorRamp:
     m_OverrideState: 0
     m_Value: {fileID: 0}
@@ -236,13 +277,13 @@ MonoBehaviour:
     m_Value: 0
   colorInfluence:
     m_OverrideState: 1
-    m_Value: 0.318
+    m_Value: 1
   directionalForward:
-    m_OverrideState: 1
-    m_Value: {r: 0.71945995, g: 0.8962264, b: 0, a: 1}
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   directionalBack:
-    m_OverrideState: 1
-    m_Value: {r: 0.19862282, g: 0, b: 0.5566038, a: 1}
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   directionalRatio:
     m_OverrideState: 0
     m_Value: 1
@@ -259,13 +300,13 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0.3
   noiseTiling:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 30
   noiseWindSpeed:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {x: 0, y: -1, z: 0}
   noiseMap:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {x: 0, y: 1}
   volumeNoise:
     m_OverrideState: 1
@@ -273,7 +314,7 @@ MonoBehaviour:
       frequency: 8
       octaves: 4
       lacunarity: 2
-      gain: 1
+      gain: 0.35
       seed: 0
       noiseType: 2
       noiseQuality: 2
