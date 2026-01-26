@@ -8,6 +8,9 @@ namespace AnoGame.Application.Enemy
         [SerializeField]
         private GameObject enemyPrefab;
 
+        [SerializeField]
+        private Transform spawnPoint;
+
         private void Start()
         {
             if (StoryManager.Instance != null)
@@ -39,8 +42,17 @@ namespace AnoGame.Application.Enemy
         {
             if (enemyPrefab != null)
             {
+                var pos = transform.position;
+                var rot = transform.rotation;
+
+                if (spawnPoint != null)
+                {
+                    pos = spawnPoint.position;
+                    rot = spawnPoint.rotation;
+                }
+
                 // Instantiate(enemyPrefab, transform.position, transform.rotation);
-                EnemySpawnManager.Instance.Spawn(enemyPrefab, transform.position, transform.rotation);
+                EnemySpawnManager.Instance.Spawn(enemyPrefab, pos, rot);
             }
         }
     }
