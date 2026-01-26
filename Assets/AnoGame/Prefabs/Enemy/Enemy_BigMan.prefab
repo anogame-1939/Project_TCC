@@ -1234,12 +1234,9 @@ GameObject:
   - component: {fileID: 4183435016230059746}
   - component: {fileID: 8545826120565574306}
   - component: {fileID: 1190557266045678637}
-  - component: {fileID: -2493535432171837609}
   - component: {fileID: -1606773166993447004}
   - component: {fileID: -1196809923107977167}
   - component: {fileID: 8592750152928306430}
-  - component: {fileID: 2426867564058213924}
-  - component: {fileID: 3768759550073536308}
   - component: {fileID: -2593897798619900649}
   m_Layer: 14
   m_Name: Enemy_BigMan
@@ -1452,90 +1449,6 @@ MonoBehaviour:
   minLifespan: 5
   maxLifespan: 15
   _fadeOutDuration: 2
-  _particleFadeOutDuration: 1.5
-  fadeInEffect: {fileID: 5874258849720272165}
-  fadeoutEffect: {fileID: 7366397120637616486}
-  disappearEffect: {fileID: 4784807143462288663}
-  fadeInPlayThreshold: 0.2
-  fadeInStopThreshold: 0.8
-  fadeOutPlayThreshold: 0.221
-  fadeOutStopThreshold: 0.682
-  shadowObjects:
-  - {fileID: 1502214921408271829}
-  - {fileID: 3030159178595364516}
-  shadowToBig:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  shadowToSmall:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.7334313
-      value: 0.34540385
-      inSlope: 1.3544357
-      outSlope: 1.3544357
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  shadowScaleDuration: 2
---- !u!114 &-2493535432171837609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d1d94f36a1ed426da38aec7c1956c23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hitDetector: {fileID: 4183435016230059746}
-  lifespan: {fileID: 1190557266045678637}
-  _eventData: {fileID: 0}
 --- !u!114 &-1606773166993447004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1779,79 +1692,9 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   use2DFlip: 0
   spriteRenderer: {fileID: 3983856807045630392}
-  characterBrain: {fileID: 6182930195229746077}
   characterSettings: {fileID: 8237711469134898448}
   useAngleSnap: 1
   snapStep: 45
---- !u!114 &2426867564058213924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d021daeb50ad3c4581d6e25b0d55562, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterBrain: {fileID: 0}
-  moveControl: {fileID: 0}
-  playerTag: Player
-  speedThreshold: 0.1
-  animatorChildIndex: 0
-  animatorBoolParam: IsMove
-  locomotionSpeedParam: LocomotionSpeed
-  chaseAnimSpeedMult: 1
-  dashAnimSpeedMult: 1.6
-  isChasing: 0
-  isStoryMode: 0
-  motionSampleInterval: 0.1
-  velocityEmaHalfLife: 0.3
-  predictionLeadTime: 0.6
-  aheadMinDistance: 2
-  aheadMaxDistance: 3
-  minPredictableSpeed: 0.2
-  navmeshSnapRadius: 3
-  minSeparationFromPlayer: 3
-  enableFrontBackRandom: 1
-  frontSpawnProbability: 0.639
-  backDistanceScale: 1.1
-  lateralAngleJitterDeg: 8
-  lateralOffsetMax: 1
-  dashPattern: 0
-  enableDash: 1
-  dashPreWaitSeconds: 2.5
-  dashPostWaitSeconds: 0.1
-  dashCooldownMinSeconds: 5
-  dashCooldownMaxSeconds: 8
-  dashDistance: 15
-  dashSpeed: 16
-  dashFaceTarget: 1
-  homingSpeedMultiplier: 1.179
-  homingTurnSharpness: 2.04
-  zigzagSpeedMultiplier: 0.82
-  zigzagMaxAngleDeg: 45
-  zigzagFrequencyHz: 1.33
-  controlFacingWhileChasing: 1
-  chaseTurnSharpness: 8
---- !u!114 &3768759550073536308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7092537996067713669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2fbbabb79c9e614fa6806000ec01efe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  animator: {fileID: 7665162067455944546}
-  characterBrain: {fileID: 6182930195229746077}
-  cameraAngleController: {fileID: 8592750152928306430}
-  testTarget: {fileID: 0}
 --- !u!114 &-2593897798619900649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1864,7 +1707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a70f55eba6898a34189ad47f99776f19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  move: {fileID: 5085902700854131339}
+  agent: {fileID: 0}
   playerTag: Player
   boostedSpeed: 7
   revertSmoothing: 0
@@ -2197,11 +2040,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3398961789130681742, guid: 41f5b99baac3f5b4f88208db1e08d399, type: 3}
   m_PrefabInstance: {fileID: 2651179313729696350}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &7366397120637616486 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4823446104108970808, guid: 41f5b99baac3f5b4f88208db1e08d399, type: 3}
-  m_PrefabInstance: {fileID: 2651179313729696350}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2757046627190861282
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2267,11 +2105,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c8ca5aada3df164080dedc58f3734d7, type: 3}
---- !u!198 &4784807143462288663 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 7216442199481012469, guid: 9c8ca5aada3df164080dedc58f3734d7, type: 3}
-  m_PrefabInstance: {fileID: 2757046627190861282}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8124554572490453358 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6233764849461484684, guid: 9c8ca5aada3df164080dedc58f3734d7, type: 3}
@@ -2342,11 +2175,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: baf8c8574a911ef4084459b588131f70, type: 3}
---- !u!198 &5874258849720272165 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 7518351422999865798, guid: baf8c8574a911ef4084459b588131f70, type: 3}
-  m_PrefabInstance: {fileID: 4166677954043063523}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6745684874713592002 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7227854239005367329, guid: baf8c8574a911ef4084459b588131f70, type: 3}
