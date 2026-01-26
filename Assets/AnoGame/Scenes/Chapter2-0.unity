@@ -442,7 +442,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &114527884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2998,7 +2998,6 @@ GameObject:
   - component: {fileID: 499392702}
   - component: {fileID: 499392701}
   - component: {fileID: 499392700}
-  - component: {fileID: 499392699}
   - component: {fileID: 499392698}
   - component: {fileID: 499392697}
   m_Layer: 0
@@ -3033,63 +3032,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74b3c198ffc01748a918592f18194d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &499392699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 499392696}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Events:
-    m_Signals:
-    - {fileID: 11400000, guid: b1f3c4dbcb41f4a4abe8fb30dc1aee15, type: 2}
-    - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
-    m_Events:
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: AnoGame.Application.Direction.CanRoller, AnoGame.Application
-          m_MethodName: RollOnce
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
-          m_MethodName: StartChase
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: AnoGame.Application.Event.EventTriggerBase, AnoGame.Application
-          m_MethodName: StartEvent
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
 --- !u!114 &499392700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3193,7 +3135,7 @@ PlayableDirector:
   - key: {fileID: -5666620178435591413, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
     value: {fileID: 0}
   - key: {fileID: 6505799321644411476, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
-    value: {fileID: 499392699}
+    value: {fileID: 0}
   - key: {fileID: 2731971872814437139, guid: 5958945b90524f645b45096b2c23e61e, type: 2}
     value: {fileID: 711800054}
   - key: {fileID: 6260012825160726105, guid: aff22e9d0c0114ca1bedfbe242ab0a8c, type: 2}
@@ -4034,7 +3976,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &621707324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8795,7 +8737,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1209250938
 Transform:
   m_ObjectHideFlags: 0
@@ -13409,7 +13351,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1916187285
 MonoBehaviour:
   m_ObjectHideFlags: 0
