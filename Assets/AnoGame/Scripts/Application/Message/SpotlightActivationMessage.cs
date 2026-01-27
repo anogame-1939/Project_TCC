@@ -6,6 +6,7 @@ namespace AnoGame.Application.Message
     {
         public Vector3 Position;
         public float Radius;
+        [System.Obsolete("Duration is deprecated. Spotlights are now persistent until deactivated.")]
         public float Duration;
         public string LightId;
 

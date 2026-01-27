@@ -16,15 +16,21 @@ namespace AnoGame.Application.Player.Interaction
         public void PublishActivation()
         {
             var pos = useTransformAsPosition ? transform.position : targetPosition;
-            
+
             MessageBroker.Default.Publish(new SpotlightActivationMessage(
                 pos,
                 radius,
                 duration,
                 lightId
             ));
-            
+
             Debug.Log($"[SpotlightInteractTrigger] Published activation for ID: {lightId}");
+        }
+
+        public void PublishDeactivation()
+        {
+            MessageBroker.Default.Publish(new SpotlightDeactivationMessage(lightId));
+            Debug.Log($"[SpotlightInteractTrigger] Published deactivation for ID: {lightId}");
         }
 
         private void OnDrawGizmosSelected()
