@@ -147,16 +147,6 @@ namespace AnoGame.Application.Story
                 Debug.Log($"[EnemyMoveHandler] SetEnemyInputBlocked({blocked}) called.");
                 coordinator.SetInputBlocked(blocked);
             }
-
-            if (blocked)
-            {
-                ctrl.BeginLock();
-                ctrl.Freeze();
-            }
-            else
-            {
-                ctrl.EndLock();
-            }
         }
 
         public void StopHeartbeat()
