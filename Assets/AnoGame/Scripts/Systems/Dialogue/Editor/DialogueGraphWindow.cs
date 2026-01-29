@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 namespace AnoGame.Systems.Dialogue.Editor
 {
@@ -46,15 +47,36 @@ namespace AnoGame.Systems.Dialogue.Editor
                 // Link events
                 _sidebar.OnRequestPanTo = (pos) =>
                 {
-                    _canvas.ScrollPos = pos - new Vector2(100, 100);
+                    float offsetX = (_showSidebar ? 250f : 0f) + 50f;
+                    _canvas.ScrollPos = pos - new Vector2(offsetX, 50); // Align to Top-Left with margin
                     Repaint();
                 };
 
                 _sidebar.OnSelectSection = (chapter, section) =>
                 {
                     _canvas.SetFilter(chapter, section);
+
+                    // Auto-pan to first node of this section
+                    var firstNode = _data.Conversations.FirstOrDefault(u => u.ChapterID == chapter && u.SectionID == section);
+                    if (firstNode != null)
+                    {
+                        float offsetX = (_showSidebar ? 250f : 0f) + 50f;
+                        _canvas.ScrollPos = firstNode.Position - new Vector2(offsetX, 50);
+                    }
                     Repaint();
                 };
+
+                // Default Initialization: Show 1st Chapter/Section
+                if (_data.Conversations.Count > 0)
+                {
+                    var first = _data.Conversations[0];
+                    if (!string.IsNullOrEmpty(first.ChapterID) && !string.IsNullOrEmpty(first.SectionID))
+                    {
+                        _canvas.SetFilter(first.ChapterID, first.SectionID);
+                        float offsetX = (_showSidebar ? 250f : 0f) + 50f;
+                        _canvas.ScrollPos = first.Position - new Vector2(offsetX, 50);
+                    }
+                }
             }
         }
 
