@@ -357,10 +357,10 @@ namespace AnoGame.Systems.Dialogue.Editor
                 int level = kvp.Key;
                 var layerNodes = kvp.Value;
 
-                float x = level * spacingX;
+                float y = level * spacingY;
                 for (int i = 0; i < layerNodes.Count; i++)
                 {
-                    float y = i * spacingY;
+                    float x = i * spacingX;
                     layerNodes[i].Position = startOffset + new Vector2(x, y);
                 }
             }
@@ -540,8 +540,8 @@ namespace AnoGame.Systems.Dialogue.Editor
                 if (!IsUnitVisible(unit)) continue;
 
                 Vector2 startPos = unit.Position - ScrollPos;
-                startPos.x += NodeWidth;
-                startPos.y += NodeHeight / 2;
+                startPos.x += NodeWidth / 2;
+                startPos.y += NodeHeight;
 
                 if (!string.IsNullOrEmpty(unit.NextID))
                 {
@@ -574,8 +574,10 @@ namespace AnoGame.Systems.Dialogue.Editor
             if (_posCache.TryGetValue(targetID, out Vector2 targetPos))
             {
                 Vector2 end = targetPos - ScrollPos;
-                end.y += NodeHeight / 2;
-                Handles.DrawBezier(start, end, start + Vector2.right * 50, end + Vector2.left * 50, color, null, 2f);
+                end.x += NodeWidth / 2;
+
+                // Tangents: Start goes Down (+Y), End comes from Up (-Y)
+                Handles.DrawBezier(start, end, start + Vector2.up * 50, end + Vector2.down * 50, color, null, 2f);
             }
         }
 
