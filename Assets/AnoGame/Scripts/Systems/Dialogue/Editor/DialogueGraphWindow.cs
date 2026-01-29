@@ -82,6 +82,11 @@ namespace AnoGame.Systems.Dialogue.Editor
                     _canvas.SetFilter(null, null);
                 }
 
+                if (GUILayout.Button("Grid Layout", EditorStyles.toolbarButton))
+                {
+                    _canvas.AutoLayoutVisibleNodes();
+                }
+
                 GUILayout.FlexibleSpace();
             }
 

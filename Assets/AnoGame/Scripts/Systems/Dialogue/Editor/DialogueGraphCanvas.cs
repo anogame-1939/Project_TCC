@@ -322,23 +322,58 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
         }
 
+        public void AutoLayoutVisibleNodes()
+        {
+            var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
+            if (visibleNodes.Count == 0) return;
+
+            int count = visibleNodes.Count;
+            int cols = Mathf.CeilToInt(Mathf.Sqrt(count));
+            float spacingX = NodeWidth + 50f;
+            float spacingY = NodeHeight + 50f;
+
+            for (int i = 0; i < count; i++)
+            {
+                int col = i % cols;
+                int row = i / cols;
+                visibleNodes[i].Position = new Vector2(col * spacingX, row * spacingY);
+            }
+
+            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50, 50);
+        }
+
         private void DrawConnections(Rect visibleRect)
         {
-            // Handles in Groups:
-            // Handles.DrawBezier draws in screen space or current GUI space? 
-            // It generally seems to respect GUI.matrix.
-            // Let's assume it works relative to the Group.
-
             foreach (var unit in Data.Conversations)
             {
+                if (!IsUnitVisible(unit)) continue;
+
                 Vector2 startPos = unit.Position - ScrollPos;
                 startPos.x += NodeWidth;
                 startPos.y += NodeHeight / 2;
 
-                if (!string.IsNullOrEmpty(unit.NextID)) DrawCurve(startPos, unit.NextID, Color.white);
+                if (!string.IsNullOrEmpty(unit.NextID))
+                {
+                    var target = Data.Conversations.FirstOrDefault(u => u.ID == unit.NextID);
+                    if (target != null && IsUnitVisible(target))
+                    {
+                        DrawCurve(startPos, unit.NextID, Color.white);
+                    }
+                }
+
                 if (unit.Choices != null)
                 {
-                    foreach (var c in unit.Choices) if (!string.IsNullOrEmpty(c.TargetID)) DrawCurve(startPos, c.TargetID, Color.cyan);
+                    foreach (var c in unit.Choices)
+                    {
+                        if (!string.IsNullOrEmpty(c.TargetID))
+                        {
+                            var target = Data.Conversations.FirstOrDefault(u => u.ID == c.TargetID);
+                            if (target != null && IsUnitVisible(target))
+                            {
+                                DrawCurve(startPos, c.TargetID, Color.cyan);
+                            }
+                        }
+                    }
                 }
             }
         }
