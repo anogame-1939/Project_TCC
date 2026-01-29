@@ -1,0 +1,830 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac6aa8a42cb8794191a3900b1a18b72, type: 3}
+  m_Name: MasterDialogueData
+  m_EditorClassIdentifier: 
+  Conversations:
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_10"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_7"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042...\u305D\u3046\u3060\u3063\u305F"
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_8"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_8"
+    SpeakerName: "\u7956\u6BCD"
+    BodyText: "\u307B\u3089\u3001\u3053\u3053\u306B\u7F6E\u3044\u3066\u3042\u308B\u3067\u3057\u3087\u3046\n"
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_11"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_9"
+    SpeakerName: "\u7956\u6BCD"
+    BodyText: "\u3042\u3089\u3001\u7F8E\u54B2\u3002\u82B1\u306F\uFF1F\n\u5DEB\u5973\u69D8\u306B\u6E21\u3059\u306E\u3092\u5FD8\u308C\u306A\u3044\u3067"
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_7"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_10"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u884C\u3063\u3066\u304D\u307E\u3059..."
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_9"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_11"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u304A\u3070\u3042\u3061\u3083\u3093\u304B\u3089\u3063\u3066\u2026\u4F1D\u3048\u308B\u3093\u3060\u3088\u306D"
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_13"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_13"
+    SpeakerName: "\u7956\u6BCD"
+    BodyText: "\u3048\u3048\u3001\u305D\u3046\u3088\n\u6C17\u3092\u3064\u3051\u3066\u884C\u304D\u306A\u3055\u3044"
+    NextID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_14"
+    Choices: []
+  - ID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_14"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: 
+    Choices: []
+  - ID: "0.0.2_\u795E\u793E\u3078\u884C\u3053\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "0.0.2_\u795E\u793E\u3078\u884C\u3053\u3046_1"
+    Choices: []
+  - ID: "0.0.2_\u795E\u793E\u3078\u884C\u3053\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u795E\u793E\u3078\u5411\u304B\u304A\u3046"
+    NextID: 
+    Choices: []
+  - ID: "1.1.0_\u4F55\u3042\u308C_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.1.0_\u4F55\u3042\u308C_1"
+    Choices: []
+  - ID: "1.1.0_\u4F55\u3042\u308C_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u4F55\u3042\u308C"
+    NextID: "1.1.0_\u4F55\u3042\u308C_2"
+    Choices: []
+  - ID: "1.1.0_\u4F55\u3042\u308C_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u611F\u3058\u60AA..."
+    NextID: 
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_1"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u5DEB\u5973\u69D8\u2026\u3044\u308B\u304B\u306A...?"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_2"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u3001\u304A\u96A3\u306E\u304A\u3070\u3055\u3093\u3060"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_3"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_3"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u3042\u3089\u3001\u7F8E\u54B2\u3061\u3083\u3093\u3002\u4E00\u4EBA\u306A\u306E\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_4"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_4"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u306F\u3044\u3001\u82B1\u3092\u6301\u3063\u3066\u304D\u305F\u3093\u3067\u3059"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_5"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_5"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u307F\u3093\u306A\u672C\u5802\u306B\u4F9B\u3048\u3066\u308B\u308F\u3088\n\u79C1\u3082\u3053\u306E\u693F\u3092\u6301\u3063\u3066\u3044\u304F\u3068\u3053\u308D\u306A\u306E"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_6"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_6"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u306E...\u5DEB\u5973\u69D8\u306F\u3044\u3089\u3063\u3057\u3083\u3044\u307E\u305B\u3093\u304B\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_7"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_7"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u4ECA\u65E5\u306F\u307E\u3060\u304A\u898B\u304B\u3051\u3057\u3066\u306A\u3044\u308F\u306D\u3047\n\u73CD\u3057\u3044\u308F\u3002\u3044\u3064\u3082\u306A\u3089\u3053\u306E\u6642\u9593\u3001\u672C\u5802\u3067\u5F85\u3063\u3066\u308B\u306E\u306B\n"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_8"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_8"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u305D\u3046\u3067\u3059\u304B..."
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_9"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_9"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u305D\u306E\u82B1\u3001\u3068\u3066\u3082\u73CD\u3057\u3044\u8272\u306D\n\u3069\u3053\u3067\u6458\u3093\u3060\u306E\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_10"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_10"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u308C\u306F...\u304A\u3070\u3042\u3061\u3083\u3093\u306B\u6E21\u3055\u308C\u3066\u2026"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_11"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_11"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u7BE4\u5B50\u3055\u3093\u304B\u3089\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_12"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_12"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u307E\u3042..."
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_13"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_13"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\uFF1F\n\u306A\u3093\u3067\u3059\u304B\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_14"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_14"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u3044\u3044\u3048\u3001\u306A\u3093\u3067\u3082\u306A\u3044\u306E\n\u3055\u3001\u65E9\u304F\u304A\u4F9B\u3048\u306B\u884C\u304D\u307E\u3057\u3087\u3046"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_15"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_15"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3067\u3082\u3001\u5DEB\u5973\u69D8\u306B\u6E21\u3059\u3088\u3046\u306B\u8A00\u308F\u308C\u3066\u3066..."
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_16"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_16"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u305D\u3046\u2026\n\u306A\u3089\u3001\u307E\u305F\u5F8C\u3067\u6765\u308C\u3070\u3044\u3044\u3093\u3058\u3083\u306A\u3044\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_17"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_17"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u305D\u3046\u3067\u3059\u306D\u2026\n\u4E00\u65E6\u5BB6\u306B\u5E30\u308A\u307E\u3059"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_18"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_18"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u6C17\u3092\u3064\u3051\u3066\u5E30\u308B\u306E\u3088"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_19"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_19"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u3042\u3001\u305D\u3046\u3060\u7F8E\u54B2\u3061\u3083\u3093"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_20"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_20"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_21"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_21"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u305D\u306E\u82B1...\n\u3042\u3093\u307E\u308A\u4EBA\u306B\u306F\u898B\u305B\u306A\u3044\u65B9\u304C\u3044\u3044\u304B\u3082\u3057\u308C\u306A\u3044\u308F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_22"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_22"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3069\u3046\u3057\u3066\u3067\u3059\u304B\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_23"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_23"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u2026"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_27"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_24"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u305D\u308C\u3058\u3083\u3001\u6C17\u3092\u3064\u3051\u3066\u5E30\u3063\u3066\u306D"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_25"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_25"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\uFF1F"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_26"
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_26"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u5BB6\u306B\u5E30\u308D\u3046"
+    NextID: 
+    Choices: []
+  - ID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_27"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u3042\u3001\u3044\u3048\n\u3054\u3081\u3093\u306A\u3055\u3044\n\u306A\u3093\u3067\u3082\u306A\u3044\u306E"
+    NextID: "1.0.1_\u5DEB\u5973\u306F\uFF1F_24"
+    Choices: []
+  - ID: "1.0.1_\u795E\u793E\u3078\u5411\u304B\u304A\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.1_\u795E\u793E\u3078\u5411\u304B\u304A\u3046_1"
+    Choices: []
+  - ID: "1.0.1_\u795E\u793E\u3078\u5411\u304B\u304A\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u795E\u793E\u3078\u5411\u304B\u304A\u3046"
+    NextID: 
+    Choices: []
+  - ID: "1.0.2_\u5BB6\u306B\u5E30\u308D\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.2_\u5BB6\u306B\u5E30\u308D\u3046_1"
+    Choices: []
+  - ID: "1.0.2_\u5BB6\u306B\u5E30\u308D\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u5BB6\u306B\u5E30\u308D\u3046\n"
+    NextID: 
+    Choices: []
+  - ID: "1.0.3_\u982D\u75DB_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.3_\u982D\u75DB_1"
+    Choices: []
+  - ID: "1.0.3_\u982D\u75DB_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3046\u3063..."
+    NextID: "1.0.3_\u982D\u75DB_2"
+    Choices: []
+  - ID: "1.0.3_\u982D\u75DB_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u306A\u3093\u3060\u304B\u982D\u304C\u75DB\u3044...\n"
+    NextID: "1.0.3_\u982D\u75DB_3"
+    Choices: []
+  - ID: "1.0.3_\u982D\u75DB_3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u6025\u3044\u3067\u5E30\u308D\u3046\n"
+    NextID: 
+    Choices: []
+  - ID: "1.0.4_\u901A\u308C\u306A\u3044_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.4_\u901A\u308C\u306A\u3044_2"
+    Choices: []
+  - ID: "1.0.4_\u901A\u308C\u306A\u3044_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u901A\u308C\u306A\u3044\u2026"
+    NextID: 
+    Choices: []
+  - ID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_1"
+    Choices: []
+  - ID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3048\u3001\u4F55\u3053\u308C\uFF1F"
+    NextID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_2"
+    Choices: []
+  - ID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u3066\u901A\u308C\u306A\u3044"
+    NextID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_3"
+    Choices: []
+  - ID: "1.0.5_\u5BB6\u306E\u524D\u3092\u9ED2\u3044\u9727\u304C\u8986\u3063\u3066\u3044\u308B_3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u6C17\u6301\u3061\u60AA\u3044\u2026"
+    NextID: 
+    Choices: []
+  - ID: "1.0.6_\u3069\u3046\u3059\u308C\u3070\u3044\u3044\u3093\u3060\u308D_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.6_\u3069\u3046\u3059\u308C\u3070\u3044\u3044\u3093\u3060\u308D_1"
+    Choices: []
+  - ID: "1.0.6_\u3069\u3046\u3059\u308C\u3070\u3044\u3044\u3093\u3060\u308D_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3069\u3046\u3057\u305F\u3089\u3044\u3044\u3093\u3060\u308D..."
+    NextID: 
+    Choices: []
+  - ID: "1.0.7_\u8DB3\u97F3\u304C\u805E\u3053\u3048\u305F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.0.7_\u8DB3\u97F3\u304C\u805E\u3053\u3048\u305F_1"
+    Choices: []
+  - ID: "1.0.7_\u8DB3\u97F3\u304C\u805E\u3053\u3048\u305F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u3063\u3061\u306E\u65B9\u304B\u3089\u8DB3\u97F3\u304C\u805E\u3053\u3048\u305F\u6C17\u304C\u3059\u308B"
+    NextID: "1.0.7_\u8DB3\u97F3\u304C\u805E\u3053\u3048\u305F_2"
+    Choices: []
+  - ID: "1.0.7_\u8DB3\u97F3\u304C\u805E\u3053\u3048\u305F_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u8AB0\u304B\u3044\u308B\u306E\u304B\u306A\uFF1F"
+    NextID: 
+    Choices: []
+  - ID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B_1"
+    Choices: []
+  - ID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u3001\u3042\u308C\u306F"
+    NextID: 
+    Choices: []
+  - ID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B2_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B2_1"
+    Choices: []
+  - ID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B2_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u6728\u306B\u4F55\u304B\u5F15\u3063\u304B\u304B\u3063\u3066\u308B"
+    NextID: 
+    Choices: []
+  - ID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B3_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B3_1"
+    Choices: []
+  - ID: "1.2.10_\u6728\u306B\u4F55\u304B\u3072\u3063\u304B\u304B\u3063\u3066\u308B3_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u306A\u306B\u304B\u5F15\u3063\u304B\u3051\u3089\u308C\u308B\u68D2\u3067\u3082\u3042\u308C\u3070\u53D6\u308C\u308B\u304B\u3082"
+    NextID: 
+    Choices: []
+  - ID: "1.2.11_\u8AB0\u3082\u3044\u306A\u3044\u2026_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.11_\u8AB0\u3082\u3044\u306A\u3044\u2026_1"
+    Choices: []
+  - ID: "1.2.11_\u8AB0\u3082\u3044\u306A\u3044\u2026_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u753A\u306E\u4EBA\u304C\u8AB0\u3082\u3044\u306A\u3044\u2026"
+    NextID: "1.2.11_\u8AB0\u3082\u3044\u306A\u3044\u2026_2"
+    Choices: []
+  - ID: "1.2.11_\u8AB0\u3082\u3044\u306A\u3044\u2026_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u4E00\u4F53\u307F\u3093\u306A\u3069\u3053\u306B\uFF1F"
+    NextID: 
+    Choices: []
+  - ID: "1.2.12_\u982D\u304C\u75DB\u3044_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.12_\u982D\u304C\u75DB\u3044_1"
+    Choices: []
+  - ID: "1.2.12_\u982D\u304C\u75DB\u3044_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3046\u3063...\uFF01"
+    NextID: "1.2.12_\u982D\u304C\u75DB\u3044_2"
+    Choices: []
+  - ID: "1.2.12_\u982D\u304C\u75DB\u3044_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u982D\u304C\u75DB\u3044\u2026"
+    NextID: 
+    Choices: []
+  - ID: "1.2.13_\u81EA\u8CA9\u6A5F\u3067\u3075\u3055\u304C\u308C\u3066\u308B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.13_\u81EA\u8CA9\u6A5F\u3067\u3075\u3055\u304C\u308C\u3066\u308B_1"
+    Choices: []
+  - ID: "1.2.13_\u81EA\u8CA9\u6A5F\u3067\u3075\u3055\u304C\u308C\u3066\u308B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3048\u3001\u306A\u306B\u3053\u308C"
+    NextID: "1.2.13_\u81EA\u8CA9\u6A5F\u3067\u3075\u3055\u304C\u308C\u3066\u308B_2"
+    Choices: []
+  - ID: "1.2.13_\u81EA\u8CA9\u6A5F\u3067\u3075\u3055\u304C\u308C\u3066\u308B_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u81EA\u52D5\u8CA9\u58F2\u6A5F\u3067\u9053\u304C\u3075\u3055\u304C\u308C\u3066\u3044\u3066\u901A\u308C\u306A\u3044"
+    NextID: 
+    Choices: []
+  - ID: "1.2.14_\u81EA\u8CA9\u6A5F\u306E\u5411\u3053\u3046\u306B\u4EBA\u5F71\uFF1F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.14_\u81EA\u8CA9\u6A5F\u306E\u5411\u3053\u3046\u306B\u4EBA\u5F71\uFF1F_1"
+    Choices: []
+  - ID: "1.2.14_\u81EA\u8CA9\u6A5F\u306E\u5411\u3053\u3046\u306B\u4EBA\u5F71\uFF1F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\uFF1F"
+    NextID: "1.2.14_\u81EA\u8CA9\u6A5F\u306E\u5411\u3053\u3046\u306B\u4EBA\u5F71\uFF1F_2"
+    Choices: []
+  - ID: "1.2.14_\u81EA\u8CA9\u6A5F\u306E\u5411\u3053\u3046\u306B\u4EBA\u5F71\uFF1F_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3084\u3063\u3071\u308A\u8AB0\u304B\u3044\u308B\u306E\uFF1F"
+    NextID: 
+    Choices: []
+  - ID: "1.2.15_\u306A\u306B\u304B\u8E0F\u307F\u53F0\u306B\u306A\u308B\u3082\u306E_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.15_\u306A\u306B\u304B\u8E0F\u307F\u53F0\u306B\u306A\u308B\u3082\u306E_1"
+    Choices: []
+  - ID: "1.2.15_\u306A\u306B\u304B\u8E0F\u307F\u53F0\u306B\u306A\u308B\u3082\u306E_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u306A\u306B\u304B\u8E0F\u307F\u53F0\u306B\u306A\u308B\u3082\u306E\u304C\u3042\u308C\u3070\u4E57\u308A\u8D8A\u3048\u3089\u308C\u308B\u304B\u3082"
+    NextID: 
+    Choices: []
+  - ID: "1.2.17_\u30A2\u30D1\u30FC\u30C8\u306E\u65B9\u306B\u5411\u304B\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.17_\u30A2\u30D1\u30FC\u30C8\u306E\u65B9\u306B\u5411\u304B\u3046_1"
+    Choices: []
+  - ID: "1.2.17_\u30A2\u30D1\u30FC\u30C8\u306E\u65B9\u306B\u5411\u304B\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u8AB0\u304B\u3044\u308B\u2026"
+    NextID: 
+    Choices: []
+  - ID: "1.2.24_\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.24_\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_1"
+    Choices: []
+  - ID: "1.2.24_\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046"
+    NextID: 
+    Choices: []
+  - ID: "1.2.x_\u3053\u3063\u3061\u306B\u306F\u4F55\u3082\u306A\u3044\u3068\u601D\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.x_\u3053\u3063\u3061\u306B\u306F\u4F55\u3082\u306A\u3044\u3068\u601D\u3046_1"
+    Choices: []
+  - ID: "1.2.x_\u3053\u3063\u3061\u306B\u306F\u4F55\u3082\u306A\u3044\u3068\u601D\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u3063\u3061\u306B\u306F\u4F55\u3082\u306A\u3044\u3068\u601D\u3046\n"
+    NextID: 
+    Choices: []
+  - ID: "\u30A2\u30A4\u30C6\u30E0\u3092\u4F7F\u7528_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u30A2\u30A4\u30C6\u30E0\u3092\u4F7F\u7528_1"
+    Choices: []
+  - ID: "\u30A2\u30A4\u30C6\u30E0\u3092\u4F7F\u7528_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "[lua(GetTextTableValue(Variable[\"itemName\"]))]\u3092\u4F7F\u7528\u3057\u305F"
+    NextID: 
+    Choices: []
+  - ID: "\u30A2\u30A4\u30C6\u30E0\u3092\u53D6\u5F97_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u30A2\u30A4\u30C6\u30E0\u3092\u53D6\u5F97_1"
+    Choices: []
+  - ID: "\u30A2\u30A4\u30C6\u30E0\u3092\u53D6\u5F97_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3092\u624B\u306B\u5165\u308C\u305F\u3002"
+    NextID: 
+    Choices: []
+  - ID: "\u30A2\u30A4\u30C6\u30E0\u4F7F\u7528\u5931\u6557_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u30A2\u30A4\u30C6\u30E0\u4F7F\u7528\u5931\u6557_1"
+    Choices: []
+  - ID: "\u30A2\u30A4\u30C6\u30E0\u4F7F\u7528\u5931\u6557_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u3053\u3067\u306F\u4F7F\u3048\u306A\u3044"
+    NextID: 
+    Choices: []
+  - ID: "1\u56DE\u76EE\u306E\u30DF\u30B9_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1\u56DE\u76EE\u306E\u30DF\u30B9_1"
+    Choices: []
+  - ID: "1\u56DE\u76EE\u306E\u30DF\u30B9_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u2026\uFF1F"
+    NextID: "1\u56DE\u76EE\u306E\u30DF\u30B9_2"
+    Choices: []
+  - ID: "1\u56DE\u76EE\u306E\u30DF\u30B9_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u306A\u3093\u3068\u3082\u306A\u3044"
+    NextID: "1\u56DE\u76EE\u306E\u30DF\u30B9_3"
+    Choices: []
+  - ID: "1\u56DE\u76EE\u306E\u30DF\u30B9_3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3067\u3082\u3001\u6B21\u306F\u306A\u3044\u6C17\u304C\u3059\u308B\u2026"
+    NextID: 
+    Choices: []
+  - ID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_0"
+    SpeakerName: Overlay
+    BodyText: 
+    NextID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_1"
+    Choices: []
+  - ID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_1"
+    SpeakerName: Overlay
+    BodyText: "\u305D\u306E\u753A\u306B\u306F\u3001\u53E4\u304F\u304B\u3089\u4F1D\u308F\u308B\u6625\u306E\u884C\u4E8B\u304C\u3042\u3063\u305F\u3002\n\u82B1\u796D\u308A\u2014\u2014\u3002\n\u6BCE\u5E74\u3001\u753A\u306E\u4EBA\u3005\u306F\u601D\u3044\u601D\u3044\u306E\u82B1\u3092\u6301\u3061\u5BC4\u308A\u3001\u795E\u793E\u306B\u5949\u7D0D\u3059\u308B\u3002\n\u3053\u306E\u753A\u306B\u5F15\u3063\u8D8A\u3057\u3066\u304D\u305F\u7F8E\u54B2\u306B\u3068\u3063\u3066\u306F\u521D\u3081\u3066\u8FCE\u3048\u308B\u753A\u306E\u4F1D\u7D71\u884C\u4E8B\u3060\u3002"
+    NextID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_2"
+    Choices: []
+  - ID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_2"
+    SpeakerName: Overlay
+    BodyText: "\u3057\u304B\u3057\u3001\u3053\u306E\u82B1\u796D\u308A\u306E\u7531\u6765\u3092\u77E5\u308B\u8005\u306F\u8AB0\u3082\u3044\u306A\u3044\u3002\n\u306A\u305C\u6BCE\u5E74\u884C\u308F\u308C\u308B\u306E\u304B\u3001\u3044\u3064\u304B\u3089\u59CB\u307E\u3063\u305F\u306E\u304B\u2014\u2014\u3002"
+    NextID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_3"
+    Choices: []
+  - ID: "\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3_3"
+    SpeakerName: Overlay
+    BodyText: "\u305D\u308C\u3067\u3082\u6625\u306E\u8A2A\u308C\u3068\u5171\u306B\u3001\u753A\u306E\u4EBA\u3005\u306F\u82B1\u3092\u643A\u3048\u3066\u795E\u793E\u306B\u8A2A\u308C\u308B\u306E\u3067\u3042\u3063\u305F\u3002\n"
+    NextID: 
+    Choices: []
+  - ID: "\u521D\u56DE\u3067\u30CF\u30A4\u30C9\u3067\u304D\u306A\u304B\u3063\u305F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u521D\u56DE\u3067\u30CF\u30A4\u30C9\u3067\u304D\u306A\u304B\u3063\u305F_1"
+    Choices: []
+  - ID: "\u521D\u56DE\u3067\u30CF\u30A4\u30C9\u3067\u304D\u306A\u304B\u3063\u305F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u306E\u5316\u7269\u3068\u906D\u9047\u3057\u305F\u3089\u81EA\u52D5\u8CA9\u58F2\u6A5F\u3068\u304B\u306E\u7269\u9670\u306B\u96A0\u308C\u306A\u3044\u3068"
+    NextID: 
+    Choices: []
+  - ID: "\u5371\u306A\u304B\u3063\u305F..._0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u5371\u306A\u304B\u3063\u305F..._1"
+    Choices: []
+  - ID: "\u5371\u306A\u304B\u3063\u305F..._1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u5371\u306A\u304B\u3063\u305F..."
+    NextID: "\u5371\u306A\u304B\u3063\u305F..._2"
+    Choices: []
+  - ID: "\u5371\u306A\u304B\u3063\u305F..._2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u306E\u5316\u7269\u306F\u4E00\u4F53\u4F55\u3060\u3063\u305F\u3093\u3060\u308D\u3046..."
+    NextID: "\u5371\u306A\u304B\u3063\u305F..._3"
+    Choices: []
+  - ID: "\u5371\u306A\u304B\u3063\u305F..._3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u308F\u304B\u3089\u306A\u3044..."
+    NextID: "\u5371\u306A\u304B\u3063\u305F..._4"
+    Choices: []
+  - ID: "\u5371\u306A\u304B\u3063\u305F..._4"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3067\u3082\u3001\u4ECA\u306F\u5143\u306E\u4E16\u754C\u306B\u623B\u308B\u305F\u3081\u306E\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046"
+    NextID: 
+    Choices: []
+  - ID: "\u3053\u3053\u306B\u96A0\u308C\u308C\u3070\u5B89\u5168_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3053\u3053\u306B\u96A0\u308C\u308C\u3070\u5B89\u5168_1"
+    Choices: []
+  - ID: "\u3053\u3053\u306B\u96A0\u308C\u308C\u3070\u5B89\u5168_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u3053\u306B\u96A0\u308C\u308C\u3070\u3042\u306E\u5316\u7269\u304B\u3089\u8EAB\u3092\u96A0\u305B\u308B\u304B\u3082\u3057\u308C\u306A\u3044"
+    NextID: 
+    Choices: []
+  - ID: "\u3053\u3063\u3061\u3067\u306F\u306A\u3044\u6C17\u304C\u3059\u308B..._0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3053\u3063\u3061\u3067\u306F\u306A\u3044\u6C17\u304C\u3059\u308B..._1"
+    Choices: []
+  - ID: "\u3053\u3063\u3061\u3067\u306F\u306A\u3044\u6C17\u304C\u3059\u308B..._1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u3063\u3061\u3067\u306F\u306A\u3044\u6C17\u304C\u3059\u308B..."
+    NextID: 
+    Choices: []
+  - ID: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_1"
+    Choices: []
+  - ID: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u4F55\u304C\u8D77\u3053\u3063\u3066\u3044\u308B\u306E\u304B\u306F\u308F\u304B\u3089\u306A\u3044\u3051\u3069\u3001\u5143\u306E\u4E16\u754C\u306B\u623B\u3089\u306A\u3044\u3068"
+    NextID: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_2"
+    Choices: []
+  - ID: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046"
+    NextID: 
+    Choices: []
+  - ID: "\u9580\u306E\u5411\u3053\u3046\u306B\u306A\u306B\u304B\u3042\u308B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u9580\u306E\u5411\u3053\u3046\u306B\u306A\u306B\u304B\u3042\u308B_1"
+    Choices: []
+  - ID: "\u9580\u306E\u5411\u3053\u3046\u306B\u306A\u306B\u304B\u3042\u308B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u9580\u306E\u5411\u3053\u3046\u306B\u4F55\u304B\u3042\u308B"
+    NextID: "\u9580\u306E\u5411\u3053\u3046\u306B\u306A\u306B\u304B\u3042\u308B_2"
+    Choices: []
+  - ID: "\u9580\u306E\u5411\u3053\u3046\u306B\u306A\u306B\u304B\u3042\u308B_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3067\u3082\u8526\u304C\u90AA\u9B54\u3067\u624B\u304C\u5C4A\u304B\u306A\u3044"
+    NextID: 
+    Choices: []
+  - ID: "\u526A\u5B9A\u92CF\u3067\u8349\u3092\u5207\u3063\u305F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u526A\u5B9A\u92CF\u3067\u8349\u3092\u5207\u3063\u305F_1"
+    Choices: []
+  - ID: "\u526A\u5B9A\u92CF\u3067\u8349\u3092\u5207\u3063\u305F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u526A\u5B9A\u92CF\u3067\u8349\u3092\u5207\u3063\u305F"
+    NextID: 
+    Choices: []
+  - ID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_1"
+    Choices: []
+  - ID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u9375\u3092\u843D\u3068\u3057\u305F\uFF1F"
+    NextID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_2"
+    Choices: []
+  - ID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3042\u306E\u5316\u7269\u3082\u4F55\u304B\u63A2\u3057\u3066\u3044\u308B\u3088\u3046\u306B\u898B\u3048\u305F\u3051\u3069"
+    NextID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_3"
+    Choices: []
+  - ID: "\u624B\u5E33\u3092\u3072\u308D\u3063\u305F_3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3082\u3057\u304B\u3057\u305F\u3089\u2026"
+    NextID: 
+    Choices: []
+  - ID: "\u5B9F\u5BB6\u3067\u30CF\u30B5\u30DF\u3092\u898B\u3064\u3051\u308B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u5B9F\u5BB6\u3067\u30CF\u30B5\u30DF\u3092\u898B\u3064\u3051\u308B_1"
+    Choices: []
+  - ID: "\u5B9F\u5BB6\u3067\u30CF\u30B5\u30DF\u3092\u898B\u3064\u3051\u308B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u7384\u95A2\u306E\u524D\u306B\u4F55\u304B\u843D\u3061\u3066\u3044\u308B"
+    NextID: 
+    Choices: []
+  - ID: "\u3048\uFF1F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3048\uFF1F_1"
+    Choices: []
+  - ID: "\u3048\uFF1F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3048\uFF1F"
+    NextID: 
+    Choices: []
+  - ID: "\u8AB0\u304B\u306E\u5098\u3060_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u8AB0\u304B\u306E\u5098\u3060_1"
+    Choices: []
+  - ID: "\u8AB0\u304B\u306E\u5098\u3060_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u96FB\u67F1\u306B\u8AB0\u304B\u306E\u5098\u304C\u7ACB\u3066\u304B\u3051\u3089\u308C\u3066\u3044\u308B"
+    NextID: 
+    Choices: []
+  - ID: "\u5098\u3092\u4F7F\u3063\u3066\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u5098\u3092\u4F7F\u3063\u3066\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_2"
+    Choices: []
+  - ID: "\u5098\u3092\u4F7F\u3063\u3066\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u30FB\u30FB\u30FB"
+    NextID: "\u5098\u3092\u4F7F\u3063\u3066\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_3"
+    Choices: []
+  - ID: "\u5098\u3092\u4F7F\u3063\u3066\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u53D6\u308C\u305F"
+    NextID: 
+    Choices: []
+  - ID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_1"
+    Choices: []
+  - ID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u5165\u624B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u2026"
+    NextID: 
+    Choices: []
+  - ID: "\u3053\u308C\u3092\u63A2\u3057\u3066\u305F\u3093\u3067\u3057\u3087\uFF1F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3053\u308C\u3092\u63A2\u3057\u3066\u305F\u3093\u3067\u3057\u3087\uFF1F_1"
+    Choices: []
+  - ID: "\u3053\u308C\u3092\u63A2\u3057\u3066\u305F\u3093\u3067\u3057\u3087\uFF1F_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u308C\u3092\u63A2\u3057\u3066\u305F\u3093\u3067\u3057\u3087\uFF1F"
+    NextID: 
+    Choices: []
+  - ID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u4F7F\u7528_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u4F7F\u7528_1"
+    Choices: []
+  - ID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u4F7F\u7528_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u958B\u3044\u305F\u2026"
+    NextID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u4F7F\u7528_2"
+    Choices: []
+  - ID: "\u30A2\u30D1\u30FC\u30C8\u306E\u9375\u3092\u4F7F\u7528_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u7384\u95A2\u5148\u306B\u304D\u308C\u3044\u306B\u6298\u308A\u305F\u305F\u307E\u308C\u305F\u30CF\u30F3\u30AB\u30C1\u304C\u3042\u308B"
+    NextID: 
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_0"
+    SpeakerName: Flashback
+    BodyText: 
+    NextID: "OL\u306E\u56DE\u60F3_4"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_1"
+    SpeakerName: Flashback
+    BodyText: "\u3053\u308C\u3063\u3066\u2026"
+    NextID: "OL\u306E\u56DE\u60F3_2"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_2"
+    SpeakerName: Flashback
+    BodyText: "\u3042\u306E\u4EBA\u306E\u8A18\u61B6\u2026\uFF1F"
+    NextID: "OL\u306E\u56DE\u60F3_3"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_3"
+    SpeakerName: Flashback
+    BodyText: "\u306F\u3044\u3001\u3053\u308C\n\u30D7\u30EC\u30BC\u30F3\u30C8\uFF01"
+    NextID: "OL\u306E\u56DE\u60F3_6"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_4"
+    SpeakerName: Flashback
+    BodyText: "\u304A\u75B2\u308C\u69D8\uFF01"
+    NextID: "OL\u306E\u56DE\u60F3_5"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_5"
+    SpeakerName: Flashback
+    BodyText: "\u3048\uFF1F\u3053\u306E\u4EBA\u306F\u2026\u8AB0\uFF1F"
+    NextID: "OL\u306E\u56DE\u60F3_1"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_6"
+    SpeakerName: Flashback
+    BodyText: "\u308F\u3042\u3001\u3042\u308A\u304C\u3068\u3046\uFF01"
+    NextID: "OL\u306E\u56DE\u60F3_7"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_7"
+    SpeakerName: Flashback
+    BodyText: "\u3067\u3082\u306A\u3093\u3067\u30CF\u30F3\u30AB\u30C1\uFF1F"
+    NextID: "OL\u306E\u56DE\u60F3_8"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_8"
+    SpeakerName: Flashback
+    BodyText: "\u3053\u3053\u306E\u3068\u3053\u308D\u3001\u6B8B\u696D\u7D9A\u304D\u3067\u9811\u5F35\u3063\u3066\u305F\u3060\u308D\uFF1F"
+    NextID: "OL\u306E\u56DE\u60F3_9"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_9"
+    SpeakerName: Flashback
+    BodyText: "\u306A\u3093\u304B\u52B4\u3063\u3066\u3042\u3052\u3089\u308C\u306A\u3044\u304B\u306A\u3063\u3066\u4FFA\u306A\u308A\u306B\u3044\u308D\u3044\u308D\u8003\u3048\u305F\u3066\u307F\u305F\u3093\u3060"
+    NextID: "OL\u306E\u56DE\u60F3_10"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_10"
+    SpeakerName: Flashback
+    BodyText: "\u541B\u306F\u30D6\u30E9\u30F3\u30C9\u3082\u306E\u306B\u306F\u8208\u5473\u306A\u3044\u3057\u3001\u30D1\u30D5\u30A7\u306F\u3053\u306E\u9593\u98DF\u3079\u305F\u3060\u308D\uFF1F\n\u4E00\u6669\u60A9\u3093\u3060\u7D50\u679C\u3053\u306E\u30CF\u30F3\u30AB\u30C1\u306B\u306A\u3063\u305F\u3063\u3066\u308F\u3051"
+    NextID: "OL\u306E\u56DE\u60F3_11"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_11"
+    SpeakerName: Flashback
+    BodyText: "\u305D\u3046\u3060\u3063\u305F\u3093\u3060"
+    NextID: "OL\u306E\u56DE\u60F3_12"
+    Choices: []
+  - ID: "OL\u306E\u56DE\u60F3_12"
+    SpeakerName: Flashback
+    BodyText: "\u3075\u3075\u3001\u3042\u308A\u304C\u3068\u3046"
+    NextID: 
+    Choices: []
+  - ID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_1"
+    Choices: []
+  - ID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349\u304C\u751F\u3048\u3066\u308B"
+    NextID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_2"
+    Choices: []
+  - ID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_2"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u306E\u8349\u304C\u9727\u3092\u767A\u751F\u3055\u305B\u3066\u3044\u308B\uFF1F"
+    NextID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_3"
+    Choices: []
+  - ID: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349_3"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u306E\u8349\u3092\u53D6\u308A\u9664\u3051\u3070\u901A\u308C\u308B\u3088\u3046\u306B\u306A\u308B\u304B\u3082"
+    NextID: 
+    Choices: []
+  - ID: "1.2.37_EP1\u30A8\u30F3\u30C7\u30A3\u30F3\u30B0_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "1.2.37_EP1\u30A8\u30F3\u30C7\u30A3\u30F3\u30B0_1"
+    Choices: []
+  - ID: "1.2.37_EP1\u30A8\u30F3\u30C7\u30A3\u30F3\u30B0_1"
+    SpeakerName: "\u304A\u3070\u3055\u3093"
+    BodyText: "\u79C1\u3068\u306E\u5F7C\u3068\u306E\u5927\u5207\u306A\u601D\u3044\u51FA\n\u898B\u3064\u3051\u3066\u304F\u308C\u3066\u3042\u308A\u304C\u3068\u3046"
+    NextID: 
+    Choices: []
+  - ID: "\u3053\u306E\u90E8\u5C4B\u3058\u3083\u306A\u3044_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3053\u306E\u90E8\u5C4B\u3058\u3083\u306A\u3044_1"
+    Choices: []
+  - ID: "\u3053\u306E\u90E8\u5C4B\u3058\u3083\u306A\u3044_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u306E\u90E8\u5C4B\u3058\u3083\u306A\u3044"
+    NextID: 
+    Choices: []
+  - ID: "\u3053\u306E\u90E8\u5C4B\u306A\u6C17\u304C\u3059\u308B_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: "\u3053\u306E\u90E8\u5C4B\u306A\u6C17\u304C\u3059\u308B_1"
+    Choices: []
+  - ID: "\u3053\u306E\u90E8\u5C4B\u306A\u6C17\u304C\u3059\u308B_1"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: "\u3053\u306E\u90E8\u5C4B\u306A\u6C17\u304C\u3059\u308B"
+    NextID: 
+    Choices: []
+  - ID: "\u300C\u3042\u300D_\u7F36\u3092\u8E74\u98DB\u3070\u3057\u305F_0"
+    SpeakerName: "\u7F8E\u54B2"
+    BodyText: 
+    NextID: 
+    Choices: []

@@ -1,0 +1,36 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace AnoGame.Systems.Dialogue
+{
+    [Serializable]
+    public class ConversationUnit
+    {
+        [Tooltip("Unique ID for this conversation node (e.g. S1_Intro_01)")]
+        public string ID;
+
+        [Tooltip("Name of the speaker")]
+        public string SpeakerName;
+
+        [TextArea(3, 10)]
+        [Tooltip("The dialogue text")]
+        public string BodyText;
+
+        [Tooltip("ID of the next conversation node. Leave empty if this is the end or if using choices.")]
+        public string NextID;
+
+        [Tooltip("Optional choices for branching dialogue")]
+        public List<Choice> Choices = new List<Choice>();
+    }
+
+    [Serializable]
+    public class Choice
+    {
+        [Tooltip("Text displayed on the choice button")]
+        public string ChoiceText;
+
+        [Tooltip("ID of the conversation node to jump to if this choice is selected")]
+        public string TargetID;
+    }
+}
