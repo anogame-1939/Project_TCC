@@ -9,6 +9,7 @@ namespace AnoGame.Application.Player.Interaction
         [Header("Spotlight Settings")]
         [SerializeField] private Vector3 targetPosition;
         [SerializeField] private float radius = 5f;
+        [Tooltip("Active duration in seconds. Set to negative value for infinite duration.")]
         [SerializeField] private float duration = 5f;
         [SerializeField] private string lightId;
         [SerializeField] private bool useTransformAsPosition = true;
