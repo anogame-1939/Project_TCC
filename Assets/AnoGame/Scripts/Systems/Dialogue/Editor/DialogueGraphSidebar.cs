@@ -13,6 +13,7 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         // Navigation events
         public System.Action<Vector2> OnRequestPanTo;
+        public System.Action<string, string> OnSelectSection;
 
         public DialogueGraphSidebar(MasterDialogueData data)
         {
@@ -47,8 +48,11 @@ namespace AnoGame.Systems.Dialogue.Editor
                     {
                         if (!allowChapter && !sectionGroup.Any(u => u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
-                        if (GUILayout.Button($"▶ {sectionGroup.Key} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
+                        if (GUILayout.Button($"{sectionGroup.Key} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
                         {
+                            // Trigger Filter
+                            OnSelectSection?.Invoke(chapterGroup.Key, sectionGroup.Key);
+
                             // Pan to first item
                             var first = sectionGroup.FirstOrDefault();
                             if (first != null) OnRequestPanTo?.Invoke(first.Position);

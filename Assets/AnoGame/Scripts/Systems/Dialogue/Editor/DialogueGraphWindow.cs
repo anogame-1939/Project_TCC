@@ -49,6 +49,12 @@ namespace AnoGame.Systems.Dialogue.Editor
                     _canvas.ScrollPos = pos - new Vector2(100, 100);
                     Repaint();
                 };
+
+                _sidebar.OnSelectSection = (chapter, section) =>
+                {
+                    _canvas.SetFilter(chapter, section);
+                    Repaint();
+                };
             }
         }
 
@@ -70,6 +76,12 @@ namespace AnoGame.Systems.Dialogue.Editor
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 _showSidebar = GUILayout.Toggle(_showSidebar, "Sidebar", EditorStyles.toolbarButton);
+
+                if (GUILayout.Button("Show All", EditorStyles.toolbarButton))
+                {
+                    _canvas.SetFilter(null, null);
+                }
+
                 GUILayout.FlexibleSpace();
             }
 

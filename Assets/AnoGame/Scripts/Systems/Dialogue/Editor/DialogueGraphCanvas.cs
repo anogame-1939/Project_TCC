@@ -37,6 +37,17 @@ namespace AnoGame.Systems.Dialogue.Editor
             _host = host;
         }
 
+        // Filter
+        public string FilterChapter = null;
+        public string FilterSection = null;
+
+        public void SetFilter(string chapter, string section)
+        {
+            FilterChapter = chapter;
+            FilterSection = section;
+            _selectedIDs.Clear(); // Clear selection when changing views to avoid confusion
+        }
+
         public void Draw(Rect position, float sidebarWidth = 0f)
         {
             if (Data == null) return;
@@ -53,6 +64,8 @@ namespace AnoGame.Systems.Dialogue.Editor
             UpdatePosCache();
 
             // 1. Draw Connections (Behind nodes)
+            // Only draw connections if both start and end are visible? 
+            // Or just start? Let's check visibility in loop.
             if (Event.current.type == EventType.Repaint)
             {
                 DrawConnections(localRect);
@@ -62,6 +75,10 @@ namespace AnoGame.Systems.Dialogue.Editor
             for (int i = 0; i < Data.Conversations.Count; i++)
             {
                 var unit = Data.Conversations[i];
+
+                // Filter Check
+                if (!IsUnitVisible(unit)) continue;
+
                 if (unit.Position == Vector2.zero) unit.Position = new Vector2(100 + (i * 20), 100 + (i * 20));
 
                 Vector2 drawPos = unit.Position - ScrollPos;
@@ -70,7 +87,7 @@ namespace AnoGame.Systems.Dialogue.Editor
                 // Simple Culling
                 if (nodeRect.xMax < 0 || nodeRect.x > localRect.width || nodeRect.yMax < 0 || nodeRect.y > localRect.height)
                 {
-                    // Skip drawing but keep logic?
+                    // Culling off-screen
                 }
 
                 DrawNode(unit, nodeRect);
@@ -86,6 +103,16 @@ namespace AnoGame.Systems.Dialogue.Editor
             ProcessEvents(Event.current, localRect, sidebarWidth);
 
             GUI.EndGroup();
+        }
+
+        private bool IsUnitVisible(ConversationUnit unit)
+        {
+            if (string.IsNullOrEmpty(FilterChapter) && string.IsNullOrEmpty(FilterSection)) return true;
+
+            bool matchChapter = string.IsNullOrEmpty(FilterChapter) || unit.ChapterID == FilterChapter;
+            bool matchSection = string.IsNullOrEmpty(FilterSection) || unit.SectionID == FilterSection;
+
+            return matchChapter && matchSection;
         }
 
         private void DrawNode(ConversationUnit unit, Rect rect)
