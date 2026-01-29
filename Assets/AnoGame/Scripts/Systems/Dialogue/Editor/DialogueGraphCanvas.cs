@@ -129,9 +129,16 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUI.Box(rect, "", style);
             GUI.color = Color.white;
 
-            // Title Bar Area (for Dragging)
+            // Title Bar Area (for Dragging) - Simplified ID
+            string displayID = unit.ID;
+            string prefix = $"{unit.ChapterID}_{unit.SectionID}_";
+            if (!string.IsNullOrEmpty(unit.ChapterID) && !string.IsNullOrEmpty(unit.SectionID) && displayID.StartsWith(prefix))
+            {
+                displayID = displayID.Substring(prefix.Length);
+            }
+
             Rect titleRect = new Rect(rect.x, rect.y, rect.width, 20);
-            GUI.Label(titleRect, unit.ID, EditorStyles.boldLabel);
+            GUI.Label(titleRect, displayID, EditorStyles.boldLabel);
 
             // Content Area
             Rect contentRect = new Rect(rect.x + 5, rect.y + 20, rect.width - 10, rect.height - 25);
@@ -139,10 +146,10 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUILayout.BeginArea(contentRect);
             EditorGUILayout.BeginVertical();
 
-            EditorGUIUtility.labelWidth = 50;
-            unit.SpeakerName = EditorGUILayout.TextField("Speaker", unit.SpeakerName);
+            // Speaker (No Label)
+            unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName);
 
-            EditorGUILayout.LabelField("Text:");
+            // Text (No Label)
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(50));
 
             // Links Preview
@@ -150,10 +157,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             {
                 EditorGUILayout.LabelField($"Choices: {unit.Choices.Count}", EditorStyles.miniLabel);
             }
-            else if (!string.IsNullOrEmpty(unit.NextID))
-            {
-                EditorGUILayout.LabelField($"Next: {unit.NextID}", EditorStyles.miniLabel);
-            }
+            // NextID is hidden as requested
 
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
@@ -325,7 +329,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
         }
 
-        public void AutoLayoutFlow()
+        public void AutoLayoutFlow(float extraOffsetX = 0f)
         {
             var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
             if (visibleNodes.Count == 0) return;
@@ -365,10 +369,10 @@ namespace AnoGame.Systems.Dialogue.Editor
                 }
             }
 
-            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50, 50);
+            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50 + extraOffsetX, 50);
         }
 
-        public void AutoLayoutVisibleNodes()
+        public void AutoLayoutVisibleNodes(float extraOffsetX = 0f)
         {
             var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
             if (visibleNodes.Count == 0) return;
@@ -406,7 +410,7 @@ namespace AnoGame.Systems.Dialogue.Editor
                 visibleNodes[i].Position = startOffset + new Vector2(col * spacingX, row * spacingY);
             }
 
-            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50, 50);
+            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50 + extraOffsetX, 50);
         }
 
         private Dictionary<string, int> GetNodeLevels(List<ConversationUnit> nodes)

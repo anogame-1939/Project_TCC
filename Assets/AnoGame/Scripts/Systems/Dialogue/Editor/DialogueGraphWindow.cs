@@ -106,12 +106,12 @@ namespace AnoGame.Systems.Dialogue.Editor
 
                 if (GUILayout.Button("Grid Layout", EditorStyles.toolbarButton))
                 {
-                    _canvas.AutoLayoutVisibleNodes();
+                    _canvas.AutoLayoutVisibleNodes(_showSidebar ? 250f : 0f);
                 }
 
                 if (GUILayout.Button("Flow Layout", EditorStyles.toolbarButton))
                 {
-                    _canvas.AutoLayoutFlow();
+                    _canvas.AutoLayoutFlow(_showSidebar ? 250f : 0f);
                 }
 
                 GUILayout.FlexibleSpace();
