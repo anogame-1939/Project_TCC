@@ -14,7 +14,7 @@ namespace AnoGame.Systems.Dialogue.Editor
         private EditorWindow _host;
 
         private const float NodeWidth = 255f;
-        private const float NodeHeight = 87f; // Increased by 5px
+        private const float NodeHeight = 92f; // Increased by another 5px
 
         // Selection
         private HashSet<string> _selectedIDs = new HashSet<string>();
