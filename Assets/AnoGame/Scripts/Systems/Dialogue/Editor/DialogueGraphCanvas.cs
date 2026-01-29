@@ -13,8 +13,8 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private EditorWindow _host;
 
-        private const float NodeWidth = 220f;
-        private const float NodeHeight = 82f; // Adjusted for symmetric padding
+        private const float NodeWidth = 255f;
+        private const float NodeHeight = 87f; // Increased by 5px
 
         // Selection
         private HashSet<string> _selectedIDs = new HashSet<string>();
@@ -141,7 +141,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUILayout.Space(3);
 
             // Text (No Label)
-            unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(50));
+            unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(55));
 
             // Links Preview
             if (unit.Choices != null && unit.Choices.Count > 0)
