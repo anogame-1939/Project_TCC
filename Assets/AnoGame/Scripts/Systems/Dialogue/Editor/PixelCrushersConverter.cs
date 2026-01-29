@@ -44,6 +44,22 @@ namespace AnoGame.Systems.Dialogue.Editor
             {
                 string conversationTitle = conversation.Title;
 
+                // Parse Title to guess Chapter/Section (Format: Chapter/Section/...)
+                // We assume many users use folder-like structures in Pixel Crushers
+                string[] parts = conversationTitle.Split(new char[] { '/', '_' }, System.StringSplitOptions.RemoveEmptyEntries);
+                string chapter = "Default";
+                string section = conversationTitle;
+
+                if (parts.Length >= 2)
+                {
+                    chapter = parts[0];
+                    section = parts[1];
+                }
+                else if (parts.Length == 1)
+                {
+                    section = parts[0];
+                }
+
                 // Pixel Crushers often has a "START" node (ID 0) which is empty. 
                 // We typically want to skip it unless it has text, but usually links flow FROM it.
                 // We simply map all nodes and let the ID linking resolve the flow.
@@ -56,6 +72,8 @@ namespace AnoGame.Systems.Dialogue.Editor
 
                     ConversationUnit unit = new ConversationUnit();
                     unit.ID = GenerateID(conversationTitle, entry.id);
+                    unit.ChapterID = chapter;
+                    unit.SectionID = section;
 
                     // Get Speaker Name
                     var actor = sourceDatabase.GetActor(entry.ActorID);

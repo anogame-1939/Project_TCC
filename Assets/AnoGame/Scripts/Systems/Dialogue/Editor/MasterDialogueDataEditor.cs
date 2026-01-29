@@ -38,6 +38,20 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             EditorGUILayout.Space();
 
+            // Clear All Button
+            GUI.backgroundColor = Color.red;
+            if (GUILayout.Button("Clear All Data", GUILayout.Height(30)))
+            {
+                if (EditorUtility.DisplayDialog("Clear All Data", "Are you sure you want to delete ALL conversation data? This cannot be undone.", "Yes, Delete All", "Cancel"))
+                {
+                    _target.Conversations.Clear();
+                    EditorUtility.SetDirty(_target);
+                }
+            }
+            GUI.backgroundColor = Color.white;
+
+            EditorGUILayout.Space();
+
             // Add New Button
             if (GUILayout.Button("Add New Conversation", GUILayout.Height(30)))
             {

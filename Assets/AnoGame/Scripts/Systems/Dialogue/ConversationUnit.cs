@@ -10,6 +10,12 @@ namespace AnoGame.Systems.Dialogue
         [Tooltip("Unique ID for this conversation node (e.g. S1_Intro_01)")]
         public string ID;
 
+        [Tooltip("Story/Chapter Context (e.g. Story1)")]
+        public string ChapterID;
+
+        [Tooltip("Section/Situation Context (e.g. Intro, BossBattle)")]
+        public string SectionID;
+
         [Tooltip("Name of the speaker")]
         public string SpeakerName;
 
@@ -22,6 +28,9 @@ namespace AnoGame.Systems.Dialogue
 
         [Tooltip("Optional choices for branching dialogue")]
         public List<Choice> Choices = new List<Choice>();
+
+        [HideInInspector]
+        public Vector2 Position; // For Node Editor
     }
 
     [Serializable]
