@@ -271,6 +271,8 @@ namespace AnoGame.Systems.Dialogue.Editor
             for (int i = Data.Conversations.Count - 1; i >= 0; i--)
             {
                 var unit = Data.Conversations[i];
+                if (!IsUnitVisible(unit)) continue;
+
                 Vector2 drawPos = unit.Position - ScrollPos;
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
 
@@ -295,15 +297,16 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private void SelectNodesInRect(Rect r, Rect viewOffset)
         {
-            Rect worldSelection = r; // Already in local space which maps to screen space inside Group?
-            // Wait, Unit Pos is World. ScrollPos is Camera.
-            // MousePos is in Local Group Rect (0,0 = top left of canvas view).
-            // So: DrawPos = UnitPos - ScrollPos.
-            // MousePos checks against DrawPos.
-            // So SelectionRect is in "Draw Space".
+            Rect worldSelection = r;
+            // r is in "Group Local" space.
+            // unit.Position is in World space.
+            // Node is drawn at (unit.Position - ScrollPos).
+            // So we compare r with Rect(unit.Position - ScrollPos, size).
 
             foreach (var unit in Data.Conversations)
             {
+                if (!IsUnitVisible(unit)) continue;
+
                 Vector2 drawPos = unit.Position - ScrollPos;
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
                 if (r.Overlaps(nodeRect))
@@ -327,19 +330,66 @@ namespace AnoGame.Systems.Dialogue.Editor
             var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
             if (visibleNodes.Count == 0) return;
 
+            // Sort by ID naturally (handling _1, _2, _10 correctly)
+            visibleNodes.Sort(CompareNodeIDs);
+
             int count = visibleNodes.Count;
-            int cols = Mathf.CeilToInt(Mathf.Sqrt(count));
+            // Calculate grid dimensions (Column-Major: Fill Top->Down, then Right)
+            // Try to keep it somewhat square, or favor height since we are listing lists
+            int rows = Mathf.CeilToInt(Mathf.Sqrt(count));
+            // Ensure at least 1 row to prevent divide by zero
+            rows = Mathf.Max(1, rows);
+
             float spacingX = NodeWidth + 50f;
             float spacingY = NodeHeight + 50f;
 
+            // Start offset to avoid (0,0) which is treated as "uninitialized" in Draw()
+            Vector2 startOffset = new Vector2(50, 50);
+
             for (int i = 0; i < count; i++)
             {
-                int col = i % cols;
-                int row = i / cols;
-                visibleNodes[i].Position = new Vector2(col * spacingX, row * spacingY);
+                // Column-Major indices
+                // Fill Y first (row varies fast), then X (col varies slow)
+                int row = i % rows;
+                int col = i / rows;
+
+                visibleNodes[i].Position = startOffset + new Vector2(col * spacingX, row * spacingY);
             }
 
             if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50, 50);
+        }
+
+        private int CompareNodeIDs(ConversationUnit a, ConversationUnit b)
+        {
+            // Try to extract suffix numbers
+            string idA = a.ID ?? "";
+            string idB = b.ID ?? "";
+
+            var partsA = idA.Split('_');
+            var partsB = idB.Split('_');
+
+            if (partsA.Length > 0 && partsB.Length > 0)
+            {
+                // Compare Last Parts as int if possible
+                string suffixA = partsA[partsA.Length - 1];
+                string suffixB = partsB[partsB.Length - 1];
+
+                if (int.TryParse(suffixA, out int numA) && int.TryParse(suffixB, out int numB))
+                {
+                    // If prefixes are same, sort by number
+                    // Construct prefix from all parts except last
+                    string prefixA = string.Join("_", partsA.Take(partsA.Length - 1));
+                    string prefixB = string.Join("_", partsB.Take(partsB.Length - 1));
+
+                    int prefixCompare = string.Compare(prefixA, prefixB);
+                    if (prefixCompare != 0) return prefixCompare;
+
+                    return numA.CompareTo(numB);
+                }
+            }
+
+            // Fallback to Natural Sort
+            return EditorUtility.NaturalCompare(idA, idB);
         }
 
         private void DrawConnections(Rect visibleRect)
