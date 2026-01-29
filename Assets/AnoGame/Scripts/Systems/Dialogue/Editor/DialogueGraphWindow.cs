@@ -52,6 +52,8 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
         }
 
+        private bool _showSidebar = true;
+
         private void OnGUI()
         {
             if (_data == null)
@@ -64,30 +66,35 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             if (_canvas == null || _sidebar == null) InitializeSubSystems();
 
-            EditorGUILayout.BeginHorizontal();
+            // 1. Draw Toolbar with GUILayout
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+            {
+                _showSidebar = GUILayout.Toggle(_showSidebar, "Sidebar", EditorStyles.toolbarButton);
+                GUILayout.FlexibleSpace();
+            }
 
-            // Draw Sidebar (Fixed width)
-            _sidebar.Draw(250f);
+            // 2. Calculate Rects manually
+            float toolbarHeight = EditorStyles.toolbar.fixedHeight;
+            Rect mainArea = new Rect(0, toolbarHeight, position.width, position.height - toolbarHeight);
 
-            // Draw Canvas (Rest of space)
-            Rect canvasRect = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            // 3. Draw Canvas (Full Main Area)
+            // We strip any GUILayout logic from relying on "rest of window"
+            _canvas.Draw(mainArea, _showSidebar ? 250f : 0f);
 
-            // We need to end the horizontal before we begin windows usually, 
-            // but for custom drawing we can manage.
-            // Actually, because we use GUILayout.Window in Canvas, it complicates nesting.
-            // Best practice: End layout, then draw windows in a group or specific area if possible.
-            // However, GUILayout.Window is top-level. 
-            // We will just draw the sidebar first, then use `BeginArea` for canvas? 
-            // OR just let the windows float on top of everything. 
-            // Sidebar needs to be preserved from being covered.
+            // 4. Draw Sidebar Overlay
+            if (_showSidebar)
+            {
+                Rect sidebarRect = new Rect(mainArea.x, mainArea.y, 250f, mainArea.height);
 
-            // Strategy: Draw Sidebar first. Then end horizontal.
-            // The space reserved by GetRect is for the canvas background.
+                // Background & Border
+                EditorGUI.DrawRect(sidebarRect, new Color(0.2f, 0.2f, 0.2f, 1f));
+                EditorGUI.DrawRect(new Rect(sidebarRect.xMax - 1, sidebarRect.y, 1, sidebarRect.height), Color.black);
 
-            EditorGUILayout.EndHorizontal();
-
-            // Draw Canvas Elements
-            _canvas.Draw(canvasRect); // This handles Background, Connections, Nodes.
+                // Important: BeginArea resets coordinate system to (0,0) relative to rect
+                GUILayout.BeginArea(sidebarRect);
+                _sidebar.Draw(250f);
+                GUILayout.EndArea();
+            }
 
             if (GUI.changed)
             {

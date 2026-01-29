@@ -37,12 +37,11 @@ namespace AnoGame.Systems.Dialogue.Editor
             _host = host;
         }
 
-        public void Draw(Rect position)
+        public void Draw(Rect position, float sidebarWidth = 0f)
         {
             if (Data == null) return;
 
             // Define the canvas area for clipping
-            // Nodes outside this rect (e.g. under the sidebar) will be hidden by BeginGroup
             GUI.BeginGroup(position);
             Rect localRect = new Rect(0, 0, position.width, position.height);
 
@@ -54,10 +53,6 @@ namespace AnoGame.Systems.Dialogue.Editor
             UpdatePosCache();
 
             // 1. Draw Connections (Behind nodes)
-            // Note: Bezier handles might draw outside the Group if we aren't careful, 
-            // but usually Handles are clipped by the current view rect in IMGUI? 
-            // Actually Handles.DrawBezier ignores GUI.BeginGroup usually.
-            // For now, let's keep drawing them. 
             if (Event.current.type == EventType.Repaint)
             {
                 DrawConnections(localRect);
@@ -88,7 +83,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
 
             // Process Input LAST to ensure it covers everything drawn
-            ProcessEvents(Event.current, localRect);
+            ProcessEvents(Event.current, localRect, sidebarWidth);
 
             GUI.EndGroup();
         }
@@ -137,9 +132,12 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUILayout.EndArea();
         }
 
-        private void ProcessEvents(Event e, Rect viewRect)
+        private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
         {
             Vector2 mousePos = e.mousePosition;
+
+            // If mouse is over the sidebar overlay (restrictedX), ignore interaction with canvas
+            if (mousePos.x < restrictedX) return;
 
             // Handle Node Dragging (Priority over box select)
             if (_isDraggingNode && e.type == EventType.MouseDrag)
