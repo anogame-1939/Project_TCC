@@ -14,7 +14,7 @@ namespace AnoGame.Systems.Dialogue.Editor
         private EditorWindow _host;
 
         private const float NodeWidth = 220f;
-        private const float NodeHeight = 150f;
+        private const float NodeHeight = 82f; // Adjusted for symmetric padding
 
         // Selection
         private HashSet<string> _selectedIDs = new HashSet<string>();
@@ -129,25 +129,16 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUI.Box(rect, "", style);
             GUI.color = Color.white;
 
-            // Title Bar Area (for Dragging) - Simplified ID
-            string displayID = unit.ID;
-            string prefix = $"{unit.ChapterID}_{unit.SectionID}_";
-            if (!string.IsNullOrEmpty(unit.ChapterID) && !string.IsNullOrEmpty(unit.SectionID) && displayID.StartsWith(prefix))
-            {
-                displayID = displayID.Substring(prefix.Length);
-            }
-
-            Rect titleRect = new Rect(rect.x, rect.y, rect.width, 20);
-            GUI.Label(titleRect, displayID, EditorStyles.boldLabel);
-
-            // Content Area
-            Rect contentRect = new Rect(rect.x + 5, rect.y + 20, rect.width - 10, rect.height - 25);
+            // Content Area - Symmetric padding (5px top, 5px bottom)
+            Rect contentRect = new Rect(rect.x + 5, rect.y + 5, rect.width - 10, rect.height - 10);
 
             GUILayout.BeginArea(contentRect);
             EditorGUILayout.BeginVertical();
 
             // Speaker (No Label)
-            unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName);
+            unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName, GUILayout.Width(80));
+
+            GUILayout.Space(3);
 
             // Text (No Label)
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(50));
@@ -348,7 +339,7 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             Vector2 startOffset = new Vector2(50, 50);
             float spacingX = NodeWidth + 80f; // Wider for connections
-            float spacingY = NodeHeight + 30f;
+            float spacingY = NodeHeight + 20f; // Reduced gap for shorter connectors
 
             // Sort layers by ID
             foreach (var lvl in nodesByLevel.Keys)
@@ -396,7 +387,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             rows = Mathf.Max(1, rows);
 
             float spacingX = NodeWidth + 50f;
-            float spacingY = NodeHeight + 50f;
+            float spacingY = NodeHeight + 30f;
 
             // Start offset to avoid (0,0) which is treated as "uninitialized" in Draw()
             Vector2 startOffset = new Vector2(50, 50);
