@@ -37,7 +37,7 @@ namespace AnoGame.Systems.Dialogue.Editor
                 {
                     bool allowChapter = string.IsNullOrEmpty(_searchFilter) || chapterGroup.Key.ToLower().Contains(_searchFilter.ToLower());
 
-                    EditorGUILayout.LabelField($"▼ {chapterGroup.Key}", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField($"{chapterGroup.Key}", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
 
                     // Group by Section
