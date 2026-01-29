@@ -87,6 +87,11 @@ namespace AnoGame.Systems.Dialogue.Editor
                     _canvas.AutoLayoutVisibleNodes();
                 }
 
+                if (GUILayout.Button("Flow Layout", EditorStyles.toolbarButton))
+                {
+                    _canvas.AutoLayoutFlow();
+                }
+
                 GUILayout.FlexibleSpace();
             }
 

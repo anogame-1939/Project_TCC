@@ -325,6 +325,143 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
         }
 
+        public void AutoLayoutFlow()
+        {
+            var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
+            if (visibleNodes.Count == 0) return;
+
+            // 1. Build Graph & In-Degree
+            Dictionary<string, List<string>> adjacency = new Dictionary<string, List<string>>();
+            Dictionary<string, int> inDegree = new Dictionary<string, int>();
+            Dictionary<string, ConversationUnit> nodeMap = new Dictionary<string, ConversationUnit>();
+
+            foreach (var n in visibleNodes)
+            {
+                nodeMap[n.ID] = n;
+                if (!adjacency.ContainsKey(n.ID)) adjacency[n.ID] = new List<string>();
+                if (!inDegree.ContainsKey(n.ID)) inDegree[n.ID] = 0;
+            }
+
+            foreach (var n in visibleNodes)
+            {
+                List<string> targets = new List<string>();
+                if (!string.IsNullOrEmpty(n.NextID)) targets.Add(n.NextID);
+                if (n.Choices != null)
+                {
+                    foreach (var c in n.Choices) if (!string.IsNullOrEmpty(c.TargetID)) targets.Add(c.TargetID);
+                }
+
+                foreach (var t in targets)
+                {
+                    if (nodeMap.ContainsKey(t))
+                    {
+                        adjacency[n.ID].Add(t);
+                        inDegree[t]++;
+                    }
+                }
+            }
+
+            // 2. Assign Levels (Longest Path Layering using DFS/BFS-like)
+            // Roots are nodes with In-Degree 0 (or pick first if cycle)
+            Dictionary<string, int> levels = new Dictionary<string, int>();
+            Queue<string> queue = new Queue<string>();
+
+            foreach (var kvp in inDegree)
+            {
+                if (kvp.Value == 0)
+                {
+                    queue.Enqueue(kvp.Key);
+                    levels[kvp.Key] = 0;
+                }
+            }
+
+            // Safety: If no roots found (fully cyclic), pick first visible
+            if (queue.Count == 0 && visibleNodes.Count > 0)
+            {
+                var first = visibleNodes[0].ID;
+                queue.Enqueue(first);
+                levels[first] = 0;
+            }
+
+            // Standard topological level assignment
+            // Note: This simple BFS is "Shortest Path" layering. 
+            // For "Flow", usually "Shortest Path" is fine, or "Longest" if we want to push down.
+            // Let's stick to Shortest for simplicity.
+            while (queue.Count > 0)
+            {
+                string id = queue.Dequeue();
+                int currentLevel = levels[id];
+
+                if (adjacency.ContainsKey(id))
+                {
+                    foreach (var childID in adjacency[id])
+                    {
+                        // Update level if not visited or if we found a longer path?
+                        // For DAG, max(level) is best.
+                        if (!levels.ContainsKey(childID))
+                        {
+                            levels[childID] = currentLevel + 1;
+                            queue.Enqueue(childID);
+                        }
+                        else
+                        {
+                            // Already visited. If we want longest path (better flow), we update and re-queue?
+                            // Careful of cycles.
+                            if (levels[childID] < currentLevel + 1)
+                            {
+                                levels[childID] = currentLevel + 1;
+                                // Limit depth to prevent infinite loops in cycles? 
+                                // Simple safeguard: if level > count, stop.
+                                if (levels[childID] < visibleNodes.Count)
+                                    queue.Enqueue(childID);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Handle disconnected components / unvisited nodes
+            foreach (var n in visibleNodes)
+            {
+                if (!levels.ContainsKey(n.ID)) levels[n.ID] = 0;
+            }
+
+            // 3. Layout
+            var nodesByLevel = new Dictionary<int, List<ConversationUnit>>();
+            foreach (var node in visibleNodes)
+            {
+                int lvl = levels[node.ID];
+                if (!nodesByLevel.ContainsKey(lvl)) nodesByLevel[lvl] = new List<ConversationUnit>();
+                nodesByLevel[lvl].Add(node);
+            }
+
+            Vector2 startOffset = new Vector2(50, 50);
+            float spacingX = NodeWidth + 80f; // Wider for connections
+            float spacingY = NodeHeight + 30f;
+
+            // Sort layers by ID or parentage to reduce crossing?
+            // Natural sort is a good fallback logic
+            foreach (var lvl in nodesByLevel.Keys)
+            {
+                nodesByLevel[lvl].Sort((a, b) => EditorUtility.NaturalCompare(a.ID, b.ID));
+            }
+
+            foreach (var kvp in nodesByLevel)
+            {
+                int level = kvp.Key;
+                var layerNodes = kvp.Value;
+
+                float x = level * spacingX;
+                for (int i = 0; i < layerNodes.Count; i++)
+                {
+                    float y = i * spacingY;
+                    layerNodes[i].Position = startOffset + new Vector2(x, y);
+                }
+            }
+
+            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50, 50);
+        }
+
         public void AutoLayoutVisibleNodes()
         {
             var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
