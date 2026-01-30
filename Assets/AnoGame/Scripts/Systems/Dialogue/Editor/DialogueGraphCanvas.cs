@@ -178,10 +178,9 @@ namespace AnoGame.Systems.Dialogue.Editor
             // Speaker (Dropdown)
             var actorNames = Data.ActorDefinitions.Select(a => a.Name).ToList();
 
-            // Shared Input Color (Darker for Contrast)
-            // Reverting to standard UI styles to ensure arrows and selection states are visible.
-            // Using a dark tint to contrast with the bright node background.
-            Color inputBgColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+            // Shared Input Color (Actor Color - Brighter)
+            // Keeping standard rounded UI but tinting it with the actor's color (mixed with white for brightness).
+            Color inputBgColor = Color.Lerp(nodeColor, Color.white, 0f);
 
             if (actorNames.Count > 0)
             {
