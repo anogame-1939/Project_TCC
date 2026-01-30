@@ -144,27 +144,26 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private void DrawNode(ConversationUnit unit, Rect rect)
         {
-            GUIStyle style = new GUIStyle("window");
+            Color nodeColor = Data.GetActorColor(unit.SpeakerName);
 
-            // Reset Colors
-            GUI.color = Color.white;
-            GUI.backgroundColor = Color.white;
-
-            // Apply Actor Color to Background (Stronger Tint)
-            GUI.backgroundColor = Data.GetActorColor(unit.SpeakerName);
-
-            // Apply Selection Tint (Cyan Glow/Border)
+            // Selection Highlight (Cyan Border)
             if (State.IsSelected(unit.ID))
             {
-                GUI.color = Color.cyan;
+                float border = 2f;
+                Rect selectionRect = new Rect(rect.x - border, rect.y - border, rect.width + border * 2, rect.height + border * 2);
+                EditorGUI.DrawRect(selectionRect, Color.cyan);
             }
 
-            GUI.Box(rect, "", style);
+            // Main Background (Strong Color)
+            EditorGUI.DrawRect(rect, nodeColor);
 
-            // Reset for Content
-            GUI.color = Color.white;
-            GUI.backgroundColor = Color.white;
+            // Subtle Border/Frame for definition
+            Color prevColor = GUI.color;
+            GUI.color = new Color(0, 0, 0, 0.5f);
+            GUI.Box(rect, "", EditorStyles.helpBox);
+            GUI.color = prevColor;
 
+            // Close Button
             if (GUI.Button(new Rect(rect.x + rect.width - 20, rect.y, 20, 20), "×"))
             {
                 _nodesToDelete.Add(unit);
