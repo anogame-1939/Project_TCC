@@ -52,12 +52,12 @@ namespace AnoGame.Systems.Dialogue.Editor
                     Repaint();
                 };
 
-                _sidebar.OnSelectSection = (chapter, section) =>
+                _sidebar.OnSelectSection = (ep, chapter, section) =>
                 {
-                    _canvas.SetFilter(chapter, section);
+                    _canvas.SetFilter(ep, chapter, section);
 
                     // Auto-pan to first node of this section
-                    var firstNode = _data.Conversations.FirstOrDefault(u => u.ChapterID == chapter && u.SectionID == section);
+                    var firstNode = _data.Conversations.FirstOrDefault(u => u.EpisodeID == ep && u.ChapterID == chapter && u.SectionID == section);
                     if (firstNode != null)
                     {
                         float offsetX = (_showSidebar ? 250f : 0f) + 50f;
@@ -66,13 +66,13 @@ namespace AnoGame.Systems.Dialogue.Editor
                     Repaint();
                 };
 
-                // Default Initialization: Show 1st Chapter/Section
+                // Default Initialization: Show 1st Unit
                 if (_data.Conversations.Count > 0)
                 {
                     var first = _data.Conversations[0];
-                    if (!string.IsNullOrEmpty(first.ChapterID) && !string.IsNullOrEmpty(first.SectionID))
+                    if (!string.IsNullOrEmpty(first.EpisodeID))
                     {
-                        _canvas.SetFilter(first.ChapterID, first.SectionID);
+                        _canvas.SetFilter(first.EpisodeID, first.ChapterID, first.SectionID);
                         float offsetX = (_showSidebar ? 250f : 0f) + 50f;
                         _canvas.ScrollPos = first.Position - new Vector2(offsetX, 50);
                     }

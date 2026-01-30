@@ -10,6 +10,15 @@ namespace AnoGame.Systems.Dialogue.Debug
         [Tooltip("Available Conversation IDs (auto-filled if MasterData is accessible via Manager)")]
         public List<string> AvailableIDs = new List<string>();
 
+        [Header("Section Playback")]
+        public string TargetEpisode;
+        public string TargetChapter;
+        public string TargetSection;
+
+        [Tooltip("Enable Auto-Advance for testing")]
+        public bool AutoAdvance = false;
+
+        [Header("Direct Playback")]
         [Tooltip("ID to play when 'Play' button is clicked")]
         public string TargetID;
 
@@ -36,6 +45,8 @@ namespace AnoGame.Systems.Dialogue.Debug
 
         public void PlayCurrentTarget()
         {
+            ApplyDebugSettings();
+
             if (string.IsNullOrEmpty(TargetID))
             {
                 UnityEngine.Debug.LogWarning("[DialogueDebug] No TargetID specified.");
@@ -46,9 +57,28 @@ namespace AnoGame.Systems.Dialogue.Debug
             {
                 DialogueManager.Instance.StartConversation(TargetID);
             }
-            else
+        }
+
+        public void PlaySection()
+        {
+            ApplyDebugSettings();
+
+            if (DialogueManager.Instance != null)
             {
-                UnityEngine.Debug.LogError("[DialogueDebug] DialogueManager instance not found.");
+                DialogueManager.Instance.StartSection(TargetEpisode, TargetChapter, TargetSection);
+            }
+        }
+
+        private void ApplyDebugSettings()
+        {
+            if (DialogueManager.Instance != null)
+            {
+                // Find UI and apply settings
+                var ui = FindObjectOfType<UI.DialogueUIController>();
+                if (ui != null)
+                {
+                    ui.IsAutoAdvance = AutoAdvance;
+                }
             }
         }
 
@@ -98,7 +128,27 @@ namespace AnoGame.Systems.Dialogue.Debug
             if (GUILayout.Button("Play Target ID"))
             {
                 PlayCurrentTarget();
-                _isVisible = false; // Close on play? Or keep open? Let's keep open.
+                //_isVisible = false; 
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Section Playback:");
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Ep:", GUILayout.Width(25));
+            TargetEpisode = GUILayout.TextField(TargetEpisode);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Ch:", GUILayout.Width(25));
+            TargetChapter = GUILayout.TextField(TargetChapter);
+            GUILayout.Label("Sec:", GUILayout.Width(30));
+            TargetSection = GUILayout.TextField(TargetSection);
+            GUILayout.EndHorizontal();
+
+            AutoAdvance = GUILayout.Toggle(AutoAdvance, "Auto Advance");
+
+            if (GUILayout.Button("Play Section"))
+            {
+                PlaySection();
             }
 
             if (GUILayout.Button("Refresh List"))

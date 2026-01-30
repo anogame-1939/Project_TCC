@@ -26,6 +26,14 @@ public class DialogueDebugControllerEditor : Editor
             }
         }
 
+        if (GUILayout.Button("Play Section"))
+        {
+            if (Application.isPlaying)
+            {
+                controller.PlaySection();
+            }
+        }
+
         if (GUILayout.Button("Refresh ID List"))
         {
             controller.RefreshIDList();

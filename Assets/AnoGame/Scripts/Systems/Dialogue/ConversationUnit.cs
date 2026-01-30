@@ -10,6 +10,9 @@ namespace AnoGame.Systems.Dialogue
         [Tooltip("Unique ID for this conversation node (e.g. S1_Intro_01)")]
         public string ID;
 
+        [Tooltip("Episode Context (e.g. Ep1)")]
+        public string EpisodeID;
+
         [Tooltip("Story/Chapter Context (e.g. Story1)")]
         public string ChapterID;
 

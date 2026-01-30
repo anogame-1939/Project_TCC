@@ -97,6 +97,31 @@ namespace AnoGame.Systems.Dialogue
                 }
             }
         }
+
+        public void StartSection(string episodeID, string chapterID, string sectionID)
+        {
+            if (masterData == null) return;
+
+            // Find first node that matches context and typically ends with "_1" or is simply the first found?
+            // Convention: ID = "{Episode}_{Chapter}_{Section}_1" ? 
+            // Or just search for first unit with matching context fields.
+            // Let's search for first unit in the list that matches context.
+            foreach (var unit in masterData.Conversations)
+            {
+                // Loose matching if null
+                bool matchEp = string.IsNullOrEmpty(episodeID) || unit.EpisodeID == episodeID;
+                bool matchCh = string.IsNullOrEmpty(chapterID) || unit.ChapterID == chapterID;
+                bool matchSec = string.IsNullOrEmpty(sectionID) || unit.SectionID == sectionID;
+
+                if (matchEp && matchCh && matchSec)
+                {
+                    StartConversation(unit.ID);
+                    return;
+                }
+            }
+
+            UnityEngine.Debug.LogWarning($"[DialogueManager] No conversation found for Ep:{episodeID} Ch:{chapterID} Sec:{sectionID}");
+        }
         public IEnumerable<string> GetAllConversationIDs()
         {
             if (masterData != null)

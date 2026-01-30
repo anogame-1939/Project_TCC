@@ -19,6 +19,7 @@ namespace AnoGame.Systems.Dialogue.Editor
         private Dictionary<string, Vector2> _posCache = new Dictionary<string, Vector2>();
 
         // Filter
+        public string FilterEpisode = null;
         public string FilterChapter = null;
         public string FilterSection = null;
 
@@ -32,8 +33,9 @@ namespace AnoGame.Systems.Dialogue.Editor
             State = new DialogueGraphState(); // Initialize State
         }
 
-        public void SetFilter(string chapter, string section)
+        public void SetFilter(string episode, string chapter, string section)
         {
+            FilterEpisode = episode;
             FilterChapter = chapter;
             FilterSection = section;
             State.ClearSelection();
@@ -184,10 +186,11 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private bool IsUnitVisible(ConversationUnit unit)
         {
-            if (string.IsNullOrEmpty(FilterChapter) && string.IsNullOrEmpty(FilterSection)) return true;
-            bool matchChapter = string.IsNullOrEmpty(FilterChapter) || unit.ChapterID == FilterChapter;
-            bool matchSection = string.IsNullOrEmpty(FilterSection) || unit.SectionID == FilterSection;
-            return matchChapter && matchSection;
+            if (string.IsNullOrEmpty(FilterEpisode) && string.IsNullOrEmpty(FilterChapter) && string.IsNullOrEmpty(FilterSection)) return true;
+            bool matchEp = string.IsNullOrEmpty(FilterEpisode) || unit.EpisodeID == FilterEpisode;
+            bool matchCh = string.IsNullOrEmpty(FilterChapter) || unit.ChapterID == FilterChapter;
+            bool matchSec = string.IsNullOrEmpty(FilterSection) || unit.SectionID == FilterSection;
+            return matchEp && matchCh && matchSec;
         }
 
         private void DrawNode(ConversationUnit unit, Rect rect)
@@ -346,6 +349,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             var newUnit = new ConversationUnit
             {
                 ID = newID,
+                EpisodeID = parent.EpisodeID,
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
                 SpeakerName = "New Speaker",

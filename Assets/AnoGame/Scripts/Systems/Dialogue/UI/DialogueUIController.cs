@@ -50,16 +50,50 @@ namespace AnoGame.Systems.Dialogue.UI
             SetupChoices(unit);
         }
 
+        [Header("Auto Advance")]
+        public bool IsAutoAdvance = false;
+        [SerializeField] private float autoAdvanceDelay = 1.0f;
+        [SerializeField] private Button continueButton;
+
         private IEnumerator TypeText(string content)
         {
             isTyping = true;
             bodyText.text = "";
+            if (continueButton) continueButton.gameObject.SetActive(true); // Always show during typing so user can skip? Or hide?
+            // Usually hide continue button while typing, click anywhere to skip.
+            // But if we use continue button AS the skip button...
+            // Let's hide it while typing, show it when waiting.
+            if (continueButton) continueButton.gameObject.SetActive(false);
+
             foreach (char c in content)
             {
                 bodyText.text += c;
                 yield return new WaitForSeconds(typingSpeed);
             }
             isTyping = false;
+
+            if (IsAutoAdvance)
+            {
+                // Wait delay then next
+                // But if choices exist, we must wait for user? Yes.
+                if (currentUnit.Choices == null || currentUnit.Choices.Count == 0)
+                {
+                    yield return new WaitForSeconds(autoAdvanceDelay);
+                    OnClickNext();
+                }
+                else
+                {
+                    // Choices will be shown, user must pick.
+                }
+            }
+            else
+            {
+                // Show Continue Button if no choices (or even if choices? usually choices hide continue)
+                if (currentUnit.Choices == null || currentUnit.Choices.Count == 0)
+                {
+                    if (continueButton) continueButton.gameObject.SetActive(true);
+                }
+            }
         }
 
         private void SetupChoices(ConversationUnit unit)
@@ -93,6 +127,10 @@ namespace AnoGame.Systems.Dialogue.UI
                 if (typingCoroutine != null) StopCoroutine(typingCoroutine);
                 bodyText.text = currentUnit.BodyText;
                 isTyping = false;
+
+                // Typing finished manually. If Auto, we pause? Or immediately wait delay?
+                // If manual click to skip, we should show continue button immediately.
+                if (continueButton) continueButton.gameObject.SetActive(true);
                 return;
             }
 
