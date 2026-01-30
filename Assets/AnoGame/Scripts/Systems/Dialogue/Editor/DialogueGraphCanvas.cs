@@ -159,6 +159,28 @@ namespace AnoGame.Systems.Dialogue.Editor
                 float x = (sidebarWidth > 0 ? sidebarWidth : 0) + 20;
                 GUI.Label(new Rect(x, 20, 500, 50), label, style);
             }
+
+            // Debug Overlay
+            if (_host != null)
+            {
+                Rect hostRect = _host.position;
+                Rect localRect = new Rect(0, 0, hostRect.width, hostRect.height - EditorStyles.toolbar.fixedHeight);
+                Rect worldRect = new Rect(0, 0, localRect.width / Zoom, localRect.height / Zoom);
+
+                string debugInfo = $"Window: {hostRect.width}x{hostRect.height}\n" +
+                                   $"Editor: {localRect.width}x{localRect.height}\n" +
+                                   $"Grid: {worldRect.width}x{worldRect.height}\n" +
+                                   $"Zoom: {Zoom:F2}";
+
+                GUIStyle debugStyle = new GUIStyle(EditorStyles.label);
+                debugStyle.alignment = TextAnchor.LowerRight;
+                debugStyle.normal.textColor = Color.yellow;
+
+                // Draw at bottom right of the canvas (relative to 0,0 of the group)
+                // Since we are in BeginGroup(mainArea), the coordinate (localRect.width, localRect.height) is the bottom right.
+                Rect debugRect = new Rect(localRect.width - 300, localRect.height - 100, 290, 90);
+                GUI.Label(debugRect, debugInfo, debugStyle);
+            }
         }
 
         private bool IsUnitVisible(ConversationUnit unit)
