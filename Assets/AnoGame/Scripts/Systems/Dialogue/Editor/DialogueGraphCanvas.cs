@@ -154,20 +154,21 @@ namespace AnoGame.Systems.Dialogue.Editor
                 EditorGUI.DrawRect(selectionRect, Color.cyan);
             }
 
-            // Main Background (Strong Color)
-            EditorGUI.DrawRect(rect, nodeColor);
+            // 1. Definition Border (Black)
+            EditorGUI.DrawRect(rect, new Color(0.1f, 0.1f, 0.1f, 1f));
 
-            // Subtle Border/Frame for definition
-            Color prevColor = GUI.color;
-            GUI.color = new Color(0, 0, 0, 0.5f);
-            GUI.Box(rect, "", EditorStyles.helpBox);
-            GUI.color = prevColor;
+            // 2. Main Background (In set by 1px for border effect)
+            Rect bodyRect = new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+            EditorGUI.DrawRect(bodyRect, nodeColor);
 
-            // Close Button
+            // Close Button (Red)
+            Color oldBg = GUI.backgroundColor;
+            GUI.backgroundColor = Color.red;
             if (GUI.Button(new Rect(rect.x + rect.width - 20, rect.y, 20, 20), "×"))
             {
                 _nodesToDelete.Add(unit);
             }
+            GUI.backgroundColor = oldBg;
 
             Rect contentRect = new Rect(rect.x + 5, rect.y + 5, rect.width - 10, rect.height - 10);
 
@@ -176,6 +177,12 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             // Speaker (Dropdown)
             var actorNames = Data.ActorDefinitions.Select(a => a.Name).ToList();
+
+            // Shared Input Color (Darker for Contrast)
+            // Reverting to standard UI styles to ensure arrows and selection states are visible.
+            // Using a dark tint to contrast with the bright node background.
+            Color inputBgColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+
             if (actorNames.Count > 0)
             {
                 // Ensure current name is in list
@@ -191,7 +198,11 @@ namespace AnoGame.Systems.Dialogue.Editor
                 int currentIndex = actorNames.IndexOf(unit.SpeakerName ?? "");
                 if (currentIndex == -1) currentIndex = 0;
 
+                Color dropdownBg = GUI.backgroundColor;
+                GUI.backgroundColor = inputBgColor;
                 int newIndex = EditorGUILayout.Popup(currentIndex, actorNames.ToArray(), GUILayout.Width(80));
+                GUI.backgroundColor = dropdownBg;
+
                 if (newIndex >= 0 && newIndex < actorNames.Count)
                 {
                     unit.SpeakerName = actorNames[newIndex];
@@ -200,10 +211,18 @@ namespace AnoGame.Systems.Dialogue.Editor
             else
             {
                 // Fallback if no ActorList defined
+                Color dropdownBg = GUI.backgroundColor;
+                GUI.backgroundColor = inputBgColor;
                 unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName, GUILayout.Width(80));
+                GUI.backgroundColor = dropdownBg;
             }
             GUILayout.Space(3);
+
+            // Body Text
+            Color bodyBg = GUI.backgroundColor;
+            GUI.backgroundColor = inputBgColor;
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(55));
+            GUI.backgroundColor = bodyBg;
 
             if (unit.Choices != null && unit.Choices.Count > 0)
             {
