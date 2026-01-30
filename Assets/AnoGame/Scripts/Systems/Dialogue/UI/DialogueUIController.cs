@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.InputSystem;
+using AnoGame.Systems.Dialogue;
 
 namespace AnoGame.Systems.Dialogue.UI
 {
@@ -13,6 +14,7 @@ namespace AnoGame.Systems.Dialogue.UI
         [SerializeField] private GameObject itemsParent; // The main panel to show/hide
         [SerializeField] private TextMeshProUGUI speakerNameText;
         [SerializeField] private TextMeshProUGUI bodyText;
+        [SerializeField] private Button continueButton;
 
         [Header("Choices")]
         [SerializeField] private Transform choiceContainer;
@@ -24,41 +26,18 @@ namespace AnoGame.Systems.Dialogue.UI
         [Header("Input")]
         [SerializeField] private Key advanceKey = Key.Space;
 
+        [Header("Auto Advance")]
+        [SerializeField] private bool _isAutoAdvance = false;
+        [SerializeField] private float autoAdvanceDelay = 1.0f;
+
         private ConversationUnit currentUnit;
         private Coroutine typingCoroutine;
         private bool isTyping = false;
         private bool isSkipping = false;
+        private float inputCooldown = 0f;
 
         public bool IsDialogueActive => itemsParent != null && itemsParent.activeSelf;
 
-        private void Awake()
-        {
-            if (itemsParent) itemsParent.SetActive(false);
-            if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
-        }
-
-        private void Start()
-        {
-            // Register self to Manager (Simple singleton pattern or dependency injection)
-            // For now, we assume Manager calls us or we set it up in Inspector
-            DialogueManager.Instance.RegisterUI(this);
-        }
-
-        public void ShowConversation(ConversationUnit unit)
-        {
-            currentUnit = unit;
-            if (itemsParent) itemsParent.SetActive(true);
-
-            if (speakerNameText) speakerNameText.text = unit.SpeakerName;
-
-            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
-
-            SetupChoices(unit);
-        }
-
-        [Header("Auto Advance")]
-        [SerializeField] private bool _isAutoAdvance = false;
         public bool IsAutoAdvance
         {
             get => _isAutoAdvance;
@@ -83,8 +62,33 @@ namespace AnoGame.Systems.Dialogue.UI
         {
             IsAutoAdvance = !IsAutoAdvance;
         }
-        [SerializeField] private float autoAdvanceDelay = 1.0f;
-        [SerializeField] private Button continueButton;
+
+        private void Awake()
+        {
+            if (itemsParent) itemsParent.SetActive(false);
+            if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
+        }
+
+        private void Start()
+        {
+            // Register self to Manager (Simple singleton pattern or dependency injection)
+            // For now, we assume Manager calls us or we set it up in Inspector
+            DialogueManager.Instance.RegisterUI(this);
+        }
+
+        public void ShowConversation(ConversationUnit unit)
+        {
+            currentUnit = unit;
+            if (itemsParent) itemsParent.SetActive(true);
+            inputCooldown = 0.2f; // Prevent immediate skip input
+
+            if (speakerNameText) speakerNameText.text = unit.SpeakerName;
+
+            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+            typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
+
+            SetupChoices(unit);
+        }
 
         private IEnumerator TypeText(string content)
         {
@@ -101,7 +105,7 @@ namespace AnoGame.Systems.Dialogue.UI
 
             WaitForSeconds wait = new WaitForSeconds(typingSpeed);
 
-            for (int i = 0; i <= totalVisibleCharacters; i++)
+            for (int i = 1; i <= totalVisibleCharacters; i++)
             {
                 bodyText.maxVisibleCharacters = i;
 
@@ -111,7 +115,7 @@ namespace AnoGame.Systems.Dialogue.UI
                 }
                 else
                 {
-                    yield return new WaitForSeconds(1f);
+                    yield return wait;
                 }
             }
 
@@ -121,14 +125,21 @@ namespace AnoGame.Systems.Dialogue.UI
 
             if (IsAutoAdvance)
             {
+                // Wait delay then next
+                // But if choices exist, we must wait for user? Yes.
                 if (currentUnit.Choices == null || currentUnit.Choices.Count == 0)
                 {
                     yield return new WaitForSeconds(autoAdvanceDelay);
                     OnClickNext();
                 }
+                else
+                {
+                    // Choices will be shown, user must pick.
+                }
             }
             else
             {
+                // Show Continue Button if no choices (or even if choices? usually choices hide continue)
                 if (currentUnit.Choices == null || currentUnit.Choices.Count == 0)
                 {
                     if (continueButton) continueButton.gameObject.SetActive(true);
@@ -205,8 +216,10 @@ namespace AnoGame.Systems.Dialogue.UI
 
         private void Update()
         {
-            // Only listen if dialogue is active
-            if (itemsParent != null && itemsParent.activeSelf)
+            if (inputCooldown > 0f) inputCooldown -= Time.deltaTime;
+
+            // Only listen if dialogue is active and cooldown passed
+            if (itemsParent != null && itemsParent.activeSelf && inputCooldown <= 0f)
             {
                 if (Keyboard.current != null && Keyboard.current[advanceKey].wasPressedThisFrame)
                 {
