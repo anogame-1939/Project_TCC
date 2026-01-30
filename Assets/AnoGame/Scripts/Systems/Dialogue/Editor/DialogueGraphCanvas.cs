@@ -146,13 +146,24 @@ namespace AnoGame.Systems.Dialogue.Editor
         {
             GUIStyle style = new GUIStyle("window");
 
+            // Reset Colors
+            GUI.color = Color.white;
+            GUI.backgroundColor = Color.white;
+
+            // Apply Actor Color to Background (Stronger Tint)
+            GUI.backgroundColor = Data.GetActorColor(unit.SpeakerName);
+
+            // Apply Selection Tint (Cyan Glow/Border)
             if (State.IsSelected(unit.ID))
             {
                 GUI.color = Color.cyan;
             }
 
             GUI.Box(rect, "", style);
+
+            // Reset for Content
             GUI.color = Color.white;
+            GUI.backgroundColor = Color.white;
 
             if (GUI.Button(new Rect(rect.x + rect.width - 20, rect.y, 20, 20), "×"))
             {
@@ -164,7 +175,34 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUILayout.BeginArea(contentRect);
             EditorGUILayout.BeginVertical();
 
-            unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName, GUILayout.Width(80));
+            // Speaker (Dropdown)
+            var actorNames = Data.ActorDefinitions.Select(a => a.Name).ToList();
+            if (actorNames.Count > 0)
+            {
+                // Ensure current name is in list
+                if (!string.IsNullOrEmpty(unit.SpeakerName) && !actorNames.Contains(unit.SpeakerName))
+                {
+                    actorNames.Insert(0, unit.SpeakerName);
+                }
+                else if (string.IsNullOrEmpty(unit.SpeakerName))
+                {
+                    if (!actorNames.Contains("")) actorNames.Insert(0, "");
+                }
+
+                int currentIndex = actorNames.IndexOf(unit.SpeakerName ?? "");
+                if (currentIndex == -1) currentIndex = 0;
+
+                int newIndex = EditorGUILayout.Popup(currentIndex, actorNames.ToArray(), GUILayout.Width(80));
+                if (newIndex >= 0 && newIndex < actorNames.Count)
+                {
+                    unit.SpeakerName = actorNames[newIndex];
+                }
+            }
+            else
+            {
+                // Fallback if no ActorList defined
+                unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName, GUILayout.Width(80));
+            }
             GUILayout.Space(3);
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(55));
 

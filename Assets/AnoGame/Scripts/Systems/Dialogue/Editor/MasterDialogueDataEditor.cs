@@ -16,6 +16,27 @@ namespace AnoGame.Systems.Dialogue.Editor
         private void OnEnable()
         {
             _target = (MasterDialogueData)target;
+
+            // Migration
+            if (_target.ActorList != null && _target.ActorList.Count > 0)
+            {
+                if (_target.ActorDefinitions == null) _target.ActorDefinitions = new List<ActorDefinition>();
+
+                int colorIndex = _target.ActorDefinitions.Count;
+                foreach (var name in _target.ActorList)
+                {
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        var def = new ActorDefinition();
+                        def.Name = name;
+                        def.Color = MasterDialogueData.PastelPalette[colorIndex % MasterDialogueData.PastelPalette.Length];
+                        _target.ActorDefinitions.Add(def);
+                        colorIndex++;
+                    }
+                }
+                _target.ActorList.Clear();
+                EditorUtility.SetDirty(_target);
+            }
         }
 
         public override void OnInspectorGUI()
@@ -35,6 +56,11 @@ namespace AnoGame.Systems.Dialogue.Editor
                 GUI.FocusControl(null);
             }
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
+
+            // Actor Management
+            DrawActorManagement();
 
             EditorGUILayout.Space();
 
@@ -131,6 +157,85 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
+        }
+
+        private void DrawActorManagement()
+        {
+            EditorGUILayout.LabelField("Actor Management", EditorStyles.boldLabel);
+
+            if (_target.ActorDefinitions == null) _target.ActorDefinitions = new List<ActorDefinition>();
+
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+            // Theme Selector
+            EditorGUILayout.BeginHorizontal();
+            ColorTheme newTheme = (ColorTheme)EditorGUILayout.EnumPopup("Color Theme", _target.Theme);
+            if (newTheme != _target.Theme)
+            {
+                _target.Theme = newTheme;
+                EditorUtility.SetDirty(_target);
+            }
+            if (GUILayout.Button("Apply Theme to All", GUILayout.Width(130)))
+            {
+                if (EditorUtility.DisplayDialog("Apply Theme", "This will overwrite all actor colors based on the selected theme. Continue?", "Yes", "No"))
+                {
+                    var palette = MasterDialogueData.GetPalette(_target.Theme);
+                    for (int i = 0; i < _target.ActorDefinitions.Count; i++)
+                    {
+                        _target.ActorDefinitions[i].Color = palette[i % palette.Length];
+                    }
+                    EditorUtility.SetDirty(_target);
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
+
+            for (int i = 0; i < _target.ActorDefinitions.Count; i++)
+            {
+                var actor = _target.ActorDefinitions[i];
+                EditorGUILayout.BeginHorizontal();
+
+                // Color Picker
+                Color newColor = EditorGUILayout.ColorField(GUIContent.none, actor.Color, false, false, false, GUILayout.Width(40));
+                if (newColor != actor.Color)
+                {
+                    actor.Color = newColor;
+                    EditorUtility.SetDirty(_target);
+                }
+
+                // Name
+                string newName = EditorGUILayout.TextField(actor.Name);
+                if (newName != actor.Name)
+                {
+                    actor.Name = newName;
+                    EditorUtility.SetDirty(_target);
+                }
+
+                // Remove
+                if (GUILayout.Button("X", GUILayout.Width(20)))
+                {
+                    _target.ActorDefinitions.RemoveAt(i);
+                    EditorUtility.SetDirty(_target);
+                    i--; // adjust index
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            if (GUILayout.Button("Add New Actor"))
+            {
+                var newActor = new ActorDefinition();
+                newActor.Name = "New Actor";
+                // Auto-assign color based on Theme
+                var palette = MasterDialogueData.GetPalette(_target.Theme);
+                newActor.Color = palette[_target.ActorDefinitions.Count % palette.Length];
+
+                _target.ActorDefinitions.Add(newActor);
+                EditorUtility.SetDirty(_target);
+            }
+
+            EditorGUILayout.EndVertical();
         }
 
         private void AddNewConversation()
