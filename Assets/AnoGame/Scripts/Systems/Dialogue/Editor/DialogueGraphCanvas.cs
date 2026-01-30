@@ -149,16 +149,19 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private void DrawOverlay(float sidebarWidth)
         {
-            if (!string.IsNullOrEmpty(FilterChapter) || !string.IsNullOrEmpty(FilterSection))
+            if (!string.IsNullOrEmpty(FilterEpisode) || !string.IsNullOrEmpty(FilterChapter) || !string.IsNullOrEmpty(FilterSection))
             {
-                string label = $"{FilterChapter ?? "All"} / {FilterSection ?? "All"}";
+                var sample = Data.Conversations.FirstOrDefault(u => IsUnitVisible(u));
+                string secDisplay = sample?.SectionName ?? FilterSection ?? "All";
+
+                string label = $"{FilterEpisode ?? "All"} / {FilterChapter ?? "All"} / {secDisplay}";
                 GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
-                style.fontSize = 24;
+                style.fontSize = 20;
                 style.fontStyle = FontStyle.Bold;
                 style.normal.textColor = new Color(1f, 1f, 1f, 0.3f);
 
                 float x = (sidebarWidth > 0 ? sidebarWidth : 0) + 20;
-                GUI.Label(new Rect(x, 20, 500, 50), label, style);
+                GUI.Label(new Rect(x, 20, 600, 50), label, style);
             }
 
             // Debug Overlay

@@ -65,13 +65,15 @@ namespace AnoGame.Systems.Dialogue.Editor
                         {
                             if (!allowChapter && !sectionGroup.Any(u => u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
-                            if (GUILayout.Button($"{sectionGroup.Key} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
+                            var first = sectionGroup.FirstOrDefault();
+                            string displayName = string.IsNullOrEmpty(first?.SectionName) ? sectionGroup.Key : first.SectionName;
+
+                            if (GUILayout.Button($"{displayName} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
                             {
                                 // Trigger Filter
                                 OnSelectSection?.Invoke(epGroup.Key, chapterGroup.Key, sectionGroup.Key);
 
                                 // Pan to first item
-                                var first = sectionGroup.FirstOrDefault();
                                 if (first != null) OnRequestPanTo?.Invoke(first.Position);
                             }
 

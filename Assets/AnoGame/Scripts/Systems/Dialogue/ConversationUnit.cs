@@ -19,6 +19,9 @@ namespace AnoGame.Systems.Dialogue
         [Tooltip("Section/Situation Context (e.g. Intro, BossBattle)")]
         public string SectionID;
 
+        [Tooltip("Human readable name for the section")]
+        public string SectionName;
+
         [Tooltip("Name of the speaker")]
         public string SpeakerName;
 

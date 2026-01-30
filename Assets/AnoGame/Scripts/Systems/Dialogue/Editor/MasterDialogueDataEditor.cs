@@ -58,15 +58,25 @@ namespace AnoGame.Systems.Dialogue.Editor
             EditorGUILayout.EndHorizontal();
 
             // Migration Logic
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Migration Tools", EditorStyles.miniBoldLabel);
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Auto-Migrate Hierarchy from IDs", GUILayout.Height(25)))
+            if (GUILayout.Button("Migrate Hierarchy from IDs", GUILayout.Height(25)))
             {
                 if (EditorUtility.DisplayDialog("Migrate Hierarchy", "This will try to populate Episode/Chapter/Section fields from existing IDs (format: Ep_Ch_Sec_Num). Continue?", "Yes", "Cancel"))
                 {
                     MigrateHierarchy();
                 }
             }
+            if (GUILayout.Button("Migrate 0.0.0 Format", GUILayout.Height(25)))
+            {
+                if (EditorUtility.DisplayDialog("Migrate 0.0.0 Format", "This will parse ChapterID '0.0.0' into Ep/Ch/Sec, and move current SectionID to SectionName. Continue?", "Yes", "Cancel"))
+                {
+                    MigrateLegacyFormat();
+                }
+            }
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
 
             EditorGUILayout.Space();
 
@@ -148,6 +158,14 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             // Content
             unit.ID = EditorGUILayout.TextField("ID", unit.ID);
+
+            EditorGUILayout.BeginHorizontal();
+            unit.EpisodeID = EditorGUILayout.TextField("Ep", unit.EpisodeID);
+            unit.ChapterID = EditorGUILayout.TextField("Ch", unit.ChapterID);
+            unit.SectionID = EditorGUILayout.TextField("Sec", unit.SectionID);
+            EditorGUILayout.EndHorizontal();
+
+            unit.SectionName = EditorGUILayout.TextField("Section Name", unit.SectionName);
             unit.SpeakerName = EditorGUILayout.TextField("Speaker", unit.SpeakerName);
 
             EditorGUILayout.LabelField("Body Text:");
@@ -291,6 +309,35 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
             EditorUtility.SetDirty(_target);
             UnityEngine.Debug.Log($"[DialogueSystem] Migrated {_target.Conversations.Count} units.");
+        }
+
+        private void MigrateLegacyFormat()
+        {
+            Undo.RecordObject(_target, "Migrate Dialogue Legacy Format");
+            int count = 0;
+            foreach (var unit in _target.Conversations)
+            {
+                // 1. Move current SectionID to SectionName (since it contains the name)
+                if (!string.IsNullOrEmpty(unit.SectionID) && string.IsNullOrEmpty(unit.SectionName))
+                {
+                    unit.SectionName = unit.SectionID;
+                }
+
+                // 2. Parse 0.0.0 from ChapterID if it exists in that format
+                if (!string.IsNullOrEmpty(unit.ChapterID) && unit.ChapterID.Contains("."))
+                {
+                    var dots = unit.ChapterID.Split('.');
+                    if (dots.Length == 3)
+                    {
+                        unit.EpisodeID = dots[0];
+                        unit.ChapterID = dots[1];
+                        unit.SectionID = dots[2];
+                    }
+                }
+                count++;
+            }
+            EditorUtility.SetDirty(_target);
+            UnityEngine.Debug.Log($"[DialogueSystem] Legacy Migration complete for {count} units.");
         }
     }
 }
