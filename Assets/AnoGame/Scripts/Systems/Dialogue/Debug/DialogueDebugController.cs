@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.InputSystem; // 追加：InputSystemの名前空間
+using UDebug = UnityEngine.Debug;
 
 namespace AnoGame.Systems.Dialogue.Debug
 {
@@ -24,7 +25,12 @@ namespace AnoGame.Systems.Dialogue.Debug
 
         [Header("On-Screen Console")]
         public bool ShowOnScreen = false;
-        public KeyCode ToggleKey = KeyCode.BackQuote; // "~" key
+        [Tooltip("If true, pressing the ToggleKey will also advance the dialogue if it is active")]
+        public bool AdvanceWithToggleKey = true;
+
+        // 修正点1：KeyCode(旧) から Key(新) に変更
+        // これによりInspectorで新しいInputSystemのキー一覧から選択できるようになります
+        public Key ToggleKey = Key.Backquote; // "~" key
 
         private bool _isVisible = false;
         private Vector2 _scrollPos;
@@ -36,8 +42,22 @@ namespace AnoGame.Systems.Dialogue.Debug
 
         private void Update()
         {
-            if (Input.GetKeyDown(ToggleKey))
+            // 修正点2：Input.GetKeyDown(旧) から Keyboard.current[key].wasPressedThisFrame(新) に変更
+            // Keyboard.currentがnullでないかチェックするのが安全です
+            if (Keyboard.current != null && Keyboard.current[ToggleKey].wasPressedThisFrame)
             {
+                UDebug.Log("ToggleKey pressed");
+
+                // If dialogue is active and we want to advance with toggle key
+                if (AdvanceWithToggleKey)
+                {
+                    var ui = FindFirstObjectByType<UI.DialogueUIController>();
+                    if (ui != null && ui.IsDialogueActive)
+                    {
+                        ui.OnClickNext();
+                    }
+                }
+
                 _isVisible = !_isVisible;
                 if (_isVisible) RefreshIDList();
             }
@@ -74,10 +94,10 @@ namespace AnoGame.Systems.Dialogue.Debug
             if (DialogueManager.Instance != null)
             {
                 // Find UI and apply settings
-                var ui = FindObjectOfType<UI.DialogueUIController>();
+                var ui = FindFirstObjectByType<UI.DialogueUIController>();
                 if (ui != null)
                 {
-                    ui.IsAutoAdvance = AutoAdvance;
+                    ui.SetAutoAdvance(AutoAdvance);
                 }
             }
         }
@@ -98,7 +118,7 @@ namespace AnoGame.Systems.Dialogue.Debug
             {
                 // Fallback for Editor-time execution of ContextMenu
                 // Find DialogueManager in scene
-                var mgr = FindObjectOfType<DialogueManager>();
+                var mgr = FindFirstObjectByType<DialogueManager>();
                 if (mgr != null)
                 {
                     var ids = mgr.GetAllConversationIDs();

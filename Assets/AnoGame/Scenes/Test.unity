@@ -198,7 +198,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 100, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &216183362
@@ -800,10 +800,11 @@ MonoBehaviour:
   TargetEpisode: 0
   TargetChapter: 0
   TargetSection: 0
-  AutoAdvance: 1
+  AutoAdvance: 0
   TargetID: "0.0.0_\u6700\u521D\u306E\u4F1A\u8A71_0"
   ShowOnScreen: 0
-  ToggleKey: 96
+  AdvanceWithToggleKey: 1
+  ToggleKey: 1
 --- !u!114 &497189261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -822,7 +823,8 @@ MonoBehaviour:
   choiceContainer: {fileID: 858507640}
   choiceButtonPrefab: {fileID: 1878314178}
   typingSpeed: 0.05
-  IsAutoAdvance: 0
+  advanceKey: 1
+  _isAutoAdvance: 1
   autoAdvanceDelay: 1
   continueButton: {fileID: 0}
 --- !u!1 &572881704
@@ -1060,6 +1062,7 @@ GameObject:
   - component: {fileID: 858507640}
   - component: {fileID: 858507642}
   - component: {fileID: 858507641}
+  - component: {fileID: 858507643}
   m_Layer: 5
   m_Name: Panel_1
   m_TagString: Untagged
@@ -1124,6 +1127,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 858507639}
   m_CullTransparentMesh: 1
+--- !u!114 &858507643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 858507639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1171666476
 GameObject:
   m_ObjectHideFlags: 0
@@ -1645,8 +1674,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: bfd48e06934c72c42a61f7bf623f73e7, type: 2}
+  m_sharedMaterial: {fileID: -101273621592834886, guid: bfd48e06934c72c42a61f7bf623f73e7, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
