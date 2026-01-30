@@ -8,48 +8,36 @@ namespace AnoGame.Systems.Dialogue.Editor
     public class DialogueGraphCanvas
     {
         public MasterDialogueData Data;
-        public Vector2 ScrollPos;
-        public float Zoom = 1.0f;
+        public DialogueGraphState State; // New State Container
 
         private EditorWindow _host;
 
         private const float NodeWidth = 255f;
-        private const float NodeHeight = 92f; // Increased by another 5px
-
-        // Selection
-        private HashSet<string> _selectedIDs = new HashSet<string>();
-
-        // Dragging Logic
-        private bool _isDraggingSelectionBox = false;
-        private Vector2 _selectionStartPos;
-        private Rect _selectionRect;
-
-        private bool _isDraggingNode = false;
-        private string _draggingNodeID = null;
-        private Vector2 _lastMousePos;
+        private const float NodeHeight = 92f;
 
         // Caching
         private Dictionary<string, Vector2> _posCache = new Dictionary<string, Vector2>();
-
-        public DialogueGraphCanvas(MasterDialogueData data, EditorWindow host)
-        {
-            Data = data;
-            _host = host;
-        }
 
         // Filter
         public string FilterChapter = null;
         public string FilterSection = null;
 
+        // Actions
+        private List<ConversationUnit> _nodesToDelete = new List<ConversationUnit>();
+
+        public DialogueGraphCanvas(MasterDialogueData data, EditorWindow host)
+        {
+            Data = data;
+            _host = host;
+            State = new DialogueGraphState(); // Initialize State
+        }
+
         public void SetFilter(string chapter, string section)
         {
             FilterChapter = chapter;
             FilterSection = section;
-            _selectedIDs.Clear(); // Clear selection when changing views to avoid confusion
+            State.ClearSelection();
         }
-
-        // Actions
-        private List<ConversationUnit> _nodesToDelete = new List<ConversationUnit>();
 
         public void Draw(Rect position, float sidebarWidth = 0f)
         {
@@ -66,13 +54,13 @@ namespace AnoGame.Systems.Dialogue.Editor
             // Update Cache for Connections
             UpdatePosCache();
 
-            // 1. Draw Connections (Behind nodes)
+            // 1. Draw Connections
             if (Event.current.type == EventType.Repaint)
             {
                 DrawConnections(localRect);
             }
 
-            // 2. Draw Nodes (Custom Box)
+            // 2. Draw Nodes
             for (int i = 0; i < Data.Conversations.Count; i++)
             {
                 var unit = Data.Conversations[i];
@@ -80,19 +68,19 @@ namespace AnoGame.Systems.Dialogue.Editor
 
                 if (unit.Position == Vector2.zero) unit.Position = new Vector2(100 + (i * 20), 100 + (i * 20));
 
-                Vector2 drawPos = unit.Position - ScrollPos;
+                Vector2 drawPos = unit.Position - State.ScrollPos;
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
 
                 DrawNode(unit, nodeRect);
             }
 
-            // 3. Draw Overlay (Section Name)
+            // 3. Draw Overlay
             DrawOverlay(sidebarWidth);
 
             // Draw Selection Box
-            if (_isDraggingSelectionBox)
+            if (State.IsDraggingSelectionBox)
             {
-                GUI.Box(_selectionRect, "", "SelectionRect");
+                GUI.Box(State.SelectionRect, "", "SelectionRect");
             }
 
             // Process Input LAST
@@ -111,6 +99,12 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUI.EndGroup();
         }
 
+        public Vector2 ScrollPos
+        {
+            get => State.ScrollPos;
+            set => State.ScrollPos = value;
+        }
+
         private void DrawOverlay(float sidebarWidth)
         {
             if (!string.IsNullOrEmpty(FilterChapter) || !string.IsNullOrEmpty(FilterSection))
@@ -119,9 +113,8 @@ namespace AnoGame.Systems.Dialogue.Editor
                 GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
                 style.fontSize = 24;
                 style.fontStyle = FontStyle.Bold;
-                style.normal.textColor = new Color(1f, 1f, 1f, 0.3f); // Transparent white
+                style.normal.textColor = new Color(1f, 1f, 1f, 0.3f);
 
-                // Offset by sidebar width (+ padding) so it's not covered
                 float x = (sidebarWidth > 0 ? sidebarWidth : 0) + 20;
                 GUI.Label(new Rect(x, 20, 500, 50), label, style);
             }
@@ -130,20 +123,16 @@ namespace AnoGame.Systems.Dialogue.Editor
         private bool IsUnitVisible(ConversationUnit unit)
         {
             if (string.IsNullOrEmpty(FilterChapter) && string.IsNullOrEmpty(FilterSection)) return true;
-
             bool matchChapter = string.IsNullOrEmpty(FilterChapter) || unit.ChapterID == FilterChapter;
             bool matchSection = string.IsNullOrEmpty(FilterSection) || unit.SectionID == FilterSection;
-
             return matchChapter && matchSection;
         }
 
         private void DrawNode(ConversationUnit unit, Rect rect)
         {
-            // Background Box
-            GUIStyle style = new GUIStyle("window"); // Use default window style for look
+            GUIStyle style = new GUIStyle("window");
 
-            // Highlight
-            if (_selectedIDs.Contains(unit.ID))
+            if (State.IsSelected(unit.ID))
             {
                 GUI.color = Color.cyan;
             }
@@ -151,32 +140,24 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUI.Box(rect, "", style);
             GUI.color = Color.white;
 
-            // Delete Button (Top-Right)
             if (GUI.Button(new Rect(rect.x + rect.width - 20, rect.y, 20, 20), "×"))
             {
                 _nodesToDelete.Add(unit);
             }
 
-            // Content Area - Symmetric padding (5px top, 5px bottom)
             Rect contentRect = new Rect(rect.x + 5, rect.y + 5, rect.width - 10, rect.height - 10);
 
             GUILayout.BeginArea(contentRect);
             EditorGUILayout.BeginVertical();
 
-            // Speaker (No Label)
             unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName, GUILayout.Width(80));
-
             GUILayout.Space(3);
-
-            // Text (No Label)
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(55));
 
-            // Links Preview
             if (unit.Choices != null && unit.Choices.Count > 0)
             {
                 EditorGUILayout.LabelField($"Choices: {unit.Choices.Count}", EditorStyles.miniLabel);
             }
-            // NextID is hidden as requested
 
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
@@ -184,24 +165,27 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
         {
-            Vector2 mousePos = e.mousePosition; // Local to Group
+            Vector2 mousePos = e.mousePosition;
 
-            // If mouse is over the sidebar overlay area, ignore interaction with canvas
-            // Note: Since Sidebar is overlaying the canvas, we assume restrictedX matches the visual sidebar width.
             if (restrictedX > 0 && mousePos.x < restrictedX) return;
+
+            // Hit Test
+            string clickedNodeID = GetNodeAtPosition(mousePos);
+            bool isOverNode = !string.IsNullOrEmpty(clickedNodeID);
 
             // Right Click (Context Menu)
             if (e.type == EventType.MouseDown && e.button == 1)
             {
-                string clickedNodeID = GetNodeAtPosition(mousePos);
                 var menu = new GenericMenu();
-
-                if (!string.IsNullOrEmpty(clickedNodeID))
+                if (isOverNode)
                 {
                     var unit = Data.Conversations.FirstOrDefault(u => u.ID == clickedNodeID);
                     if (unit != null)
                     {
-                        menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + ScrollPos));
+                        // Select the node we right-clicked if not already selected
+                        if (!State.IsSelected(clickedNodeID)) State.SetSelection(clickedNodeID);
+
+                        menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + State.ScrollPos));
                         menu.AddItem(new GUIContent("Insert Node After"), false, () => InsertNodeAfter(unit));
                         menu.AddSeparator("");
                         menu.AddItem(new GUIContent("Delete Node"), false, () => _nodesToDelete.Add(unit));
@@ -209,78 +193,69 @@ namespace AnoGame.Systems.Dialogue.Editor
                 }
                 else
                 {
-                    menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + ScrollPos));
+                    menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + State.ScrollPos));
                 }
-
                 menu.ShowAsContext();
                 e.Use();
                 return;
             }
 
-            // Left Click (Selection / Dragging)
+            // Left Click Logic
             if (e.type == EventType.MouseDown && e.button == 0)
             {
-                string clickedNodeID = GetNodeAtPosition(mousePos);
-
-                if (!string.IsNullOrEmpty(clickedNodeID))
+                if (isOverNode)
                 {
-                    // Clicked Node
+                    // Selection Logic
                     if (e.modifiers == EventModifiers.Shift || e.modifiers == EventModifiers.Control)
                     {
-                        // Toggle Selection
-                        if (_selectedIDs.Contains(clickedNodeID)) _selectedIDs.Remove(clickedNodeID);
-                        else _selectedIDs.Add(clickedNodeID);
+                        if (State.IsSelected(clickedNodeID)) State.RemoveFromSelection(clickedNodeID);
+                        else State.AddToSelection(clickedNodeID);
                     }
                     else
                     {
-                        // If not already selected, clear and select this
-                        if (!_selectedIDs.Contains(clickedNodeID))
+                        if (!State.IsSelected(clickedNodeID))
                         {
-                            _selectedIDs.Clear();
-                            _selectedIDs.Add(clickedNodeID);
+                            State.SetSelection(clickedNodeID);
                         }
                     }
 
-                    _isDraggingNode = true;
-                    _draggingNodeID = clickedNodeID;
-                    _lastMousePos = e.mousePosition;
+                    State.StartDraggingNode(clickedNodeID, mousePos);
                     e.Use();
                 }
                 else
                 {
-                    // Clicked Empty -> Start Selection Box
-                    _isDraggingSelectionBox = true;
-                    _selectionStartPos = mousePos;
-                    _selectionRect = new Rect(mousePos, Vector2.zero);
-
+                    // Start Box Select
+                    State.StartDraggingSelectionBox(mousePos);
                     if (e.modifiers != EventModifiers.Shift && e.modifiers != EventModifiers.Control)
                     {
-                        _selectedIDs.Clear();
+                        State.ClearSelection();
                     }
                     e.Use();
                 }
             }
 
+            // Dragging
             if (e.type == EventType.MouseDrag)
             {
-                if (_isDraggingNode)
+                if (State.IsDraggingNode)
                 {
-                    Vector2 legacyDelta = e.delta;
-                    MoveSelectedNodes(legacyDelta, null);
-                    _lastMousePos = mousePos;
+                    Vector2 delta = mousePos - State.LastMousePos;
+                    MoveSelectedNodes(delta);
+                    State.LastMousePos = mousePos;
+
                     e.Use();
                     _host.Repaint();
                 }
-                else if (_isDraggingSelectionBox)
+                else if (State.IsDraggingSelectionBox)
                 {
-                    _selectionRect = GetRect(_selectionStartPos, mousePos);
-                    SelectNodesInRect(_selectionRect, ScrollPos);
+                    State.UpdateSelectionBox(mousePos);
+                    SelectNodesInRect(State.SelectionRect, State.ScrollPos);
                     e.Use();
                     _host.Repaint();
                 }
-                else if (e.button == 2 || (e.button == 0 && e.alt)) // Middle or Alt+Left Pan
+                else if (e.button == 2 || (e.button == 0 && e.alt))
                 {
-                    ScrollPos -= e.delta;
+                    State.ScrollPos -= e.delta;
                     e.Use();
                     _host.Repaint();
                 }
@@ -288,27 +263,22 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             if (e.type == EventType.MouseUp)
             {
-                _isDraggingNode = false;
-                _isDraggingSelectionBox = false;
-                _draggingNodeID = null;
+                State.StopDraggingNode();
+                State.StopDraggingSelectionBox();
             }
         }
 
         private string GetNodeAtPosition(Vector2 mousePos)
         {
-            // Iterate reverse to respect draw order (topmost first)
             for (int i = Data.Conversations.Count - 1; i >= 0; i--)
             {
                 var unit = Data.Conversations[i];
                 if (!IsUnitVisible(unit)) continue;
 
-                Vector2 drawPos = unit.Position - ScrollPos;
+                Vector2 drawPos = unit.Position - State.ScrollPos;
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
 
-                if (nodeRect.Contains(mousePos))
-                {
-                    return unit.ID;
-                }
+                if (nodeRect.Contains(mousePos)) return unit.ID;
             }
             return null;
         }
@@ -389,11 +359,11 @@ namespace AnoGame.Systems.Dialogue.Editor
             );
         }
 
-        private void MoveSelectedNodes(Vector2 delta, string excludeID)
+        private void MoveSelectedNodes(Vector2 delta)
         {
             foreach (var unit in Data.Conversations)
             {
-                if (_selectedIDs.Contains(unit.ID))
+                if (State.IsSelected(unit.ID))
                 {
                     unit.Position += delta;
                 }
@@ -415,7 +385,7 @@ namespace AnoGame.Systems.Dialogue.Editor
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
                 if (r.Overlaps(nodeRect))
                 {
-                    _selectedIDs.Add(unit.ID);
+                    State.AddToSelection(unit.ID);
                 }
             }
         }
@@ -469,7 +439,7 @@ namespace AnoGame.Systems.Dialogue.Editor
                 }
             }
 
-            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50 + extraOffsetX, 50);
+            if (visibleNodes.Count > 0) State.ScrollPos = visibleNodes[0].Position - new Vector2(50 + extraOffsetX, 50);
         }
 
         public void AutoLayoutVisibleNodes(float extraOffsetX = 0f)
@@ -510,7 +480,7 @@ namespace AnoGame.Systems.Dialogue.Editor
                 visibleNodes[i].Position = startOffset + new Vector2(col * spacingX, row * spacingY);
             }
 
-            if (visibleNodes.Count > 0) ScrollPos = visibleNodes[0].Position - new Vector2(50 + extraOffsetX, 50);
+            if (visibleNodes.Count > 0) State.ScrollPos = visibleNodes[0].Position - new Vector2(50 + extraOffsetX, 50);
         }
 
         private Dictionary<string, int> GetNodeLevels(List<ConversationUnit> nodes)
@@ -643,7 +613,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             {
                 if (!IsUnitVisible(unit)) continue;
 
-                Vector2 startPos = unit.Position - ScrollPos;
+                Vector2 startPos = unit.Position - State.ScrollPos;
                 startPos.x += NodeWidth / 2;
                 startPos.y += NodeHeight;
 
@@ -677,7 +647,7 @@ namespace AnoGame.Systems.Dialogue.Editor
         {
             if (_posCache.TryGetValue(targetID, out Vector2 targetPos))
             {
-                Vector2 end = targetPos - ScrollPos;
+                Vector2 end = targetPos - State.ScrollPos;
                 end.x += NodeWidth / 2;
 
                 // Tangents: Start goes Down (+Y), End comes from Up (-Y)
@@ -697,14 +667,14 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             for (int i = 0; i < widthDivs; i++)
             {
-                float x = (spacing * i) - (ScrollPos.x % spacing);
+                float x = (spacing * i) - (State.ScrollPos.x % spacing);
                 if (x < 0) x += spacing;
                 Handles.DrawLine(new Vector3(x, 0, 0), new Vector3(x, rect.height, 0));
             }
 
             for (int j = 0; j < heightDivs; j++)
             {
-                float y = (spacing * j) - (ScrollPos.y % spacing);
+                float y = (spacing * j) - (State.ScrollPos.y % spacing);
                 if (y < 0) y += spacing;
                 Handles.DrawLine(new Vector3(0, y, 0), new Vector3(rect.width, y, 0));
             }
