@@ -48,6 +48,9 @@ namespace AnoGame.Systems.Dialogue.Editor
             _selectedIDs.Clear(); // Clear selection when changing views to avoid confusion
         }
 
+        // Actions
+        private List<ConversationUnit> _nodesToDelete = new List<ConversationUnit>();
+
         public void Draw(Rect position, float sidebarWidth = 0f)
         {
             if (Data == null) return;
@@ -64,8 +67,6 @@ namespace AnoGame.Systems.Dialogue.Editor
             UpdatePosCache();
 
             // 1. Draw Connections (Behind nodes)
-            // Only draw connections if both start and end are visible? 
-            // Or just start? Let's check visibility in loop.
             if (Event.current.type == EventType.Repaint)
             {
                 DrawConnections(localRect);
@@ -75,8 +76,6 @@ namespace AnoGame.Systems.Dialogue.Editor
             for (int i = 0; i < Data.Conversations.Count; i++)
             {
                 var unit = Data.Conversations[i];
-
-                // Filter Check
                 if (!IsUnitVisible(unit)) continue;
 
                 if (unit.Position == Vector2.zero) unit.Position = new Vector2(100 + (i * 20), 100 + (i * 20));
@@ -84,14 +83,11 @@ namespace AnoGame.Systems.Dialogue.Editor
                 Vector2 drawPos = unit.Position - ScrollPos;
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
 
-                // Simple Culling
-                if (nodeRect.xMax < 0 || nodeRect.x > localRect.width || nodeRect.yMax < 0 || nodeRect.y > localRect.height)
-                {
-                    // Culling off-screen
-                }
-
                 DrawNode(unit, nodeRect);
             }
+
+            // 3. Draw Overlay (Section Name)
+            DrawOverlay();
 
             // Draw Selection Box
             if (_isDraggingSelectionBox)
@@ -99,10 +95,36 @@ namespace AnoGame.Systems.Dialogue.Editor
                 GUI.Box(_selectionRect, "", "SelectionRect");
             }
 
-            // Process Input LAST to ensure it covers everything drawn
+            // Process Input LAST
             ProcessEvents(Event.current, localRect, sidebarWidth);
 
+            // Handle Deletions
+            if (_nodesToDelete.Count > 0)
+            {
+                foreach (var node in _nodesToDelete)
+                {
+                    Data.Conversations.Remove(node);
+                    // Optional: Cleanup links pointing TO this node?
+                    // For now, keep it simple as per request.
+                }
+                _nodesToDelete.Clear();
+            }
+
             GUI.EndGroup();
+        }
+
+        private void DrawOverlay()
+        {
+            if (!string.IsNullOrEmpty(FilterChapter) || !string.IsNullOrEmpty(FilterSection))
+            {
+                string label = $"{FilterChapter ?? "All"} / {FilterSection ?? "All"}";
+                GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
+                style.fontSize = 24;
+                style.fontStyle = FontStyle.Bold;
+                style.normal.textColor = new Color(1f, 1f, 1f, 0.3f); // Transparent white
+
+                GUI.Label(new Rect(20, 20, 500, 50), label, style);
+            }
         }
 
         private bool IsUnitVisible(ConversationUnit unit)
