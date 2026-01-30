@@ -75,8 +75,7 @@ namespace AnoGame.Systems.Dialogue.Editor
 
                 if (unit.Position == Vector2.zero) unit.Position = new Vector2(100 + (i * 20), 100 + (i * 20));
 
-                Vector2 drawPos = unit.Position - State.ScrollPos;
-                Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
+                Rect nodeRect = GetNodeRect(unit, State.ScrollPos);
 
                 DrawNode(unit, nodeRect);
             }
@@ -272,13 +271,91 @@ namespace AnoGame.Systems.Dialogue.Editor
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(55));
             GUI.backgroundColor = bodyBg;
 
-            if (unit.Choices != null && unit.Choices.Count > 0)
+            // Choices Section
+            GUILayout.Space(5);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Choices", EditorStyles.boldLabel, GUILayout.Width(60));
+            // Add Choice Button (Header style)
+            if (GUILayout.Button("+", GUILayout.Width(20)))
             {
-                EditorGUILayout.LabelField($"Choices: {unit.Choices.Count}", EditorStyles.miniLabel);
+                if (unit.Choices == null) unit.Choices = new List<Choice>();
+                unit.Choices.Add(new Choice { ChoiceText = "New Choice" });
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (unit.Choices == null) unit.Choices = new List<Choice>();
+
+            for (int i = 0; i < unit.Choices.Count; i++)
+            {
+                var choice = unit.Choices[i];
+                EditorGUILayout.BeginHorizontal();
+
+                // Choice Text
+                GUI.backgroundColor = inputBgColor;
+                choice.ChoiceText = EditorGUILayout.TextField(choice.ChoiceText);
+                GUI.backgroundColor = bodyBg;
+
+                // Create/Link Node Button
+                if (string.IsNullOrEmpty(choice.TargetID))
+                {
+                    if (GUILayout.Button("+Node", GUILayout.Width(45)))
+                    {
+                        CreateNodeForChoice(unit, choice);
+                    }
+                }
+                else
+                {
+                    // Visual indicator that it is linked
+                    // Could add a "Jump to" or "Clear" but keeping it simple for now
+                    if (GUILayout.Button("->", GUILayout.Width(25)))
+                    {
+                        // Select target?
+                        State.SetSelection(choice.TargetID);
+                        // Pan to target?
+                        var target = Data.Conversations.FirstOrDefault(x => x.ID == choice.TargetID);
+                        if (target != null) State.ScrollPos = target.Position - new Vector2(250, 50);
+                    }
+                }
+
+                // Delete Choice
+                GUI.backgroundColor = Color.red;
+                if (GUILayout.Button("x", GUILayout.Width(20)))
+                {
+                    unit.Choices.RemoveAt(i);
+                    i--;
+                }
+                GUI.backgroundColor = bodyBg;
+
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
+        }
+
+        private void CreateNodeForChoice(ConversationUnit parent, Choice choice)
+        {
+            string newID = GenerateNextID();
+
+            // Heuristic position for new node:
+            // Place it to the right and slightly down from parent, or stack them if multiple choices
+            int choiceIndex = parent.Choices.IndexOf(choice);
+            Vector2 offset = new Vector2(NodeWidth + 50, (choiceIndex * (NodeHeight + 20)));
+            Vector2 newPos = parent.Position + offset;
+
+            var newUnit = new ConversationUnit
+            {
+                ID = newID,
+                ChapterID = parent.ChapterID,
+                SectionID = parent.SectionID,
+                SpeakerName = "New Speaker",
+                BodyText = "New Text",
+                Position = newPos
+            };
+
+            choice.TargetID = newID;
+            Data.Conversations.Add(newUnit);
+            _host.Repaint();
         }
 
         private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
@@ -439,12 +516,23 @@ namespace AnoGame.Systems.Dialogue.Editor
                 var unit = Data.Conversations[i];
                 if (!IsUnitVisible(unit)) continue;
 
-                Vector2 drawPos = unit.Position - State.ScrollPos;
-                Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
+                Rect nodeRect = GetNodeRect(unit, State.ScrollPos);
 
                 if (nodeRect.Contains(mousePos)) return unit.ID;
             }
             return null;
+        }
+
+        private Rect GetNodeRect(ConversationUnit unit, Vector2 scrollPos)
+        {
+            float currentHeight = 115f; // reduced base height since button is moved up
+            if (unit.Choices != null && unit.Choices.Count > 0)
+            {
+                currentHeight += unit.Choices.Count * 25f;
+            }
+
+            Vector2 drawPos = unit.Position - scrollPos;
+            return new Rect(drawPos.x, drawPos.y, NodeWidth, currentHeight);
         }
 
         private void CreateNode(Vector2 worldPos)
@@ -545,8 +633,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             {
                 if (!IsUnitVisible(unit)) continue;
 
-                Vector2 drawPos = unit.Position - scrollPos;
-                Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
+                Rect nodeRect = GetNodeRect(unit, scrollPos);
                 if (r.Overlaps(nodeRect))
                 {
                     State.AddToSelection(unit.ID);
@@ -777,29 +864,42 @@ namespace AnoGame.Systems.Dialogue.Editor
             {
                 if (!IsUnitVisible(unit)) continue;
 
-                Vector2 startPos = unit.Position - State.ScrollPos;
-                startPos.x += NodeWidth / 2;
-                startPos.y += NodeHeight;
+                // Use dynamic rect for connection start point
+                Rect nodeRect = GetNodeRect(unit, State.ScrollPos);
+
+                // Normal NextID starts from Bottom-Center
+                Vector2 bottomStartPos = new Vector2(nodeRect.center.x, nodeRect.yMax);
 
                 if (!string.IsNullOrEmpty(unit.NextID))
                 {
                     var target = Data.Conversations.FirstOrDefault(u => u.ID == unit.NextID);
                     if (target != null && IsUnitVisible(target))
                     {
-                        DrawCurve(startPos, unit.NextID, Color.white);
+                        DrawCurve(bottomStartPos, unit.NextID, Color.white, false);
                     }
                 }
 
                 if (unit.Choices != null)
                 {
-                    foreach (var c in unit.Choices)
+                    // Choice connections start from Right Edge
+                    // Base Offset Calculation:
+                    // Header(~86px) + Choices Label(~20px) = ~106px (approx start of first choice)
+                    // Choice Row = 25px
+                    float choicesStartY = nodeRect.y + 106f;
+
+                    for (int i = 0; i < unit.Choices.Count; i++)
                     {
+                        var c = unit.Choices[i];
                         if (!string.IsNullOrEmpty(c.TargetID))
                         {
                             var target = Data.Conversations.FirstOrDefault(u => u.ID == c.TargetID);
                             if (target != null && IsUnitVisible(target))
                             {
-                                DrawCurve(startPos, c.TargetID, Color.cyan);
+                                // Center of the choice row
+                                float choiceRowCenterY = choicesStartY + (i * 25f) + 12.5f;
+                                Vector2 choiceStartPos = new Vector2(nodeRect.xMax, choiceRowCenterY);
+
+                                DrawCurve(choiceStartPos, c.TargetID, Color.cyan, true);
                             }
                         }
                     }
@@ -807,15 +907,23 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
         }
 
-        private void DrawCurve(Vector2 start, string targetID, Color color)
+        private void DrawCurve(Vector2 start, string targetID, Color color, bool startFromRight)
         {
-            if (_posCache.TryGetValue(targetID, out Vector2 targetPos))
+            // Target Node top center
+            if (Data.Conversations.FirstOrDefault(u => u.ID == targetID) is ConversationUnit targetUnit)
             {
-                Vector2 end = targetPos - State.ScrollPos;
-                end.x += NodeWidth / 2;
+                // We need target position relative to scroll
+                // We don't need full rect, just top center.
+                // Target Pos is Top-Left. Width is fixed (NodeWidth).
+                Vector2 targetWorldPos = targetUnit.Position;
+                Vector2 targetDrawPos = targetWorldPos - State.ScrollPos;
+                Vector2 end = targetDrawPos + new Vector2(NodeWidth / 2, 0);
 
-                // Tangents: Start goes Down (+Y), End comes from Up (-Y)
-                Handles.DrawBezier(start, end, start + Vector2.up * 50, end + Vector2.down * 50, color, null, 2f);
+                // Tangents
+                Vector2 startTangent = start + (startFromRight ? Vector2.right : Vector2.up) * 50;
+                Vector2 endTangent = end + Vector2.down * 50;
+
+                Handles.DrawBezier(start, end, startTangent, endTangent, color, null, 2f);
             }
         }
 

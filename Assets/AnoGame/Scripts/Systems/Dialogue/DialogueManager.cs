@@ -55,7 +55,7 @@ namespace AnoGame.Systems.Dialogue
                     }
                     else if (conversationCache.ContainsKey(unit.ID))
                     {
-                        Debug.LogWarning($"[DialogueManager] Duplicate ID found: {unit.ID}");
+                        UnityEngine.Debug.LogWarning($"[DialogueManager] Duplicate ID found: {unit.ID}");
                     }
                 }
             }
@@ -70,7 +70,7 @@ namespace AnoGame.Systems.Dialogue
                 return unit;
             }
 
-            Debug.LogError($"[DialogueManager] Conversation ID not found: {id}");
+            UnityEngine.Debug.LogError($"[DialogueManager] Conversation ID not found: {id}");
             return null;
         }
 
@@ -93,7 +93,17 @@ namespace AnoGame.Systems.Dialogue
                 }
                 else
                 {
-                    Debug.LogWarning($"[DialogueManager] No UI registered. Conversation content: {unit.BodyText}");
+                    UnityEngine.Debug.LogWarning($"[DialogueManager] No UI registered. Conversation content: {unit.BodyText}");
+                }
+            }
+        }
+        public IEnumerable<string> GetAllConversationIDs()
+        {
+            if (masterData != null)
+            {
+                foreach (var unit in masterData.Conversations)
+                {
+                    if (!string.IsNullOrEmpty(unit.ID)) yield return unit.ID;
                 }
             }
         }

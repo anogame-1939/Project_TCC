@@ -26,7 +26,7 @@ namespace AnoGame.Systems.Dialogue
         {
             if (string.IsNullOrEmpty(ConversationID))
             {
-                Debug.LogWarning("[SimpleDialogueTrigger] No ConversationID assigned.", this);
+                UnityEngine.Debug.LogWarning("[SimpleDialogueTrigger] No ConversationID assigned.", this);
                 return;
             }
 
