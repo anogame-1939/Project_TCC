@@ -48,8 +48,15 @@ namespace AnoGame.Systems.Dialogue.Editor
             Rect localRect = new Rect(0, 0, position.width, position.height);
 
             // Draw Background & Grid
-            DrawGrid(localRect, 20, 0.2f, Color.gray);
-            DrawGrid(localRect, 100, 0.4f, Color.gray);
+            // Apply Zoom to World Space
+            Matrix4x4 oldMatrix = GUI.matrix;
+            GUIUtility.ScaleAroundPivot(new Vector2(Zoom, Zoom), Vector2.zero);
+
+            // Calculate Visible World Area
+            Rect worldRect = new Rect(0, 0, localRect.width / Zoom, localRect.height / Zoom);
+
+            DrawGrid(worldRect, 20, 0.2f, Color.gray);
+            DrawGrid(worldRect, 100, 0.4f, Color.gray);
 
             // Update Cache for Connections
             UpdatePosCache();
@@ -74,13 +81,27 @@ namespace AnoGame.Systems.Dialogue.Editor
                 DrawNode(unit, nodeRect);
             }
 
+            // Restore Matrix for UI Overlay
+            GUI.matrix = oldMatrix;
+
             // 3. Draw Overlay
             DrawOverlay(sidebarWidth);
 
             // Draw Selection Box
             if (State.IsDraggingSelectionBox)
             {
+                // Box is drawn in Screen Space (mousePos is raw), so we might need logic here.
+                // Actually, StartDraggingSelectionBox uses 'mousePos'.
+                // If we change 'mousePos' to be World Space in ProcessEvents, then 'SelectionRect' will be World Space.
+                // So we should draw it in World Space (inside the Matrix).
+
+                // Let's Move this INSIDE the matrix for consistent World Space rendering.
+                GUI.matrix = oldMatrix; // Undo first
+                GUIUtility.ScaleAroundPivot(new Vector2(Zoom, Zoom), Vector2.zero); // Re-apply
+
                 GUI.Box(State.SelectionRect, "", "SelectionRect");
+
+                GUI.matrix = oldMatrix; // Restore again
             }
 
             // Process Input LAST
@@ -117,6 +138,12 @@ namespace AnoGame.Systems.Dialogue.Editor
         {
             get => State.ScrollPos;
             set => State.ScrollPos = value;
+        }
+
+        public float Zoom
+        {
+            get => State.Zoom;
+            set => State.Zoom = value;
         }
 
         private void DrawOverlay(float sidebarWidth)
@@ -234,9 +261,54 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
         {
-            Vector2 mousePos = e.mousePosition;
+            // Zoom: Modify mousePos to likely World Coordinate relative to Zoom
+            // Pivot is (0,0) of the Group.
+            Vector2 mousePos = e.mousePosition / Zoom;
 
-            if (restrictedX > 0 && mousePos.x < restrictedX) return;
+            if (restrictedX > 0 && e.mousePosition.x < restrictedX) return;
+
+            // Zoom Control
+            if (e.type == EventType.ScrollWheel)
+            {
+                float zoomDelta = -e.delta.y * 0.05f;
+                float oldZoom = Zoom;
+                float newZoom = Mathf.Clamp(oldZoom + zoomDelta, 0.2f, 2.0f);
+
+                if (Mathf.Abs(newZoom - oldZoom) > 0.001f)
+                {
+                    // Mouse-Centered Zoom Logic
+                    // CanvasPos = (ViewPos / oldZoom) + ScrollPos
+                    Vector2 mouseViewPos = e.mousePosition; // Raw View Pos
+                    Vector2 mouseCanvasPos = (mouseViewPos / oldZoom) + State.ScrollPos;
+
+                    Zoom = newZoom;
+
+                    // newScrollPos = mouseCanvasPos - (mouseViewPos / newZoom)
+                    State.ScrollPos = mouseCanvasPos - (mouseViewPos / newZoom);
+
+                    e.Use();
+                }
+                return;
+            }
+
+            // Delete Key
+            if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Delete)
+            {
+                if (State.SelectedIDs.Count > 0)
+                {
+                    // Create a copy to modify collection safely if needed, though we track units here
+                    var idsToDelete = State.SelectedIDs.ToList();
+                    foreach (var id in idsToDelete)
+                    {
+                        var u = Data.Conversations.FirstOrDefault(x => x.ID == id);
+                        if (u != null) _nodesToDelete.Add(u);
+                    }
+                    State.ClearSelection();
+                    e.Use();
+                    _host.Repaint();
+                }
+                return;
+            }
 
             // Hit Test
             string clickedNodeID = GetNodeAtPosition(mousePos);
