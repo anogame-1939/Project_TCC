@@ -57,6 +57,17 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
             EditorGUILayout.EndHorizontal();
 
+            // Migration Logic
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Auto-Migrate Hierarchy from IDs", GUILayout.Height(25)))
+            {
+                if (EditorUtility.DisplayDialog("Migrate Hierarchy", "This will try to populate Episode/Chapter/Section fields from existing IDs (format: Ep_Ch_Sec_Num). Continue?", "Yes", "Cancel"))
+                {
+                    MigrateHierarchy();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.Space();
 
             // Actor Management
@@ -243,6 +254,43 @@ namespace AnoGame.Systems.Dialogue.Editor
             var newUnit = new ConversationUnit();
             newUnit.ID = "New_Conversation_" + _target.Conversations.Count;
             _target.Conversations.Add(newUnit);
+        }
+
+        private void MigrateHierarchy()
+        {
+            Undo.RecordObject(_target, "Migrate Dialogue Hierarchy");
+            foreach (var unit in _target.Conversations)
+            {
+                if (string.IsNullOrEmpty(unit.ID)) continue;
+
+                var parts = unit.ID.Split('_');
+                if (parts.Length == 4)
+                {
+                    unit.EpisodeID = parts[0];
+                    unit.ChapterID = parts[1];
+                    unit.SectionID = parts[2];
+                }
+                else if (parts.Length == 3)
+                {
+                    unit.EpisodeID = "Default";
+                    unit.ChapterID = parts[0];
+                    unit.SectionID = parts[1];
+                }
+                else if (parts.Length == 2)
+                {
+                    unit.EpisodeID = "Default";
+                    unit.ChapterID = "Default";
+                    unit.SectionID = parts[0];
+                }
+                else
+                {
+                    unit.EpisodeID = "Default";
+                    unit.ChapterID = "Default";
+                    unit.SectionID = unit.ID;
+                }
+            }
+            EditorUtility.SetDirty(_target);
+            UnityEngine.Debug.Log($"[DialogueSystem] Migrated {_target.Conversations.Count} units.");
         }
     }
 }

@@ -101,7 +101,7 @@ namespace AnoGame.Systems.Dialogue.Editor
 
                 if (GUILayout.Button("Show All", EditorStyles.toolbarButton))
                 {
-                    _canvas.SetFilter(null, null);
+                    _canvas.SetFilter(null, null, null);
                 }
 
                 if (GUILayout.Button("Grid Layout", EditorStyles.toolbarButton))

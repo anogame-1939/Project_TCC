@@ -546,6 +546,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             var newUnit = new ConversationUnit
             {
                 ID = newID,
+                EpisodeID = FilterEpisode ?? "Ep1",
                 ChapterID = FilterChapter ?? "Chapter",
                 SectionID = FilterSection ?? "Section",
                 SpeakerName = "New Speaker",
@@ -561,15 +562,13 @@ namespace AnoGame.Systems.Dialogue.Editor
         {
             string newID = GenerateNextID();
 
-            // Place to the right of parent (Flow direction is rightward? Or Downward?)
-            // Wait, previous request set Flow to Vertical.
-            // But connections go Bottom->Top.
-            // Let's place it BELOW the parent by default for vertical flow.
+            // Place BELOW the parent by default for vertical flow.
             Vector2 newPos = parent.Position + new Vector2(0, NodeHeight + 50);
 
             var newUnit = new ConversationUnit
             {
                 ID = newID,
+                EpisodeID = parent.EpisodeID,
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
                 SpeakerName = "New Speaker",
@@ -586,9 +585,10 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private string GenerateNextID()
         {
+            string ep = FilterEpisode ?? "Ep1";
             string chapter = FilterChapter ?? "Chapter";
             string section = FilterSection ?? "Section";
-            string prefix = $"{chapter}_{section}_";
+            string prefix = $"{ep}_{chapter}_{section}_";
 
             int maxNum = 0;
             foreach (var u in Data.Conversations)
