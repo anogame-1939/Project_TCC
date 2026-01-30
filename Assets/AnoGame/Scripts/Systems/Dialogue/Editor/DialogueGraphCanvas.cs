@@ -87,7 +87,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
 
             // 3. Draw Overlay (Section Name)
-            DrawOverlay();
+            DrawOverlay(sidebarWidth);
 
             // Draw Selection Box
             if (_isDraggingSelectionBox)
@@ -104,8 +104,6 @@ namespace AnoGame.Systems.Dialogue.Editor
                 foreach (var node in _nodesToDelete)
                 {
                     Data.Conversations.Remove(node);
-                    // Optional: Cleanup links pointing TO this node?
-                    // For now, keep it simple as per request.
                 }
                 _nodesToDelete.Clear();
             }
@@ -113,7 +111,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             GUI.EndGroup();
         }
 
-        private void DrawOverlay()
+        private void DrawOverlay(float sidebarWidth)
         {
             if (!string.IsNullOrEmpty(FilterChapter) || !string.IsNullOrEmpty(FilterSection))
             {
@@ -123,7 +121,9 @@ namespace AnoGame.Systems.Dialogue.Editor
                 style.fontStyle = FontStyle.Bold;
                 style.normal.textColor = new Color(1f, 1f, 1f, 0.3f); // Transparent white
 
-                GUI.Label(new Rect(20, 20, 500, 50), label, style);
+                // Offset by sidebar width (+ padding) so it's not covered
+                float x = (sidebarWidth > 0 ? sidebarWidth : 0) + 20;
+                GUI.Label(new Rect(x, 20, 500, 50), label, style);
             }
         }
 
@@ -150,6 +150,12 @@ namespace AnoGame.Systems.Dialogue.Editor
 
             GUI.Box(rect, "", style);
             GUI.color = Color.white;
+
+            // Delete Button (Top-Right)
+            if (GUI.Button(new Rect(rect.x + rect.width - 20, rect.y, 20, 20), "×"))
+            {
+                _nodesToDelete.Add(unit);
+            }
 
             // Content Area - Symmetric padding (5px top, 5px bottom)
             Rect contentRect = new Rect(rect.x + 5, rect.y + 5, rect.width - 10, rect.height - 10);
@@ -178,107 +184,113 @@ namespace AnoGame.Systems.Dialogue.Editor
 
         private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
         {
-            Vector2 mousePos = e.mousePosition;
+            Vector2 mousePos = e.mousePosition; // Local to Group
 
-            // If mouse is over the sidebar overlay (restrictedX), ignore interaction with canvas
-            if (mousePos.x < restrictedX) return;
+            // If mouse is over the sidebar overlay area, ignore interaction with canvas
+            // Note: Since Sidebar is overlaying the canvas, we assume restrictedX matches the visual sidebar width.
+            if (restrictedX > 0 && mousePos.x < restrictedX) return;
 
-            // Handle Node Dragging (Priority over box select)
-            if (_isDraggingNode && e.type == EventType.MouseDrag)
+            // Right Click (Context Menu)
+            if (e.type == EventType.MouseDown && e.button == 1)
             {
-                Vector2 delta = mousePos - _lastMousePos;
-                MoveSelectedNodes(delta, null); // Move all selected
-                _lastMousePos = mousePos;
-                GUI.changed = true;
-                e.Use();
-                return;
-            }
+                string clickedNodeID = GetNodeAtPosition(mousePos);
+                var menu = new GenericMenu();
 
-            if (_isDraggingNode && e.type == EventType.MouseUp)
-            {
-                _isDraggingNode = false;
-                _draggingNodeID = null;
-                e.Use();
-                return;
-            }
-
-            // Mouse Down on Canvas
-            if (e.type == EventType.MouseDown && viewRect.Contains(mousePos))
-            {
-                if (e.button == 0) // Left Click
+                if (!string.IsNullOrEmpty(clickedNodeID))
                 {
-                    // Check if clicked on a Node
-                    string clickedNodeID = GetNodeAtPosition(mousePos);
-
-                    if (clickedNodeID != null)
+                    var unit = Data.Conversations.FirstOrDefault(u => u.ID == clickedNodeID);
+                    if (unit != null)
                     {
-                        // Clicked a node
-                        _isDraggingNode = true;
-                        _draggingNodeID = clickedNodeID;
-                        _lastMousePos = mousePos;
+                        menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + ScrollPos));
+                        menu.AddItem(new GUIContent("Insert Node After"), false, () => InsertNodeAfter(unit));
+                        menu.AddSeparator("");
+                        menu.AddItem(new GUIContent("Delete Node"), false, () => _nodesToDelete.Add(unit));
+                    }
+                }
+                else
+                {
+                    menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + ScrollPos));
+                }
 
-                        // Selection Logic
-                        if (e.shift || e.control)
-                        {
-                            if (_selectedIDs.Contains(clickedNodeID)) _selectedIDs.Remove(clickedNodeID);
-                            else _selectedIDs.Add(clickedNodeID);
-                        }
-                        else
-                        {
-                            if (!_selectedIDs.Contains(clickedNodeID))
-                            {
-                                _selectedIDs.Clear();
-                                _selectedIDs.Add(clickedNodeID);
-                            }
-                            // If already selected, keep selection (to allow dragging group)
-                        }
+                menu.ShowAsContext();
+                e.Use();
+                return;
+            }
 
-                        GUI.changed = true;
-                        e.Use();
+            // Left Click (Selection / Dragging)
+            if (e.type == EventType.MouseDown && e.button == 0)
+            {
+                string clickedNodeID = GetNodeAtPosition(mousePos);
+
+                if (!string.IsNullOrEmpty(clickedNodeID))
+                {
+                    // Clicked Node
+                    if (e.modifiers == EventModifiers.Shift || e.modifiers == EventModifiers.Control)
+                    {
+                        // Toggle Selection
+                        if (_selectedIDs.Contains(clickedNodeID)) _selectedIDs.Remove(clickedNodeID);
+                        else _selectedIDs.Add(clickedNodeID);
                     }
                     else
                     {
-                        // Clicked Empty Space -> Start Box Select
-                        _isDraggingSelectionBox = true;
-                        _selectionStartPos = mousePos;
-                        _selectionRect = new Rect(mousePos.x, mousePos.y, 0, 0);
-                        if (!e.shift && !e.control) _selectedIDs.Clear();
-                        e.Use();
+                        // If not already selected, clear and select this
+                        if (!_selectedIDs.Contains(clickedNodeID))
+                        {
+                            _selectedIDs.Clear();
+                            _selectedIDs.Add(clickedNodeID);
+                        }
                     }
+
+                    _isDraggingNode = true;
+                    _draggingNodeID = clickedNodeID;
+                    _lastMousePos = e.mousePosition;
+                    e.Use();
                 }
-                else if (e.button == 2) // Middle Click -> Pan
+                else
                 {
-                    // Handled in Drag
+                    // Clicked Empty -> Start Selection Box
+                    _isDraggingSelectionBox = true;
+                    _selectionStartPos = mousePos;
+                    _selectionRect = new Rect(mousePos, Vector2.zero);
+
+                    if (e.modifiers != EventModifiers.Shift && e.modifiers != EventModifiers.Control)
+                    {
+                        _selectedIDs.Clear();
+                    }
+                    e.Use();
                 }
             }
 
-            // Panning
-            if (e.type == EventType.MouseDrag && e.button == 2)
+            if (e.type == EventType.MouseDrag)
             {
-                ScrollPos -= e.delta;
-                GUI.changed = true;
-                e.Use();
+                if (_isDraggingNode)
+                {
+                    Vector2 legacyDelta = e.delta;
+                    MoveSelectedNodes(legacyDelta, null);
+                    _lastMousePos = mousePos;
+                    e.Use();
+                    _host.Repaint();
+                }
+                else if (_isDraggingSelectionBox)
+                {
+                    _selectionRect = GetRect(_selectionStartPos, mousePos);
+                    SelectNodesInRect(_selectionRect, ScrollPos);
+                    e.Use();
+                    _host.Repaint();
+                }
+                else if (e.button == 2 || (e.button == 0 && e.alt)) // Middle or Alt+Left Pan
+                {
+                    ScrollPos -= e.delta;
+                    e.Use();
+                    _host.Repaint();
+                }
             }
 
-            // Box Selection Drag
-            if (_isDraggingSelectionBox && e.type == EventType.MouseDrag)
+            if (e.type == EventType.MouseUp)
             {
-                _selectionRect = new Rect(
-                    Mathf.Min(_selectionStartPos.x, mousePos.x),
-                    Mathf.Min(_selectionStartPos.y, mousePos.y),
-                    Mathf.Abs(mousePos.x - _selectionStartPos.x),
-                    Mathf.Abs(mousePos.y - _selectionStartPos.y)
-                );
-                GUI.changed = true;
-                e.Use();
-            }
-
-            // Box Selection End
-            if (_isDraggingSelectionBox && e.type == EventType.MouseUp)
-            {
+                _isDraggingNode = false;
                 _isDraggingSelectionBox = false;
-                SelectNodesInRect(_selectionRect, viewRect);
-                e.Use();
+                _draggingNodeID = null;
             }
         }
 
@@ -301,6 +313,82 @@ namespace AnoGame.Systems.Dialogue.Editor
             return null;
         }
 
+        private void CreateNode(Vector2 worldPos)
+        {
+            string newID = GenerateNextID();
+
+            var newUnit = new ConversationUnit
+            {
+                ID = newID,
+                ChapterID = FilterChapter ?? "Chapter",
+                SectionID = FilterSection ?? "Section",
+                SpeakerName = "New Speaker",
+                BodyText = "New Text",
+                Position = worldPos
+            };
+
+            Data.Conversations.Add(newUnit);
+            _host.Repaint();
+        }
+
+        private void InsertNodeAfter(ConversationUnit parent)
+        {
+            string newID = GenerateNextID();
+
+            // Place to the right of parent (Flow direction is rightward? Or Downward?)
+            // Wait, previous request set Flow to Vertical.
+            // But connections go Bottom->Top.
+            // Let's place it BELOW the parent by default for vertical flow.
+            Vector2 newPos = parent.Position + new Vector2(0, NodeHeight + 50);
+
+            var newUnit = new ConversationUnit
+            {
+                ID = newID,
+                ChapterID = parent.ChapterID,
+                SectionID = parent.SectionID,
+                SpeakerName = "New Speaker",
+                BodyText = "New Text",
+                Position = newPos,
+                NextID = parent.NextID // Inherit the flow
+            };
+
+            parent.NextID = newID;
+
+            Data.Conversations.Add(newUnit);
+            _host.Repaint();
+        }
+
+        private string GenerateNextID()
+        {
+            string chapter = FilterChapter ?? "Chapter";
+            string section = FilterSection ?? "Section";
+            string prefix = $"{chapter}_{section}_";
+
+            int maxNum = 0;
+            foreach (var u in Data.Conversations)
+            {
+                if (u.ID != null && u.ID.StartsWith(prefix))
+                {
+                    string suffix = u.ID.Substring(prefix.Length);
+                    if (int.TryParse(suffix, out int n))
+                    {
+                        if (n > maxNum) maxNum = n;
+                    }
+                }
+            }
+            return prefix + (maxNum + 1);
+        }
+
+        private Rect GetRect(Vector2 p1, Vector2 p2)
+        {
+            return Rect.MinMaxRect(
+                Mathf.Min(p1.x, p2.x),
+                Mathf.Min(p1.y, p2.y),
+                Mathf.Max(p1.x, p2.x),
+                Mathf.Max(p1.y, p2.y)
+            );
+        }
+
         private void MoveSelectedNodes(Vector2 delta, string excludeID)
         {
             foreach (var unit in Data.Conversations)
@@ -312,9 +400,8 @@ namespace AnoGame.Systems.Dialogue.Editor
             }
         }
 
-        private void SelectNodesInRect(Rect r, Rect viewOffset)
+        private void SelectNodesInRect(Rect r, Vector2 scrollPos)
         {
-            Rect worldSelection = r;
             // r is in "Group Local" space.
             // unit.Position is in World space.
             // Node is drawn at (unit.Position - ScrollPos).
@@ -324,7 +411,7 @@ namespace AnoGame.Systems.Dialogue.Editor
             {
                 if (!IsUnitVisible(unit)) continue;
 
-                Vector2 drawPos = unit.Position - ScrollPos;
+                Vector2 drawPos = unit.Position - scrollPos;
                 Rect nodeRect = new Rect(drawPos.x, drawPos.y, NodeWidth, NodeHeight);
                 if (r.Overlaps(nodeRect))
                 {
