@@ -92,6 +92,20 @@ namespace AnoGame.Systems.Dialogue.Editor
                 foreach (var node in _nodesToDelete)
                 {
                     Data.Conversations.Remove(node);
+
+                    // Cleanup References (Fix "Tail" issue)
+                    foreach (var other in Data.Conversations)
+                    {
+                        if (other.NextID == node.ID) other.NextID = null;
+
+                        if (other.Choices != null)
+                        {
+                            foreach (var c in other.Choices)
+                            {
+                                if (c.TargetID == node.ID) c.TargetID = null;
+                            }
+                        }
+                    }
                 }
                 _nodesToDelete.Clear();
             }
@@ -185,8 +199,9 @@ namespace AnoGame.Systems.Dialogue.Editor
                         // Select the node we right-clicked if not already selected
                         if (!State.IsSelected(clickedNodeID)) State.SetSelection(clickedNodeID);
 
-                        menu.AddItem(new GUIContent("Add Node"), false, () => CreateNode(mousePos + State.ScrollPos));
-                        menu.AddItem(new GUIContent("Insert Node After"), false, () => InsertNodeAfter(unit));
+                        // "Add Node" becomes contextual: It inserts after this node
+                        menu.AddItem(new GUIContent("Add Node"), false, () => InsertNodeAfter(unit));
+
                         menu.AddSeparator("");
                         menu.AddItem(new GUIContent("Delete Node"), false, () => _nodesToDelete.Add(unit));
                     }
