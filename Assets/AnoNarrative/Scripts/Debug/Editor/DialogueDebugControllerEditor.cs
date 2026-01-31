@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using AnoGame.Systems.Dialogue.Debug;
+using AnoGame.AnoNarrative.Debug;
 
 [CustomEditor(typeof(DialogueDebugController))]
 public class DialogueDebugControllerEditor : Editor

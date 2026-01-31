@@ -1,9 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.InputSystem; // 追加：InputSystemの名前空間
+using UnityEngine.InputSystem;
 using UDebug = UnityEngine.Debug;
+using AnoGame.AnoNarrative; // Add core namespace if not implicitly available, or just fix package
 
-namespace AnoGame.Systems.Dialogue.Debug
+namespace AnoGame.AnoNarrative.Debug
 {
     public class DialogueDebugController : MonoBehaviour
     {

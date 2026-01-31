@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AnoGame.Systems.Dialogue
+namespace AnoGame.AnoNarrative
 {
     public class DialogueManager : MonoBehaviour
     {
@@ -80,6 +80,16 @@ namespace AnoGame.Systems.Dialogue
         public void RegisterUI(UI.DialogueUIController ui)
         {
             activeUI = ui;
+        }
+
+        public bool IsConversationActive => activeUI != null && activeUI.IsDialogueActive;
+
+        public void StopConversation()
+        {
+            if (activeUI != null)
+            {
+                activeUI.Close();
+            }
         }
 
         public void StartConversation(string id)

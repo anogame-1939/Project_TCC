@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AnoGame.Systems.Dialogue
+namespace AnoGame.AnoNarrative
 {
     [System.Serializable]
     public class ActorDefinition

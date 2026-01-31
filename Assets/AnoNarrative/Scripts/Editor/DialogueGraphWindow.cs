@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Linq;
 
-namespace AnoGame.Systems.Dialogue.Editor
+namespace AnoGame.AnoNarrative.Editor
 {
     // Main Window for Dialogue Graph
     public class DialogueGraphWindow : EditorWindow

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace AnoGame.Systems.Dialogue
+namespace AnoGame.AnoNarrative
 {
     public class SimpleDialogueTrigger : MonoBehaviour
     {

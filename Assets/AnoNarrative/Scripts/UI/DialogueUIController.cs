@@ -4,9 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.InputSystem;
-using AnoGame.Systems.Dialogue;
+using AnoGame.AnoNarrative;
 
-namespace AnoGame.Systems.Dialogue.UI
+namespace AnoGame.AnoNarrative.UI
 {
     public class DialogueUIController : MonoBehaviour
     {

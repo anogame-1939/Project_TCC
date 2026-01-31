@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
+using AnoGame.AnoNarrative;
 
-namespace AnoGame.Systems.Dialogue.Editor
+namespace AnoGame.AnoNarrative.Editor
 {
     public class DialogueGraphCanvas
     {
