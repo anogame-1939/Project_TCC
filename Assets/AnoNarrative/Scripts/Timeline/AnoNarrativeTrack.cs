@@ -15,7 +15,7 @@ namespace AnoGame.AnoNarrative.Timeline
     public class AnoNarrativeTrack : TrackAsset
     {
         [Header("Clip Defaults")]
-        public double defaultClipDuration = 5.0;
+        public double defaultClipDuration = 0.5;
 
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
