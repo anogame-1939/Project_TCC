@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UDebug = UnityEngine.Debug;
-using AnoGame.AnoNarrative; // Add core namespace if not implicitly available, or just fix package
 
 namespace AnoGame.AnoNarrative.Debug
 {

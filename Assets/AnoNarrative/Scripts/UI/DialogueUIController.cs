@@ -69,6 +69,15 @@ namespace AnoGame.AnoNarrative.UI
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
         }
 
+        private void OnEnable()
+        {
+            // Try register if Manager exists
+            if (DialogueManager.Instance != null)
+            {
+                DialogueManager.Instance.RegisterUI(this);
+            }
+        }
+
         private void Start()
         {
             // Register self to Manager (Simple singleton pattern or dependency injection)
@@ -87,6 +96,22 @@ namespace AnoGame.AnoNarrative.UI
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
 
+            SetupChoices(unit);
+        }
+
+        public void PreviewConversation(ConversationUnit unit)
+        {
+            currentUnit = unit;
+            if (itemsParent) itemsParent.SetActive(true);
+
+            if (speakerNameText) speakerNameText.text = unit.SpeakerName;
+            if (bodyText)
+            {
+                bodyText.text = unit.BodyText;
+                bodyText.maxVisibleCharacters = 99999;
+            }
+
+            // Hide choices in preview for now or show them static?
             SetupChoices(unit);
         }
 

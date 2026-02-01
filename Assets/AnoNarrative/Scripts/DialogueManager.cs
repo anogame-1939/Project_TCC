@@ -108,6 +108,45 @@ namespace AnoGame.AnoNarrative
             }
         }
 
+        public void PreviewConversation(string id)
+        {
+            Debug.Log($"[DialogueManager] PreviewConversation requested for ID: {id}");
+
+            // In Editor, activeUI might not be registered yet if Start() wasn't called.
+            if (activeUI == null)
+            {
+#if UNITY_EDITOR
+                activeUI = FindObjectOfType<UI.DialogueUIController>();
+                if (activeUI != null) Debug.Log("[DialogueManager] Found ActiveUI via FindObjectOfType.");
+#endif
+            }
+
+            var unit = GetConversation(id);
+            if (unit != null)
+            {
+                if (activeUI != null)
+                {
+                    activeUI.PreviewConversation(unit);
+                }
+                else
+                {
+                    Debug.LogWarning("[DialogueManager] ActiveUI is null.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[DialogueManager] ConversationUnit not found for ID: {id}");
+            }
+        }
+
+        public void AdvanceConversation()
+        {
+            if (activeUI != null)
+            {
+                activeUI.OnClickNext();
+            }
+        }
+
         public void StartSection(string episodeID, string chapterID, string sectionID)
         {
             if (masterData == null) return;
