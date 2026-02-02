@@ -227,8 +227,9 @@ namespace AnoGame.AnoNarrative.Editor
                             int secID = sectionGroup.Key.ID;
                             string secNameKey = sectionGroup.Key.NameKey;
 
-                            // Skip Default Section (-1) as requested
-                            if (secID == -1) continue;
+                            // Skip Default Section (-1) ONLY if it has no name or explicitly "Default"
+                            // Many valid sections have ID -1 but distinct names.
+                            if (secID == -1 && (string.IsNullOrEmpty(secNameKey) || secNameKey == "Default")) continue;
 
                             if (!allowChapter && !sectionGroup.Any(u => u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
@@ -300,7 +301,14 @@ namespace AnoGame.AnoNarrative.Editor
                                     evt.Use();
                                 }
 
-                                // 2. Left Click (Select) - Draw Button manually
+                                // 2. Double Click (Rename) - Explicit Check
+                                if (evt.type == EventType.MouseDown && evt.clickCount == 2 && btnRect.Contains(evt.mousePosition) && evt.button == 0)
+                                {
+                                    StartRename(epGroup.Key, chapterGroup.Key, secID, displayName);
+                                    evt.Use();
+                                }
+
+                                // 3. Left Click (Select) - Draw Button manually
                                 if (GUI.Button(btnRect, $"{displayName} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
                                 {
                                     string filterName = (secID == -1) ? secNameKey : null;
