@@ -2,18 +2,19 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
+using AnoGame.AnoNarrative.Timeline;
 
 namespace AnoGame.AnoNarrative.Editor
 {
-    [CustomEditor(typeof(DialogueController))]
-    public class DialogueControllerEditor : UnityEditor.Editor
+    [CustomEditor(typeof(AnoNarrativeClip))]
+    public class AnoNarrativeClipEditor : UnityEditor.Editor
     {
+        private SerializedProperty _targetController;
         private SerializedProperty _targetEpisode;
         private SerializedProperty _targetChapter;
         private SerializedProperty _targetSection;
-        private SerializedProperty _targetID;
-        private SerializedProperty _playOnStart;
-        private SerializedProperty _autoAdvance;
+        private SerializedProperty _conversationID;
+        private SerializedProperty _pauseTimeline;
 
         private MasterDialogueData _masterData;
         private Vector2 _scrollPos;
@@ -23,12 +24,12 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void OnEnable()
         {
-            _targetEpisode = serializedObject.FindProperty("TargetEpisode");
-            _targetChapter = serializedObject.FindProperty("TargetChapter");
-            _targetSection = serializedObject.FindProperty("TargetSection");
-            _targetID = serializedObject.FindProperty("TargetID");
-            _playOnStart = serializedObject.FindProperty("PlayOnStart");
-            _autoAdvance = serializedObject.FindProperty("AutoAdvance");
+            _targetController = serializedObject.FindProperty("targetController");
+            _targetEpisode = serializedObject.FindProperty("targetEpisode");
+            _targetChapter = serializedObject.FindProperty("targetChapter");
+            _targetSection = serializedObject.FindProperty("targetSection");
+            _conversationID = serializedObject.FindProperty("conversationID");
+            _pauseTimeline = serializedObject.FindProperty("pauseTimeline");
 
             FindMasterData();
             UpdateFilteredList();
@@ -38,36 +39,36 @@ namespace AnoGame.AnoNarrative.Editor
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_playOnStart);
-            EditorGUILayout.PropertyField(_autoAdvance);
+            EditorGUILayout.PropertyField(_targetController);
+            EditorGUILayout.PropertyField(_pauseTimeline);
 
             EditorGUILayout.Space(10);
 
             // Selection (Moved to top)
             EditorGUILayout.LabelField("Selection", EditorStyles.boldLabel);
             GUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(_targetID);
+            EditorGUILayout.PropertyField(_conversationID);
             if (GUILayout.Button("Clear", GUILayout.Width(50)))
             {
-                _targetID.stringValue = "";
+                _conversationID.stringValue = "";
             }
             GUILayout.EndHorizontal();
 
-            // Validation Warning
-            if (!string.IsNullOrEmpty(_targetID.stringValue))
+            // Validation Checking
+            if (!string.IsNullOrEmpty(_conversationID.stringValue))
             {
                 if (_masterData != null)
                 {
-                    var exists = _masterData.Conversations.Any(c => c.ID == _targetID.stringValue);
+                    var exists = _masterData.Conversations.Any(c => c.ID == _conversationID.stringValue);
                     if (!exists)
                     {
-                        EditorGUILayout.HelpBox("Target ID not found in MasterDialogueData!", MessageType.Warning);
+                        EditorGUILayout.HelpBox("Conversation ID not found in MasterDialogueData!", MessageType.Warning);
                     }
                 }
             }
-            else
+            else if (_targetController.exposedReferenceValue == null)
             {
-                EditorGUILayout.HelpBox("Please select a Target ID.", MessageType.Info);
+                EditorGUILayout.HelpBox("Please select a Conversation ID.", MessageType.Info);
             }
 
             EditorGUILayout.Space(10);
@@ -102,7 +103,7 @@ namespace AnoGame.AnoNarrative.Editor
         {
             if (_masterData == null)
             {
-                EditorGUILayout.HelpBox("MasterDialogueData not found in project. Cannot search conversations.", MessageType.Warning);
+                EditorGUILayout.HelpBox("MasterDialogueData not found. Cannot search conversations.", MessageType.Warning);
                 if (GUILayout.Button("Retry Find MasterData"))
                 {
                     FindMasterData();
@@ -150,15 +151,15 @@ namespace AnoGame.AnoNarrative.Editor
             foreach (var id in _filteredIDs)
             {
                 GUILayout.BeginHorizontal();
-                if (id == _targetID.stringValue)
+                if (id == _conversationID.stringValue)
                 {
                     GUI.backgroundColor = Color.green;
                 }
 
                 if (GUILayout.Button(id))
                 {
-                    _targetID.stringValue = id;
-                    GUI.FocusControl(null); // Remove focus to update field
+                    _conversationID.stringValue = id;
+                    GUI.FocusControl(null);
                 }
 
                 GUI.backgroundColor = Color.white;
@@ -188,14 +189,14 @@ namespace AnoGame.AnoNarrative.Editor
                     GUILayout.BeginHorizontal();
                 }
 
-                if (id == _targetID.stringValue)
+                if (id == _conversationID.stringValue)
                 {
                     GUI.backgroundColor = Color.green;
                 }
 
                 if (GUILayout.Button(content, GUILayout.Width(btnWidth)))
                 {
-                    _targetID.stringValue = id;
+                    _conversationID.stringValue = id;
                     GUI.FocusControl(null);
                 }
                 GUI.backgroundColor = Color.white;
@@ -207,7 +208,6 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void FindMasterData()
         {
-            // Try to find via asset database
             string[] guids = AssetDatabase.FindAssets("t:MasterDialogueData");
             if (guids.Length > 0)
             {
