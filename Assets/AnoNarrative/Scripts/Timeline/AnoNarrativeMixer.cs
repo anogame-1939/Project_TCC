@@ -12,6 +12,9 @@ namespace AnoGame.AnoNarrative.Timeline
         {
             base.ProcessFrame(playable, info, playerData);
 
+            // Debug binding
+            // Debug.Log($"[AnoNarrativeMixer] ProcessFrame. playerData: {(playerData == null ? "null" : playerData.GetType().Name)}");
+
             // Get the binding from the track
             var receiver = playerData as DialogueTimelineReceiver;
 
