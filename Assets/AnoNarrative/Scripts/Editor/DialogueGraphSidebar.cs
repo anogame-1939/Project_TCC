@@ -38,7 +38,17 @@ namespace AnoGame.AnoNarrative.Editor
                 {
                     bool allowEp = string.IsNullOrEmpty(_searchFilter) || epGroup.Key.ToLower().Contains(_searchFilter.ToLower());
 
-                    EditorGUILayout.LabelField($"Episode: {epGroup.Key}", EditorStyles.boldLabel);
+                    EditorGUILayout.BeginHorizontal();
+                    // Left-aligned bold label for Episode
+                    GUILayout.Label($"Episode: {epGroup.Key}", EditorStyles.boldLabel);
+                    GUILayout.FlexibleSpace();
+                    // Add Button for creating new Chapter in this Episode
+                    if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
+                    {
+                        CreateChapter(epGroup.Key);
+                    }
+                    EditorGUILayout.EndHorizontal();
+
                     EditorGUI.indentLevel++;
 
                     // Group by Chapter
@@ -48,11 +58,13 @@ namespace AnoGame.AnoNarrative.Editor
                     {
                         bool allowChapter = allowEp || chapterGroup.Key.ToLower().Contains(_searchFilter.ToLower());
 
+                        // Chapter Header with Add Section Button
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField($"{chapterGroup.Key}", EditorStyles.miniBoldLabel);
+                        GUILayout.Label($"Chapter: {chapterGroup.Key}", EditorStyles.miniBoldLabel); // Changed format
+                        GUILayout.FlexibleSpace();
                         if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
                         {
-                            CreateSection(epGroup.Key, chapterGroup.Key);
+                            RequestCreateSection(epGroup.Key, chapterGroup.Key);
                         }
                         EditorGUILayout.EndHorizontal();
 
@@ -68,7 +80,11 @@ namespace AnoGame.AnoNarrative.Editor
                             var first = sectionGroup.FirstOrDefault();
                             string displayName = string.IsNullOrEmpty(first?.SectionName) ? sectionGroup.Key : first.SectionName;
 
-                            if (GUILayout.Button($"{displayName} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
+                            // Left Aligned Section Button
+                            GUIStyle leftButton = new GUIStyle(EditorStyles.miniButtonLeft);
+                            leftButton.alignment = TextAnchor.MiddleLeft;
+
+                            if (GUILayout.Button($"{displayName} ({sectionGroup.Count()})", leftButton))
                             {
                                 // Trigger Filter
                                 OnSelectSection?.Invoke(epGroup.Key, chapterGroup.Key, sectionGroup.Key);
@@ -110,27 +126,71 @@ namespace AnoGame.AnoNarrative.Editor
             EditorGUI.DrawRect(divider, Color.black);
         }
 
-        private void CreateSection(string epID, string chapterID)
+        private void RequestCreateSection(string epID, string chapterID)
         {
-            string newSection = "NewSection";
+            // Suggest a default name
+            string defaultName = GetUniqueSectionName(epID, chapterID);
+
+            // Show Popup
+            TextInputPopup.Show(
+                "Create Section",
+                "Enter a name for the new Section (leave empty for default):",
+                "",
+                defaultName,
+                (result) => CreateSection(epID, chapterID, result)
+            );
+        }
+
+        private string GetUniqueSectionName(string epID, string chapterID)
+        {
+            string baseName = "NewSection";
             int count = 1;
-            while (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID && u.SectionID == newSection))
+            string candidate = baseName;
+            while (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID && u.SectionID == candidate))
             {
-                newSection = $"NewSection_{count++}";
+                candidate = $"{baseName}_{count++}";
+            }
+            return candidate;
+        }
+
+        private void CreateSection(string epID, string chapterID, string sectionName)
+        {
+            // Ensure unique if user typed something that already exists? 
+            // For now, let's just create it. Ideally we might want to check for duplicates again, 
+            // but the graph can handle multiple sections with same name if they are distinct logic blocks technically?
+            // Actually, usually SectionID should be unique within the Chapter.
+
+            // Validation: IF exists, maybe append suffix?
+            if (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID && u.SectionID == sectionName))
+            {
+                sectionName = GetUniqueSectionName(epID, chapterID); // Fallback to unique
             }
 
             // Add initial node
             var newNode = new ConversationUnit
             {
-                ID = $"{epID}_{chapterID}_{newSection}_1",
+                ID = $"{epID}_{chapterID}_{sectionName}_1",
                 EpisodeID = epID,
                 ChapterID = chapterID,
-                SectionID = newSection,
+                SectionID = sectionName,
+                SectionName = sectionName, // Also set SectionName
                 SpeakerName = "New Speaker",
                 BodyText = "Start",
                 Position = new Vector2(100, 100)
             };
             Data.Conversations.Add(newNode);
+        }
+
+        private void CreateChapter(string epID)
+        {
+            string newCh = "Ch1";
+            int count = 1;
+            while (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == newCh))
+            {
+                newCh = $"Ch{++count}";
+            }
+
+            RequestCreateSection(epID, newCh);
         }
 
         private void CreateEpisode()
@@ -141,10 +201,8 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 newEp = $"Ep{++count}";
             }
-            // Create default chapter inside
-            string ch = "Ch1";
 
-            CreateSection(newEp, ch);
+            CreateChapter(newEp);
         }
 
         private void DeleteSection(string ep, string chapter, string section)
