@@ -147,6 +147,10 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void DrawListCandidates()
         {
+            // Create a left-aligned button style
+            GUIStyle leftAlignedButtonStyle = new GUIStyle(GUI.skin.button);
+            leftAlignedButtonStyle.alignment = TextAnchor.MiddleLeft;
+
             foreach (var id in _filteredIDs)
             {
                 GUILayout.BeginHorizontal();
@@ -155,7 +159,7 @@ namespace AnoGame.AnoNarrative.Editor
                     GUI.backgroundColor = Color.green;
                 }
 
-                if (GUILayout.Button(id))
+                if (GUILayout.Button(id, leftAlignedButtonStyle))
                 {
                     _targetID.stringValue = id;
                     GUI.FocusControl(null); // Remove focus to update field
@@ -171,15 +175,19 @@ namespace AnoGame.AnoNarrative.Editor
             float windowWidth = EditorGUIUtility.currentViewWidth - 40; // Approximate usable width
             float currentX = 0;
 
+            // Create a left-aligned button style
+            GUIStyle leftAlignedButtonStyle = new GUIStyle(GUI.skin.button);
+            leftAlignedButtonStyle.alignment = TextAnchor.MiddleLeft;
+
             GUILayout.BeginHorizontal();
             foreach (var id in _filteredIDs)
             {
-                // Truncate logic: 5 chars 
-                string display = id.Length > 5 ? id.Substring(0, 5) : id;
+                // Truncate logic: 10 chars 
+                string display = id.Length > 10 ? id.Substring(0, 10) : id;
                 GUIContent content = new GUIContent(display, id); // Tooltip has full ID
 
                 // Keep button width roughly consistent or compact
-                float btnWidth = 50f;
+                float btnWidth = 100f;
 
                 if (currentX + btnWidth > windowWidth)
                 {
@@ -193,7 +201,7 @@ namespace AnoGame.AnoNarrative.Editor
                     GUI.backgroundColor = Color.green;
                 }
 
-                if (GUILayout.Button(content, GUILayout.Width(btnWidth)))
+                if (GUILayout.Button(content, leftAlignedButtonStyle, GUILayout.Width(btnWidth)))
                 {
                     _targetID.stringValue = id;
                     GUI.FocusControl(null);
