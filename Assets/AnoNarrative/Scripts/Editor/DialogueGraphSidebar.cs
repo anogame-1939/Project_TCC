@@ -13,7 +13,10 @@ namespace AnoGame.AnoNarrative.Editor
 
         // Navigation events
         public System.Action<Vector2> OnRequestPanTo;
-        public System.Action<int, int, int, string> OnSelectSection; // Ep, Ch, Sec, Name(optional)
+        public System.Action<int, int, int, string> OnSelectSection;
+
+        // Static変数でドラッグデータを保持
+        private static SectionDragData _currentDragData;
 
         public DialogueGraphSidebar(MasterDialogueData data)
         {
@@ -22,6 +25,24 @@ namespace AnoGame.AnoNarrative.Editor
 
         public void Draw(float width)
         {
+            // イベント処理：ドラッグ終了や中断時の強制リセット
+            Event evt = Event.current;
+            if (evt.type == EventType.DragExited || evt.type == EventType.Ignore || (evt.type == EventType.KeyDown && evt.keyCode == KeyCode.Escape))
+            {
+                if (_currentDragData != null)
+                {
+                    _currentDragData = null;
+                    // DragAndDrop.PrepareStartDrag(); 
+                }
+            }
+            // マウスアップ時も、ドラッグ中ならリセット（ドロップ処理漏れ防止）
+            if (evt.type == EventType.MouseUp && _currentDragData != null)
+            {
+                // ここでnullにするとDragPerformが呼ばれる前に消えてしまう可能性があるため、
+                // 本来はDragPerformで消すが、保険としてGUIの最後に消す処理を入れるのが一般的。
+                // 今回はDragPerformが呼ばれない問題への対処なので、ここは一旦スルーしてOK。
+            }
+
             GUILayout.BeginVertical(GUILayout.Width(width), GUILayout.ExpandHeight(true));
             EditorGUILayout.LabelField("Navigator", EditorStyles.boldLabel);
 
@@ -31,7 +52,6 @@ namespace AnoGame.AnoNarrative.Editor
 
             if (Data != null)
             {
-                // Group by Episode first
                 var episodes = Data.Conversations.GroupBy(u => u.EpisodeID).OrderBy(g => g.Key);
 
                 foreach (var epGroup in episodes)
@@ -42,7 +62,6 @@ namespace AnoGame.AnoNarrative.Editor
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField($"Episode: {epStr}", EditorStyles.boldLabel);
                     GUILayout.FlexibleSpace();
-                    // Add Button for creating new Chapter in this Episode
                     if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
                     {
                         CreateChapter(epGroup.Key);
@@ -51,7 +70,6 @@ namespace AnoGame.AnoNarrative.Editor
 
                     EditorGUI.indentLevel++;
 
-                    // Group by Chapter
                     var chapters = epGroup.GroupBy(u => u.ChapterID).OrderBy(g => g.Key);
 
                     foreach (var chapterGroup in chapters)
@@ -59,32 +77,84 @@ namespace AnoGame.AnoNarrative.Editor
                         string chStr = chapterGroup.Key == -1 ? "Default" : chapterGroup.Key.ToString();
                         bool allowChapter = allowEp || chStr.Contains(_searchFilter);
 
-                        EditorGUILayout.BeginHorizontal();
-                        // Limit label width to prevent horizontal scroll. 
-                        // Width - Indent(15) - Buttons(40) - ScrollBar/Padding(30) approx = -85
-                        float labelMaxWidth = width - 85f;
-                        EditorGUILayout.LabelField($"{chStr}", EditorStyles.miniBoldLabel, GUILayout.MaxWidth(labelMaxWidth));
-                        GUILayout.FlexibleSpace(); // Push buttons to right
+                        // =========================================================
+                        // 【修正点1】GetLastRectをやめ、GetControlRectで確実に領域を確保
+                        // =========================================================
 
-                        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(20)))
+                        // 1行分のRectを確保する（ここをチャプターヘッダーとドロップエリアにする）
+                        Rect headerRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+
+                        // 判定用Rect（横幅いっぱい）
+                        Rect dropRect = new Rect(0, headerRect.y, width, headerRect.height);
+
+                        // ラベルなどの描画用Rect調整
+                        Rect labelRect = new Rect(headerRect.x, headerRect.y, headerRect.width - 50, headerRect.height);
+
+                        // 1. ラベル描画（手動）
+                        EditorGUI.LabelField(labelRect, $"{chStr}", EditorStyles.miniBoldLabel);
+
+                        // 2. ドロップ判定処理
+                        bool blockedByButton = (evt.mousePosition.x > width - 50);
+
+                        if (dropRect.Contains(evt.mousePosition))
+                        {
+                            if (_currentDragData != null)
+                            {
+                                if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
+                                {
+                                    DragAndDrop.visualMode = blockedByButton ? DragAndDropVisualMode.None : DragAndDropVisualMode.Move;
+
+                                    if (evt.type == EventType.DragUpdated)
+                                    {
+                                        if (!blockedByButton)
+                                        {
+                                            EditorGUI.DrawRect(dropRect, new Color(1f, 1f, 0f, 0.3f));
+                                            Event.current.Use();
+                                        }
+                                    }
+
+                                    if (evt.type == EventType.DragPerform)
+                                    {
+                                        if (!blockedByButton)
+                                        {
+                                            Debug.Log($"Dropped on Chapter {chapterGroup.Key}.");
+                                            DragAndDrop.AcceptDrag();
+
+                                            MoveSectionToChapter(_currentDragData.Ep, _currentDragData.Ch, _currentDragData.Sec, epGroup.Key, chapterGroup.Key);
+
+                                            _currentDragData = null;
+                                            DragAndDrop.PrepareStartDrag();
+                                            Event.current.Use();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // 3. ボタン描画（手動配置）
+                        // GetControlRectを使ったので、GUILayout.ButtonではなくGUI.Buttonを使う
+                        // またはGUILayoutのエリア計算が狂わないよう注意が必要ですが、
+                        // ここではシンプルにRect計算でボタンを配置します。
+
+                        Rect btnRectPlus = new Rect(headerRect.xMax - 42, headerRect.y, 20, headerRect.height);
+                        Rect btnRectMinus = new Rect(headerRect.xMax - 20, headerRect.y, 20, headerRect.height);
+
+                        if (GUI.Button(btnRectPlus, "+", EditorStyles.miniButtonLeft))
                         {
                             RequestCreateSection(epGroup.Key, chapterGroup.Key);
                         }
-                        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+                        if (GUI.Button(btnRectMinus, "-", EditorStyles.miniButtonRight))
                         {
                             DeleteChapter(epGroup.Key, chapterGroup.Key);
                         }
-                        EditorGUILayout.EndHorizontal();
+
+                        // =========================================================
 
                         EditorGUI.indentLevel++;
 
-                        // Group by Section
-                        // Modified logic: If SectionID is -1 (Default), we distinguishing by SectionName to separate them visually.
-                        // We use a composite key object or just a custom grouping.
                         var sections = chapterGroup.GroupBy(u => new
                         {
                             ID = u.SectionID,
-                            // If ID is -1, treat Name as part of the key. Otherwise ignore name (empty).
                             NameKey = (u.SectionID == -1 ? u.SectionName : "")
                         }).OrderBy(g => g.Key.ID).ThenBy(g => g.Key.NameKey);
 
@@ -93,27 +163,43 @@ namespace AnoGame.AnoNarrative.Editor
                             int secID = sectionGroup.Key.ID;
                             string secNameKey = sectionGroup.Key.NameKey;
 
-                            // Filter check
-                            // Note: FilterSectionName logic in Canvas implies strict match if provided.
                             if (!allowChapter && !sectionGroup.Any(u => u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
                             var first = sectionGroup.FirstOrDefault();
                             string displayName = string.IsNullOrEmpty(first?.SectionName) ? (secID == -1 ? "Default" : secID.ToString()) : first.SectionName;
 
+                            EditorGUILayout.BeginHorizontal();
+
+                            GUILayout.Label("=", GUILayout.Width(20));
+                            Rect handleRect = GUILayoutUtility.GetLastRect();
+
+                            // =========================================================
+                            // 【修正点2】ドラッグ開始ガードの徹底
+                            // =========================================================
+                            if (_currentDragData == null && evt.type == EventType.MouseDrag && handleRect.Contains(evt.mousePosition))
+                            {
+                                Debug.Log($"Drag Start Detected on Handle for {displayName}");
+
+                                _currentDragData = new SectionDragData { Ep = epGroup.Key, Ch = chapterGroup.Key, Sec = secID };
+
+                                DragAndDrop.PrepareStartDrag();
+                                DragAndDrop.SetGenericData("SectionDrag", _currentDragData);
+                                DragAndDrop.objectReferences = new UnityEngine.Object[0];
+                                DragAndDrop.StartDrag($"Move Section {displayName}");
+                                Event.current.Use();
+                            }
+
                             if (GUILayout.Button($"{displayName} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
                             {
-                                // Trigger Filter
-                                // If secID is -1, we pass the name key to enable strict filtering
                                 string filterName = (secID == -1) ? secNameKey : null;
                                 OnSelectSection?.Invoke(epGroup.Key, chapterGroup.Key, secID, filterName);
-
-                                // Pan to first item
                                 if (first != null) OnRequestPanTo?.Invoke(first.Position);
                             }
 
-                            // Context Menu for Section
+                            EditorGUILayout.EndHorizontal();
+
                             Rect btnRect = GUILayoutUtility.GetLastRect();
-                            if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && btnRect.Contains(Event.current.mousePosition))
+                            if (evt.type == EventType.MouseDown && evt.button == 1 && (btnRect.Contains(evt.mousePosition) || handleRect.Contains(evt.mousePosition)))
                             {
                                 GenericMenu menu = new GenericMenu();
                                 menu.AddItem(new GUIContent("Delete Section"), false, () => DeleteSection(epGroup.Key, chapterGroup.Key, secID));
@@ -137,45 +223,33 @@ namespace AnoGame.AnoNarrative.Editor
             EditorGUILayout.EndScrollView();
             GUILayout.EndVertical();
 
-            // Draw Divider line
             Rect divider = GUILayoutUtility.GetLastRect();
             divider.x += divider.width;
             divider.width = 1;
             EditorGUI.DrawRect(divider, Color.black);
         }
 
+        // Helper Methods
         private void CreateChapter(int epID)
         {
-            // Suggest next chapter ID
             int nextCh = 1;
             if (Data.Conversations.Any(u => u.EpisodeID == epID))
             {
                 nextCh = Data.Conversations.Where(u => u.EpisodeID == epID).Max(u => u.ChapterID) + 1;
             }
-
-            // Immediate creation of a "Frame" (Placeholder Unit)
-            // We need at least one section. Let's start with Section 1 (or 0?).
-            // User requested "Increment Chapter".
-
             int startSec = 1;
             string defaultName = GetUniqueSectionName(epID, nextCh);
-
             CreateSection(epID, nextCh, startSec, defaultName);
         }
 
         private void RequestCreateSection(int epID, int chapterID)
         {
-            // Suggest Section ID (Max + 1)
             int nextSec = 1;
             if (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID))
             {
                 nextSec = Data.Conversations.Where(u => u.EpisodeID == epID && u.ChapterID == chapterID).Max(u => u.SectionID) + 1;
             }
-
-            // Suggest a default name
             string defaultName = GetUniqueSectionName(epID, chapterID);
-
-            // Immediate Create
             CreateSection(epID, chapterID, nextSec, defaultName);
         }
 
@@ -184,7 +258,6 @@ namespace AnoGame.AnoNarrative.Editor
             string baseName = "NewSection";
             int count = 1;
             string candidate = baseName;
-            // Name uniqueness strictly not required by Schema but nice for UI
             while (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID && u.SectionName == candidate))
             {
                 candidate = $"{baseName}_{count++}";
@@ -194,7 +267,6 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void CreateSection(int epID, int chapterID, int sectionID, string sectionName)
         {
-            // Add initial node
             var newNode = new ConversationUnit
             {
                 ID = $"{epID}_{chapterID}_{sectionID}_1",
@@ -216,10 +288,7 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 newEp = Data.Conversations.Max(u => u.EpisodeID) + 1;
             }
-
-            // Create default chapter inside (Ch1)
             int ch = 1;
-
             RequestCreateSection(newEp, ch);
         }
 
@@ -230,6 +299,32 @@ namespace AnoGame.AnoNarrative.Editor
                 Data.Conversations.RemoveAll(u => u.EpisodeID == ep && u.ChapterID == chapter && u.SectionID == section);
             }
         }
+
+        private void MoveSectionToChapter(int srcEp, int srcCh, int srcSec, int destEp, int destCh)
+        {
+            if (srcEp == destEp && srcCh == destCh) return;
+
+            int newSecID = 1;
+            var destUnits = Data.Conversations.Where(u => u.EpisodeID == destEp && u.ChapterID == destCh);
+            if (destUnits.Any())
+            {
+                newSecID = destUnits.Max(u => u.SectionID) + 1;
+            }
+
+            var unitsToMove = Data.Conversations.Where(u => u.EpisodeID == srcEp && u.ChapterID == srcCh && u.SectionID == srcSec).ToList();
+            foreach (var unit in unitsToMove)
+            {
+                unit.EpisodeID = destEp;
+                unit.ChapterID = destCh;
+                unit.SectionID = newSecID;
+            }
+
+            EditorUtility.SetDirty(Data);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"Moved Section {srcSec} (from {srcEp}/{srcCh}) to {destEp}/{destCh} (New SectionID: {newSecID})");
+        }
+
+        private class SectionDragData { public int Ep; public int Ch; public int Sec; }
 
         private void DeleteChapter(int ep, int chapter)
         {
