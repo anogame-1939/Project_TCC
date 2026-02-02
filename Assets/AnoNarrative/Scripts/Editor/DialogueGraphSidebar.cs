@@ -244,7 +244,8 @@ namespace AnoGame.AnoNarrative.Editor
                             // Drag Start (Section)
                             if (_currentDragData == null && evt.type == EventType.MouseDrag && handleRect.Contains(evt.mousePosition))
                             {
-                                _currentDragData = new SidebarDragData { Type = DragType.Section, Ep = epGroup.Key, Ch = chapterGroup.Key, Sec = secID };
+                                // Important: Pass displayName (SecName) to distinguish "Default" sections with same ID -1
+                                _currentDragData = new SidebarDragData { Type = DragType.Section, Ep = epGroup.Key, Ch = chapterGroup.Key, Sec = secID, SecName = displayName };
                                 DragAndDrop.PrepareStartDrag();
                                 DragAndDrop.SetGenericData("SectionDrag", _currentDragData);
                                 DragAndDrop.objectReferences = new UnityEngine.Object[0];
@@ -445,6 +446,7 @@ namespace AnoGame.AnoNarrative.Editor
             public int Ep;
             public int Ch;
             public int Sec;
+            public string SecName;
         }
 
         // ... [Rest of Reorder Logic same as before] ...
@@ -460,14 +462,31 @@ namespace AnoGame.AnoNarrative.Editor
                 if (currentIndex + 1 == insertIndex) return;
                 if (insertIndex > currentIndex) insertIndex--;
             }
-            var movingUnits = Data.Conversations.Where(u => u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch && u.SectionID == dragData.Sec).ToList();
-            var targetChapterUnits = Data.Conversations.Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh).Where(u => !(u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch && u.SectionID == dragData.Sec)).GroupBy(u => u.SectionID).OrderBy(g => g.Key).ToList();
+
+            // Fix: Filter by Name as well if ID is -1, to avoid grabbing ALL default sections
+            // If Sec != -1, ID is unique enough. If Sec == -1, we MUST key off SectionName.
+            var movingUnits = Data.Conversations.Where(u =>
+                u.EpisodeID == dragData.Ep &&
+                u.ChapterID == dragData.Ch &&
+                u.SectionID == dragData.Sec &&
+                (dragData.Sec != -1 || u.SectionName == dragData.SecName)
+            ).ToList();
+
+            // When gathering "Others" in target, ensure we exclude the ones we just picked up
+            // Note: We can reuse movingUnits reference check or repeat the logic. Ref check is safer.
+            var targetChapterUnits = Data.Conversations.Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh)
+                .Where(u => !movingUnits.Contains(u))
+                .GroupBy(u => u.SectionID).OrderBy(g => g.Key).ToList();
+
             var reordered = new List<List<ConversationUnit>>();
             foreach (var g in targetChapterUnits) reordered.Add(g.ToList());
+
             if (insertIndex < 0) insertIndex = 0;
             if (insertIndex > reordered.Count) insertIndex = reordered.Count;
+
             foreach (var unit in movingUnits) { unit.EpisodeID = targetEp; unit.ChapterID = targetCh; }
             reordered.Insert(insertIndex, movingUnits);
+
             int newSecID = 1;
             foreach (var g in reordered) { foreach (var unit in g) unit.SectionID = newSecID; newSecID++; }
             EditorUtility.SetDirty(Data);
