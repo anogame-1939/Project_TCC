@@ -56,12 +56,12 @@ namespace AnoGame.AnoNarrative.Editor
                     Repaint();
                 };
 
-                _sidebar.OnSelectSection = (ep, chapter, section) =>
+                _sidebar.OnSelectSection = (ep, ch, sec, name) =>
                 {
-                    _canvas.SetFilter(ep, chapter, section);
+                    _canvas.SetFilter(ep, ch, sec, name);
 
                     // Auto-pan to first node of this section
-                    var firstNode = _data.Conversations.FirstOrDefault(u => u.EpisodeID == ep && u.ChapterID == chapter && u.SectionID == section);
+                    var firstNode = _data.Conversations.FirstOrDefault(u => u.EpisodeID == ep && u.ChapterID == ch && u.SectionID == sec);
                     if (firstNode != null)
                     {
                         float offsetX = (_showSidebar ? SidebarWidth : 0f) + 50f;
@@ -74,8 +74,8 @@ namespace AnoGame.AnoNarrative.Editor
                 if (_data.Conversations.Count > 0)
                 {
                     var first = _data.Conversations[0];
-                    // Check if initialized (assuming -1 is uninitialized or 0 is min)
-                    if (first.EpisodeID != -1)
+                    // Check if initialized
+                    if (first.EpisodeID != int.MinValue)
                     {
                         _canvas.SetFilter(first.EpisodeID, first.ChapterID, first.SectionID);
                         float offsetX = (_showSidebar ? SidebarWidth : 0f) + 50f;
@@ -104,7 +104,7 @@ namespace AnoGame.AnoNarrative.Editor
 
                 if (GUILayout.Button("Show All", EditorStyles.toolbarButton))
                 {
-                    _canvas.SetFilter(-1, -1, -1);
+                    _canvas.SetFilter(int.MinValue, int.MinValue, int.MinValue);
                 }
 
                 if (GUILayout.Button("Grid Layout", EditorStyles.toolbarButton))

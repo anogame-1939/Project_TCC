@@ -13,7 +13,7 @@ namespace AnoGame.AnoNarrative.Editor
 
         // Navigation events
         public System.Action<Vector2> OnRequestPanTo;
-        public System.Action<int, int, int> OnSelectSection; // Ep, Ch, Sec
+        public System.Action<int, int, int, string> OnSelectSection; // Ep, Ch, Sec, Name(optional)
 
         public DialogueGraphSidebar(MasterDialogueData data)
         {
@@ -36,11 +36,11 @@ namespace AnoGame.AnoNarrative.Editor
 
                 foreach (var epGroup in episodes)
                 {
-                    string epStr = epGroup.Key.ToString();
+                    string epStr = epGroup.Key == -1 ? "Default" : epGroup.Key.ToString();
                     bool allowEp = string.IsNullOrEmpty(_searchFilter) || epStr.Contains(_searchFilter);
 
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField($"Episode: {epGroup.Key}", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField($"Episode: {epStr}", EditorStyles.boldLabel);
                     GUILayout.FlexibleSpace();
                     // Add Button for creating new Chapter in this Episode
                     if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
@@ -56,11 +56,11 @@ namespace AnoGame.AnoNarrative.Editor
 
                     foreach (var chapterGroup in chapters)
                     {
-                        string chStr = chapterGroup.Key.ToString();
+                        string chStr = chapterGroup.Key == -1 ? "Default" : chapterGroup.Key.ToString();
                         bool allowChapter = allowEp || chStr.Contains(_searchFilter);
 
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField($"{chapterGroup.Key}", EditorStyles.miniBoldLabel);
+                        EditorGUILayout.LabelField($"{chStr}", EditorStyles.miniBoldLabel);
                         if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
                         {
                             RequestCreateSection(epGroup.Key, chapterGroup.Key);
@@ -70,20 +70,33 @@ namespace AnoGame.AnoNarrative.Editor
                         EditorGUI.indentLevel++;
 
                         // Group by Section
-                        var sections = chapterGroup.GroupBy(u => u.SectionID).OrderBy(g => g.Key);
+                        // Modified logic: If SectionID is -1 (Default), we distinguishing by SectionName to separate them visually.
+                        // We use a composite key object or just a custom grouping.
+                        var sections = chapterGroup.GroupBy(u => new
+                        {
+                            ID = u.SectionID,
+                            // If ID is -1, treat Name as part of the key. Otherwise ignore name (empty).
+                            NameKey = (u.SectionID == -1 ? u.SectionName : "")
+                        }).OrderBy(g => g.Key.ID).ThenBy(g => g.Key.NameKey);
 
                         foreach (var sectionGroup in sections)
                         {
+                            int secID = sectionGroup.Key.ID;
+                            string secNameKey = sectionGroup.Key.NameKey;
+
                             // Filter check
+                            // Note: FilterSectionName logic in Canvas implies strict match if provided.
                             if (!allowChapter && !sectionGroup.Any(u => u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
                             var first = sectionGroup.FirstOrDefault();
-                            string displayName = string.IsNullOrEmpty(first?.SectionName) ? sectionGroup.Key.ToString() : first.SectionName;
+                            string displayName = string.IsNullOrEmpty(first?.SectionName) ? (secID == -1 ? "Default" : secID.ToString()) : first.SectionName;
 
                             if (GUILayout.Button($"{displayName} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
                             {
                                 // Trigger Filter
-                                OnSelectSection?.Invoke(epGroup.Key, chapterGroup.Key, sectionGroup.Key);
+                                // If secID is -1, we pass the name key to enable strict filtering
+                                string filterName = (secID == -1) ? secNameKey : null;
+                                OnSelectSection?.Invoke(epGroup.Key, chapterGroup.Key, secID, filterName);
 
                                 // Pan to first item
                                 if (first != null) OnRequestPanTo?.Invoke(first.Position);
@@ -94,7 +107,7 @@ namespace AnoGame.AnoNarrative.Editor
                             if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && btnRect.Contains(Event.current.mousePosition))
                             {
                                 GenericMenu menu = new GenericMenu();
-                                menu.AddItem(new GUIContent("Delete Section"), false, () => DeleteSection(epGroup.Key, chapterGroup.Key, sectionGroup.Key));
+                                menu.AddItem(new GUIContent("Delete Section"), false, () => DeleteSection(epGroup.Key, chapterGroup.Key, secID));
                                 menu.ShowAsContext();
                                 Event.current.Use();
                             }

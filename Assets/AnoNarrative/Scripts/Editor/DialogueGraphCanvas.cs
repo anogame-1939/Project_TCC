@@ -19,10 +19,11 @@ namespace AnoGame.AnoNarrative.Editor
         // Caching
         private Dictionary<string, Vector2> _posCache = new Dictionary<string, Vector2>();
 
-        // Filter (-1 means All or None selected effectively)
-        public int FilterEpisode = -1;
-        public int FilterChapter = -1;
-        public int FilterSection = -1;
+        // Filter (int.MinValue means All)
+        public int FilterEpisode = int.MinValue;
+        public int FilterChapter = int.MinValue;
+        public int FilterSection = int.MinValue;
+        public string FilterSectionName = null; // Optional additional filter
 
         // Actions
         private List<ConversationUnit> _nodesToDelete = new List<ConversationUnit>();
@@ -34,12 +35,13 @@ namespace AnoGame.AnoNarrative.Editor
             State = new DialogueGraphState(); // Initialize State
         }
 
-        public void SetFilter(int episode, int chapter, int section)
+        public void SetFilter(int ep, int ch, int sec, string secName = null)
         {
-            FilterEpisode = episode;
-            FilterChapter = chapter;
-            FilterSection = section;
-            State.ClearSelection();
+            FilterEpisode = ep;
+            FilterChapter = ch;
+            FilterSection = sec;
+            FilterSectionName = secName;
+            State.ScrollPos = Vector2.zero;
         }
 
         public void Draw(Rect position, float sidebarWidth = 0f)
@@ -150,12 +152,12 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void DrawOverlay(float sidebarWidth)
         {
-            if (FilterEpisode != -1 || FilterChapter != -1 || FilterSection != -1)
+            if (FilterEpisode != int.MinValue || FilterChapter != int.MinValue || FilterSection != int.MinValue)
             {
                 var sample = Data.Conversations.FirstOrDefault(u => IsUnitVisible(u));
-                string secDisplay = sample?.SectionName ?? (FilterSection != -1 ? FilterSection.ToString() : "All");
+                string secDisplay = sample?.SectionName ?? (FilterSection != int.MinValue ? FilterSection.ToString() : "All");
 
-                string label = $"Ep:{(FilterEpisode != -1 ? FilterEpisode.ToString() : "All")} / Ch:{(FilterChapter != -1 ? FilterChapter.ToString() : "All")} / {secDisplay}";
+                string label = $"Ep:{(FilterEpisode != int.MinValue ? FilterEpisode.ToString() : "All")} / Ch:{(FilterChapter != int.MinValue ? FilterChapter.ToString() : "All")} / {secDisplay}";
                 GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
                 style.fontSize = 20;
                 style.fontStyle = FontStyle.Bold;
@@ -190,11 +192,20 @@ namespace AnoGame.AnoNarrative.Editor
 
         private bool IsUnitVisible(ConversationUnit unit)
         {
-            if (FilterEpisode == -1 && FilterChapter == -1 && FilterSection == -1) return true;
-            bool matchEp = FilterEpisode == -1 || unit.EpisodeID == FilterEpisode;
-            bool matchCh = FilterChapter == -1 || unit.ChapterID == FilterChapter;
-            bool matchSec = FilterSection == -1 || unit.SectionID == FilterSection;
-            return matchEp && matchCh && matchSec;
+            if (FilterEpisode == int.MinValue && FilterChapter == int.MinValue && FilterSection == int.MinValue) return true;
+
+            bool matchEp = FilterEpisode == int.MinValue || unit.EpisodeID == FilterEpisode;
+            bool matchCh = FilterChapter == int.MinValue || unit.ChapterID == FilterChapter;
+            bool matchSec = FilterSection == int.MinValue || unit.SectionID == FilterSection;
+
+            // If strict name filter is set, check it
+            bool matchName = true;
+            if (!string.IsNullOrEmpty(FilterSectionName))
+            {
+                matchName = unit.SectionName == FilterSectionName;
+            }
+
+            return matchEp && matchCh && matchSec && matchName;
         }
 
         private void DrawNode(ConversationUnit unit, Rect rect)
@@ -550,9 +561,9 @@ namespace AnoGame.AnoNarrative.Editor
             var newUnit = new ConversationUnit
             {
                 ID = newID,
-                EpisodeID = FilterEpisode != -1 ? FilterEpisode : 1,
-                ChapterID = FilterChapter != -1 ? FilterChapter : 1,
-                SectionID = FilterSection != -1 ? FilterSection : 1,
+                EpisodeID = FilterEpisode != int.MinValue ? FilterEpisode : 1,
+                ChapterID = FilterChapter != int.MinValue ? FilterChapter : 1,
+                SectionID = FilterSection != int.MinValue ? FilterSection : 1,
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = worldPos
@@ -590,9 +601,9 @@ namespace AnoGame.AnoNarrative.Editor
         private string GenerateNextID()
         {
             // Fallback for ID generation prefix logic if filters are not set
-            int ep = FilterEpisode != -1 ? FilterEpisode : 1;
-            int ch = FilterChapter != -1 ? FilterChapter : 1;
-            int sec = FilterSection != -1 ? FilterSection : 1;
+            int ep = FilterEpisode != int.MinValue ? FilterEpisode : 1;
+            int ch = FilterChapter != int.MinValue ? FilterChapter : 1;
+            int sec = FilterSection != int.MinValue ? FilterSection : 1;
 
             string prefix = $"{ep}_{ch}_{sec}_";
 
