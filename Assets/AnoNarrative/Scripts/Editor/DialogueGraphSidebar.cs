@@ -60,10 +60,19 @@ namespace AnoGame.AnoNarrative.Editor
                         bool allowChapter = allowEp || chStr.Contains(_searchFilter);
 
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField($"{chStr}", EditorStyles.miniBoldLabel);
-                        if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
+                        // Limit label width to prevent horizontal scroll. 
+                        // Width - Indent(15) - Buttons(40) - ScrollBar/Padding(30) approx = -85
+                        float labelMaxWidth = width - 85f;
+                        EditorGUILayout.LabelField($"{chStr}", EditorStyles.miniBoldLabel, GUILayout.MaxWidth(labelMaxWidth));
+                        GUILayout.FlexibleSpace(); // Push buttons to right
+
+                        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(20)))
                         {
                             RequestCreateSection(epGroup.Key, chapterGroup.Key);
+                        }
+                        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+                        {
+                            DeleteChapter(epGroup.Key, chapterGroup.Key);
                         }
                         EditorGUILayout.EndHorizontal();
 
@@ -144,7 +153,14 @@ namespace AnoGame.AnoNarrative.Editor
                 nextCh = Data.Conversations.Where(u => u.EpisodeID == epID).Max(u => u.ChapterID) + 1;
             }
 
-            RequestCreateSection(epID, nextCh);
+            // Immediate creation of a "Frame" (Placeholder Unit)
+            // We need at least one section. Let's start with Section 1 (or 0?).
+            // User requested "Increment Chapter".
+
+            int startSec = 1;
+            string defaultName = GetUniqueSectionName(epID, nextCh);
+
+            CreateSection(epID, nextCh, startSec, defaultName);
         }
 
         private void RequestCreateSection(int epID, int chapterID)
@@ -159,16 +175,8 @@ namespace AnoGame.AnoNarrative.Editor
             // Suggest a default name
             string defaultName = GetUniqueSectionName(epID, chapterID);
 
-            // Show Popup
-            SectionCreatePopup.Show(
-                "Create Section",
-                Data,
-                epID,
-                chapterID,
-                nextSec,
-                defaultName,
-                (ep, ch, sec, name) => CreateSection(ep, ch, sec, name)
-            );
+            // Immediate Create
+            CreateSection(epID, chapterID, nextSec, defaultName);
         }
 
         private string GetUniqueSectionName(int epID, int chapterID)
@@ -220,6 +228,14 @@ namespace AnoGame.AnoNarrative.Editor
             if (EditorUtility.DisplayDialog("Delete Section", $"Are you sure you want to delete section '{section}' in '{ep}/{chapter}'?", "Yes", "No"))
             {
                 Data.Conversations.RemoveAll(u => u.EpisodeID == ep && u.ChapterID == chapter && u.SectionID == section);
+            }
+        }
+
+        private void DeleteChapter(int ep, int chapter)
+        {
+            if (EditorUtility.DisplayDialog("Delete Chapter", $"Are you sure you want to delete Chapter {chapter} in Episode {ep} and ALL its sections?", "Yes", "No"))
+            {
+                Data.Conversations.RemoveAll(u => u.EpisodeID == ep && u.ChapterID == chapter);
             }
         }
     }
