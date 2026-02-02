@@ -155,16 +155,31 @@ namespace AnoGame.AnoNarrative.Editor
             if (FilterEpisode != int.MinValue || FilterChapter != int.MinValue || FilterSection != int.MinValue)
             {
                 var sample = Data.Conversations.FirstOrDefault(u => IsUnitVisible(u));
-                string secDisplay = sample?.SectionName ?? (FilterSection != int.MinValue ? FilterSection.ToString() : "All");
+                // Use FilterSectionName if available, or sample name, or fallback.
+                string secName = !string.IsNullOrEmpty(FilterSectionName) ? FilterSectionName : (sample?.SectionName ?? "All");
 
-                string label = $"Ep:{(FilterEpisode != int.MinValue ? FilterEpisode.ToString() : "All")} / Ch:{(FilterChapter != int.MinValue ? FilterChapter.ToString() : "All")} / {secDisplay}";
+                string label;
+                if (FilterEpisode != int.MinValue && FilterChapter != int.MinValue && FilterSection != int.MinValue)
+                {
+                    // Format: 1.1.1_SectionName
+                    label = $"{FilterEpisode}.{FilterChapter}.{FilterSection}_{secName}";
+                }
+                else
+                {
+                    // Fallback or partial filter format
+                    string epStr = FilterEpisode != int.MinValue ? FilterEpisode.ToString() : "*";
+                    string chStr = FilterChapter != int.MinValue ? FilterChapter.ToString() : "*";
+                    string secStr = FilterSection != int.MinValue ? FilterSection.ToString() : "*";
+                    label = $"{epStr}.{chStr}.{secStr}_{secName}";
+                }
+
                 GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
                 style.fontSize = 20;
                 style.fontStyle = FontStyle.Bold;
                 style.normal.textColor = new Color(1f, 1f, 1f, 0.3f);
 
                 float x = (sidebarWidth > 0 ? sidebarWidth : 0) + 20;
-                GUI.Label(new Rect(x, 20, 600, 50), label, style);
+                GUI.Label(new Rect(x, 20, 800, 50), label, style);
             }
 
             // Debug Overlay

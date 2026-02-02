@@ -102,10 +102,7 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 _showSidebar = GUILayout.Toggle(_showSidebar, "Sidebar", EditorStyles.toolbarButton);
 
-                if (GUILayout.Button("Show All", EditorStyles.toolbarButton))
-                {
-                    _canvas.SetFilter(int.MinValue, int.MinValue, int.MinValue);
-                }
+
 
                 if (GUILayout.Button("Grid Layout", EditorStyles.toolbarButton))
                 {
