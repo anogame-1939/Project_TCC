@@ -26,7 +26,7 @@ namespace AnoGame.AnoNarrative.Timeline
                 // But if OnBehaviourPlay failed due to null receiver, we retry here.
                 if (info.weight > 0)
                 {
-                    Debug.Log($"[AnoNarrativeBehaviour] ProcessFrame: Receiver found ({receiver.name}), triggering delayed start.");
+                    // Debug.Log($"[AnoNarrativeBehaviour] ProcessFrame: Receiver found ({receiver.name}), triggering delayed start.");
                     StartConversation();
                 }
             }
@@ -34,11 +34,10 @@ namespace AnoGame.AnoNarrative.Timeline
 
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
-            Debug.Log($"[AnoNarrativeBehaviour] OnBehaviourPlay Called. App.isPlaying: {Application.isPlaying}, _isTriggered: {_isTriggered}, ConversationID: {conversationID}, Receiver: {(receiver != null ? receiver.name : "null")}");
+            // Debug.Log($"[AnoNarrativeBehaviour] OnBehaviourPlay Called. App.isPlaying: {Application.isPlaying}, _isTriggered: {_isTriggered}, ConversationID: {conversationID}, Receiver: {(receiver != null ? receiver.name : "null")}");
 
             if (_isTriggered || !Application.isPlaying)
             {
-                // Debug.Log($"[AnoNarrativeBehaviour] OnBehaviourPlay Skipped. _isTriggered: {_isTriggered}, App.isPlaying: {Application.isPlaying}");
                 return;
             }
 
@@ -50,7 +49,7 @@ namespace AnoGame.AnoNarrative.Timeline
 
             if (receiver == null)
             {
-                Debug.LogWarning($"[AnoNarrativeBehaviour] Receiver is null for conversation {conversationID}. Waiting for Mixer injection in ProcessFrame...");
+                // Debug.LogWarning($"[AnoNarrativeBehaviour] Receiver is null for conversation {conversationID}. Waiting for Mixer injection in ProcessFrame...");
                 // Do NOT return failure, just don't trigger yet. ProcessFrame will pick it up properly once Mixer runs.
                 return;
             }
@@ -66,39 +65,59 @@ namespace AnoGame.AnoNarrative.Timeline
 
             if (pauseTimeline)
             {
-                Debug.Log("[AnoNarrativeBehaviour] Requesting PauseTimeline.");
+                // Debug.Log("[AnoNarrativeBehaviour] Requesting PauseTimeline.");
                 PauseTimeline();
             }
 
-            Debug.Log($"[AnoNarrativeBehaviour] Calling receiver.Play({conversationID}).");
+            // Debug.Log($"[AnoNarrativeBehaviour] Calling receiver.Play({conversationID}).");
             receiver.Play(conversationID);
 
             // Wait for conversation to end
-            Debug.Log("[AnoNarrativeBehaviour] Starting MonitorConversationEnd Coroutine.");
+            // Debug.Log("[AnoNarrativeBehaviour] Starting MonitorConversationEnd Coroutine.");
             MonitorConversationEnd().Forget();
         }
 
         private async UniTaskVoid MonitorConversationEnd()
         {
-            Debug.Log("[AnoNarrativeBehaviour] MonitorConversationEnd: Waiting for LastPostLateUpdate...");
+            // Debug.Log("[AnoNarrativeBehaviour] MonitorConversationEnd: Waiting for LastPostLateUpdate...");
             // Wait a frame to ensure active state is updated (if manager starts it)
             await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
 
-            Debug.Log("[AnoNarrativeBehaviour] MonitorConversationEnd: Waiting for Conversation to end...");
+            // Debug.Log("[AnoNarrativeBehaviour] MonitorConversationEnd: Waiting for Conversation to end...");
+
             // Wait until conversation is no longer active
-            // Using receiver to check allows receiver to handle "Simulation" (always false) or real check
             await UniTask.WaitUntil(() =>
             {
                 if (receiver == null)
                 {
                     Debug.LogWarning("[AnoNarrativeBehaviour] MonitorConversationEnd: Receiver lost during wait. Aborting.");
-                    return true; // Abort wait if receiver lost
+                    return true;
                 }
+
+                // Seek/Scrub Detection
+                // If the timeline time has changed significantly from where we paused it, the user (or logic) has moved the head.
+                // In this case, we should cancel the conversation and respect the new time.
+                if (pauseTimeline && director != null && director.playableGraph.IsValid())
+                {
+                    double currentTime = director.time;
+                    if (System.Math.Abs(currentTime - _pausedTime) > 0.01f) // Tolerance for float drift
+                    {
+                        Debug.Log($"[AnoNarrativeBehaviour] Timeline Playhead moved significantly (Time: {currentTime:F2} vs Paused: {_pausedTime:F2}). Cancelling Conversation.");
+
+                        // Stop Dialogue
+                        DialogueManager.Instance.StopConversation();
+
+                        // Ensure we don't snap back to old time
+                        _pausedTime = currentTime;
+                        return true;
+                    }
+                }
+
                 bool active = receiver.IsConversationActive;
                 return !active;
             });
 
-            Debug.Log($"[AnoNarrativeBehaviour] MonitorConversationEnd: Conversation ended. pauseTimeline: {pauseTimeline}");
+            // Debug.Log($"[AnoNarrativeBehaviour] MonitorConversationEnd: Conversation ended. pauseTimeline: {pauseTimeline}");
 
             if (pauseTimeline)
             {
@@ -108,31 +127,23 @@ namespace AnoGame.AnoNarrative.Timeline
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
-            Debug.Log($"[AnoNarrativeBehaviour] OnBehaviourPause Called. Director State: {(director != null ? director.state.ToString() : "null")}");
-            // If we paused the graph, OnBehaviourPause is called.
-            // But also when the clip finishes.
-
-            // If the clip finishes normally or is interrupted, we might need to cleanup.
-            // But if we are simply PAUSED by our own logic, we don't want to stop conversation.
-
-            // If the timeline is stopped externally while we are active, we should stop dialogue?
-            if (Application.isPlaying && director != null && director.state != PlayState.Playing)
-            {
-                // Timeline stopped or paused manually (not by us?) 
-                // Actually this logic is tricky. 
-                // Let's stick to simple logic: If the clip scope ends, we don't necessarily stop dialogue unless strictly desired.
-                // But if we want to secure "end", maybe we just ensure resuming happened.
-            }
+            // Debug.Log($"[AnoNarrativeBehaviour] OnBehaviourPause Called. Director State: {(director != null ? director.state.ToString() : "null")}");
 
             // If the timeline is just paused, we should NOT reset the trigger state.
             // Resetting it would cause OnBehaviourPlay to re-trigger the conversation when resumed.
             if (director != null && director.state == PlayState.Paused)
             {
-                Debug.Log("[AnoNarrativeBehaviour] OnBehaviourPause: Director Paused, skipping reset of _isTriggered.");
+                // HOWEVER, if the user Scrolled/Seeked, the state is also Paused.
+                // We need to know if time changed.
+                // But MonitorConversationEnd handles the "While Playing" seek.
+                // If we are strictly paused, checking changes is hard without tracking per frame.
+                // Assuming MonitorConversationEnd covers the active cancellation case.
+
+                // Debug.Log("[AnoNarrativeBehaviour] OnBehaviourPause: Director Paused, skipping reset of _isTriggered.");
                 return;
             }
 
-            Debug.Log("[AnoNarrativeBehaviour] OnBehaviourPause: Resetting _isTriggered to false.");
+            // Debug.Log("[AnoNarrativeBehaviour] OnBehaviourPause: Resetting _isTriggered to false.");
             _isTriggered = false;
         }
 
@@ -146,20 +157,23 @@ namespace AnoGame.AnoNarrative.Timeline
 
             _prevSpeed = director.playableGraph.GetRootPlayable(0).GetSpeed();
             _pausedTime = director.time;
-            Debug.Log($"[AnoNarrativeBehaviour] PauseTimeline. PausedTime: {_pausedTime}, PrevSpeed: {_prevSpeed}");
+            // Debug.Log($"[AnoNarrativeBehaviour] PauseTimeline. PausedTime: {_pausedTime}, PrevSpeed: {_prevSpeed}");
             director.playableGraph.GetRootPlayable(0).SetSpeed(0);
         }
 
         private void ResumeTimeline()
         {
-            Debug.Log("[AnoNarrativeBehaviour] ResumeTimeline Called.");
+            // Debug.Log("[AnoNarrativeBehaviour] ResumeTimeline Called.");
             if (director == null || !director.playableGraph.IsValid())
             {
                 Debug.LogWarning("[AnoNarrativeBehaviour] ResumeTimeline Failed: director is null or graph invalid.");
                 return;
             }
 
-            Debug.Log($"[AnoNarrativeBehaviour] Resuming to Time: {_pausedTime}, Speed: {(_prevSpeed <= 0 ? 1 : _prevSpeed)}");
+            // Only restore time if it hasn't drifted via our Seek Logic
+            // The Seek logic updates _pausedTime to current time if detected, so we just set it.
+            // Actually, if we scrubbed, we are at new time. setting director.time = newTime is redundant but safe.
+            // Debug.Log($"[AnoNarrativeBehaviour] Resuming to Time: {_pausedTime}, Speed: {(_prevSpeed <= 0 ? 1 : _prevSpeed)}");
             director.time = _pausedTime;
             director.playableGraph.GetRootPlayable(0).SetSpeed(_prevSpeed <= 0 ? 1 : _prevSpeed);
         }

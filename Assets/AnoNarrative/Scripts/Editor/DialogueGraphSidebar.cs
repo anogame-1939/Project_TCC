@@ -16,7 +16,7 @@ namespace AnoGame.AnoNarrative.Editor
         public System.Action<int, int, int, string> OnSelectSection;
 
         // Static変数でドラッグデータを保持
-        private static SectionDragData _currentDragData;
+        private static SidebarDragData _currentDragData;
 
         public DialogueGraphSidebar(MasterDialogueData data)
         {
@@ -32,15 +32,12 @@ namespace AnoGame.AnoNarrative.Editor
                 if (_currentDragData != null)
                 {
                     _currentDragData = null;
-                    // DragAndDrop.PrepareStartDrag(); 
                 }
             }
-            // マウスアップ時も、ドラッグ中ならリセット（ドロップ処理漏れ防止）
+            // マウスアップ時も、ドラッグ中ならリセット
             if (evt.type == EventType.MouseUp && _currentDragData != null)
             {
-                // ここでnullにするとDragPerformが呼ばれる前に消えてしまう可能性があるため、
-                // 本来はDragPerformで消すが、保険としてGUIの最後に消す処理を入れるのが一般的。
-                // 今回はDragPerformが呼ばれない問題への対処なので、ここは一旦スルーしてOK。
+                // GUIループの最後に処理されるべきだが、簡易対応として
             }
 
             GUILayout.BeginVertical(GUILayout.Width(width), GUILayout.ExpandHeight(true));
@@ -59,6 +56,7 @@ namespace AnoGame.AnoNarrative.Editor
                     string epStr = epGroup.Key == -1 ? "Default" : epGroup.Key.ToString();
                     bool allowEp = string.IsNullOrEmpty(_searchFilter) || epStr.Contains(_searchFilter);
 
+                    // --- EPISODE Header ---
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField($"Episode: {epStr}", EditorStyles.boldLabel);
                     GUILayout.FlexibleSpace();
@@ -67,6 +65,35 @@ namespace AnoGame.AnoNarrative.Editor
                         CreateChapter(epGroup.Key);
                     }
                     EditorGUILayout.EndHorizontal();
+
+                    // Episode Drop Zone (allow dropping Chapter to end of Episode)
+                    Rect epRect = GUILayoutUtility.GetLastRect();
+                    if (_currentDragData != null && _currentDragData.Type == DragType.Chapter)
+                    {
+                        if (epRect.Contains(evt.mousePosition))
+                        {
+                            if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
+                            {
+                                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+                                if (evt.type == EventType.DragUpdated) Event.current.Use();
+                                if (evt.type == EventType.DragPerform)
+                                {
+                                    DragAndDrop.AcceptDrag();
+                                    // Append to end of this Episode
+                                    int targetCh = 1;
+                                    if (epGroup.Any()) targetCh = epGroup.Max(u => u.ChapterID) + 1;
+                                    PerformChapterReorder(_currentDragData, epGroup.Key, targetCh);
+                                    _currentDragData = null;
+                                    Event.current.Use();
+                                }
+                            }
+                        }
+                        // Visual feedback for Episode drop
+                        if (evt.type == EventType.Repaint && epRect.Contains(evt.mousePosition))
+                        {
+                            EditorGUI.DrawRect(epRect, new Color(0, 1, 1, 0.2f));
+                        }
+                    }
 
                     EditorGUI.indentLevel++;
 
@@ -78,56 +105,106 @@ namespace AnoGame.AnoNarrative.Editor
                         bool allowChapter = allowEp || chStr.Contains(_searchFilter);
 
                         // =========================================================
-                        // 【修正点1】GetLastRectをやめ、GetControlRectで確実に領域を確保
+                        // Chapter Header Logic
                         // =========================================================
-
-                        // 1行分のRectを確保する（ここをチャプターヘッダーとドロップエリアにする）
                         Rect headerRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+                        float headerWidth = width;
 
-                        // 判定用Rect（横幅いっぱい）
-                        Rect dropRect = new Rect(0, headerRect.y, width, headerRect.height);
-
-                        // ラベルなどの描画用Rect調整
+                        // 1. Label Drawing & Interact Rect
                         Rect labelRect = new Rect(headerRect.x, headerRect.y, headerRect.width - 50, headerRect.height);
-
-                        // 1. ラベル描画（手動）
                         EditorGUI.LabelField(labelRect, $"{chStr}", EditorStyles.miniBoldLabel);
 
-                        // 2. ドロップ判定処理
-                        bool blockedByButton = (evt.mousePosition.x > width - 50);
-
-                        // Header Drop (Append to End of Chapter)
-                        if (dropRect.Contains(evt.mousePosition))
+                        // 2. Drag Start (Chapter)
+                        // Only allow dragging if NOT dragging something else
+                        if (_currentDragData == null && evt.type == EventType.MouseDrag && labelRect.Contains(evt.mousePosition))
                         {
-                            if (_currentDragData != null)
+                            Debug.Log($"Drag Start Chapter: {chStr}");
+                            _currentDragData = new SidebarDragData { Type = DragType.Chapter, Ep = epGroup.Key, Ch = chapterGroup.Key };
+                            DragAndDrop.PrepareStartDrag();
+                            DragAndDrop.SetGenericData("ChapterDrag", _currentDragData);
+                            DragAndDrop.objectReferences = new UnityEngine.Object[0];
+                            DragAndDrop.StartDrag($"Move Chapter {chStr}");
+                            Event.current.Use();
+                        }
+
+                        // 3. Drop Zone Logic (Chapter Reorder)
+                        if (_currentDragData != null && _currentDragData.Type == DragType.Chapter)
+                        {
+                            // Define Zones
+                            Rect chDropRect = new Rect(0, headerRect.y, headerWidth, headerRect.height);
+                            Rect chTopZone = new Rect(0, headerRect.y, headerWidth, headerRect.height * 0.5f);
+                            Rect chBotZone = new Rect(0, headerRect.y + (headerRect.height * 0.5f), headerWidth, headerRect.height * 0.5f);
+
+                            bool isInChRect = chDropRect.Contains(evt.mousePosition);
+                            bool isTop = chTopZone.Contains(evt.mousePosition);
+
+                            if (isInChRect)
                             {
                                 if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
                                 {
-                                    DragAndDrop.visualMode = blockedByButton ? DragAndDropVisualMode.None : DragAndDropVisualMode.Move;
-
-                                    if (evt.type == EventType.DragUpdated && !blockedByButton)
+                                    DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+                                    if (evt.type == EventType.DragUpdated) Event.current.Use();
+                                    if (evt.type == EventType.DragPerform)
                                     {
-                                        EditorGUI.DrawRect(dropRect, new Color(1f, 1f, 0f, 0.3f));
-                                        Event.current.Use();
-                                    }
-
-                                    if (evt.type == EventType.DragPerform && !blockedByButton)
-                                    {
-                                        int maxSec = 0;
-                                        if (chapterGroup.Any()) maxSec = chapterGroup.Max(u => u.SectionID);
-
-                                        MoveSection(_currentDragData.Ep, _currentDragData.Ch, _currentDragData.Sec, epGroup.Key, chapterGroup.Key, maxSec + 1);
-
                                         DragAndDrop.AcceptDrag();
+                                        // If top, insert at this index (i.e., become this ID)
+                                        // If bottom, insert after (i.e., become ID + 1)
+                                        // Note: In Chapter loop, chapterGroup.Key is the ID.
+                                        int targetChID = isTop ? chapterGroup.Key : chapterGroup.Key + 1;
+                                        PerformChapterReorder(_currentDragData, epGroup.Key, targetChID);
                                         _currentDragData = null;
-                                        // DragAndDrop.PrepareStartDrag(); // Error fix
                                         Event.current.Use();
                                     }
                                 }
                             }
+
+                            // Visuals
+                            if (evt.type == EventType.Repaint && isInChRect)
+                            {
+                                if (isTop)
+                                    EditorGUI.DrawRect(new Rect(0, headerRect.y - 1, headerWidth, 2), Color.cyan);
+                                else
+                                    EditorGUI.DrawRect(new Rect(0, headerRect.yMax - 1, headerWidth, 2), Color.cyan);
+                            }
                         }
 
-                        // 3. ボタン描画（手動配置）
+                        // 4. Drop Logic (Section Auto-Append to Chapter)
+                        // If dragging a Section and hovering Chapter header -> Append to End of Chapter
+                        if (_currentDragData != null && _currentDragData.Type == DragType.Section)
+                        {
+                            // ... existing logic for section drop on header ...
+                            if (headerRect.Contains(evt.mousePosition))
+                            {
+                                if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
+                                {
+                                    bool blocked = (evt.mousePosition.x > width - 50);
+                                    DragAndDrop.visualMode = blocked ? DragAndDropVisualMode.None : DragAndDropVisualMode.Move;
+
+                                    if (evt.type == EventType.DragUpdated && !blocked)
+                                    {
+                                        Event.current.Use(); // Just consume
+                                    }
+
+                                    if (evt.type == EventType.DragPerform && !blocked)
+                                    {
+                                        int maxSec = 0;
+                                        if (chapterGroup.Any()) maxSec = chapterGroup.Max(u => u.SectionID);
+                                        // Move Section
+                                        PerformSectionReorder(_currentDragData, epGroup.Key, chapterGroup.Key, maxSec + 1); // Using Reorder method for move
+                                        DragAndDrop.AcceptDrag();
+                                        _currentDragData = null;
+                                        Event.current.Use();
+                                    }
+                                }
+                                // Visual
+                                if (evt.type == EventType.Repaint && headerRect.Contains(evt.mousePosition) && !(evt.mousePosition.x > width - 50))
+                                {
+                                    EditorGUI.DrawRect(headerRect, new Color(1f, 1f, 0f, 0.2f));
+                                }
+                            }
+                        }
+
+                        // Buttons
                         Rect btnRectPlus = new Rect(headerRect.xMax - 42, headerRect.y, 20, headerRect.height);
                         Rect btnRectMinus = new Rect(headerRect.xMax - 20, headerRect.y, 20, headerRect.height);
 
@@ -166,15 +243,10 @@ namespace AnoGame.AnoNarrative.Editor
                             GUILayout.Label("=", GUILayout.Width(20));
                             Rect handleRect = GUILayoutUtility.GetLastRect();
 
-                            // =========================================================
-                            // 【修正点2】ドラッグ開始ガードの徹底
-                            // =========================================================
+                            // Drag Start (Section)
                             if (_currentDragData == null && evt.type == EventType.MouseDrag && handleRect.Contains(evt.mousePosition))
                             {
-                                Debug.Log($"Drag Start Detected on Handle for {displayName}");
-
-                                _currentDragData = new SectionDragData { Ep = epGroup.Key, Ch = chapterGroup.Key, Sec = secID };
-
+                                _currentDragData = new SidebarDragData { Type = DragType.Section, Ep = epGroup.Key, Ch = chapterGroup.Key, Sec = secID };
                                 DragAndDrop.PrepareStartDrag();
                                 DragAndDrop.SetGenericData("SectionDrag", _currentDragData);
                                 DragAndDrop.objectReferences = new UnityEngine.Object[0];
@@ -191,80 +263,48 @@ namespace AnoGame.AnoNarrative.Editor
 
                             EditorGUILayout.EndHorizontal();
 
-                            // --- DRAG & DROP LOGIC (Ported from DragDropTestWindow) ---
+                            // --- SECTION DROP LOGIC ---
                             Rect rowRect = GUILayoutUtility.GetLastRect();
-                            // Ensure the rect covers the full width for easier catching
                             rowRect.x = 0;
                             rowRect.width = width;
+                            float spacing = 1f;
 
-                            float contentHeight = rowRect.height;
-                            float spacing = 1f; // Define spacing here
+                            Rect dropZoneRect = new Rect(0, rowRect.y + (rowRect.height * 0.5f), width, rowRect.height);
+                            Rect topZoneRect = new Rect(0, rowRect.y, width, rowRect.height * 0.5f);
 
-                            // Define Drop Zones
-                            // DropZone covers bottom half of this item + visual gap area. 
-                            // Meaning if we drop here, we insert AFTER this item.
-                            Rect dropZoneRect = new Rect(0, rowRect.y + (contentHeight * 0.5f), width, contentHeight);
-
-                            // TopZone only for the very first item (insert at top)
-                            Rect topZoneRect = new Rect(0, rowRect.y, width, contentHeight * 0.5f);
-
-                            bool isInDropZone = false;
-                            bool isInTopZone = false;
-
-                            if (_currentDragData != null)
+                            if (_currentDragData != null && _currentDragData.Type == DragType.Section)
                             {
-                                isInDropZone = dropZoneRect.Contains(evt.mousePosition);
-                                isInTopZone = (i == 0) && topZoneRect.Contains(evt.mousePosition);
+                                bool isInDropZone = dropZoneRect.Contains(evt.mousePosition);
+                                bool isInTopZone = (i == 0) && topZoneRect.Contains(evt.mousePosition);
 
-                                // 1. LOGIC PHASE (DragUpdated / DragPerform)
                                 if (isInDropZone || isInTopZone)
                                 {
                                     if (evt.type == EventType.DragUpdated)
                                     {
                                         DragAndDrop.visualMode = DragAndDropVisualMode.Move;
                                         Event.current.Use();
-                                        // Request Repaint to update the visuals in the next phase
-                                        // (Since this is a helper class, we might need to rely on the window's repaint loop or trigger it)
-                                        // For now, assuming the window calls Repaint on MouseMove/DragUpdated.
                                     }
-
                                     if (evt.type == EventType.DragPerform)
                                     {
                                         DragAndDrop.AcceptDrag();
-
-                                        // Target Index Calculation
-                                        // TopZone -> 0
-                                        // DropZone -> i + 1 (Insert after current)
                                         int targetIndex = isInTopZone ? 0 : i + 1;
-
-                                        PerformReorder(_currentDragData, epGroup.Key, chapterGroup.Key, targetIndex);
-
+                                        PerformSectionReorder(_currentDragData, epGroup.Key, chapterGroup.Key, targetIndex);
                                         _currentDragData = null;
-                                        DragAndDrop.PrepareStartDrag();
                                         Event.current.Use();
                                     }
                                 }
-                            }
 
-                            // 2. VISUAL PHASE (Draws during Repaint)
-                            // Draw Cyan Line for feedback
-                            if (_currentDragData != null && (evt.type == EventType.Repaint))
-                            {
-                                // We check global mouse position against our defined zones again for drawing
-                                // (Or use the flags if we trust they are up to date from layout event, but Repaint is separate)
-                                bool drawDrop = dropZoneRect.Contains(evt.mousePosition);
-                                bool drawTop = (i == 0) && topZoneRect.Contains(evt.mousePosition);
-
-                                if (drawDrop)
+                                if (evt.type == EventType.Repaint)
                                 {
-                                    // Line below the item
-                                    float lineY = rowRect.yMax + (spacing * 0.5f);
-                                    EditorGUI.DrawRect(new Rect(0, lineY - 1, width, 2), Color.cyan);
-                                }
-                                else if (drawTop)
-                                {
-                                    // Line above the first item
-                                    EditorGUI.DrawRect(new Rect(0, rowRect.y - 1, width, 2), Color.cyan);
+                                    if (dropZoneRect.Contains(evt.mousePosition))
+                                    {
+                                        float lineY = rowRect.yMax + (spacing * 0.5f);
+                                        EditorGUI.DrawRect(new Rect(0, lineY - 1, width, 2), Color.cyan);
+                                    }
+                                    else if (isInTopZone) // re-check for safety
+                                    {
+                                        EditorGUI.DrawRect(new Rect(0, rowRect.y - 1, width, 2), Color.cyan);
+                                    }
                                 }
                             }
 
@@ -278,7 +318,7 @@ namespace AnoGame.AnoNarrative.Editor
                                 Event.current.Use();
                             }
 
-                            GUILayout.Space(spacing); // 実際にレイアウト上の隙間を空ける
+                            GUILayout.Space(spacing);
                         }
                         EditorGUI.indentLevel--;
                     }
@@ -302,7 +342,178 @@ namespace AnoGame.AnoNarrative.Editor
             EditorGUI.DrawRect(divider, Color.black);
         }
 
-        // Helper Methods
+        // --- DATA & LOGIC ---
+
+        private enum DragType { Section, Chapter }
+
+        private class SidebarDragData
+        {
+            public DragType Type;
+            public int Ep;
+            public int Ch;
+            public int Sec;
+        }
+
+        private void PerformSectionReorder(SidebarDragData dragData, int targetEp, int targetCh, int insertIndex)
+        {
+            if (dragData.Type != DragType.Section) return;
+
+            // Logic logic logic... reuse existing logic block
+            // NOTE: Copying previous logic but adapting variable names
+
+            // Create list of target
+            var targetList = Data.Conversations
+                .Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh)
+                .GroupBy(u => u.SectionID).OrderBy(g => g.Key).ToList();
+
+            // Self-drop check
+            if (dragData.Ep == targetEp && dragData.Ch == targetCh)
+            {
+                int currentIndex = targetList.FindIndex(g => g.Key == dragData.Sec);
+                if (currentIndex == -1) return;
+                if (currentIndex == insertIndex) return;
+                if (currentIndex + 1 == insertIndex) return;
+
+                // Adjust index if moving down
+                if (insertIndex > currentIndex) insertIndex--;
+            }
+
+            var movingUnits = Data.Conversations
+                .Where(u => u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch && u.SectionID == dragData.Sec)
+                .ToList();
+
+            // Remove logic handled by exclude-filter in construction? 
+            // Reuse robust logic:
+
+            // 2. target units excluding moving ones
+            var targetChapterUnits = Data.Conversations
+                .Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh)
+                .Where(u => !(u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch && u.SectionID == dragData.Sec))
+                .GroupBy(u => u.SectionID)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            // Insert to list of lists context
+            var reordered = new List<List<ConversationUnit>>();
+            foreach (var g in targetChapterUnits) reordered.Add(g.ToList());
+
+            // Clamp
+            if (insertIndex < 0) insertIndex = 0;
+            if (insertIndex > reordered.Count) insertIndex = reordered.Count;
+
+            // Update IDs of moving units
+            foreach (var unit in movingUnits)
+            {
+                unit.EpisodeID = targetEp;
+                unit.ChapterID = targetCh;
+            }
+
+            reordered.Insert(insertIndex, movingUnits);
+
+            // Reassign SectionIDs
+            int newSecID = 1;
+            foreach (var g in reordered)
+            {
+                foreach (var unit in g) unit.SectionID = newSecID;
+                newSecID++;
+            }
+
+            EditorUtility.SetDirty(Data);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"Moved Section {dragData.Sec} to {targetEp}/{targetCh} index {insertIndex}");
+        }
+
+        private void PerformChapterReorder(SidebarDragData dragData, int targetEp, int targetChID)
+        {
+            if (dragData.Type != DragType.Chapter) return;
+
+            // 1. Get all units in the moving chapter
+            var movingUnits = Data.Conversations
+                .Where(u => u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch)
+                .ToList();
+
+            if (!movingUnits.Any()) return;
+
+            // 2. Determine target ordering
+            // Get all existing ChapterIDs in target Episode (excluding the moving one if same Ep)
+            // But actually we are dealing with raw IDs in the target episode.
+
+            // List of Chapters in Target Episode
+            var targetChapters = Data.Conversations
+                .Where(u => u.EpisodeID == targetEp)
+                .Where(u => !(u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch)) // Exclude self if same episode
+                .GroupBy(u => u.ChapterID)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            // Map targetChID to list index
+            // If dropping on Ch 2 (targetChID=2), we want to be at index where key was 2?
+            // Actually targetChID is the "Desired ID".
+            // Logic:
+            // Iterate through sorted existing chapters.
+            // Construct a new list of chapters.
+
+            var newChapterOrder = new List<List<ConversationUnit>>();
+
+            // Logic: targetChID implies insertion point.
+            // If we drop on top of Ch 5, target is 5. We insert BEFORE 5.
+            // If we drop bottom of Ch 5, target is 6. We insert AFTER 5.
+
+            // Find insertion index in the filtered list
+            int insertIndex = 0;
+            bool found = false;
+            for (int i = 0; i < targetChapters.Count; i++)
+            {
+                // If the current chapter has ID >= targetChID, we insert before it?
+                // Visual logic: Top of 5 -> Target 5. List: 1, 2, 4, 5. Insert at index matching 5.
+                // Bottom of 5 -> Target 6. List: 1, 2, 4, 5. Insert at index after 5.
+
+                // Simpler: Compare keys.
+                if (targetChapters[i].Key < targetChID)
+                {
+                    insertIndex = i + 1;
+                }
+            }
+            // Logic tweak: If Self is Same Episode, we need to handle index shift logic similar to sections.
+            if (dragData.Ep == targetEp)
+            {
+                // Visual drop logic gave us a TargetID based on VISUAL layout.
+                // If I drag Ch 2 below Ch 3. Target is 4.
+                // Existing: 1, 2, 3, 4.
+                // Filtered: 1, 3, 4.
+                // 3 < 4, Index = 2 (after 3). 
+                // Insert at 2: 1, 3, [2], 4. -> Re-ID -> 1, 2, 3, 4. (Wait, 2 becomes 3, 3 becomes 2).
+            }
+
+            foreach (var g in targetChapters) newChapterOrder.Add(g.ToList());
+
+            // Clamp
+            if (insertIndex < 0) insertIndex = 0;
+            if (insertIndex > newChapterOrder.Count) insertIndex = newChapterOrder.Count;
+
+            // Update Moving Units Data
+            foreach (var unit in movingUnits)
+            {
+                unit.EpisodeID = targetEp;
+                // ChapterID will be reassigned
+            }
+
+            newChapterOrder.Insert(insertIndex, movingUnits);
+
+            // Reassign IDs
+            int newID = 1;
+            foreach (var chList in newChapterOrder)
+            {
+                foreach (var unit in chList) unit.ChapterID = newID;
+                newID++;
+            }
+
+            EditorUtility.SetDirty(Data);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"Moved Chapter {dragData.Ch} to Ep {targetEp} as Ch {insertIndex + 1}");
+        }
+
+        // Helper Methods (Keep existing Create/Delete methods)
         private void CreateChapter(int epID)
         {
             int nextCh = 1;
@@ -372,144 +583,6 @@ namespace AnoGame.AnoNarrative.Editor
                 Data.Conversations.RemoveAll(u => u.EpisodeID == ep && u.ChapterID == chapter && u.SectionID == section);
             }
         }
-
-        private void PerformReorder(SectionDragData dragData, int targetEp, int targetCh, int insertIndex)
-        {
-            // 同じアイテムへのドロップは無視
-            if (dragData.Ep == targetEp && dragData.Ch == targetCh)
-            {
-                // 現在のリスト上のインデックスを取得
-                var currentList = Data.Conversations
-                    .Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh)
-                    .GroupBy(u => u.SectionID) // Section単位
-                    .OrderBy(g => g.Key)
-                    .ToList();
-
-                int currentIndex = currentList.FindIndex(g => g.Key == dragData.Sec);
-                if (currentIndex == -1) return;
-
-                // 同じ場所なら何もしない（微調整必要：下移動時のindexズレ考慮）
-                if (currentIndex == insertIndex) return;
-                if (currentIndex + 1 == insertIndex) return; // 自分の直下＝自分と同じ位置
-            }
-
-            // 1. 移動対象のUnitをすべて取得
-            var movingUnits = Data.Conversations
-                .Where(u => u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch && u.SectionID == dragData.Sec)
-                .ToList();
-
-            // 2. 移動先チャプターの全セクションIDリストを作る（移動対象は除く）
-            //    移動元と移動先が同じ場合、ここで除外されることで「抜けた状態」になる
-            var targetChapterUnits = Data.Conversations
-                .Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh)
-                .Where(u => !(u.EpisodeID == dragData.Ep && u.ChapterID == dragData.Ch && u.SectionID == dragData.Sec)) // 移動対象を除外
-                .GroupBy(u => u.SectionID)
-                .OrderBy(g => g.Key)
-                .ToList();
-
-            // 3. insertIndexの位置に移動対象をダミーとして挿入したいが、
-            //    GroupByのリストには直接入れられないので、IDリストを作る
-            var newOrderSectionIDs = new List<int>();
-            foreach (var g in targetChapterUnits) newOrderSectionIDs.Add(g.Key);
-
-            // リスト内での挿入位置を調整
-            // 同一グループ内移動の場合、移動元を除去したあとのインデックスに対して挿入位置が正しいか確認が必要
-            // 上で「移動対象を除外」しているので、targetChapterUnitsは「抜けた後のリスト」になっている。
-            // したがって insertIndex はそのまま「抜けた後のリストの何番目に挿入するか」として使えるが、
-            // 下方向に移動した場合の補正が必要。
-            // しかし、UIのループ(i)は「移動前」の状態で行われている。
-
-            // 例: [A(0), B(1), C(2)] で A を B(1) の下 (=Index 2) に入れたい。
-            // targetChapterUnits = [B, C]
-            // insertIndex = 2. But targetChapterUnits.Count = 2. Insert(2) is OK (End).
-            // Result: [B, C, A] -> Correct.
-
-            // 例: [A(0), B(1), C(2)] で C を A(0) の上 (=Index 0) に入れたい。
-            // targetChapterUnits = [A, B]
-            // insertIndex = 0.
-            // Result: [C, A, B] -> Correct.
-
-            // 例: [A(0), B(1), C(2)] で A を A(0) の下 (=Index 1) に入れたい。(意味ない操作)
-            // targetChapterUnits = [B, C]
-            // insertIndex = 1.
-            // Result: [B, A, C]. Wait, A was at 0, B at 1. Swapped.
-
-            // UIのインデックス(i)を使って判断する場合、
-            // 「自分より下の位置」に挿入する場合、自分自身がリストから消える分、インデックスが1つ減ることを考慮する。
-            if (dragData.Ep == targetEp && dragData.Ch == targetCh)
-            {
-                var originalList = Data.Conversations
-                    .Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh)
-                    .GroupBy(u => u.SectionID).OrderBy(g => g.Key).ToList();
-                int originalIndex = originalList.FindIndex(g => g.Key == dragData.Sec);
-
-                if (insertIndex > originalIndex)
-                {
-                    insertIndex--;
-                }
-            }
-
-            // 範囲制限
-            if (insertIndex < 0) insertIndex = 0;
-            if (insertIndex > targetChapterUnits.Count) insertIndex = targetChapterUnits.Count;
-
-            // 4. 再配置＆ID書き換え実行
-            // まず移動対象の所属を書き換え
-            foreach (var unit in movingUnits)
-            {
-                unit.EpisodeID = targetEp;
-                unit.ChapterID = targetCh;
-                // SectionIDは後で決めるので一旦保留、あるいは仮
-            }
-
-            // targetChapterUnits (List<Group>) に movingUnits をインサートしたいが型が違う
-            // 実体ではなく「順番」だけ確定させればいい。
-
-            // 既存の要素（Group）のリスト
-            var reorderedGroups = new List<List<ConversationUnit>>();
-            foreach (var g in targetChapterUnits)
-            {
-                reorderedGroups.Add(g.ToList());
-            }
-
-            // 移動対象を挿入
-            reorderedGroups.Insert(insertIndex, movingUnits);
-
-            // 5. 連番振り直し
-            int currentSecID = 1;
-            foreach (var groupList in reorderedGroups)
-            {
-                foreach (var unit in groupList)
-                {
-                    unit.SectionID = currentSecID;
-                }
-                currentSecID++;
-            }
-
-            EditorUtility.SetDirty(Data);
-            AssetDatabase.SaveAssets(); // 強制保存しないとID重複などでバグる可能性がある
-
-            Debug.Log($"Reordered Section {dragData.Sec} to index {insertIndex} in {targetEp}/{targetCh}. New Max SecID: {currentSecID - 1}");
-        }
-
-        private void MoveSection(int srcEp, int srcCh, int srcSec, int destEp, int destCh, int destSec)
-        {
-            // 旧メソッド（互換性のため残すか、書き換えるか）
-            // 今回は末尾追加用として使う
-
-            // 移動
-            var units = Data.Conversations.Where(u => u.EpisodeID == srcEp && u.ChapterID == srcCh && u.SectionID == srcSec).ToList();
-            foreach (var unit in units)
-            {
-                unit.EpisodeID = destEp;
-                unit.ChapterID = destCh;
-                unit.SectionID = destSec;
-            }
-            EditorUtility.SetDirty(Data);
-            AssetDatabase.SaveAssets();
-        }
-
-        private class SectionDragData { public int Ep; public int Ch; public int Sec; }
 
         private void DeleteChapter(int ep, int chapter)
         {
