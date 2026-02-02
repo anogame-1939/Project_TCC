@@ -9,7 +9,7 @@ namespace AnoGame.AnoNarrative.Editor
     public class DialogueGraphCanvas
     {
         public MasterDialogueData Data;
-        public DialogueGraphState State; // New State Container
+        public DialogueGraphState State;
 
         private EditorWindow _host;
 
@@ -31,7 +31,7 @@ namespace AnoGame.AnoNarrative.Editor
         {
             Data = data;
             _host = host;
-            State = new DialogueGraphState(); // Initialize State
+            State = new DialogueGraphState();
         }
 
         public void SetFilter(int episode, int chapter, int section)
@@ -42,35 +42,29 @@ namespace AnoGame.AnoNarrative.Editor
             State.ClearSelection();
         }
 
-        public void Draw(Rect position, float sidebarWidth = 0f)
+        public void Draw(Rect position)
         {
             if (Data == null) return;
 
-            // Define the canvas area for clipping
             GUI.BeginGroup(position);
             Rect localRect = new Rect(0, 0, position.width, position.height);
 
             // Draw Background & Grid
-            // Apply Zoom to World Space
             Matrix4x4 oldMatrix = GUI.matrix;
             GUIUtility.ScaleAroundPivot(new Vector2(Zoom, Zoom), Vector2.zero);
 
-            // Calculate Visible World Area
             Rect worldRect = new Rect(0, 0, localRect.width / Zoom, localRect.height / Zoom);
 
             DrawGrid(worldRect, 20, 0.2f, Color.gray);
             DrawGrid(worldRect, 100, 0.4f, Color.gray);
 
-            // Update Cache for Connections
             UpdatePosCache();
 
-            // 1. Draw Connections
             if (Event.current.type == EventType.Repaint)
             {
                 DrawConnections(localRect);
             }
 
-            // 2. Draw Nodes
             for (int i = 0; i < Data.Conversations.Count; i++)
             {
                 var unit = Data.Conversations[i];
@@ -83,34 +77,28 @@ namespace AnoGame.AnoNarrative.Editor
                 DrawNode(unit, nodeRect);
             }
 
-            // Restore Matrix for UI Overlay
             GUI.matrix = oldMatrix;
 
-            // 3. Draw Overlay
-            DrawOverlay(sidebarWidth);
+            DrawOverlay();
 
-            // Draw Selection Box
             if (State.IsDraggingSelectionBox)
             {
-                GUI.matrix = oldMatrix; // Undo first
-                GUIUtility.ScaleAroundPivot(new Vector2(Zoom, Zoom), Vector2.zero); // Re-apply
+                GUI.matrix = oldMatrix;
+                GUIUtility.ScaleAroundPivot(new Vector2(Zoom, Zoom), Vector2.zero);
 
                 GUI.Box(State.SelectionRect, "", "SelectionRect");
 
-                GUI.matrix = oldMatrix; // Restore again
+                GUI.matrix = oldMatrix;
             }
 
-            // Process Input LAST
-            ProcessEvents(Event.current, localRect, sidebarWidth);
+            ProcessEvents(Event.current, localRect);
 
-            // Handle Deletions
             if (_nodesToDelete.Count > 0)
             {
                 foreach (var node in _nodesToDelete)
                 {
                     Data.Conversations.Remove(node);
 
-                    // Cleanup References (Fix "Tail" issue)
                     foreach (var other in Data.Conversations)
                     {
                         if (other.NextID == node.ID) other.NextID = null;
@@ -142,12 +130,11 @@ namespace AnoGame.AnoNarrative.Editor
             set => State.Zoom = value;
         }
 
-        private void DrawOverlay(float sidebarWidth)
+        private void DrawOverlay()
         {
             if (FilterEpisode != -1 || FilterChapter != -1 || FilterSection != -1)
             {
                 var sample = Data.Conversations.FirstOrDefault(u => IsUnitVisible(u));
-                // Show SectionName if available, else just "Section X"
                 string secDisplay = sample?.SectionName ?? (FilterSection != -1 ? FilterSection.ToString() : "All");
 
                 string epStr = FilterEpisode != -1 ? FilterEpisode.ToString() : "All";
@@ -159,11 +146,9 @@ namespace AnoGame.AnoNarrative.Editor
                 style.fontStyle = FontStyle.Bold;
                 style.normal.textColor = new Color(1f, 1f, 1f, 0.3f);
 
-                float x = (sidebarWidth > 0 ? sidebarWidth : 0) + 20;
-                GUI.Label(new Rect(x, 20, 600, 50), label, style);
+                GUI.Label(new Rect(20, 20, 600, 50), label, style);
             }
 
-            // Debug Overlay
             if (_host != null)
             {
                 Rect hostRect = _host.position;
@@ -179,7 +164,6 @@ namespace AnoGame.AnoNarrative.Editor
                 debugStyle.alignment = TextAnchor.LowerRight;
                 debugStyle.normal.textColor = Color.yellow;
 
-                // Draw at bottom right of the canvas (relative to 0,0 of the group)
                 Rect debugRect = new Rect(localRect.width - 300, localRect.height - 100, 290, 90);
                 GUI.Label(debugRect, debugInfo, debugStyle);
             }
@@ -198,7 +182,6 @@ namespace AnoGame.AnoNarrative.Editor
         {
             Color nodeColor = Data.GetActorColor(unit.SpeakerName);
 
-            // Selection Highlight (Cyan Border)
             if (State.IsSelected(unit.ID))
             {
                 float border = 2f;
@@ -206,14 +189,11 @@ namespace AnoGame.AnoNarrative.Editor
                 EditorGUI.DrawRect(selectionRect, Color.cyan);
             }
 
-            // 1. Definition Border (Black)
             EditorGUI.DrawRect(rect, new Color(0.1f, 0.1f, 0.1f, 1f));
 
-            // 2. Main Background (In set by 1px for border effect)
             Rect bodyRect = new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
             EditorGUI.DrawRect(bodyRect, nodeColor);
 
-            // Close Button (Red)
             Color oldBg = GUI.backgroundColor;
             GUI.backgroundColor = Color.red;
             if (GUI.Button(new Rect(rect.x + rect.width - 20, rect.y, 20, 20), "×"))
@@ -227,16 +207,14 @@ namespace AnoGame.AnoNarrative.Editor
             GUILayout.BeginArea(contentRect);
             EditorGUILayout.BeginVertical();
 
-            // Speaker (Dropdown)
-            var actorNames = Data.ActorDefinitions.Select(a => a.Name).ToList();
+            // Display Node Number for Debugging / Reference
+            EditorGUILayout.LabelField($"#{unit.NodeNumber}", EditorStyles.miniLabel);
 
-            // Shared Input Color (Actor Color - Brighter)
-            // Keeping standard rounded UI but tinting it with the actor's color (mixed with white for brightness).
+            var actorNames = Data.ActorDefinitions.Select(a => a.Name).ToList();
             Color inputBgColor = Color.Lerp(nodeColor, Color.white, 0f);
 
             if (actorNames.Count > 0)
             {
-                // Ensure current name is in list
                 if (!string.IsNullOrEmpty(unit.SpeakerName) && !actorNames.Contains(unit.SpeakerName))
                 {
                     actorNames.Insert(0, unit.SpeakerName);
@@ -261,7 +239,6 @@ namespace AnoGame.AnoNarrative.Editor
             }
             else
             {
-                // Fallback if no ActorList defined
                 Color dropdownBg = GUI.backgroundColor;
                 GUI.backgroundColor = inputBgColor;
                 unit.SpeakerName = EditorGUILayout.TextField(unit.SpeakerName, GUILayout.Width(80));
@@ -269,17 +246,14 @@ namespace AnoGame.AnoNarrative.Editor
             }
             GUILayout.Space(3);
 
-            // Body Text
             Color bodyBg = GUI.backgroundColor;
             GUI.backgroundColor = inputBgColor;
             unit.BodyText = EditorGUILayout.TextArea(unit.BodyText, GUILayout.Height(55));
             GUI.backgroundColor = bodyBg;
 
-            // Choices Section
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Choices", EditorStyles.boldLabel, GUILayout.Width(60));
-            // Add Choice Button (Header style)
             if (GUILayout.Button("+", GUILayout.Width(20)))
             {
                 if (unit.Choices == null) unit.Choices = new List<Choice>();
@@ -294,12 +268,10 @@ namespace AnoGame.AnoNarrative.Editor
                 var choice = unit.Choices[i];
                 EditorGUILayout.BeginHorizontal();
 
-                // Choice Text
                 GUI.backgroundColor = inputBgColor;
                 choice.ChoiceText = EditorGUILayout.TextField(choice.ChoiceText);
                 GUI.backgroundColor = bodyBg;
 
-                // Create/Link Node Button
                 if (string.IsNullOrEmpty(choice.TargetID))
                 {
                     if (GUILayout.Button("+Node", GUILayout.Width(45)))
@@ -309,18 +281,14 @@ namespace AnoGame.AnoNarrative.Editor
                 }
                 else
                 {
-                    // Visual indicator that it is linked
                     if (GUILayout.Button("->", GUILayout.Width(25)))
                     {
-                        // Select target?
                         State.SetSelection(choice.TargetID);
-                        // Pan to target?
                         var target = Data.Conversations.FirstOrDefault(x => x.ID == choice.TargetID);
                         if (target != null) State.ScrollPos = target.Position - new Vector2(250, 50);
                     }
                 }
 
-                // Delete Choice
                 GUI.backgroundColor = Color.red;
                 if (GUILayout.Button("x", GUILayout.Width(20)))
                 {
@@ -338,9 +306,8 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void CreateNodeForChoice(ConversationUnit parent, Choice choice)
         {
-            string newID = GenerateNextID();
+            string newID = System.Guid.NewGuid().ToString();
 
-            // Heuristic position for new node:
             int choiceIndex = parent.Choices.IndexOf(choice);
             Vector2 offset = new Vector2(NodeWidth + 50, (choiceIndex * (NodeHeight + 20)));
             Vector2 newPos = parent.Position + offset;
@@ -351,7 +318,8 @@ namespace AnoGame.AnoNarrative.Editor
                 EpisodeID = parent.EpisodeID,
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
-                SectionName = parent.SectionName, // inherit section name?
+                SectionName = parent.SectionName,
+                NodeNumber = parent.NodeNumber + 1, // Suggestion
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = newPos
@@ -362,14 +330,10 @@ namespace AnoGame.AnoNarrative.Editor
             _host.Repaint();
         }
 
-        private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
+        private void ProcessEvents(Event e, Rect viewRect)
         {
-            // Zoom: Modify mousePos to likely World Coordinate relative to Zoom
             Vector2 mousePos = e.mousePosition / Zoom;
 
-            if (restrictedX > 0 && e.mousePosition.x < restrictedX) return;
-
-            // Zoom Control
             if (e.type == EventType.ScrollWheel)
             {
                 float zoomDelta = -e.delta.y * 0.05f;
@@ -378,8 +342,7 @@ namespace AnoGame.AnoNarrative.Editor
 
                 if (Mathf.Abs(newZoom - oldZoom) > 0.001f)
                 {
-                    // Mouse-Centered Zoom Logic
-                    Vector2 mouseViewPos = e.mousePosition; // Raw View Pos
+                    Vector2 mouseViewPos = e.mousePosition;
                     Vector2 mouseCanvasPos = (mouseViewPos / oldZoom) + State.ScrollPos;
 
                     Zoom = newZoom;
@@ -391,7 +354,6 @@ namespace AnoGame.AnoNarrative.Editor
                 return;
             }
 
-            // Delete Key
             if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Delete)
             {
                 if (State.SelectedIDs.Count > 0)
@@ -409,11 +371,9 @@ namespace AnoGame.AnoNarrative.Editor
                 return;
             }
 
-            // Hit Test
             string clickedNodeID = GetNodeAtPosition(mousePos);
             bool isOverNode = !string.IsNullOrEmpty(clickedNodeID);
 
-            // Right Click (Context Menu)
             if (e.type == EventType.MouseDown && e.button == 1)
             {
                 var menu = new GenericMenu();
@@ -422,7 +382,6 @@ namespace AnoGame.AnoNarrative.Editor
                     var unit = Data.Conversations.FirstOrDefault(u => u.ID == clickedNodeID);
                     if (unit != null)
                     {
-                        // Select the node we right-clicked if not already selected
                         if (!State.IsSelected(clickedNodeID)) State.SetSelection(clickedNodeID);
 
                         menu.AddItem(new GUIContent("Add Node"), false, () => InsertNodeAfter(unit));
@@ -440,12 +399,10 @@ namespace AnoGame.AnoNarrative.Editor
                 return;
             }
 
-            // Left Click Logic
             if (e.type == EventType.MouseDown && e.button == 0)
             {
                 if (isOverNode)
                 {
-                    // Selection Logic
                     if (e.modifiers == EventModifiers.Shift || e.modifiers == EventModifiers.Control)
                     {
                         if (State.IsSelected(clickedNodeID)) State.RemoveFromSelection(clickedNodeID);
@@ -464,7 +421,6 @@ namespace AnoGame.AnoNarrative.Editor
                 }
                 else
                 {
-                    // Start Box Select
                     State.StartDraggingSelectionBox(mousePos);
                     if (e.modifiers != EventModifiers.Shift && e.modifiers != EventModifiers.Control)
                     {
@@ -474,7 +430,6 @@ namespace AnoGame.AnoNarrative.Editor
                 }
             }
 
-            // Dragging
             if (e.type == EventType.MouseDrag)
             {
                 if (State.IsDraggingNode)
@@ -524,7 +479,7 @@ namespace AnoGame.AnoNarrative.Editor
 
         private Rect GetNodeRect(ConversationUnit unit, Vector2 scrollPos)
         {
-            float currentHeight = 115f; // reduced base height since button is moved up
+            float currentHeight = 115f;
             if (unit.Choices != null && unit.Choices.Count > 0)
             {
                 currentHeight += unit.Choices.Count * 25f;
@@ -536,15 +491,27 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void CreateNode(Vector2 worldPos)
         {
-            string newID = GenerateNextID();
+            string newID = System.Guid.NewGuid().ToString();
+
+            // Find Max Node Num in current section?
+            int maxNode = 0;
+            if (FilterEpisode != -1 && FilterChapter != -1 && FilterSection != -1)
+            {
+                maxNode = Data.Conversations
+                    .Where(u => u.EpisodeID == FilterEpisode && u.ChapterID == FilterChapter && u.SectionID == FilterSection)
+                    .Select(u => u.NodeNumber)
+                    .DefaultIfEmpty(0)
+                    .Max();
+            }
 
             var newUnit = new ConversationUnit
             {
                 ID = newID,
-                EpisodeID = FilterEpisode != -1 ? FilterEpisode : 1, // Default to 1
+                EpisodeID = FilterEpisode != -1 ? FilterEpisode : 1,
                 ChapterID = FilterChapter != -1 ? FilterChapter : 1,
                 SectionID = FilterSection != -1 ? FilterSection : 1,
                 SectionName = "New Section",
+                NodeNumber = maxNode + 10,
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = worldPos
@@ -556,7 +523,7 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void InsertNodeAfter(ConversationUnit parent)
         {
-            string newID = GenerateNextID();
+            string newID = System.Guid.NewGuid().ToString();
 
             // Place BELOW the parent by default
             Vector2 newPos = parent.Position + new Vector2(0, NodeHeight + 50);
@@ -568,38 +535,17 @@ namespace AnoGame.AnoNarrative.Editor
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
                 SectionName = parent.SectionName,
+                NodeNumber = parent.NodeNumber + 10, // Increment by 10
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = newPos,
-                NextID = parent.NextID // Inherit the flow
+                NextID = parent.NextID
             };
 
             parent.NextID = newID;
 
             Data.Conversations.Add(newUnit);
             _host.Repaint();
-        }
-
-        private string GenerateNextID()
-        {
-            int ep = FilterEpisode != -1 ? FilterEpisode : 1;
-            int ch = FilterChapter != -1 ? FilterChapter : 1;
-            int sec = FilterSection != -1 ? FilterSection : 1;
-            string prefix = $"{ep}_{ch}_{sec}_";
-
-            int maxNum = 0;
-            foreach (var u in Data.Conversations)
-            {
-                if (u.ID != null && u.ID.StartsWith(prefix))
-                {
-                    string suffix = u.ID.Substring(prefix.Length);
-                    if (int.TryParse(suffix, out int n))
-                    {
-                        if (n > maxNum) maxNum = n;
-                    }
-                }
-            }
-            return prefix + (maxNum + 1);
         }
 
         private void MoveSelectedNodes(Vector2 delta)
@@ -781,6 +727,8 @@ namespace AnoGame.AnoNarrative.Editor
 
         private int CompareNodeIDs(ConversationUnit a, ConversationUnit b)
         {
+            // Compare by NodeNumber first, then ID (as fallback)
+            if (a.NodeNumber != b.NodeNumber) return a.NodeNumber.CompareTo(b.NodeNumber);
             return string.Compare(a.ID, b.ID);
         }
 
@@ -843,11 +791,21 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void DrawConnection(Vector2 start, Vector2 end, Color color)
         {
+            // Improved Tangent Calculation
+            float xDistance = Mathf.Abs(start.x - end.x);
+            float tangentStrength = Mathf.Clamp(xDistance * 0.6f, 50f, 300f);
+
+            // If end is purely below start (vertical), reduce tangent to avoid huge loops
+            if (end.x < start.x + 50 && end.x > start.x - 50)
+            {
+                tangentStrength = 50f;
+            }
+
             Handles.DrawBezier(
                 start,
                 end,
-                start + Vector2.right * 50f,
-                end + Vector2.left * 50f,
+                start + Vector2.right * tangentStrength,
+                end + Vector2.left * tangentStrength,
                 color,
                 null,
                 2f

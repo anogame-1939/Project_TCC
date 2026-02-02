@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace AnoGame.AnoNarrative
 {
@@ -113,5 +114,60 @@ namespace AnoGame.AnoNarrative
             var actor = ActorDefinitions.Find(a => a.Name == name);
             return actor != null ? actor.Color : Color.white;
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Migrate IDs to GUIDs")]
+        public void MigrateToGUIDs()
+        {
+            var oldToNew = new Dictionary<string, string>();
+
+            // 1. Generate New IDs
+            foreach (var unit in Conversations)
+            {
+                string oldID = unit.ID;
+                string newID = System.Guid.NewGuid().ToString();
+
+                // Parse old ID for NodeNumber (e.g. "0.0.0_Name_10" -> 10)
+                if (!string.IsNullOrEmpty(oldID))
+                {
+                    var parts = oldID.Split('_');
+                    if (parts.Length > 0)
+                    {
+                        var lastPart = parts[parts.Length - 1];
+                        if (int.TryParse(lastPart, out int num))
+                        {
+                            unit.NodeNumber = num;
+                        }
+                    }
+                }
+
+                unit.ID = newID;
+                if (!oldToNew.ContainsKey(oldID)) oldToNew[oldID] = newID;
+            }
+
+            // 2. Remap References
+            foreach (var unit in Conversations)
+            {
+                if (!string.IsNullOrEmpty(unit.NextID) && oldToNew.TryGetValue(unit.NextID, out string nextGuid))
+                {
+                    unit.NextID = nextGuid;
+                }
+
+                if (unit.Choices != null)
+                {
+                    foreach (var c in unit.Choices)
+                    {
+                        if (!string.IsNullOrEmpty(c.TargetID) && oldToNew.TryGetValue(c.TargetID, out string choiceGuid))
+                        {
+                            c.TargetID = choiceGuid;
+                        }
+                    }
+                }
+            }
+
+            Debug.Log($"Migrated {Conversations.Count} conversations to GUIDs.");
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }

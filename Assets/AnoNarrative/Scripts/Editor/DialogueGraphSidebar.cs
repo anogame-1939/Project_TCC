@@ -20,9 +20,10 @@ namespace AnoGame.AnoNarrative.Editor
             Data = data;
         }
 
-        public void Draw(float width)
+        public void Draw(Rect rect)
         {
-            GUILayout.BeginVertical(GUILayout.Width(width), GUILayout.ExpandHeight(true));
+            GUILayout.BeginArea(rect);
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             EditorGUILayout.LabelField("Navigator", EditorStyles.boldLabel);
 
             _searchFilter = EditorGUILayout.TextField(_searchFilter, EditorStyles.toolbarSearchField);
@@ -120,12 +121,7 @@ namespace AnoGame.AnoNarrative.Editor
 
             EditorGUILayout.EndScrollView();
             GUILayout.EndVertical();
-
-            // Draw Divider line
-            Rect divider = GUILayoutUtility.GetLastRect();
-            divider.x += divider.width;
-            divider.width = 1;
-            EditorGUI.DrawRect(divider, Color.black);
+            GUILayout.EndArea();
         }
 
         private void RequestCreateSection(int epID, int chapterID)
@@ -170,7 +166,7 @@ namespace AnoGame.AnoNarrative.Editor
             // Add initial node
             var newNode = new ConversationUnit
             {
-                ID = $"{epID}_{chapterID}_{sectionID}_1",
+                ID = System.Guid.NewGuid().ToString(),
                 EpisodeID = epID,
                 ChapterID = chapterID,
                 SectionID = sectionID,

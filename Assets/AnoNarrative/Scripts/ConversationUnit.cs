@@ -19,6 +19,9 @@ namespace AnoGame.AnoNarrative
         [Tooltip("Section/Situation Context (e.g. 1)")]
         public int SectionID = -1;
 
+        [Tooltip("Order of the node within the section")]
+        public int NodeNumber = 0;
+
         [Tooltip("Human readable name for the section")]
         public string SectionName;
 
