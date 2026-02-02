@@ -120,7 +120,7 @@ namespace AnoGame.AnoNarrative.Editor
 
                                         DragAndDrop.AcceptDrag();
                                         _currentDragData = null;
-                                        DragAndDrop.PrepareStartDrag();
+                                        // DragAndDrop.PrepareStartDrag(); // Error fix
                                         Event.current.Use();
                                     }
                                 }
@@ -193,6 +193,16 @@ namespace AnoGame.AnoNarrative.Editor
 
                             // --- INSERTION LOGIC (Between Sections) ---
                             Rect rowRect = GUILayoutUtility.GetLastRect();
+                            float spacing = 30f; // アイテム間の隙間
+
+                            // 【調整】ドラッグ中は判定を広げて、ドロップしやすくする
+                            // 特に縦幅は「下の隙間」も含めることで、隙間にマウスがあっても反応するようにする
+                            if (_currentDragData != null)
+                            {
+                                rowRect.x = 0;
+                                rowRect.width = width;
+                                rowRect.height += spacing; // 判定エリアを下に広げる
+                            }
 
                             if (_currentDragData != null && rowRect.Contains(evt.mousePosition))
                             {
@@ -202,7 +212,18 @@ namespace AnoGame.AnoNarrative.Editor
 
                                     // Top or Bottom check
                                     bool isTopHalf = (evt.mousePosition.y - rowRect.y) < (rowRect.height / 2f);
-                                    Rect insertLineRect = new Rect(rowRect.x, isTopHalf ? rowRect.y : rowRect.yMax, rowRect.width, 2f);
+
+                                    // ラインの表示位置：Gapを含めたRectの下端ではなく、視覚的なアイテムの下端(または隙間の中央)に出したい
+                                    // Rect.heightを足しているので、yMaxは「隙間の下」になる。
+                                    // 線を引きたいのは「隙間」の位置。
+                                    // Topなら rowRect.y (これは変わらずアイテム上端)
+                                    // Bottomなら... 本来のアイテムの下端付近がいい。
+                                    // rowRect.y + (rowRect.height - spacing) が本来のアイテム下端。
+
+                                    float lineY = isTopHalf ? rowRect.y : (rowRect.yMax - spacing);
+
+                                    // 少し太めに見やすく
+                                    Rect insertLineRect = new Rect(0, lineY, width, 2f); // 幅も画面いっぱいにする
 
                                     if (evt.type == EventType.DragUpdated)
                                     {
@@ -213,30 +234,24 @@ namespace AnoGame.AnoNarrative.Editor
                                     if (evt.type == EventType.DragPerform)
                                     {
                                         // 目標インデックス計算
-                                        // 現在のi個目の前に挿入(=i) か 後ろに挿入(=i+1)
-                                        // ただし、SectionIDベースなので、リスト上のインデックスから計算する必要がある。
-                                        // ここでは「このセクションのID」を基準に計算するほうが安全だが、
-                                        // 割り込み系なのでリスト順序で計算し、あとでIDを振り直す戦略をとる。
-
-                                        // まずベースとなるターゲットSectionIDを決める
-                                        // 単純にリスト操作で「何番目に挿入するか」を決める
                                         int targetListIndex = isTopHalf ? i : i + 1;
-
-                                        // リスト操作後の新しいSectionIDをどう決めるか？
-                                        // → 一度リストとして考え、移動元を除去し、移動先へ挿入し、上から順にSectionIDを1,2,3...と振り直すのが最も確実。
 
                                         PerformReorder(_currentDragData, epGroup.Key, chapterGroup.Key, targetListIndex);
 
                                         DragAndDrop.AcceptDrag();
                                         _currentDragData = null;
-                                        DragAndDrop.PrepareStartDrag();
+                                        // DragAndDrop.PrepareStartDrag(); // 修正済み
                                         Event.current.Use();
                                     }
                                 }
                             }
 
                             // Context Menu
-                            Rect btnRect = rowRect; // Use full row for context menu trigger if needed, or just button
+                            Rect btnRect = rowRect;
+                            // 判定Rectを広げたので、右クリックメニューの判定は元の高さに戻したい場合は調整が必要だが、
+                            // 広めのほうが操作しやすいかもしれないのでこのままでOKとする。
+                            // ただしwidthは広げているので、ボタン外でも反応するようになる（それはそれで便利）。
+
                             if (evt.type == EventType.MouseDown && evt.button == 1 && btnRect.Contains(evt.mousePosition))
                             {
                                 GenericMenu menu = new GenericMenu();
@@ -244,6 +259,8 @@ namespace AnoGame.AnoNarrative.Editor
                                 menu.ShowAsContext();
                                 Event.current.Use();
                             }
+
+                            GUILayout.Space(spacing); // 実際にレイアウト上の隙間を空ける
                         }
                         EditorGUI.indentLevel--;
                     }
