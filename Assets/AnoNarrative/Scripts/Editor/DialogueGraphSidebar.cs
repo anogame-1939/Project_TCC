@@ -20,10 +20,9 @@ namespace AnoGame.AnoNarrative.Editor
             Data = data;
         }
 
-        public void Draw(Rect rect)
+        public void Draw(float width)
         {
-            GUILayout.BeginArea(rect);
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            GUILayout.BeginVertical(GUILayout.Width(width), GUILayout.ExpandHeight(true));
             EditorGUILayout.LabelField("Navigator", EditorStyles.boldLabel);
 
             _searchFilter = EditorGUILayout.TextField(_searchFilter, EditorStyles.toolbarSearchField);
@@ -40,17 +39,7 @@ namespace AnoGame.AnoNarrative.Editor
                     string epStr = epGroup.Key.ToString();
                     bool allowEp = string.IsNullOrEmpty(_searchFilter) || epStr.Contains(_searchFilter);
 
-                    EditorGUILayout.BeginHorizontal();
-                    // Left-aligned bold label for Episode
-                    GUILayout.Label($"Episode: {epGroup.Key}", EditorStyles.boldLabel);
-                    GUILayout.FlexibleSpace();
-                    // Add Button for creating new Chapter in this Episode
-                    if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
-                    {
-                        CreateChapter(epGroup.Key);
-                    }
-                    EditorGUILayout.EndHorizontal();
-
+                    EditorGUILayout.LabelField($"Episode: {epGroup.Key}", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
 
                     // Group by Chapter
@@ -61,13 +50,11 @@ namespace AnoGame.AnoNarrative.Editor
                         string chStr = chapterGroup.Key.ToString();
                         bool allowChapter = allowEp || chStr.Contains(_searchFilter);
 
-                        // Chapter Header with Add Section Button
                         EditorGUILayout.BeginHorizontal();
-                        GUILayout.Label($"Chapter: {chapterGroup.Key}", EditorStyles.miniBoldLabel); // Changed format
-                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.LabelField($"{chapterGroup.Key}", EditorStyles.miniBoldLabel);
                         if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
                         {
-                            RequestCreateSection(epGroup.Key, chapterGroup.Key);
+                            CreateSection(epGroup.Key, chapterGroup.Key);
                         }
                         EditorGUILayout.EndHorizontal();
 
@@ -78,16 +65,13 @@ namespace AnoGame.AnoNarrative.Editor
 
                         foreach (var sectionGroup in sections)
                         {
+                            // Filter check
                             if (!allowChapter && !sectionGroup.Any(u => u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
                             var first = sectionGroup.FirstOrDefault();
                             string displayName = string.IsNullOrEmpty(first?.SectionName) ? sectionGroup.Key.ToString() : first.SectionName;
 
-                            // Left Aligned Section Button
-                            GUIStyle leftButton = new GUIStyle(EditorStyles.miniButtonLeft);
-                            leftButton.alignment = TextAnchor.MiddleLeft;
-
-                            if (GUILayout.Button($"{displayName} (Sec {sectionGroup.Key})", leftButton))
+                            if (GUILayout.Button($"{displayName} ({sectionGroup.Count()})", EditorStyles.miniButtonLeft))
                             {
                                 // Trigger Filter
                                 OnSelectSection?.Invoke(epGroup.Key, chapterGroup.Key, sectionGroup.Key);
@@ -121,56 +105,34 @@ namespace AnoGame.AnoNarrative.Editor
 
             EditorGUILayout.EndScrollView();
             GUILayout.EndVertical();
-            GUILayout.EndArea();
+
+            // Draw Divider line
+            Rect divider = GUILayoutUtility.GetLastRect();
+            divider.x += divider.width;
+            divider.width = 1;
+            EditorGUI.DrawRect(divider, Color.black);
         }
 
-        private void RequestCreateSection(int epID, int chapterID)
+        private void CreateSection(int epID, int chapterID)
         {
-            // Suggest a default name
-            string defaultName = GetUniqueSectionName(epID, chapterID);
-
-            // Suggest Section ID (Max + 1)
-            int nextSec = 1;
+            // Find next Section ID
+            int newSectionID = 1;
             if (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID))
             {
-                nextSec = Data.Conversations.Where(u => u.EpisodeID == epID && u.ChapterID == chapterID).Max(u => u.SectionID) + 1;
+                newSectionID = Data.Conversations.Where(u => u.EpisodeID == epID && u.ChapterID == chapterID).Max(u => u.SectionID) + 1;
             }
 
-            // Show Popup
-            SectionCreatePopup.Show(
-                "Create Section",
-                Data,
-                epID,
-                chapterID,
-                nextSec,
-                defaultName,
-                (ep, ch, sec, name) => CreateSection(ep, ch, sec, name)
-            );
-        }
+            // Suggest a Name?
+            // Keeping it simple as per original logic which used "NewSection" text.
+            // But now SectionID is int, so we don't rely on uniqueness of name for logic, just display.
 
-        private string GetUniqueSectionName(int epID, int chapterID)
-        {
-            string baseName = "NewSection";
-            int count = 1;
-            string candidate = baseName;
-            // Name uniqueness strictly not required by Schema but nice for UI
-            while (Data.Conversations.Any(u => u.EpisodeID == epID && u.ChapterID == chapterID && u.SectionName == candidate))
-            {
-                candidate = $"{baseName}_{count++}";
-            }
-            return candidate;
-        }
-
-        private void CreateSection(int epID, int chapterID, int sectionID, string sectionName)
-        {
             // Add initial node
             var newNode = new ConversationUnit
             {
-                ID = System.Guid.NewGuid().ToString(),
+                ID = $"{epID}_{chapterID}_{newSectionID}_1",
                 EpisodeID = epID,
                 ChapterID = chapterID,
-                SectionID = sectionID,
-                SectionName = sectionName,
+                SectionID = newSectionID,
                 SpeakerName = "New Speaker",
                 BodyText = "Start",
                 Position = new Vector2(100, 100)
@@ -178,27 +140,18 @@ namespace AnoGame.AnoNarrative.Editor
             Data.Conversations.Add(newNode);
         }
 
-        private void CreateChapter(int epID)
-        {
-            // Suggest next chapter ID
-            int nextCh = 1;
-            if (Data.Conversations.Any(u => u.EpisodeID == epID))
-            {
-                nextCh = Data.Conversations.Where(u => u.EpisodeID == epID).Max(u => u.ChapterID) + 1;
-            }
-
-            RequestCreateSection(epID, nextCh);
-        }
-
         private void CreateEpisode()
         {
-            int nextEp = 1;
+            int newEp = 1;
             if (Data.Conversations.Any())
             {
-                nextEp = Data.Conversations.Max(u => u.EpisodeID) + 1;
+                newEp = Data.Conversations.Max(u => u.EpisodeID) + 1;
             }
 
-            CreateChapter(nextEp);
+            // Create default chapter inside (Ch1)
+            int ch = 1;
+
+            CreateSection(newEp, ch);
         }
 
         private void DeleteSection(int ep, int chapter, int section)
