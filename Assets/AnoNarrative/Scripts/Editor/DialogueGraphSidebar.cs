@@ -468,6 +468,29 @@ namespace AnoGame.AnoNarrative.Editor
         private void PerformSectionReorder(SidebarDragData dragData, int targetEp, int targetCh, int insertIndex)
         {
             if (dragData.Type != DragType.Section) return;
+
+            // Special handling for dropping into Default (-1)
+            // Default does not support reordering or unique SectionIDs (everything is -1)
+            if (targetEp == -1)
+            {
+                var movingUnitsToDefault = Data.Conversations.Where(u =>
+                    u.EpisodeID == dragData.Ep &&
+                    u.ChapterID == dragData.Ch &&
+                    u.SectionID == dragData.Sec &&
+                    (dragData.Sec != -1 || u.SectionName == dragData.SecName)
+                ).ToList();
+
+                foreach (var u in movingUnitsToDefault)
+                {
+                    u.EpisodeID = -1;
+                    u.ChapterID = -1;
+                    u.SectionID = -1;
+                }
+                EditorUtility.SetDirty(Data);
+                AssetDatabase.SaveAssets();
+                return;
+            }
+
             var targetList = Data.Conversations.Where(u => u.EpisodeID == targetEp && u.ChapterID == targetCh).GroupBy(u => u.SectionID).OrderBy(g => g.Key).ToList();
             if (dragData.Ep == targetEp && dragData.Ch == targetCh)
             {
