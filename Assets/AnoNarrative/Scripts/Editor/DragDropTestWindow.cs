@@ -58,7 +58,7 @@ namespace AnoGame.AnoNarrative.Editor
 
             GUILayout.BeginVertical();
             GUILayout.Label($"Drag & Drop Zone Test (Dragging: {(_draggingItem != null ? _draggingItem.Name : "None")})", EditorStyles.boldLabel);
-            GUILayout.Label("Green=Content, Pink=DropZone(Below), Yellow=DragHover", EditorStyles.miniLabel);
+            GUILayout.Label("Green=Content, Line=Insertion", EditorStyles.miniLabel);
 
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
@@ -104,10 +104,6 @@ namespace AnoGame.AnoNarrative.Editor
                 EditorGUI.DrawRect(gapRect, new Color(0.2f, 0.2f, 0.2f, 1f));
                 EditorGUI.DrawRect(contentRect, new Color(0.1f, 0.3f, 0.1f, 1f));
 
-                // Visualize DropZones faintly always
-                EditorGUI.DrawRect(dropZoneRect, new Color(1f, 0f, 1f, 0.1f));
-                if (i == 0) EditorGUI.DrawRect(topZoneRect, new Color(1f, 0f, 1f, 0.1f));
-
                 // Handle & Label
                 Rect handleRect = new Rect(contentRect.x, contentRect.y, 24, contentRect.height);
                 Rect labelRect = new Rect(contentRect.x + 24, contentRect.y, contentRect.width - 24, contentRect.height);
@@ -123,33 +119,23 @@ namespace AnoGame.AnoNarrative.Editor
                 {
                     if (contentRect.Contains(evt.mousePosition))
                         EditorGUI.DrawRect(contentRect, new Color(0f, 1f, 1f, 0.3f)); // Cyan
-
-                    if (dropZoneRect.Contains(evt.mousePosition))
-                        EditorGUI.DrawRect(dropZoneRect, new Color(1f, 0f, 1f, 0.3f)); // Dark Pink
-
-                    if (i == 0 && topZoneRect.Contains(evt.mousePosition))
-                        EditorGUI.DrawRect(topZoneRect, new Color(1f, 0f, 1f, 0.3f)); // Dark Pink
                 }
-                // 2. Dragging Hover (Yellow)
+                // 2. Dragging Hover (No background highlight, only line)
                 else if (_draggingItem != null)
                 {
                     // Check hit for VISUALS (Repaint)
-                    // Note: We duplicate the hit check here for drawing because standard DrawRect works in Repaint event
                     bool isInDropZone = dropZoneRect.Contains(evt.mousePosition);
                     bool isInTopZone = (i == 0) && topZoneRect.Contains(evt.mousePosition);
 
                     if (isInDropZone)
                     {
-                        // Yellow for Drop Zone
-                        EditorGUI.DrawRect(dropZoneRect, new Color(1f, 0.92f, 0.016f, 0.5f));
-                        // Cyan Line
+                        // Cyan Line Only
                         float lineY = totalRect.y + contentHeight + (gapHeight * 0.5f);
                         EditorGUI.DrawRect(new Rect(totalRect.x, lineY - 1, totalRect.width, 2), Color.cyan);
                     }
 
                     if (isInTopZone)
                     {
-                        EditorGUI.DrawRect(topZoneRect, new Color(1f, 0.92f, 0.016f, 0.5f));
                         EditorGUI.DrawRect(new Rect(totalRect.x, totalRect.y - 1, totalRect.width, 2), Color.cyan);
                     }
                 }
