@@ -8,8 +8,10 @@ namespace AnoGame.AnoNarrative.Timeline
     public class AnoNarrativeBehaviour : PlayableBehaviour
     {
         public string conversationID;
+        public DialogueController targetController;
         public bool pauseTimeline;
         public PlayableDirector director;
+        public DialogueTimelineReceiver receiver;
 
         private bool _isTriggered;
         private double _pausedTime;
@@ -19,9 +21,28 @@ namespace AnoGame.AnoNarrative.Timeline
         {
             if (_isTriggered || !Application.isPlaying) return;
 
+            // Priority: Target Controller > ConversationID
+            if (targetController != null)
+            {
+                _isTriggered = true;
+                if (pauseTimeline) PauseTimeline();
+
+                targetController.Play();
+
+                // Monitor end via receiver (requires receiver to check global manager)
+                MonitorConversationEnd().Forget();
+                return;
+            }
+
             if (string.IsNullOrEmpty(conversationID))
             {
-                Debug.LogWarning("[AnoNarrativeTimeline] No Conversation ID specified.");
+                Debug.LogWarning("[AnoNarrativeTimeline] No Conversation ID or Controller specified.");
+                return;
+            }
+
+            if (receiver == null)
+            {
+                Debug.LogWarning($"[AnoNarrativeTimeline] Receiver is null for conversation {conversationID}. Check Track Binding.");
                 return;
             }
 
@@ -32,7 +53,7 @@ namespace AnoGame.AnoNarrative.Timeline
                 PauseTimeline();
             }
 
-            DialogueManager.Instance.StartConversation(conversationID);
+            receiver.Play(conversationID);
 
             // Wait for conversation to end
             MonitorConversationEnd().Forget();
@@ -40,11 +61,16 @@ namespace AnoGame.AnoNarrative.Timeline
 
         private async UniTaskVoid MonitorConversationEnd()
         {
-            // Wait a frame to ensure active state is updated
+            // Wait a frame to ensure active state is updated (if manager starts it)
             await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
 
             // Wait until conversation is no longer active
-            await UniTask.WaitUntil(() => !DialogueManager.Instance.IsConversationActive);
+            // Using receiver to check allows receiver to handle "Simulation" (always false) or real check
+            await UniTask.WaitUntil(() =>
+            {
+                if (receiver == null) return true; // Abort wait if receiver lost
+                return !receiver.IsConversationActive;
+            });
 
             if (pauseTimeline)
             {

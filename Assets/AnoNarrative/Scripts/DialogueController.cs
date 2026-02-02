@@ -55,6 +55,28 @@ namespace AnoGame.AnoNarrative
             DialogueManager.Instance.StartConversation(TargetID);
         }
 
+        /// <summary>
+        /// Plays a specific conversation by ID, overriding the inspector TargetID.
+        /// </summary>
+        /// <param name="conversationID">The ID of the conversation to play.</param>
+        public void Play(string conversationID)
+        {
+            if (string.IsNullOrEmpty(conversationID))
+            {
+                Debug.LogWarning($"[DialogueController] conversationID is empty on {gameObject.name}. Cannot play dialogue.", gameObject);
+                return;
+            }
+
+            if (DialogueManager.Instance == null)
+            {
+                Debug.LogError("[DialogueController] DialogueManager Instance is null. Cannot play dialogue.");
+                return;
+            }
+
+            ApplySettings();
+            DialogueManager.Instance.StartConversation(conversationID);
+        }
+
         private void ApplySettings()
         {
             // Apply AutoAdvance setting if UI controller is available

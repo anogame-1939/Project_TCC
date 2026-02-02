@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Playables;
+using AnoGame.AnoNarrative;
 
 namespace AnoGame.AnoNarrative.Timeline
 {
@@ -10,7 +11,30 @@ namespace AnoGame.AnoNarrative.Timeline
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             base.ProcessFrame(playable, info, playerData);
-            // Could handle blending here if necessary, but conversations don't really blend.
+
+            // Get the binding from the track
+            var receiver = playerData as DialogueTimelineReceiver;
+
+            if (receiver == null)
+            {
+                // If no binding, we can't play anything safely.
+                return;
+            }
+
+            // Iterate over all clips on this track
+            int inputCount = playable.GetInputCount();
+            for (int i = 0; i < inputCount; i++)
+            {
+                float weight = playable.GetInputWeight(i);
+                if (weight > 0f)
+                {
+                    var inputPlayable = playable.GetInput(i);
+                    var behaviour = ((ScriptPlayable<AnoNarrativeBehaviour>)inputPlayable).GetBehaviour();
+
+                    // Pass the receiver to the behaviour
+                    behaviour.receiver = receiver;
+                }
+            }
         }
     }
 }
