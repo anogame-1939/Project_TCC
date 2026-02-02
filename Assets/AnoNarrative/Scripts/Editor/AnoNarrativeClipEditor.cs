@@ -9,7 +9,6 @@ namespace AnoGame.AnoNarrative.Editor
     [CustomEditor(typeof(AnoNarrativeClip))]
     public class AnoNarrativeClipEditor : UnityEditor.Editor
     {
-        private SerializedProperty _targetController;
         private SerializedProperty _targetEpisode;
         private SerializedProperty _targetChapter;
         private SerializedProperty _targetSection;
@@ -24,7 +23,6 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void OnEnable()
         {
-            _targetController = serializedObject.FindProperty("targetController");
             _targetEpisode = serializedObject.FindProperty("targetEpisode");
             _targetChapter = serializedObject.FindProperty("targetChapter");
             _targetSection = serializedObject.FindProperty("targetSection");
@@ -39,7 +37,6 @@ namespace AnoGame.AnoNarrative.Editor
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_targetController);
             EditorGUILayout.PropertyField(_pauseTimeline);
 
             EditorGUILayout.Space(10);
@@ -66,7 +63,7 @@ namespace AnoGame.AnoNarrative.Editor
                     }
                 }
             }
-            else if (_targetController.exposedReferenceValue == null)
+            else
             {
                 EditorGUILayout.HelpBox("Please select a Conversation ID.", MessageType.Info);
             }

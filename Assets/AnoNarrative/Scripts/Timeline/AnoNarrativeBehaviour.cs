@@ -8,7 +8,7 @@ namespace AnoGame.AnoNarrative.Timeline
     public class AnoNarrativeBehaviour : PlayableBehaviour
     {
         public string conversationID;
-        public DialogueController targetController;
+        // public DialogueController targetController; // Removed
         public bool pauseTimeline;
         public PlayableDirector director;
         public DialogueTimelineReceiver receiver;
@@ -21,22 +21,9 @@ namespace AnoGame.AnoNarrative.Timeline
         {
             if (_isTriggered || !Application.isPlaying) return;
 
-            // Priority: Target Controller > ConversationID
-            if (targetController != null)
-            {
-                _isTriggered = true;
-                if (pauseTimeline) PauseTimeline();
-
-                targetController.Play();
-
-                // Monitor end via receiver (requires receiver to check global manager)
-                MonitorConversationEnd().Forget();
-                return;
-            }
-
             if (string.IsNullOrEmpty(conversationID))
             {
-                Debug.LogWarning("[AnoNarrativeTimeline] No Conversation ID or Controller specified.");
+                Debug.LogWarning("[AnoNarrativeTimeline] No Conversation ID specified.");
                 return;
             }
 

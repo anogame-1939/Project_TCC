@@ -7,10 +7,6 @@ namespace AnoGame.AnoNarrative.Timeline
 {
     public class AnoNarrativeClip : PlayableAsset, ITimelineClipAsset
     {
-        [Header("Conversation Settings")]
-        [Tooltip("Optional: Use an external DialogueController for playback settings.")]
-        public ExposedReference<DialogueController> targetController;
-
         [HideInInspector] public string targetEpisode;
         [HideInInspector] public string targetChapter;
         [HideInInspector] public string targetSection;
@@ -26,7 +22,6 @@ namespace AnoGame.AnoNarrative.Timeline
             var playable = ScriptPlayable<AnoNarrativeBehaviour>.Create(graph);
             var behaviour = playable.GetBehaviour();
 
-            behaviour.targetController = targetController.Resolve(graph.GetResolver());
             behaviour.conversationID = conversationID;
             behaviour.pauseTimeline = pauseTimeline;
 
