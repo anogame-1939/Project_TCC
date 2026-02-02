@@ -191,67 +191,85 @@ namespace AnoGame.AnoNarrative.Editor
 
                             EditorGUILayout.EndHorizontal();
 
-                            // --- INSERTION LOGIC (Between Sections) ---
+                            // --- DRAG & DROP LOGIC (Ported from DragDropTestWindow) ---
                             Rect rowRect = GUILayoutUtility.GetLastRect();
-                            float spacing = 30f; // アイテム間の隙間
+                            // Ensure the rect covers the full width for easier catching
+                            rowRect.x = 0;
+                            rowRect.width = width;
 
-                            // 【調整】ドラッグ中は判定を広げて、ドロップしやすくする
-                            // 特に縦幅は「下の隙間」も含めることで、隙間にマウスがあっても反応するようにする
+                            float contentHeight = rowRect.height;
+                            float spacing = 1f; // Define spacing here
+
+                            // Define Drop Zones
+                            // DropZone covers bottom half of this item + visual gap area. 
+                            // Meaning if we drop here, we insert AFTER this item.
+                            Rect dropZoneRect = new Rect(0, rowRect.y + (contentHeight * 0.5f), width, contentHeight);
+
+                            // TopZone only for the very first item (insert at top)
+                            Rect topZoneRect = new Rect(0, rowRect.y, width, contentHeight * 0.5f);
+
+                            bool isInDropZone = false;
+                            bool isInTopZone = false;
+
                             if (_currentDragData != null)
                             {
-                                rowRect.x = 0;
-                                rowRect.width = width;
-                                rowRect.height += spacing; // 判定エリアを下に広げる
-                            }
+                                isInDropZone = dropZoneRect.Contains(evt.mousePosition);
+                                isInTopZone = (i == 0) && topZoneRect.Contains(evt.mousePosition);
 
-                            if (_currentDragData != null && rowRect.Contains(evt.mousePosition))
-                            {
-                                if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
+                                // 1. LOGIC PHASE (DragUpdated / DragPerform)
+                                if (isInDropZone || isInTopZone)
                                 {
-                                    DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-
-                                    // Top or Bottom check
-                                    bool isTopHalf = (evt.mousePosition.y - rowRect.y) < (rowRect.height / 2f);
-
-                                    // ラインの表示位置：Gapを含めたRectの下端ではなく、視覚的なアイテムの下端(または隙間の中央)に出したい
-                                    // Rect.heightを足しているので、yMaxは「隙間の下」になる。
-                                    // 線を引きたいのは「隙間」の位置。
-                                    // Topなら rowRect.y (これは変わらずアイテム上端)
-                                    // Bottomなら... 本来のアイテムの下端付近がいい。
-                                    // rowRect.y + (rowRect.height - spacing) が本来のアイテム下端。
-
-                                    float lineY = isTopHalf ? rowRect.y : (rowRect.yMax - spacing);
-
-                                    // 少し太めに見やすく
-                                    Rect insertLineRect = new Rect(0, lineY, width, 2f); // 幅も画面いっぱいにする
-
                                     if (evt.type == EventType.DragUpdated)
                                     {
-                                        EditorGUI.DrawRect(insertLineRect, Color.cyan);
+                                        DragAndDrop.visualMode = DragAndDropVisualMode.Move;
                                         Event.current.Use();
+                                        // Request Repaint to update the visuals in the next phase
+                                        // (Since this is a helper class, we might need to rely on the window's repaint loop or trigger it)
+                                        // For now, assuming the window calls Repaint on MouseMove/DragUpdated.
                                     }
 
                                     if (evt.type == EventType.DragPerform)
                                     {
-                                        // 目標インデックス計算
-                                        int targetListIndex = isTopHalf ? i : i + 1;
-
-                                        PerformReorder(_currentDragData, epGroup.Key, chapterGroup.Key, targetListIndex);
-
                                         DragAndDrop.AcceptDrag();
+
+                                        // Target Index Calculation
+                                        // TopZone -> 0
+                                        // DropZone -> i + 1 (Insert after current)
+                                        int targetIndex = isInTopZone ? 0 : i + 1;
+
+                                        PerformReorder(_currentDragData, epGroup.Key, chapterGroup.Key, targetIndex);
+
                                         _currentDragData = null;
-                                        // DragAndDrop.PrepareStartDrag(); // 修正済み
+                                        DragAndDrop.PrepareStartDrag();
                                         Event.current.Use();
                                     }
                                 }
                             }
 
+                            // 2. VISUAL PHASE (Draws during Repaint)
+                            // Draw Cyan Line for feedback
+                            if (_currentDragData != null && (evt.type == EventType.Repaint))
+                            {
+                                // We check global mouse position against our defined zones again for drawing
+                                // (Or use the flags if we trust they are up to date from layout event, but Repaint is separate)
+                                bool drawDrop = dropZoneRect.Contains(evt.mousePosition);
+                                bool drawTop = (i == 0) && topZoneRect.Contains(evt.mousePosition);
+
+                                if (drawDrop)
+                                {
+                                    // Line below the item
+                                    float lineY = rowRect.yMax + (spacing * 0.5f);
+                                    EditorGUI.DrawRect(new Rect(0, lineY - 1, width, 2), Color.cyan);
+                                }
+                                else if (drawTop)
+                                {
+                                    // Line above the first item
+                                    EditorGUI.DrawRect(new Rect(0, rowRect.y - 1, width, 2), Color.cyan);
+                                }
+                            }
+
                             // Context Menu
                             Rect btnRect = rowRect;
-                            // 判定Rectを広げたので、右クリックメニューの判定は元の高さに戻したい場合は調整が必要だが、
-                            // 広めのほうが操作しやすいかもしれないのでこのままでOKとする。
-                            // ただしwidthは広げているので、ボタン外でも反応するようになる（それはそれで便利）。
-
                             if (evt.type == EventType.MouseDown && evt.button == 1 && btnRect.Contains(evt.mousePosition))
                             {
                                 GenericMenu menu = new GenericMenu();
