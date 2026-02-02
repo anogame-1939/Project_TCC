@@ -147,20 +147,17 @@ namespace AnoGame.AnoNarrative
             }
         }
 
-        public void StartSection(string episodeID, string chapterID, string sectionID)
+        public void StartSection(int episodeID, int chapterID, int sectionID)
         {
             if (masterData == null) return;
 
-            // Find first node that matches context and typically ends with "_1" or is simply the first found?
-            // Convention: ID = "{Episode}_{Chapter}_{Section}_1" ? 
-            // Or just search for first unit with matching context fields.
-            // Let's search for first unit in the list that matches context.
+            // Find first unit that matches context.
+            // -1 acts as a wildcard (similar to string.IsNullOrEmpty before)
             foreach (var unit in masterData.Conversations)
             {
-                // Loose matching if null
-                bool matchEp = string.IsNullOrEmpty(episodeID) || unit.EpisodeID == episodeID;
-                bool matchCh = string.IsNullOrEmpty(chapterID) || unit.ChapterID == chapterID;
-                bool matchSec = string.IsNullOrEmpty(sectionID) || unit.SectionID == sectionID;
+                bool matchEp = episodeID == -1 || unit.EpisodeID == episodeID;
+                bool matchCh = chapterID == -1 || unit.ChapterID == chapterID;
+                bool matchSec = sectionID == -1 || unit.SectionID == sectionID;
 
                 if (matchEp && matchCh && matchSec)
                 {

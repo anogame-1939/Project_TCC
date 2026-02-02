@@ -9,7 +9,6 @@ namespace AnoGame.AnoNarrative.Editor
     [CustomEditor(typeof(AnoNarrativeClip))]
     public class AnoNarrativeClipEditor : UnityEditor.Editor
     {
-        private SerializedProperty _targetController;
         private SerializedProperty _targetEpisode;
         private SerializedProperty _targetChapter;
         private SerializedProperty _targetSection;
@@ -21,7 +20,6 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void OnEnable()
         {
-            _targetController = serializedObject.FindProperty("targetController");
             _targetEpisode = serializedObject.FindProperty("targetEpisode");
             _targetChapter = serializedObject.FindProperty("targetChapter");
             _targetSection = serializedObject.FindProperty("targetSection");
@@ -29,7 +27,7 @@ namespace AnoGame.AnoNarrative.Editor
             _pauseTimeline = serializedObject.FindProperty("pauseTimeline");
 
             _drawer = new DialogueCandidateDrawer();
-            _drawer.Initialize(_targetEpisode.stringValue, _targetChapter.stringValue, _targetSection.stringValue);
+            _drawer.Initialize(_targetEpisode.intValue, _targetChapter.intValue, _targetSection.intValue);
 
             FindMasterData();
         }
@@ -38,23 +36,28 @@ namespace AnoGame.AnoNarrative.Editor
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_targetController);
-            EditorGUILayout.PropertyField(_pauseTimeline);
+            if (_pauseTimeline != null)
+            {
+                _pauseTimeline.boolValue = EditorGUILayout.Toggle("Pause Timeline", _pauseTimeline.boolValue);
+            }
 
             EditorGUILayout.Space(10);
 
             // Selection (Moved to top)
             EditorGUILayout.LabelField("Selection", EditorStyles.boldLabel);
-            GUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(_conversationID);
-            if (GUILayout.Button("Clear", GUILayout.Width(50)))
+            if (_conversationID != null)
             {
-                _conversationID.stringValue = "";
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.PropertyField(_conversationID);
+                if (GUILayout.Button("Clear", GUILayout.Width(50)))
+                {
+                    _conversationID.stringValue = "";
+                }
+                GUILayout.EndHorizontal();
             }
-            GUILayout.EndHorizontal();
 
             // Validation Checking
-            if (!string.IsNullOrEmpty(_conversationID.stringValue))
+            if (_conversationID != null && !string.IsNullOrEmpty(_conversationID.stringValue))
             {
                 if (_masterData != null)
                 {
@@ -65,13 +68,13 @@ namespace AnoGame.AnoNarrative.Editor
                     }
                 }
             }
-            else if (_targetController.exposedReferenceValue == null)
+            else
             {
                 EditorGUILayout.HelpBox("Please select a Conversation ID.", MessageType.Info);
             }
 
             // Use Shared Drawer
-            if (_drawer != null)
+            if (_drawer != null && _conversationID != null && _targetEpisode != null && _targetChapter != null && _targetSection != null)
             {
                 _drawer.Draw(_conversationID, _targetEpisode, _targetChapter, _targetSection);
             }

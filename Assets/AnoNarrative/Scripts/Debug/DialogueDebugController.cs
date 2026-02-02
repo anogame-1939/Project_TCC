@@ -85,7 +85,15 @@ namespace AnoGame.AnoNarrative.Debug
 
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.StartSection(TargetEpisode, TargetChapter, TargetSection);
+                int ep = -1;
+                int ch = -1;
+                int sec = -1;
+
+                int.TryParse(TargetEpisode, out ep);
+                int.TryParse(TargetChapter, out ch);
+                int.TryParse(TargetSection, out sec);
+
+                DialogueManager.Instance.StartSection(ep, ch, sec);
             }
         }
 

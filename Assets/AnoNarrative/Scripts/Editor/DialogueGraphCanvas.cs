@@ -19,10 +19,10 @@ namespace AnoGame.AnoNarrative.Editor
         // Caching
         private Dictionary<string, Vector2> _posCache = new Dictionary<string, Vector2>();
 
-        // Filter
-        public string FilterEpisode = null;
-        public string FilterChapter = null;
-        public string FilterSection = null;
+        // Filter (-1 means All)
+        public int FilterEpisode = -1;
+        public int FilterChapter = -1;
+        public int FilterSection = -1;
 
         // Actions
         private List<ConversationUnit> _nodesToDelete = new List<ConversationUnit>();
@@ -34,7 +34,7 @@ namespace AnoGame.AnoNarrative.Editor
             State = new DialogueGraphState(); // Initialize State
         }
 
-        public void SetFilter(string episode, string chapter, string section)
+        public void SetFilter(int episode, int chapter, int section)
         {
             FilterEpisode = episode;
             FilterChapter = chapter;
@@ -92,12 +92,6 @@ namespace AnoGame.AnoNarrative.Editor
             // Draw Selection Box
             if (State.IsDraggingSelectionBox)
             {
-                // Box is drawn in Screen Space (mousePos is raw), so we might need logic here.
-                // Actually, StartDraggingSelectionBox uses 'mousePos'.
-                // If we change 'mousePos' to be World Space in ProcessEvents, then 'SelectionRect' will be World Space.
-                // So we should draw it in World Space (inside the Matrix).
-
-                // Let's Move this INSIDE the matrix for consistent World Space rendering.
                 GUI.matrix = oldMatrix; // Undo first
                 GUIUtility.ScaleAroundPivot(new Vector2(Zoom, Zoom), Vector2.zero); // Re-apply
 
@@ -150,12 +144,16 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void DrawOverlay(float sidebarWidth)
         {
-            if (!string.IsNullOrEmpty(FilterEpisode) || !string.IsNullOrEmpty(FilterChapter) || !string.IsNullOrEmpty(FilterSection))
+            if (FilterEpisode != -1 || FilterChapter != -1 || FilterSection != -1)
             {
                 var sample = Data.Conversations.FirstOrDefault(u => IsUnitVisible(u));
-                string secDisplay = sample?.SectionName ?? FilterSection ?? "All";
+                // Show SectionName if available, else just "Section X"
+                string secDisplay = sample?.SectionName ?? (FilterSection != -1 ? FilterSection.ToString() : "All");
 
-                string label = $"{FilterEpisode ?? "All"} / {FilterChapter ?? "All"} / {secDisplay}";
+                string epStr = FilterEpisode != -1 ? FilterEpisode.ToString() : "All";
+                string chStr = FilterChapter != -1 ? FilterChapter.ToString() : "All";
+
+                string label = $"{epStr} / {chStr} / {secDisplay}";
                 GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
                 style.fontSize = 20;
                 style.fontStyle = FontStyle.Bold;
@@ -182,7 +180,6 @@ namespace AnoGame.AnoNarrative.Editor
                 debugStyle.normal.textColor = Color.yellow;
 
                 // Draw at bottom right of the canvas (relative to 0,0 of the group)
-                // Since we are in BeginGroup(mainArea), the coordinate (localRect.width, localRect.height) is the bottom right.
                 Rect debugRect = new Rect(localRect.width - 300, localRect.height - 100, 290, 90);
                 GUI.Label(debugRect, debugInfo, debugStyle);
             }
@@ -190,10 +187,10 @@ namespace AnoGame.AnoNarrative.Editor
 
         private bool IsUnitVisible(ConversationUnit unit)
         {
-            if (string.IsNullOrEmpty(FilterEpisode) && string.IsNullOrEmpty(FilterChapter) && string.IsNullOrEmpty(FilterSection)) return true;
-            bool matchEp = string.IsNullOrEmpty(FilterEpisode) || unit.EpisodeID == FilterEpisode;
-            bool matchCh = string.IsNullOrEmpty(FilterChapter) || unit.ChapterID == FilterChapter;
-            bool matchSec = string.IsNullOrEmpty(FilterSection) || unit.SectionID == FilterSection;
+            if (FilterEpisode == -1 && FilterChapter == -1 && FilterSection == -1) return true;
+            bool matchEp = FilterEpisode == -1 || unit.EpisodeID == FilterEpisode;
+            bool matchCh = FilterChapter == -1 || unit.ChapterID == FilterChapter;
+            bool matchSec = FilterSection == -1 || unit.SectionID == FilterSection;
             return matchEp && matchCh && matchSec;
         }
 
@@ -313,7 +310,6 @@ namespace AnoGame.AnoNarrative.Editor
                 else
                 {
                     // Visual indicator that it is linked
-                    // Could add a "Jump to" or "Clear" but keeping it simple for now
                     if (GUILayout.Button("->", GUILayout.Width(25)))
                     {
                         // Select target?
@@ -345,7 +341,6 @@ namespace AnoGame.AnoNarrative.Editor
             string newID = GenerateNextID();
 
             // Heuristic position for new node:
-            // Place it to the right and slightly down from parent, or stack them if multiple choices
             int choiceIndex = parent.Choices.IndexOf(choice);
             Vector2 offset = new Vector2(NodeWidth + 50, (choiceIndex * (NodeHeight + 20)));
             Vector2 newPos = parent.Position + offset;
@@ -356,6 +351,7 @@ namespace AnoGame.AnoNarrative.Editor
                 EpisodeID = parent.EpisodeID,
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
+                SectionName = parent.SectionName, // inherit section name?
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = newPos
@@ -369,7 +365,6 @@ namespace AnoGame.AnoNarrative.Editor
         private void ProcessEvents(Event e, Rect viewRect, float restrictedX = 0f)
         {
             // Zoom: Modify mousePos to likely World Coordinate relative to Zoom
-            // Pivot is (0,0) of the Group.
             Vector2 mousePos = e.mousePosition / Zoom;
 
             if (restrictedX > 0 && e.mousePosition.x < restrictedX) return;
@@ -384,13 +379,11 @@ namespace AnoGame.AnoNarrative.Editor
                 if (Mathf.Abs(newZoom - oldZoom) > 0.001f)
                 {
                     // Mouse-Centered Zoom Logic
-                    // CanvasPos = (ViewPos / oldZoom) + ScrollPos
                     Vector2 mouseViewPos = e.mousePosition; // Raw View Pos
                     Vector2 mouseCanvasPos = (mouseViewPos / oldZoom) + State.ScrollPos;
 
                     Zoom = newZoom;
 
-                    // newScrollPos = mouseCanvasPos - (mouseViewPos / newZoom)
                     State.ScrollPos = mouseCanvasPos - (mouseViewPos / newZoom);
 
                     e.Use();
@@ -403,7 +396,6 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 if (State.SelectedIDs.Count > 0)
                 {
-                    // Create a copy to modify collection safely if needed, though we track units here
                     var idsToDelete = State.SelectedIDs.ToList();
                     foreach (var id in idsToDelete)
                     {
@@ -433,7 +425,6 @@ namespace AnoGame.AnoNarrative.Editor
                         // Select the node we right-clicked if not already selected
                         if (!State.IsSelected(clickedNodeID)) State.SetSelection(clickedNodeID);
 
-                        // "Add Node" becomes contextual: It inserts after this node
                         menu.AddItem(new GUIContent("Add Node"), false, () => InsertNodeAfter(unit));
 
                         menu.AddSeparator("");
@@ -550,9 +541,10 @@ namespace AnoGame.AnoNarrative.Editor
             var newUnit = new ConversationUnit
             {
                 ID = newID,
-                EpisodeID = FilterEpisode ?? "Ep1",
-                ChapterID = FilterChapter ?? "Chapter",
-                SectionID = FilterSection ?? "Section",
+                EpisodeID = FilterEpisode != -1 ? FilterEpisode : 1, // Default to 1
+                ChapterID = FilterChapter != -1 ? FilterChapter : 1,
+                SectionID = FilterSection != -1 ? FilterSection : 1,
+                SectionName = "New Section",
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = worldPos
@@ -566,7 +558,7 @@ namespace AnoGame.AnoNarrative.Editor
         {
             string newID = GenerateNextID();
 
-            // Place BELOW the parent by default for vertical flow.
+            // Place BELOW the parent by default
             Vector2 newPos = parent.Position + new Vector2(0, NodeHeight + 50);
 
             var newUnit = new ConversationUnit
@@ -575,6 +567,7 @@ namespace AnoGame.AnoNarrative.Editor
                 EpisodeID = parent.EpisodeID,
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
+                SectionName = parent.SectionName,
                 SpeakerName = "New Speaker",
                 BodyText = "New Text",
                 Position = newPos,
@@ -589,10 +582,10 @@ namespace AnoGame.AnoNarrative.Editor
 
         private string GenerateNextID()
         {
-            string ep = FilterEpisode ?? "Ep1";
-            string chapter = FilterChapter ?? "Chapter";
-            string section = FilterSection ?? "Section";
-            string prefix = $"{ep}_{chapter}_{section}_";
+            int ep = FilterEpisode != -1 ? FilterEpisode : 1;
+            int ch = FilterChapter != -1 ? FilterChapter : 1;
+            int sec = FilterSection != -1 ? FilterSection : 1;
+            string prefix = $"{ep}_{ch}_{sec}_";
 
             int maxNum = 0;
             foreach (var u in Data.Conversations)
@@ -609,16 +602,6 @@ namespace AnoGame.AnoNarrative.Editor
             return prefix + (maxNum + 1);
         }
 
-        private Rect GetRect(Vector2 p1, Vector2 p2)
-        {
-            return Rect.MinMaxRect(
-                Mathf.Min(p1.x, p2.x),
-                Mathf.Min(p1.y, p2.y),
-                Mathf.Max(p1.x, p2.x),
-                Mathf.Max(p1.y, p2.y)
-            );
-        }
-
         private void MoveSelectedNodes(Vector2 delta)
         {
             foreach (var unit in Data.Conversations)
@@ -632,11 +615,6 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void SelectNodesInRect(Rect r, Vector2 scrollPos)
         {
-            // r is in "Group Local" space.
-            // unit.Position is in World space.
-            // Node is drawn at (unit.Position - ScrollPos).
-            // So we compare r with Rect(unit.Position - ScrollPos, size).
-
             foreach (var unit in Data.Conversations)
             {
                 if (!IsUnitVisible(unit)) continue;
@@ -663,10 +641,8 @@ namespace AnoGame.AnoNarrative.Editor
             var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
             if (visibleNodes.Count == 0) return;
 
-            // 1. Calculate Levels
             var levels = GetNodeLevels(visibleNodes);
 
-            // 2. Group by Level
             var nodesByLevel = new Dictionary<int, List<ConversationUnit>>();
             foreach (var node in visibleNodes)
             {
@@ -676,10 +652,9 @@ namespace AnoGame.AnoNarrative.Editor
             }
 
             Vector2 startOffset = new Vector2(50, 50);
-            float spacingX = NodeWidth + 80f; // Wider for connections
-            float spacingY = NodeHeight + 20f; // Reduced gap for shorter connectors
+            float spacingX = NodeWidth + 80f;
+            float spacingY = NodeHeight + 20f;
 
-            // Sort layers by ID
             foreach (var lvl in nodesByLevel.Keys)
             {
                 nodesByLevel[lvl].Sort(CompareNodeIDs);
@@ -706,36 +681,28 @@ namespace AnoGame.AnoNarrative.Editor
             var visibleNodes = Data.Conversations.Where(IsUnitVisible).ToList();
             if (visibleNodes.Count == 0) return;
 
-            // 1. Calculate Levels and Sort by Level then ID
             var levels = GetNodeLevels(visibleNodes);
 
             visibleNodes.Sort((a, b) =>
             {
                 int levelA = levels.ContainsKey(a.ID) ? levels[a.ID] : 0;
                 int levelB = levels.ContainsKey(b.ID) ? levels[b.ID] : 0;
-
                 if (levelA != levelB) return levelA.CompareTo(levelB);
                 return CompareNodeIDs(a, b);
             });
 
             int count = visibleNodes.Count;
-            // Calculate grid dimensions (Column-Major: Fill Top->Down, then Right)
             int rows = Mathf.CeilToInt(Mathf.Sqrt(count));
-            // Ensure at least 1 row to prevent divide by zero
             rows = Mathf.Max(1, rows);
 
             float spacingX = NodeWidth + 50f;
             float spacingY = NodeHeight + 30f;
-
-            // Start offset to avoid (0,0) which is treated as "uninitialized" in Draw()
             Vector2 startOffset = new Vector2(50, 50);
 
             for (int i = 0; i < count; i++)
             {
-                // Column-Major indices
                 int row = i % rows;
                 int col = i / rows;
-
                 visibleNodes[i].Position = startOffset + new Vector2(col * spacingX, row * spacingY);
             }
 
@@ -774,7 +741,6 @@ namespace AnoGame.AnoNarrative.Editor
                 }
             }
 
-            // Roots
             Dictionary<string, int> levels = new Dictionary<string, int>();
             Queue<string> queue = new Queue<string>();
 
@@ -787,10 +753,8 @@ namespace AnoGame.AnoNarrative.Editor
                 }
             }
 
-            // Cycle fallback
             if (queue.Count == 0 && nodes.Count > 0)
             {
-                // Sort to pick deterministically if fully cyclic
                 nodes.Sort(CompareNodeIDs);
                 var first = nodes[0].ID;
                 queue.Enqueue(first);
@@ -799,71 +763,47 @@ namespace AnoGame.AnoNarrative.Editor
 
             while (queue.Count > 0)
             {
-                string id = queue.Dequeue();
-                int currentLevel = levels[id];
+                string u = queue.Dequeue();
+                int currentLevel = levels[u];
 
-                if (adjacency.ContainsKey(id))
+                if (adjacency.ContainsKey(u))
                 {
-                    foreach (var childID in adjacency[id])
+                    foreach (var v in adjacency[u])
                     {
-                        if (!levels.ContainsKey(childID))
-                        {
-                            levels[childID] = currentLevel + 1;
-                            queue.Enqueue(childID);
-                        }
-                        else
-                        {
-                            if (levels[childID] < currentLevel + 1)
-                            {
-                                levels[childID] = currentLevel + 1;
-                                if (levels[childID] < nodes.Count)
-                                    queue.Enqueue(childID);
-                            }
-                        }
+                        if (levels.ContainsKey(v)) continue;
+                        levels[v] = currentLevel + 1;
+                        queue.Enqueue(v);
                     }
                 }
             }
-
-            // Fill unvisited
-            foreach (var n in nodes)
-            {
-                if (!levels.ContainsKey(n.ID)) levels[n.ID] = 0;
-            }
-
             return levels;
         }
 
         private int CompareNodeIDs(ConversationUnit a, ConversationUnit b)
         {
-            // Try to extract suffix numbers
-            string idA = a.ID ?? "";
-            string idB = b.ID ?? "";
+            return string.Compare(a.ID, b.ID);
+        }
 
-            var partsA = idA.Split('_');
-            var partsB = idB.Split('_');
+        private void DrawGrid(Rect rect, float spacing, float opacity, Color color)
+        {
+            if (Event.current.type != EventType.Repaint) return;
 
-            if (partsA.Length > 0 && partsB.Length > 0)
+            Handles.color = new Color(color.r, color.g, color.b, opacity);
+            Vector2 offset = new Vector2(State.ScrollPos.x % spacing, State.ScrollPos.y % spacing);
+
+            float xStart = Mathf.Floor(rect.x / spacing) * spacing;
+            for (float x = xStart; x < rect.x + rect.width; x += spacing)
             {
-                // Compare Last Parts as int if possible
-                string suffixA = partsA[partsA.Length - 1];
-                string suffixB = partsB[partsB.Length - 1];
-
-                if (int.TryParse(suffixA, out int numA) && int.TryParse(suffixB, out int numB))
-                {
-                    // If prefixes are same, sort by number
-                    // Construct prefix from all parts except last
-                    string prefixA = string.Join("_", partsA.Take(partsA.Length - 1));
-                    string prefixB = string.Join("_", partsB.Take(partsB.Length - 1));
-
-                    int prefixCompare = string.Compare(prefixA, prefixB);
-                    if (prefixCompare != 0) return prefixCompare;
-
-                    return numA.CompareTo(numB);
-                }
+                Handles.DrawLine(new Vector3(x, rect.y, 0), new Vector3(x, rect.y + rect.height, 0));
             }
 
-            // Fallback to Natural Sort
-            return EditorUtility.NaturalCompare(idA, idB);
+            float yStart = Mathf.Floor(rect.y / spacing) * spacing;
+            for (float y = yStart; y < rect.y + rect.height; y += spacing)
+            {
+                Handles.DrawLine(new Vector3(rect.x, y, 0), new Vector3(rect.x + rect.width, y, 0));
+            }
+
+            Handles.color = Color.white;
         }
 
         private void DrawConnections(Rect visibleRect)
@@ -872,42 +812,28 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 if (!IsUnitVisible(unit)) continue;
 
-                // Use dynamic rect for connection start point
-                Rect nodeRect = GetNodeRect(unit, State.ScrollPos);
-
-                // Normal NextID starts from Bottom-Center
-                Vector2 bottomStartPos = new Vector2(nodeRect.center.x, nodeRect.yMax);
+                Vector2 startPos = unit.Position + new Vector2(NodeWidth, NodeHeight / 2f);
 
                 if (!string.IsNullOrEmpty(unit.NextID))
                 {
-                    var target = Data.Conversations.FirstOrDefault(u => u.ID == unit.NextID);
-                    if (target != null && IsUnitVisible(target))
+                    if (_posCache.TryGetValue(unit.NextID, out Vector2 targetPos))
                     {
-                        DrawCurve(bottomStartPos, unit.NextID, Color.white, false);
+                        DrawConnection(startPos, targetPos + new Vector2(0, NodeHeight / 2f), Color.white);
                     }
                 }
 
                 if (unit.Choices != null)
                 {
-                    // Choice connections start from Right Edge
-                    // Base Offset Calculation:
-                    // Header(~86px) + Choices Label(~20px) = ~106px (approx start of first choice)
-                    // Choice Row = 25px
-                    float choicesStartY = nodeRect.y + 106f;
-
                     for (int i = 0; i < unit.Choices.Count; i++)
                     {
-                        var c = unit.Choices[i];
-                        if (!string.IsNullOrEmpty(c.TargetID))
+                        var choice = unit.Choices[i];
+                        if (!string.IsNullOrEmpty(choice.TargetID))
                         {
-                            var target = Data.Conversations.FirstOrDefault(u => u.ID == c.TargetID);
-                            if (target != null && IsUnitVisible(target))
+                            if (_posCache.TryGetValue(choice.TargetID, out Vector2 targetPos))
                             {
-                                // Center of the choice row
-                                float choiceRowCenterY = choicesStartY + (i * 25f) + 12.5f;
-                                Vector2 choiceStartPos = new Vector2(nodeRect.xMax, choiceRowCenterY);
-
-                                DrawCurve(choiceStartPos, c.TargetID, Color.cyan, true);
+                                float yOffset = NodeHeight + 20 + (i * 25) + 10;
+                                Vector2 choiceStart = unit.Position + new Vector2(NodeWidth, yOffset);
+                                DrawConnection(choiceStart, targetPos + new Vector2(0, NodeHeight / 2f), Color.cyan);
                             }
                         }
                     }
@@ -915,52 +841,17 @@ namespace AnoGame.AnoNarrative.Editor
             }
         }
 
-        private void DrawCurve(Vector2 start, string targetID, Color color, bool startFromRight)
+        private void DrawConnection(Vector2 start, Vector2 end, Color color)
         {
-            // Target Node top center
-            if (Data.Conversations.FirstOrDefault(u => u.ID == targetID) is ConversationUnit targetUnit)
-            {
-                // We need target position relative to scroll
-                // We don't need full rect, just top center.
-                // Target Pos is Top-Left. Width is fixed (NodeWidth).
-                Vector2 targetWorldPos = targetUnit.Position;
-                Vector2 targetDrawPos = targetWorldPos - State.ScrollPos;
-                Vector2 end = targetDrawPos + new Vector2(NodeWidth / 2, 0);
-
-                // Tangents
-                Vector2 startTangent = start + (startFromRight ? Vector2.right : Vector2.up) * 50;
-                Vector2 endTangent = end + Vector2.down * 50;
-
-                Handles.DrawBezier(start, end, startTangent, endTangent, color, null, 2f);
-            }
-        }
-
-        private void DrawGrid(Rect rect, float spacing, float opacity, Color color)
-        {
-            if (Event.current.type != EventType.Repaint) return;
-
-            Handles.BeginGUI();
-            Handles.color = new Color(color.r, color.g, color.b, opacity);
-
-            int widthDivs = Mathf.CeilToInt(rect.width / spacing);
-            int heightDivs = Mathf.CeilToInt(rect.height / spacing);
-
-            for (int i = 0; i < widthDivs; i++)
-            {
-                float x = (spacing * i) - (State.ScrollPos.x % spacing);
-                if (x < 0) x += spacing;
-                Handles.DrawLine(new Vector3(x, 0, 0), new Vector3(x, rect.height, 0));
-            }
-
-            for (int j = 0; j < heightDivs; j++)
-            {
-                float y = (spacing * j) - (State.ScrollPos.y % spacing);
-                if (y < 0) y += spacing;
-                Handles.DrawLine(new Vector3(0, y, 0), new Vector3(rect.width, y, 0));
-            }
-
-            Handles.color = Color.white;
-            Handles.EndGUI();
+            Handles.DrawBezier(
+                start,
+                end,
+                start + Vector2.right * 50f,
+                end + Vector2.left * 50f,
+                color,
+                null,
+                2f
+            );
         }
     }
 }

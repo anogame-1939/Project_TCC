@@ -28,7 +28,7 @@ namespace AnoGame.AnoNarrative.Editor
             _autoAdvance = serializedObject.FindProperty("AutoAdvance");
 
             _drawer = new DialogueCandidateDrawer();
-            _drawer.Initialize(_targetEpisode.stringValue, _targetChapter.stringValue, _targetSection.stringValue);
+            _drawer.Initialize(_targetEpisode.intValue, _targetChapter.intValue, _targetSection.intValue);
 
             FindMasterData();
         }

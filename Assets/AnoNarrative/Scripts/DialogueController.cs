@@ -10,14 +10,14 @@ namespace AnoGame.AnoNarrative
     public class DialogueController : MonoBehaviour
     {
         [Header("Filter Settings")]
-        [Tooltip("Episode ID to filter conversations (e.g. Ep1)")]
-        public string TargetEpisode;
+        [Tooltip("Episode ID to filter conversations (Default: -1)")]
+        public int TargetEpisode = -1;
 
-        [Tooltip("Chapter ID to filter conversations (e.g. Chapter1)")]
-        public string TargetChapter;
+        [Tooltip("Chapter ID to filter conversations (Default: -1)")]
+        public int TargetChapter = -1;
 
-        [Tooltip("Section ID to filter conversations (e.g. Intro)")]
-        public string TargetSection;
+        [Tooltip("Section ID to filter conversations (Default: -1)")]
+        public int TargetSection = -1;
 
         [Header("Playback Settings")]
         [Tooltip("The specific Conversation ID to play. Use the Inspector buttons to select from filtered results.")]

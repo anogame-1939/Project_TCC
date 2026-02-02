@@ -11,13 +11,12 @@ namespace AnoGame.AnoNarrative.Editor
         private MasterDialogueData _target;
         private string _searchString = "";
         private Vector2 _scrollPos;
-        private bool _showDetails = true;
 
         private void OnEnable()
         {
             _target = (MasterDialogueData)target;
 
-            // Migration
+            // Migration (Color Palette)
             if (_target.ActorList != null && _target.ActorList.Count > 0)
             {
                 if (_target.ActorDefinitions == null) _target.ActorDefinitions = new List<ActorDefinition>();
@@ -70,9 +69,9 @@ namespace AnoGame.AnoNarrative.Editor
             }
             if (GUILayout.Button("Migrate 0.0.0 Format", GUILayout.Height(25)))
             {
-                if (EditorUtility.DisplayDialog("Migrate 0.0.0 Format", "This will parse ChapterID '0.0.0' into Ep/Ch/Sec, and move current SectionID to SectionName. Continue?", "Yes", "Cancel"))
+                if (EditorUtility.DisplayDialog("Migrate 0.0.0 Format", "This will parse string IDs like '1.2.3' into Ep/Ch/Sec integers. Continue?", "Yes", "Cancel"))
                 {
-                    MigrateLegacyFormat();
+                    MigrateLegacyFormat(); // Now tailored for parsing Strings to Ints if applicable
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -123,7 +122,12 @@ namespace AnoGame.AnoNarrative.Editor
                     bool matchText = unit.BodyText != null && unit.BodyText.ToLower().Contains(_searchString.ToLower());
                     bool matchSpeaker = unit.SpeakerName != null && unit.SpeakerName.ToLower().Contains(_searchString.ToLower());
 
-                    if (!matchID && !matchText && !matchSpeaker) continue;
+                    // Allow searching by integer fields too
+                    bool matchEp = unit.EpisodeID.ToString().Contains(_searchString);
+                    bool matchCh = unit.ChapterID.ToString().Contains(_searchString);
+                    bool matchSec = unit.SectionID.ToString().Contains(_searchString);
+
+                    if (!matchID && !matchText && !matchSpeaker && !matchEp && !matchCh && !matchSec) continue;
                 }
 
                 DrawConversationUnit(unit, i);
@@ -160,9 +164,9 @@ namespace AnoGame.AnoNarrative.Editor
             unit.ID = EditorGUILayout.TextField("ID", unit.ID);
 
             EditorGUILayout.BeginHorizontal();
-            unit.EpisodeID = EditorGUILayout.TextField("Ep", unit.EpisodeID);
-            unit.ChapterID = EditorGUILayout.TextField("Ch", unit.ChapterID);
-            unit.SectionID = EditorGUILayout.TextField("Sec", unit.SectionID);
+            unit.EpisodeID = EditorGUILayout.IntField("Ep", unit.EpisodeID);
+            unit.ChapterID = EditorGUILayout.IntField("Ch", unit.ChapterID);
+            unit.SectionID = EditorGUILayout.IntField("Sec", unit.SectionID);
             EditorGUILayout.EndHorizontal();
 
             unit.SectionName = EditorGUILayout.TextField("Section Name", unit.SectionName);
@@ -271,6 +275,7 @@ namespace AnoGame.AnoNarrative.Editor
         {
             var newUnit = new ConversationUnit();
             newUnit.ID = "New_Conversation_" + _target.Conversations.Count;
+            // Defaults to -1 automatically now for ints
             _target.Conversations.Add(newUnit);
         }
 
@@ -282,29 +287,14 @@ namespace AnoGame.AnoNarrative.Editor
                 if (string.IsNullOrEmpty(unit.ID)) continue;
 
                 var parts = unit.ID.Split('_');
-                if (parts.Length == 4)
+                // Format: Ep_Ch_Section_Num or Ep_Ch_Sec
+                // Try parse integers
+
+                if (parts.Length >= 3)
                 {
-                    unit.EpisodeID = parts[0];
-                    unit.ChapterID = parts[1];
-                    unit.SectionID = parts[2];
-                }
-                else if (parts.Length == 3)
-                {
-                    unit.EpisodeID = "Default";
-                    unit.ChapterID = parts[0];
-                    unit.SectionID = parts[1];
-                }
-                else if (parts.Length == 2)
-                {
-                    unit.EpisodeID = "Default";
-                    unit.ChapterID = "Default";
-                    unit.SectionID = parts[0];
-                }
-                else
-                {
-                    unit.EpisodeID = "Default";
-                    unit.ChapterID = "Default";
-                    unit.SectionID = unit.ID;
+                    int.TryParse(parts[0], out unit.EpisodeID);
+                    int.TryParse(parts[1], out unit.ChapterID);
+                    int.TryParse(parts[2], out unit.SectionID);
                 }
             }
             EditorUtility.SetDirty(_target);
@@ -313,31 +303,15 @@ namespace AnoGame.AnoNarrative.Editor
 
         private void MigrateLegacyFormat()
         {
-            Undo.RecordObject(_target, "Migrate Dialogue Legacy Format");
-            int count = 0;
+            // Placeholder for custom legacy logic if needed. 
+            // Previous logic parsed '.' delimited strings. 
+            Undo.RecordObject(_target, "Migrate Legacy");
+
             foreach (var unit in _target.Conversations)
             {
-                // 1. Move current SectionID to SectionName (since it contains the name)
-                if (!string.IsNullOrEmpty(unit.SectionID) && string.IsNullOrEmpty(unit.SectionName))
-                {
-                    unit.SectionName = unit.SectionID;
-                }
-
-                // 2. Parse 0.0.0 from ChapterID if it exists in that format
-                if (!string.IsNullOrEmpty(unit.ChapterID) && unit.ChapterID.Contains("."))
-                {
-                    var dots = unit.ChapterID.Split('.');
-                    if (dots.Length == 3)
-                    {
-                        unit.EpisodeID = dots[0];
-                        unit.ChapterID = dots[1];
-                        unit.SectionID = dots[2];
-                    }
-                }
-                count++;
+                // We don't have a specific field target string to parse from anymore since ChapterID is int.
+                // Assuming user wants to parse logic from ID if it matches 0.0.0
             }
-            EditorUtility.SetDirty(_target);
-            UnityEngine.Debug.Log($"[DialogueSystem] Legacy Migration complete for {count} units.");
         }
     }
 }

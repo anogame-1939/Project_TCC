@@ -73,8 +73,24 @@ namespace AnoGame.AnoNarrative.Editor
 
                     ConversationUnit unit = new ConversationUnit();
                     unit.ID = GenerateID(conversationTitle, entry.id);
-                    unit.ChapterID = chapter;
-                    unit.SectionID = section;
+
+                    // Try parsing INTs from the split parts.
+                    // Assumes format might be "EpNum_ChNum" or similar numbers.
+                    // If parsing fails, defaults to -1.
+
+                    int epID = -1;
+                    int chID = -1;
+                    int secID = -1;
+
+                    // Rough heuristic: if parts are numeric, use them.
+
+                    if (int.TryParse(chapter, out int cVal)) chID = cVal;
+                    if (int.TryParse(section, out int sVal)) secID = sVal;
+
+                    unit.EpisodeID = epID;
+                    unit.ChapterID = chID;
+                    unit.SectionID = secID;
+                    unit.SectionName = section; // Keep string name here
 
                     // Get Speaker Name
                     var actor = sourceDatabase.GetActor(entry.ActorID);

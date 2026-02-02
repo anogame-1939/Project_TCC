@@ -54,6 +54,7 @@ namespace AnoGame.AnoNarrative.Editor
 
                 _sidebar.OnSelectSection = (ep, chapter, section) =>
                 {
+                    // ep, chapter, section are already INTs from Sidebar
                     _canvas.SetFilter(ep, chapter, section);
 
                     // Auto-pan to first node of this section
@@ -70,7 +71,8 @@ namespace AnoGame.AnoNarrative.Editor
                 if (_data.Conversations.Count > 0)
                 {
                     var first = _data.Conversations[0];
-                    if (!string.IsNullOrEmpty(first.EpisodeID))
+                    // Using int defaults, no need to check string.IsNullOrEmpty -> check strict -1 or just set
+                    if (first.EpisodeID != -1)
                     {
                         _canvas.SetFilter(first.EpisodeID, first.ChapterID, first.SectionID);
                         float offsetX = (_showSidebar ? 250f : 0f) + 50f;
@@ -101,7 +103,7 @@ namespace AnoGame.AnoNarrative.Editor
 
                 if (GUILayout.Button("Show All", EditorStyles.toolbarButton))
                 {
-                    _canvas.SetFilter(null, null, null);
+                    _canvas.SetFilter(-1, -1, -1);
                 }
 
                 if (GUILayout.Button("Grid Layout", EditorStyles.toolbarButton))

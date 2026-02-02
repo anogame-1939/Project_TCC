@@ -9,12 +9,14 @@ namespace AnoGame.AnoNarrative.Editor
     {
         private MasterDialogueData _masterData;
         private Vector2 _scrollPos;
+
         private bool _showCandidates = true;
         private List<string> _filteredIDs = new List<string>();
         private bool _useGridView = false;
+        private bool _showRootsOnly = true;
 
-        // Exposed for persistence if needed, or passed in via Draw
-        // For simplicity, we'll keep local state here.
+        // Last Filter Values for force refresh
+        private int LastEp, LastCh, LastSec;
 
         public void Draw(
             SerializedProperty convIDProp,
@@ -34,34 +36,54 @@ namespace AnoGame.AnoNarrative.Editor
             float originalLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 25; // Short label width
 
-            // Use passed properties
-            if (episodeProp != null) EditorGUILayout.PropertyField(episodeProp, new GUIContent("Ep"), GUILayout.MinWidth(50));
-            if (chapterProp != null) EditorGUILayout.PropertyField(chapterProp, new GUIContent("Ch"), GUILayout.MinWidth(50));
-            if (sectionProp != null) EditorGUILayout.PropertyField(sectionProp, new GUIContent("Sc"), GUILayout.MinWidth(50));
+            // Use custom filter fields
+            DrawFilterField(episodeProp, "Ep");
+            DrawFilterField(chapterProp, "Ch");
+            DrawFilterField(sectionProp, "Sec");
 
             EditorGUIUtility.labelWidth = originalLabelWidth; // Restore
             EditorGUILayout.EndHorizontal();
 
             if (EditorGUI.EndChangeCheck())
             {
-                UpdateFilteredList(episodeProp?.stringValue, chapterProp?.stringValue, sectionProp?.stringValue);
-            }
-
-            // Initial population if empty
-            if (_filteredIDs.Count == 0 && _masterData != null)
-            {
-                // We intentionally don't auto-fill on every draw to avoid heavy linq, 
-                // but we need it at least once. 
-                // However, we rely on OnEnable usually. 
-                // Since this is a helper, let's just check if we need to update.
-                // Optimally the parent calls UpdateFilteredList on Enable.
+                UpdateFilteredList(
+                    episodeProp != null ? episodeProp.intValue : -1,
+                    chapterProp != null ? chapterProp.intValue : -1,
+                    sectionProp != null ? sectionProp.intValue : -1
+                );
             }
 
             EditorGUILayout.Space(10);
             DrawCandidates(convIDProp);
         }
 
-        public void Initialize(string ep, string ch, string sec)
+        private void DrawFilterField(SerializedProperty prop, string label)
+        {
+            if (prop == null) return;
+
+            int val = prop.intValue;
+            string text = val == -1 ? "" : val.ToString();
+
+            // Draw as Text Field to allow "Empty"
+            string newText = EditorGUILayout.TextField(new GUIContent(label), text, GUILayout.MinWidth(50));
+
+            if (newText != text)
+            {
+                if (string.IsNullOrEmpty(newText))
+                {
+                    prop.intValue = -1;
+                }
+                else
+                {
+                    if (int.TryParse(newText, out int result))
+                    {
+                        prop.intValue = result;
+                    }
+                }
+            }
+        }
+
+        public void Initialize(int ep, int ch, int sec)
         {
             EnsureMasterData();
             UpdateFilteredList(ep, ch, sec);
@@ -86,18 +108,28 @@ namespace AnoGame.AnoNarrative.Editor
                 if (GUILayout.Button("Retry Find MasterData"))
                 {
                     EnsureMasterData();
-                    // We don't have ease access to current filter values here unless stored or passed
-                    // For now, let's assume they are stored in the SerializedProperties which we don't have direct access to right here without passing them again.
-                    // Ideally, Initialize is called or Draw handles it.
                 }
                 return;
             }
 
-            _showCandidates = EditorGUILayout.Foldout(_showCandidates, $"Candidates ({_filteredIDs.Count}) - Roots Only", true);
+            // Options Line
+            EditorGUILayout.BeginHorizontal();
+            _showCandidates = EditorGUILayout.Foldout(_showCandidates, $"Candidates ({_filteredIDs.Count})", true);
+            GUILayout.FlexibleSpace();
+            bool newRootsValues = EditorGUILayout.ToggleLeft("Roots Only", _showRootsOnly, GUILayout.Width(85));
+            if (newRootsValues != _showRootsOnly)
+            {
+                _showRootsOnly = newRootsValues;
+                // Force update
+                UpdateFilteredList(LastEp, LastCh, LastSec);
+            }
+            EditorGUILayout.EndHorizontal();
+
             if (_showCandidates)
             {
                 // Toggle for Grid View
                 EditorGUILayout.BeginHorizontal();
+                GUILayout.Label($"Total Data: {_masterData.Conversations.Count}", EditorStyles.miniLabel);
                 GUILayout.FlexibleSpace();
                 _useGridView = GUILayout.Toggle(_useGridView, "Grid View", EditorStyles.miniButton, GUILayout.Width(70));
                 EditorGUILayout.EndHorizontal();
@@ -192,21 +224,28 @@ namespace AnoGame.AnoNarrative.Editor
             GUILayout.EndHorizontal();
         }
 
-        private void UpdateFilteredList(string ep, string ch, string sec)
+        private void UpdateFilteredList(int ep, int ch, int sec)
         {
+            LastEp = ep;
+            LastCh = ch;
+            LastSec = sec;
+
             _filteredIDs.Clear();
             if (_masterData == null) return;
 
-            // 1. Identify all referenced IDs to find Roots
+            // 1. Identify all referenced IDs to find Roots (if needed)
             HashSet<string> referencedIDs = new HashSet<string>();
-            foreach (var unit in _masterData.Conversations)
+            if (_showRootsOnly)
             {
-                if (!string.IsNullOrEmpty(unit.NextID)) referencedIDs.Add(unit.NextID);
-                if (unit.Choices != null)
+                foreach (var unit in _masterData.Conversations)
                 {
-                    foreach (var choice in unit.Choices)
+                    if (!string.IsNullOrEmpty(unit.NextID)) referencedIDs.Add(unit.NextID);
+                    if (unit.Choices != null)
                     {
-                        if (!string.IsNullOrEmpty(choice.TargetID)) referencedIDs.Add(choice.TargetID);
+                        foreach (var choice in unit.Choices)
+                        {
+                            if (!string.IsNullOrEmpty(choice.TargetID)) referencedIDs.Add(choice.TargetID);
+                        }
                     }
                 }
             }
@@ -214,12 +253,14 @@ namespace AnoGame.AnoNarrative.Editor
             // 2. Filter
             foreach (var conv in _masterData.Conversations)
             {
-                if (referencedIDs.Contains(conv.ID)) continue;
+                if (_showRootsOnly && referencedIDs.Contains(conv.ID)) continue;
 
                 bool match = true;
-                if (!string.IsNullOrEmpty(ep) && conv.EpisodeID != ep) match = false;
-                if (!string.IsNullOrEmpty(ch) && conv.ChapterID != ch) match = false;
-                if (!string.IsNullOrEmpty(sec) && conv.SectionID != sec) match = false;
+
+                // -1 implies "Empty" / "All"
+                if (ep != -1 && conv.EpisodeID != ep) match = false;
+                if (ch != -1 && conv.ChapterID != ch) match = false;
+                if (sec != -1 && conv.SectionID != sec) match = false;
 
                 if (match)
                 {

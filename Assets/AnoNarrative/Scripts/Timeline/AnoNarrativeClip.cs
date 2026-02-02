@@ -7,9 +7,9 @@ namespace AnoGame.AnoNarrative.Timeline
 {
     public class AnoNarrativeClip : PlayableAsset, ITimelineClipAsset
     {
-        [HideInInspector] public string targetEpisode;
-        [HideInInspector] public string targetChapter;
-        [HideInInspector] public string targetSection;
+        [HideInInspector] public int targetEpisode = -1;
+        [HideInInspector] public int targetChapter = -1;
+        [HideInInspector] public int targetSection = -1;
 
         public string conversationID;
         public bool pauseTimeline = true;

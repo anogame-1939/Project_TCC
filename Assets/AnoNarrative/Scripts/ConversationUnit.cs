@@ -10,14 +10,14 @@ namespace AnoGame.AnoNarrative
         [Tooltip("Unique ID for this conversation node (e.g. S1_Intro_01)")]
         public string ID;
 
-        [Tooltip("Episode Context (e.g. Ep1)")]
-        public string EpisodeID;
+        [Tooltip("Episode Context (e.g. 1)")]
+        public int EpisodeID = -1;
 
-        [Tooltip("Story/Chapter Context (e.g. Story1)")]
-        public string ChapterID;
+        [Tooltip("Story/Chapter Context (e.g. 1)")]
+        public int ChapterID = -1;
 
-        [Tooltip("Section/Situation Context (e.g. Intro, BossBattle)")]
-        public string SectionID;
+        [Tooltip("Section/Situation Context (e.g. 1)")]
+        public int SectionID = -1;
 
         [Tooltip("Human readable name for the section")]
         public string SectionName;
