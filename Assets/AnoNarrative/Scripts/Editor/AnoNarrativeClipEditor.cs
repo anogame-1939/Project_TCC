@@ -47,6 +47,7 @@ namespace AnoGame.AnoNarrative.Editor
             EditorGUILayout.LabelField("Selection", EditorStyles.boldLabel);
             if (_conversationID != null)
             {
+                // Show current ID
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PropertyField(_conversationID);
                 if (GUILayout.Button("Clear", GUILayout.Width(50)))
@@ -54,6 +55,20 @@ namespace AnoGame.AnoNarrative.Editor
                     _conversationID.stringValue = "";
                 }
                 GUILayout.EndHorizontal();
+
+                // Show resolved Section Name
+                if (!string.IsNullOrEmpty(_conversationID.stringValue) && _masterData != null)
+                {
+                    var unit = _masterData.GetConversationByID(_conversationID.stringValue);
+                    if (unit != null)
+                    {
+                        EditorGUILayout.HelpBox($"Selected: {unit.SectionName} (Speaker: {unit.SpeakerName})", MessageType.None);
+                    }
+                    else
+                    {
+                        EditorGUILayout.HelpBox("ID not found in MasterData", MessageType.Warning);
+                    }
+                }
             }
 
             // Validation Checking

@@ -172,7 +172,18 @@ namespace AnoGame.AnoNarrative.Editor
                     GUI.backgroundColor = Color.green;
                 }
 
-                if (GUILayout.Button(id, leftAlignedButtonStyle))
+                // Resolve Name
+                string displayName = id;
+                if (_masterData != null)
+                {
+                    var unit = _masterData.GetConversationByID(id);
+                    if (unit != null && !string.IsNullOrEmpty(unit.SectionName))
+                    {
+                        displayName = unit.SectionName;
+                    }
+                }
+
+                if (GUILayout.Button(displayName, leftAlignedButtonStyle))
                 {
                     targetIDProp.stringValue = id;
                     GUI.FocusControl(null);
@@ -194,9 +205,24 @@ namespace AnoGame.AnoNarrative.Editor
             GUILayout.BeginHorizontal();
             foreach (var id in _filteredIDs)
             {
+                string displayName = id;
+                string tooltip = id;
+                if (_masterData != null)
+                {
+                    var unit = _masterData.GetConversationByID(id);
+                    if (unit != null)
+                    {
+                        if (!string.IsNullOrEmpty(unit.SectionName))
+                        {
+                            displayName = unit.SectionName;
+                        }
+                        tooltip = $"{unit.SectionName}\n{unit.SpeakerName}\n{unit.BodyText}";
+                    }
+                }
+
                 // Truncate logic: 10 chars 
-                string display = id.Length > 10 ? id.Substring(0, 10) : id;
-                GUIContent content = new GUIContent(display, id);
+                string displayLabel = displayName.Length > 12 ? displayName.Substring(0, 12) + ".." : displayName;
+                GUIContent content = new GUIContent(displayLabel, tooltip);
 
                 float btnWidth = 100f;
 
