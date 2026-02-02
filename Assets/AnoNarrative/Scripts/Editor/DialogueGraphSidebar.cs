@@ -28,6 +28,7 @@ namespace AnoGame.AnoNarrative.Editor
             public bool IsActive;
         }
         private RenameState _renameState = new RenameState();
+        private Dictionary<int, bool> _episodeFoldout = new Dictionary<int, bool>();
 
         public DialogueGraphSidebar(MasterDialogueData data)
         {
@@ -76,10 +77,20 @@ namespace AnoGame.AnoNarrative.Editor
 
                     // --- EPISODE Header ---
                     // Hide Episode Header if Default (ID -1)
+                    bool isExpanded = true;
                     if (epGroup.Key != -1)
                     {
+                        if (!_episodeFoldout.ContainsKey(epGroup.Key)) _episodeFoldout[epGroup.Key] = true;
+                        isExpanded = _episodeFoldout[epGroup.Key];
+
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField($"Episode: {epStr}", EditorStyles.boldLabel);
+
+                        // Foldout
+                        GUIStyle foldoutStyle = new GUIStyle(EditorStyles.foldout);
+                        foldoutStyle.fontStyle = FontStyle.Bold;
+                        _episodeFoldout[epGroup.Key] = EditorGUILayout.Foldout(_episodeFoldout[epGroup.Key], $"Episode: {epStr}", true, foldoutStyle);
+                        isExpanded = _episodeFoldout[epGroup.Key];
+
                         GUILayout.FlexibleSpace();
                         if (GUILayout.Button("+", EditorStyles.miniButton, GUILayout.Width(20)))
                         {
@@ -114,8 +125,12 @@ namespace AnoGame.AnoNarrative.Editor
                             }
                         }
 
-                        EditorGUI.indentLevel++;
+                        // Indent only if expanded AND not default (Default header logic handles itself)
+                        if (isExpanded) EditorGUI.indentLevel++;
                     }
+
+                    // Skip rendering chapters if collapsed (and not default)
+                    if (epGroup.Key != -1 && !isExpanded) continue;
 
                     var chapters = epGroup.GroupBy(u => u.ChapterID).OrderBy(g => g.Key);
 
