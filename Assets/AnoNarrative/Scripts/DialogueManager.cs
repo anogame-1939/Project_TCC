@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using AnoGame.AnoNarrative.Data;
 
 namespace AnoGame.AnoNarrative
 {
@@ -85,11 +86,33 @@ namespace AnoGame.AnoNarrative
         }
 
         // UI Reference
-        private UI.DialogueUIController activeUI;
+        private Dictionary<DialogueStyle, UI.DialogueUIBase> registeredUIs = new Dictionary<DialogueStyle, UI.DialogueUIBase>();
+        private UI.DialogueUIBase activeUI;
 
-        public void RegisterUI(UI.DialogueUIController ui)
+        public void RegisterUI(UI.DialogueUIBase ui, DialogueStyle style)
         {
-            activeUI = ui;
+            if (style != null)
+            {
+                if (!registeredUIs.ContainsKey(style))
+                {
+                    registeredUIs.Add(style, ui);
+                }
+                else
+                {
+                    registeredUIs[style] = ui;
+                }
+            }
+            else
+            {
+                // Fallback for default/null style, maybe key null?
+                // Or handle generic "Standard" if style is missing.
+                // Let's treat null as a specific "Default" slot for now, or just warn.
+                Debug.LogWarning("[DialogueManager] Registering UI with null style. This will be the default fallback.");
+                if (!registeredUIs.ContainsKey(null))
+                    registeredUIs.Add(null, ui);
+                else
+                    registeredUIs[null] = ui;
+            }
         }
 
         public bool IsConversationActive => activeUI != null && activeUI.IsDialogueActive;
@@ -99,48 +122,92 @@ namespace AnoGame.AnoNarrative
             if (activeUI != null)
             {
                 activeUI.Close();
+                activeUI = null;
             }
         }
 
-        public void StartConversation(string id)
+        public void StartConversation(string id, DialogueStyle style = null)
         {
             var unit = GetConversation(id);
             if (unit != null)
             {
-                if (activeUI != null)
+                // Select UI
+                UI.DialogueUIBase targetUI = ResolveUI(style);
+
+                if (targetUI != null)
                 {
+                    // If switching UIs, close the old one?
+                    if (activeUI != null && activeUI != targetUI)
+                    {
+                        activeUI.Close();
+                    }
+
+                    activeUI = targetUI;
                     activeUI.ShowConversation(unit);
                 }
                 else
                 {
-                    UnityEngine.Debug.LogWarning($"[DialogueManager] No UI registered. Conversation content: {unit.BodyText}");
+                    UnityEngine.Debug.LogWarning($"[DialogueManager] No UI registered for style: {(style != null ? style.name : "Default")}. Content: {unit.BodyText}");
                 }
             }
         }
 
-        public void PreviewConversation(string id)
+        private UI.DialogueUIBase ResolveUI(DialogueStyle style)
+        {
+            // 1. Try specific style
+            if (style != null && registeredUIs.TryGetValue(style, out var ui))
+            {
+                return ui;
+            }
+
+            // 2. Try null/Default style
+            if (registeredUIs.TryGetValue(null, out var defaultUI))
+            {
+                return defaultUI;
+            }
+
+            // 3. Fallback to any first registered UI
+            if (registeredUIs.Count > 0)
+            {
+                // Just grab the first one
+                var e = registeredUIs.GetEnumerator();
+                e.MoveNext();
+                return e.Current.Value;
+            }
+
+            return null;
+        }
+
+        public void PreviewConversation(string id, DialogueStyle style = null)
         {
             Debug.Log($"[DialogueManager] PreviewConversation requested for ID: {id}");
 
-            // In Editor, activeUI might not be registered yet if Start() wasn't called.
-            if (activeUI == null)
+            // In Editor, activeUI might not be registered if Start() wasn't called.
+            if (registeredUIs.Count == 0)
             {
 #if UNITY_EDITOR
-                activeUI = FindFirstObjectByType<UI.DialogueUIController>();
-                if (activeUI != null) Debug.Log("[DialogueManager] Found ActiveUI via FindObjectOfType.");
+                // Try finding any in scene
+                var uis = FindObjectsByType<UI.DialogueUIBase>(FindObjectsSortMode.None);
+                foreach (var u in uis)
+                {
+                    RegisterUI(u, u.Style);
+                }
 #endif
             }
 
             var unit = GetConversation(id);
             if (unit != null)
             {
-                if (activeUI != null)
+                var targetUI = ResolveUI(style);
+                if (targetUI != null)
                 {
+                    if (activeUI != null && activeUI != targetUI) activeUI.Close();
+                    activeUI = targetUI;
                     activeUI.PreviewConversation(unit);
                 }
                 else
                 {
-                    Debug.LogWarning("[DialogueManager] ActiveUI is null.");
+                    Debug.LogWarning("[DialogueManager] No UI found for preview.");
                 }
             }
             else
@@ -171,7 +238,7 @@ namespace AnoGame.AnoNarrative
 
                 if (matchEp && matchCh && matchSec)
                 {
-                    StartConversation(unit.ID);
+                    StartConversation(unit.ID, null); // Default style for now
                     return;
                 }
             }

@@ -7,6 +7,7 @@ namespace AnoGame.AnoNarrative.Timeline
     public class AnoNarrativeBehaviour : PlayableBehaviour
     {
         public string conversationID;
+        public AnoGame.AnoNarrative.Data.DialogueStyle dialogueStyle;
         // public DialogueController targetController; // Removed
         public bool pauseTimeline;
         public PlayableDirector director;
@@ -69,7 +70,7 @@ namespace AnoGame.AnoNarrative.Timeline
             }
 
             // Debug.Log($"[AnoNarrativeBehaviour] Calling receiver.Play({conversationID}).");
-            receiver.Play(conversationID);
+            receiver.Play(conversationID, dialogueStyle);
 
             // Wait for conversation to end
             // Debug.Log("[AnoNarrativeBehaviour] Starting MonitorConversationEnd Coroutine.");

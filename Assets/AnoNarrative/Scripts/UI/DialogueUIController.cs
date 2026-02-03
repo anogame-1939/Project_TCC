@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 namespace AnoGame.AnoNarrative.UI
 {
-    public class DialogueUIController : MonoBehaviour
+    public class DialogueUIController : DialogueUIBase
     {
         [Header("UI Components")]
         [SerializeField] private GameObject itemsParent; // The main panel to show/hide
@@ -39,7 +39,7 @@ namespace AnoGame.AnoNarrative.UI
         private bool isSkipping = false;
         private float inputCooldown = 0f;
 
-        public bool IsDialogueActive => itemsParent != null && itemsParent.activeSelf;
+        public override bool IsDialogueActive => itemsParent != null && itemsParent.activeSelf;
 
         public bool IsAutoAdvance
         {
@@ -72,23 +72,10 @@ namespace AnoGame.AnoNarrative.UI
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
         }
 
-        private void OnEnable()
-        {
-            // Try register if Manager exists
-            if (DialogueManager.Instance != null)
-            {
-                DialogueManager.Instance.RegisterUI(this);
-            }
-        }
+        // Start/OnEnable handled by Base, but we can override if needed. 
+        // Base Start/OnEnable registers UI.
 
-        private void Start()
-        {
-            // Register self to Manager (Simple singleton pattern or dependency injection)
-            // For now, we assume Manager calls us or we set it up in Inspector
-            DialogueManager.Instance.RegisterUI(this);
-        }
-
-        public void ShowConversation(ConversationUnit unit)
+        public override void ShowConversation(ConversationUnit unit)
         {
             currentUnit = unit;
             if (itemsParent) itemsParent.SetActive(true);
@@ -108,7 +95,7 @@ namespace AnoGame.AnoNarrative.UI
             SetupChoices(unit);
         }
 
-        public void PreviewConversation(ConversationUnit unit)
+        public override void PreviewConversation(ConversationUnit unit)
         {
             currentUnit = unit;
             if (itemsParent) itemsParent.SetActive(true);
@@ -228,7 +215,7 @@ namespace AnoGame.AnoNarrative.UI
             }
         }
 
-        public void OnClickNext()
+        public override void OnClickNext()
         {
             if (isTyping)
             {
@@ -246,7 +233,15 @@ namespace AnoGame.AnoNarrative.UI
 
             if (!string.IsNullOrEmpty(currentUnit.NextID))
             {
-                DialogueManager.Instance.StartConversation(currentUnit.NextID);
+                // NOTE: This always uses default style for next? 
+                // Or should it use the SAME style as current?
+                // DialogueManager.Instance.StartConversation doesn't know context unless we pass it.
+                // For now, assume NextID flows in the same style or defined by that unit logic (not implemented yet).
+                // Wait, if I call StartConversation(id), it uses default or resolved style.
+                // Ideally check if unit has style data, but ConversationUnit doesn't have style.
+                // So we should probably keep using the CURRENT style.
+                // But `StartConversation` with checking `this.Style` might be better.
+                DialogueManager.Instance.StartConversation(currentUnit.NextID, this.Style);
             }
             else
             {
@@ -258,7 +253,7 @@ namespace AnoGame.AnoNarrative.UI
         {
             if (!string.IsNullOrEmpty(choice.TargetID))
             {
-                DialogueManager.Instance.StartConversation(choice.TargetID);
+                DialogueManager.Instance.StartConversation(choice.TargetID, this.Style);
             }
             else
             {
@@ -266,7 +261,7 @@ namespace AnoGame.AnoNarrative.UI
             }
         }
 
-        public void Close()
+        public override void Close()
         {
             if (activeChoiceRoutine != null) StopCoroutine(activeChoiceRoutine);
             if (currentPortraitRoutine != null) StopCoroutine(currentPortraitRoutine);

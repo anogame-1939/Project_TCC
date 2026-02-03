@@ -14,6 +14,7 @@ namespace AnoGame.AnoNarrative.Editor
         private SerializedProperty _targetSection;
         private SerializedProperty _conversationID;
         private SerializedProperty _pauseTimeline;
+        private SerializedProperty _dialogueStyle;
 
         private MasterDialogueData _masterData;
         private DialogueCandidateDrawer _drawer;
@@ -25,6 +26,7 @@ namespace AnoGame.AnoNarrative.Editor
             _targetSection = serializedObject.FindProperty("targetSection");
             _conversationID = serializedObject.FindProperty("conversationID");
             _pauseTimeline = serializedObject.FindProperty("pauseTimeline");
+            _dialogueStyle = serializedObject.FindProperty("dialogueStyle");
 
             _drawer = new DialogueCandidateDrawer();
             _drawer.Initialize(_targetEpisode.intValue, _targetChapter.intValue, _targetSection.intValue);
@@ -39,6 +41,11 @@ namespace AnoGame.AnoNarrative.Editor
             if (_pauseTimeline != null)
             {
                 _pauseTimeline.boolValue = EditorGUILayout.Toggle("Pause Timeline", _pauseTimeline.boolValue);
+            }
+
+            if (_dialogueStyle != null)
+            {
+                EditorGUILayout.PropertyField(_dialogueStyle);
             }
 
             EditorGUILayout.Space(10);

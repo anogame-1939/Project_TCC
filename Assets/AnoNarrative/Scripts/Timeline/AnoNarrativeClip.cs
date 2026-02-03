@@ -12,6 +12,7 @@ namespace AnoGame.AnoNarrative.Timeline
         [HideInInspector] public int targetSection = -1;
 
         public string conversationID;
+        public AnoGame.AnoNarrative.Data.DialogueStyle dialogueStyle;
         public bool pauseTimeline = true;
 
         // ITimelineClipAsset implementation
@@ -23,6 +24,7 @@ namespace AnoGame.AnoNarrative.Timeline
             var behaviour = playable.GetBehaviour();
 
             behaviour.conversationID = conversationID;
+            behaviour.dialogueStyle = dialogueStyle;
             behaviour.pauseTimeline = pauseTimeline;
 
             // Resolve director to allow pausing
