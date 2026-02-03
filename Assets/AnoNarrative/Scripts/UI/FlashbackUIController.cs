@@ -88,7 +88,7 @@ namespace AnoGame.AnoNarrative.UI
 
             if (!string.IsNullOrEmpty(currentUnit.NextID))
             {
-                DialogueManager.Instance.StartConversation(currentUnit.NextID, this.Style);
+                DialogueManager.Instance.StartConversation(currentUnit.NextID, this.StyleName);
             }
             else
             {

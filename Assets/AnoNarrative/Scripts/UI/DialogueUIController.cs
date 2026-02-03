@@ -241,7 +241,7 @@ namespace AnoGame.AnoNarrative.UI
                 // Ideally check if unit has style data, but ConversationUnit doesn't have style.
                 // So we should probably keep using the CURRENT style.
                 // But `StartConversation` with checking `this.Style` might be better.
-                DialogueManager.Instance.StartConversation(currentUnit.NextID, this.Style);
+                DialogueManager.Instance.StartConversation(currentUnit.NextID, this.StyleName);
             }
             else
             {
@@ -253,7 +253,7 @@ namespace AnoGame.AnoNarrative.UI
         {
             if (!string.IsNullOrEmpty(choice.TargetID))
             {
-                DialogueManager.Instance.StartConversation(choice.TargetID, this.Style);
+                DialogueManager.Instance.StartConversation(choice.TargetID, this.StyleName);
             }
             else
             {

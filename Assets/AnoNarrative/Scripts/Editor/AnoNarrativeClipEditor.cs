@@ -14,7 +14,8 @@ namespace AnoGame.AnoNarrative.Editor
         private SerializedProperty _targetSection;
         private SerializedProperty _conversationID;
         private SerializedProperty _pauseTimeline;
-        private SerializedProperty _dialogueStyle;
+        private SerializedProperty _styleDatabase;
+        private SerializedProperty _dialogueStyleName;
 
         private MasterDialogueData _masterData;
         private DialogueCandidateDrawer _drawer;
@@ -26,7 +27,8 @@ namespace AnoGame.AnoNarrative.Editor
             _targetSection = serializedObject.FindProperty("targetSection");
             _conversationID = serializedObject.FindProperty("conversationID");
             _pauseTimeline = serializedObject.FindProperty("pauseTimeline");
-            _dialogueStyle = serializedObject.FindProperty("dialogueStyle");
+            _styleDatabase = serializedObject.FindProperty("styleDatabase");
+            _dialogueStyleName = serializedObject.FindProperty("dialogueStyleName");
 
             _drawer = new DialogueCandidateDrawer();
             _drawer.Initialize(_targetEpisode.intValue, _targetChapter.intValue, _targetSection.intValue);
@@ -43,9 +45,65 @@ namespace AnoGame.AnoNarrative.Editor
                 _pauseTimeline.boolValue = EditorGUILayout.Toggle("Pause Timeline", _pauseTimeline.boolValue);
             }
 
-            if (_dialogueStyle != null)
+            if (_styleDatabase != null)
             {
-                EditorGUILayout.PropertyField(_dialogueStyle);
+                EditorGUILayout.PropertyField(_styleDatabase, new GUIContent("Style Database"));
+                var db = (AnoGame.AnoNarrative.Data.DialogueStyle)_styleDatabase.objectReferenceValue;
+                if (db == null)
+                {
+                    // Try auto-assign
+                    string[] guids = AssetDatabase.FindAssets("t:DialogueStyle");
+                    if (guids.Length > 0)
+                    {
+                        string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                        db = AssetDatabase.LoadAssetAtPath<AnoGame.AnoNarrative.Data.DialogueStyle>(path);
+                        if (db != null)
+                        {
+                            _styleDatabase.objectReferenceValue = db;
+                        }
+                    }
+
+                    if (db == null && GUILayout.Button("Find Database"))
+                    {
+                        guids = AssetDatabase.FindAssets("t:DialogueStyle");
+                        if (guids.Length > 0)
+                        {
+                            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                            _styleDatabase.objectReferenceValue = AssetDatabase.LoadAssetAtPath<AnoGame.AnoNarrative.Data.DialogueStyle>(path);
+                        }
+                    }
+                }
+
+                if (db != null)
+                {
+                    if (db.styleNames != null && db.styleNames.Count > 0)
+                    {
+                        var list = db.styleNames.ToList();
+                        int index = list.IndexOf(_dialogueStyleName.stringValue);
+                        if (index < 0) index = 0;
+
+                        int newIndex = EditorGUILayout.Popup("Dialogue Style", index, list.ToArray());
+                        if (newIndex >= 0 && newIndex < list.Count)
+                        {
+                            _dialogueStyleName.stringValue = list[newIndex];
+                        }
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("Database has no styles defined.");
+                    }
+                }
+            }
+            else
+            {
+                // Should we find one automatically?
+                var guids = AssetDatabase.FindAssets("t:DialogueStyle");
+                if (guids.Length > 0)
+                {
+                    // Found one, maybe suggest or auto-assign?
+                    // For now just show field
+                }
+                EditorGUILayout.PropertyField(_styleDatabase, new GUIContent("Style Database"));
             }
 
             EditorGUILayout.Space(10);

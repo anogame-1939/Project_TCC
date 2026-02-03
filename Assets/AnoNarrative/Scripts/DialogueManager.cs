@@ -86,32 +86,26 @@ namespace AnoGame.AnoNarrative
         }
 
         // UI Reference
-        private Dictionary<DialogueStyle, UI.DialogueUIBase> registeredUIs = new Dictionary<DialogueStyle, UI.DialogueUIBase>();
+        private Dictionary<string, UI.DialogueUIBase> registeredUIs = new Dictionary<string, UI.DialogueUIBase>();
         private UI.DialogueUIBase activeUI;
 
-        public void RegisterUI(UI.DialogueUIBase ui, DialogueStyle style)
+        public void RegisterUI(UI.DialogueUIBase ui, string styleName)
         {
-            if (style != null)
+            if (string.IsNullOrEmpty(styleName)) styleName = "Standard";
+
+            if (!registeredUIs.ContainsKey(styleName))
             {
-                if (!registeredUIs.ContainsKey(style))
-                {
-                    registeredUIs.Add(style, ui);
-                }
-                else
-                {
-                    registeredUIs[style] = ui;
-                }
+                registeredUIs.Add(styleName, ui);
             }
             else
             {
-                // Fallback for default/null style, maybe key null?
-                // Or handle generic "Standard" if style is missing.
-                // Let's treat null as a specific "Default" slot for now, or just warn.
-                Debug.LogWarning("[DialogueManager] Registering UI with null style. This will be the default fallback.");
-                if (!registeredUIs.ContainsKey(null))
-                    registeredUIs.Add(null, ui);
-                else
-                    registeredUIs[null] = ui;
+                registeredUIs[styleName] = ui;
+            }
+
+            // Set default active UI if none, or if this is the "Standard" one
+            if (activeUI == null || styleName == "Standard")
+            {
+                activeUI = ui;
             }
         }
 
@@ -126,13 +120,13 @@ namespace AnoGame.AnoNarrative
             }
         }
 
-        public void StartConversation(string id, DialogueStyle style = null)
+        public void StartConversation(string id, string styleName = null)
         {
             var unit = GetConversation(id);
             if (unit != null)
             {
                 // Select UI
-                UI.DialogueUIBase targetUI = ResolveUI(style);
+                UI.DialogueUIBase targetUI = ResolveUI(styleName);
 
                 if (targetUI != null)
                 {
@@ -147,26 +141,22 @@ namespace AnoGame.AnoNarrative
                 }
                 else
                 {
-                    UnityEngine.Debug.LogWarning($"[DialogueManager] No UI registered for style: {(style != null ? style.name : "Default")}. Content: {unit.BodyText}");
+                    UnityEngine.Debug.LogWarning($"[DialogueManager] No UI registered for style: {(styleName ?? "Default")}. Content: {unit.BodyText}");
                 }
             }
         }
 
-        private UI.DialogueUIBase ResolveUI(DialogueStyle style)
+        private UI.DialogueUIBase ResolveUI(string styleName)
         {
+            if (string.IsNullOrEmpty(styleName)) styleName = "Standard";
+
             // 1. Try specific style
-            if (style != null && registeredUIs.TryGetValue(style, out var ui))
+            if (registeredUIs.TryGetValue(styleName, out var ui))
             {
                 return ui;
             }
 
-            // 2. Try null/Default style
-            if (registeredUIs.TryGetValue(null, out var defaultUI))
-            {
-                return defaultUI;
-            }
-
-            // 3. Fallback to any first registered UI
+            // 2. Fallback to any first registered UI
             if (registeredUIs.Count > 0)
             {
                 // Just grab the first one
@@ -178,7 +168,7 @@ namespace AnoGame.AnoNarrative
             return null;
         }
 
-        public void PreviewConversation(string id, DialogueStyle style = null)
+        public void PreviewConversation(string id, string styleName = null)
         {
             Debug.Log($"[DialogueManager] PreviewConversation requested for ID: {id}");
 
@@ -190,7 +180,7 @@ namespace AnoGame.AnoNarrative
                 var uis = FindObjectsByType<UI.DialogueUIBase>(FindObjectsSortMode.None);
                 foreach (var u in uis)
                 {
-                    RegisterUI(u, u.Style);
+                    RegisterUI(u, u.StyleName);
                 }
 #endif
             }
@@ -198,7 +188,7 @@ namespace AnoGame.AnoNarrative
             var unit = GetConversation(id);
             if (unit != null)
             {
-                var targetUI = ResolveUI(style);
+                var targetUI = ResolveUI(styleName);
                 if (targetUI != null)
                 {
                     if (activeUI != null && activeUI != targetUI) activeUI.Close();

@@ -23,11 +23,11 @@ namespace AnoGame.AnoNarrative.Timeline
             }
         }
 
-        public void Play(string conversationID, AnoGame.AnoNarrative.Data.DialogueStyle style = null)
+        public void Play(string conversationID, string styleName = null)
         {
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.StartConversation(conversationID, style);
+                DialogueManager.Instance.StartConversation(conversationID, styleName);
             }
             else
             {

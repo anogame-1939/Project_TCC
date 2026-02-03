@@ -6,8 +6,14 @@ namespace AnoGame.AnoNarrative.UI
     public abstract class DialogueUIBase : MonoBehaviour
     {
         [Header("Style Settings")]
-        [SerializeField] protected DialogueStyle dialogueStyle;
-        public DialogueStyle Style => dialogueStyle;
+        [Tooltip("Reference to the DialogueStyle DB to validate names.")]
+        [SerializeField] protected DialogueStyle styleData;
+
+        [Tooltip("The name of the style this UI handles (e.g. 'Standard', 'Narration')")]
+        [SerializeField] protected string styleName = "Standard";
+
+        public DialogueStyle StyleData => styleData;
+        public string StyleName => styleName;
 
         public abstract bool IsDialogueActive { get; }
 
@@ -15,17 +21,15 @@ namespace AnoGame.AnoNarrative.UI
         {
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.RegisterUI(this, dialogueStyle);
+                DialogueManager.Instance.RegisterUI(this, styleName);
             }
         }
 
         protected virtual void OnEnable()
         {
-            // Re-register if needed when enabled, though Start typically handles it.
-            // Safe to call multiple times if Manager handles duplicates.
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.RegisterUI(this, dialogueStyle);
+                DialogueManager.Instance.RegisterUI(this, styleName);
             }
         }
 

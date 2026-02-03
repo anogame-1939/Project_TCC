@@ -1,11 +1,12 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace AnoGame.AnoNarrative.Data
 {
-    [CreateAssetMenu(fileName = "NewDialogueStyle", menuName = "AnoGame/AnoNarrative/Dialogue Style")]
+    [CreateAssetMenu(fileName = "DialogueStyleValues", menuName = "AnoGame/AnoNarrative/Dialogue Style Values")]
     public class DialogueStyle : ScriptableObject
     {
-        [TextArea]
-        public string description;
+        [Tooltip("Define the available style names here (e.g., 'Standard', 'Narration', 'Flashback')")]
+        public List<string> styleNames = new List<string>() { "Standard" };
     }
 }
