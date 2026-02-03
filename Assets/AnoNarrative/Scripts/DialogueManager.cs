@@ -12,7 +12,7 @@ namespace AnoGame.AnoNarrative
             {
                 if (_instance == null)
                 {
-                    _instance = FindObjectOfType<DialogueManager>();
+                    _instance = FindFirstObjectByType<DialogueManager>();
                     if (_instance == null)
                     {
                         GameObject go = new GameObject("DialogueManager");
@@ -24,6 +24,7 @@ namespace AnoGame.AnoNarrative
         }
 
         [SerializeField] private MasterDialogueData masterData;
+        [SerializeField] private DialogueActorDatabase actorDatabase;
 
         // Runtime cache for O(1) lookup
         private Dictionary<string, ConversationUnit> conversationCache;
@@ -74,6 +75,15 @@ namespace AnoGame.AnoNarrative
             return null;
         }
 
+        public Sprite GetActorSprite(string name)
+        {
+            if (actorDatabase != null)
+            {
+                return actorDatabase.GetPortrait(name);
+            }
+            return null;
+        }
+
         // UI Reference
         private UI.DialogueUIController activeUI;
 
@@ -116,7 +126,7 @@ namespace AnoGame.AnoNarrative
             if (activeUI == null)
             {
 #if UNITY_EDITOR
-                activeUI = FindObjectOfType<UI.DialogueUIController>();
+                activeUI = FindFirstObjectByType<UI.DialogueUIController>();
                 if (activeUI != null) Debug.Log("[DialogueManager] Found ActiveUI via FindObjectOfType.");
 #endif
             }

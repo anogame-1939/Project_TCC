@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 using AnoGame.AnoNarrative;
 
 namespace AnoGame.AnoNarrative.UI
@@ -14,6 +15,7 @@ namespace AnoGame.AnoNarrative.UI
         [SerializeField] private GameObject itemsParent; // The main panel to show/hide
         [SerializeField] private TextMeshProUGUI speakerNameText;
         [SerializeField] private TextMeshProUGUI bodyText;
+        [SerializeField] private Image portraitImage;
         [SerializeField] private Button continueButton;
 
         [Header("Choices")]
@@ -22,6 +24,7 @@ namespace AnoGame.AnoNarrative.UI
 
         [Header("Settings")]
         [SerializeField] private float typingSpeed = 0.05f;
+        [SerializeField] private float portraitFadeDuration = 0.2f;
 
         [Header("Input")]
         [SerializeField] private Key advanceKey = Key.Space;
@@ -32,6 +35,8 @@ namespace AnoGame.AnoNarrative.UI
 
         private ConversationUnit currentUnit;
         private Coroutine typingCoroutine;
+        private Coroutine currentPortraitRoutine;
+        private Coroutine activeChoiceRoutine;
         private bool isTyping = false;
         private bool isSkipping = false;
         private float inputCooldown = 0f;
@@ -93,6 +98,12 @@ namespace AnoGame.AnoNarrative.UI
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
 
+            if (portraitImage)
+            {
+                var sprite = DialogueManager.Instance.GetActorSprite(unit.SpeakerName);
+                UpdatePortrait(sprite);
+            }
+
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
 
@@ -105,6 +116,13 @@ namespace AnoGame.AnoNarrative.UI
             if (itemsParent) itemsParent.SetActive(true);
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
+
+            if (portraitImage)
+            {
+                var sprite = DialogueManager.Instance.GetActorSprite(unit.SpeakerName);
+                UpdatePortrait(sprite);
+            }
+
             if (bodyText)
             {
                 bodyText.text = unit.BodyText;
@@ -174,7 +192,13 @@ namespace AnoGame.AnoNarrative.UI
 
         private void SetupChoices(ConversationUnit unit)
         {
-            // Clear old choices
+            if (activeChoiceRoutine != null) StopCoroutine(activeChoiceRoutine);
+            activeChoiceRoutine = StartCoroutine(SetupChoicesRoutine(unit));
+        }
+
+        private IEnumerator SetupChoicesRoutine(ConversationUnit unit)
+        {
+            // Clear old choices immediately
             foreach (Transform child in choiceContainer)
             {
                 if (child.gameObject != choiceButtonPrefab.gameObject)
@@ -183,14 +207,25 @@ namespace AnoGame.AnoNarrative.UI
 
             if (unit.Choices != null && unit.Choices.Count > 0)
             {
+                // Wait 0.5s before showing choices
+                yield return new WaitForSeconds(0.5f);
+
+                GameObject firstButton = null;
                 foreach (var choice in unit.Choices)
                 {
                     var btn = Instantiate(choiceButtonPrefab, choiceContainer);
                     btn.gameObject.SetActive(true);
+                    if (firstButton == null) firstButton = btn.gameObject;
+
                     var text = btn.GetComponentInChildren<TextMeshProUGUI>();
                     if (text) text.text = choice.ChoiceText;
 
                     btn.onClick.AddListener(() => OnChoiceSelected(choice));
+                }
+
+                if (firstButton != null)
+                {
+                    StartCoroutine(SelectFirstChoiceDelayed(firstButton));
                 }
             }
         }
@@ -235,7 +270,20 @@ namespace AnoGame.AnoNarrative.UI
 
         public void Close()
         {
+            if (activeChoiceRoutine != null) StopCoroutine(activeChoiceRoutine);
+            if (currentPortraitRoutine != null) StopCoroutine(currentPortraitRoutine);
+
             if (itemsParent) itemsParent.SetActive(false);
+
+            if (portraitImage)
+            {
+                portraitImage.gameObject.SetActive(false);
+                // Reset color opacity just in case it was fading
+                Color c = portraitImage.color;
+                c.a = 0f;
+                portraitImage.color = c;
+            }
+
             // Notify Manager?
         }
 
@@ -251,6 +299,73 @@ namespace AnoGame.AnoNarrative.UI
                     OnClickNext();
                 }
             }
+        }
+        private void UpdatePortrait(Sprite sprite)
+        {
+            if (currentPortraitRoutine != null) StopCoroutine(currentPortraitRoutine);
+            currentPortraitRoutine = StartCoroutine(ExecutePortraitFade(sprite));
+        }
+
+        private IEnumerator ExecutePortraitFade(Sprite newSprite)
+        {
+            // If we are showing a new sprite
+            if (newSprite != null)
+            {
+                // If it was already active and showing something, maybe we just swap?
+                // Or crossfade? For simplicity:
+                // If invisible, fade in.
+                // If visible, just swap sprite (instant) or quick fade out/in?
+                // Let's go with: If active, swap immediately. If inactive, fade in.
+
+                if (portraitImage.gameObject.activeSelf && portraitImage.color.a > 0.9f)
+                {
+                    portraitImage.sprite = newSprite;
+                    yield break;
+                }
+
+                portraitImage.sprite = newSprite;
+                portraitImage.gameObject.SetActive(true);
+
+                Color c = portraitImage.color;
+                float startAlpha = c.a;
+                float t = 0f;
+
+                while (t < portraitFadeDuration)
+                {
+                    t += Time.deltaTime;
+                    c.a = Mathf.Lerp(startAlpha, 1f, t / portraitFadeDuration);
+                    portraitImage.color = c;
+                    yield return null;
+                }
+                c.a = 1f;
+                portraitImage.color = c;
+            }
+            else
+            {
+                // Fade out
+                if (!portraitImage.gameObject.activeSelf) yield break;
+
+                Color c = portraitImage.color;
+                float startAlpha = c.a;
+                float t = 0f;
+
+                while (t < portraitFadeDuration)
+                {
+                    t += Time.deltaTime;
+                    c.a = Mathf.Lerp(startAlpha, 0f, t / portraitFadeDuration);
+                    portraitImage.color = c;
+                    yield return null;
+                }
+                c.a = 0f;
+                portraitImage.color = c;
+                portraitImage.gameObject.SetActive(false);
+            }
+        }
+
+        private IEnumerator SelectFirstChoiceDelayed(GameObject target)
+        {
+            yield return new WaitForSeconds(1.0f);
+            EventSystem.current.SetSelectedGameObject(target);
         }
     }
 }
