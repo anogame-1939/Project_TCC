@@ -1,11 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
-using AnoGame.AnoNarrative;
 
 namespace AnoGame.AnoNarrative.UI
 {

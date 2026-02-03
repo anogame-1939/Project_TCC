@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using Cysharp.Threading.Tasks;
-using AnoGame.AnoNarrative;
 
 namespace AnoGame.AnoNarrative.Timeline
 {

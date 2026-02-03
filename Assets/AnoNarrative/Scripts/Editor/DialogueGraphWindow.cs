@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using AnoGame.AnoNarrative;
 
 namespace AnoGame.AnoNarrative.Editor
 {
