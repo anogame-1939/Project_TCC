@@ -11,32 +11,22 @@ namespace AnoGame.Application.Direction.Timeline
         public InventoryHandler handlerOverride;
         public ItemData itemData;
 
-        private InventoryHandler _trackBoundHandler;
-        private bool _fired;
+        [HideInInspector] public bool hasExecuted = false;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            if (playerData is InventoryHandler h)
-            {
-                _trackBoundHandler = h;
-            }
+            // Mixer handles logic
         }
 
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
-            if (_fired || !App.isPlaying) return;
-
-            var handler = handlerOverride != null ? handlerOverride : _trackBoundHandler;
-            if (handler != null && itemData != null)
-            {
-                handler.AddItem(itemData);
-                _fired = true;
-            }
+            // Mixer handles logic
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
-            _fired = false;
+            hasExecuted = false; // Reset when graph stops or pauses? 
+            // Note: OnBehaviourPause is called when graph stops. Mixer also handles resetting on weight 0.
         }
     }
 }

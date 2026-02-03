@@ -164,7 +164,11 @@ namespace AnoGame.Application.Inventory
             Cursor.visible = false;
 
             // UI マップ購読解除
-            _confirmAction.performed -= OnConfirmPerformed;
+            if (_confirmAction != null)
+            {
+                _confirmAction.performed -= OnConfirmPerformed;
+                _confirmAction = null;
+            }
 
             if (_inventoryCloseAction != null)
             {
