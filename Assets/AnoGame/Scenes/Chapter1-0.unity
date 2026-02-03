@@ -1162,9 +1162,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1499885552}
   - component: {fileID: 1499885551}
-  - component: {fileID: 1499885550}
   - component: {fileID: 1499885553}
-  - component: {fileID: 1499885554}
   m_Layer: 0
   m_Name: "\u30BF\u30A4\u30E0\u30E9\u30A4\u30F3-\u6700\u521D\u306E\u4F1A\u8A71"
   m_TagString: Untagged
@@ -1172,51 +1170,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1499885550
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1499885549}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Events:
-    m_Signals:
-    - {fileID: 11400000, guid: 522a92ddb360bd740ad260c04d10f9ad, type: 2}
-    - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
-    m_Events:
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1499885554}
-          m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-          m_MethodName: Log
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: aa
-            m_BoolArgument: 0
-          m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1499885554}
-          m_TargetAssemblyTypeName: AnoGame.SLFBDebug.SimpleOutputLog, Assembly-CSharp
-          m_MethodName: Log
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: aaa1
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!320 &1499885551
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -1233,11 +1186,15 @@ PlayableDirector:
   m_InitialTime: 0
   m_SceneBindings:
   - key: {fileID: 8762637133860838425, guid: 5bc6d7fb2fb9d5047aed077f7c8dc9d8, type: 2}
-    value: {fileID: 1499885550}
+    value: {fileID: 0}
   - key: {fileID: -916023903625402246, guid: 51ad41be314c7dd48b3513dbd6c1e6cd, type: 2}
     value: {fileID: 457343943}
   - key: {fileID: 8762637133860838425, guid: 51ad41be314c7dd48b3513dbd6c1e6cd, type: 2}
-    value: {fileID: 1499885550}
+    value: {fileID: 0}
+  - key: {fileID: -801147075910249273, guid: 51ad41be314c7dd48b3513dbd6c1e6cd, type: 2}
+    value: {fileID: 457343943}
+  - key: {fileID: -6908033178198313409, guid: 51ad41be314c7dd48b3513dbd6c1e6cd, type: 2}
+    value: {fileID: 457343942}
   m_ExposedReferences:
     m_References:
     - 248193584c77b234f9e985a8d8fd4395: {fileID: 5486094461938385386}
@@ -1274,18 +1231,6 @@ MonoBehaviour:
   OnSkip:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1499885554
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1499885549}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a0de4cb1d084e458a791bc6f7097fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1600032658
 GameObject:
   m_ObjectHideFlags: 0
