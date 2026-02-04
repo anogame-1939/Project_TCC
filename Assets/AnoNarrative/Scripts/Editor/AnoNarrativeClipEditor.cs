@@ -114,7 +114,9 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 // Show current ID
                 GUILayout.BeginHorizontal();
+                EditorGUI.BeginDisabledGroup(true);
                 EditorGUILayout.PropertyField(_conversationID);
+                EditorGUI.EndDisabledGroup();
                 if (GUILayout.Button("Clear", GUILayout.Width(50)))
                 {
                     _conversationID.stringValue = "";
