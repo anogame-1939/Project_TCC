@@ -129,9 +129,12 @@ public class BatchEventCreator
 
     private static void CreateEventSet(EventJsonItem evt, GameObject receptorPrefab, GameObject triggerPrefab, Transform parent)
     {
-        GameObject container = new GameObject(evt.eventId);
+        // 1. Container Naming: ID + Name
+        string containerName = $"{evt.eventId}_{evt.name}";
+        
+        GameObject container = new GameObject(containerName);
         container.transform.SetParent(parent);
-        Undo.RegisterCreatedObjectUndo(container, StringPool.GetUniqueString()); // Safe identifier
+        Undo.RegisterCreatedObjectUndo(container, StringPool.GetUniqueString());
 
         // Instantiate Receptor
         if (receptorPrefab != null)
@@ -139,7 +142,7 @@ public class BatchEventCreator
             GameObject receptor = (GameObject)PrefabUtility.InstantiatePrefab(receptorPrefab, container.transform);
             if (receptor != null)
             {
-                receptor.name = $"{evt.eventId}_Receptor";
+                receptor.name = $"{evt.eventId}_Receptor"; // Clean English name for children
                 Undo.RegisterCreatedObjectUndo(receptor, StringPool.GetUniqueString());
                 ApplyReceptorData(receptor, evt);
             }
@@ -152,8 +155,10 @@ public class BatchEventCreator
             GameObject trigger = (GameObject)PrefabUtility.InstantiatePrefab(triggerPrefab, container.transform);
             if (trigger != null)
             {
-                trigger.name = $"{evt.eventId}_Trigger";
+                trigger.name = $"{evt.eventId}_Trigger"; // Clean English name for children
                 Undo.RegisterCreatedObjectUndo(trigger, StringPool.GetUniqueString());
+                
+                // Fix Component (Old -> New) and Apply Data
                 ApplyTriggerData(trigger, evt);
 
                 if (evt.timeline) PrepareTimeline(trigger, evt);
@@ -184,8 +189,27 @@ public class BatchEventCreator
 
     private static void ApplyTriggerData(GameObject goo, EventJsonItem evt)
     {
+        // 1. Remove Old Component if exists
+        // We use reflection/string check to avoid strict dependency if possible, or use the type if widely available.
+        // Assuming Legacy namespace is available or we add using.
+        // For safety, let's use string checks or GetComponent by name if we want to be loose, 
+        // but explicit type is better. We need to add 'using AnoGame.Application.Event.Legacy;' to the file top or use full name.
+        
+        var oldComp = goo.GetComponent("AnoGame.Application.Event.Legacy.InstantEventTrigger_Old");
+        if (oldComp != null)
+        {
+             Object.DestroyImmediate(oldComp);
+        }
+
+        // 2. Ensure New Component exists
         var trig = goo.GetComponent<InstantEventTrigger>();
-        if (trig != null) UpdateSO(trig, "targetEventId", evt.eventId);
+        if (trig == null)
+        {
+            trig = goo.AddComponent<InstantEventTrigger>();
+        }
+
+        // 3. Set Data
+        UpdateSO(trig, "targetEventId", evt.eventId);
     }
 
     private static void UpdateSO(Object target, string propName, string value)

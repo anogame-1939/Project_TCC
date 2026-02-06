@@ -15,7 +15,7 @@ namespace AnoGame.Application.Event
     {
         [Header("Override")]
         [EventSelector]
-        [SerializeField] private string targetEventId;
+        public string targetEventId;
 
         [SerializeField]
         private bool _onStart = false;
@@ -33,6 +33,7 @@ namespace AnoGame.Application.Event
         protected override void Start()
         {
             // EventDataが未設定で、targetEventIdがある場合、ランタイム生成で補完
+            // (OnValidateで設定されているケースが基本だが、ランタイム生成も予備として残す)
             if (eventData == null && !string.IsNullOrEmpty(targetEventId))
             {
                 eventData = ScriptableObject.CreateInstance<EventData>();
@@ -74,9 +75,25 @@ namespace AnoGame.Application.Event
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            // Inspector表示調整: BaseのeventDataは見えなくしたいが、
-            // Editor拡張を書かないと完全には消せない。
-            // ここでは targetEventId があればそれを優先するロジックのみ担保
+            if (!string.IsNullOrEmpty(targetEventId))
+            {
+                // すでに設定済みでIDが一致するなら何もしない
+                if (eventData != null && eventData.EventId == targetEventId) return;
+
+                // IDからアセットを検索して割り当てる
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:EventData");
+                foreach (var guid in guids)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    EventData asset = UnityEditor.AssetDatabase.LoadAssetAtPath<EventData>(path);
+                    if (asset != null && asset.EventId == targetEventId)
+                    {
+                        eventData = asset;
+                        UnityEditor.EditorUtility.SetDirty(this);
+                        break;
+                    }
+                }
+            }
         }
 #endif
     }

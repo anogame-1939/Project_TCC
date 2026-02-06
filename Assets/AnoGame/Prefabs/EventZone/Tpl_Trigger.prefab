@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2032865915273944860}
-  - component: {fileID: 3145975840613837564}
   - component: {fileID: 7623718712575395857}
   - component: {fileID: -3156746451325396747}
+  - component: {fileID: -1672289960120745703}
   m_Layer: 0
   m_Name: Tpl_Trigger
   m_TagString: Untagged
@@ -34,38 +34,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3145975840613837564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3594770337869902066}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a334de0ffa4e458d99e469b4aebff3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventData: {fileID: 0}
-  onPrepareEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventFinish:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventDone:
-    m_PersistentCalls:
-      m_Calls: []
-  onEventFailed:
-    m_PersistentCalls:
-      m_Calls: []
-  conditionComponents: []
-  checkConditionsOnDone: 0
-  supersededByEvents: []
-  _onStart: 0
 --- !u!320 &7623718712575395857
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -99,3 +67,36 @@ MonoBehaviour:
   OnSkip:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-1672289960120745703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3594770337869902066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f1da50e14874a0c97ffcd23e50484a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 0}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  conditionComponents: []
+  checkConditionsOnDone: 0
+  supersededByEvents: []
+  targetEventId: 
+  _onStart: 0
