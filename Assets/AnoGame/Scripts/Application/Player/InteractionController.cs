@@ -39,6 +39,11 @@ namespace AnoGame.Application.Player
         private readonly List<IInteractable> _candidates = new();
         private readonly List<InteractionOption> _optionsBuffer = new();
 
+        // ★追加: コライダー不要の IInteractable を登録する静的リスト
+        private static readonly HashSet<IInteractable> _manualInteractables = new HashSet<IInteractable>();
+        public static void RegisterManual(IInteractable interactable) => _manualInteractables.Add(interactable);
+        public static void UnregisterManual(IInteractable interactable) => _manualInteractables.Remove(interactable);
+
         private InteractionOption? _bestQuick;   // RequiresHold == false の最良
         private InteractionOption? _bestHold;    // RequiresHold == true  の最良
 
@@ -136,12 +141,21 @@ namespace AnoGame.Application.Player
         {
             _candidates.Clear();
 
+            // 1. Physics (Collider)
             var cols = Physics.OverlapSphere(transform.position, scanRadius, interactableLayer);
 
             foreach (var col in cols)
             {
                 if (col.TryGetComponent<IInteractable>(out var it))
                     _candidates.Add(it);
+            }
+
+            // 2. Manual (No Collider)
+            foreach (var manual in _manualInteractables)
+            {
+                // 距離チェックなどは ResolveBest の Score で弾かれるが、
+                // 明らかに遠いものをここで弾いても良い
+                _candidates.Add(manual);
             }
 
             // ★継続アクションの有効監視（距離で自然キャンセルなど）

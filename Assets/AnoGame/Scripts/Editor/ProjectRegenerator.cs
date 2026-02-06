@@ -7,7 +7,7 @@ namespace AnoGame.EditorExtensions
 {
     public static class ProjectRegenerator
     {
-        [MenuItem("Tools/Force Regenerate Project Files %#r")] // Ctrl+Shift+R
+        [MenuItem("Tools/Force Regenerate Project Files %#e")] // Ctrl+Shift+E
         public static void Regenerate()
         {
             Debug.Log("[ProjectRegenerator] Synced with current editor.");
@@ -57,6 +57,8 @@ namespace AnoGame.EditorExtensions
         {
             // Common Windows Paths
             string[] candidates = {
+                // Mac VS Code
+                "/Applications/Visual Studio Code.app",
                 // VS Code (User/System)
                 Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), @"Programs\Microsoft VS Code\Code.exe"),
                 @"C:\Program Files\Microsoft VS Code\Code.exe",
@@ -70,7 +72,8 @@ namespace AnoGame.EditorExtensions
 
             foreach (var c in candidates)
             {
-                if (File.Exists(c)) return c;
+                // Check for file (Windows .exe) or directory (Mac .app)
+                if (File.Exists(c) || (c.EndsWith(".app") && Directory.Exists(c))) return c;
             }
             return "";
         }
