@@ -10,7 +10,7 @@ using Unity.TinyCharacterController.Interfaces.Components;
 namespace AnoGame.Application.Player.Interaction
 {
     [AddComponentMenu("AnoGame/Event Zone (Path->Invoke)")]
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(BoxCollider))]
     public class EventZone : MonoBehaviour
     {
         [Header("判定")]
