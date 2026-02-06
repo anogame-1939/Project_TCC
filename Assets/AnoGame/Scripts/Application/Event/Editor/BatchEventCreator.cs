@@ -16,6 +16,7 @@ public class BatchEventCreator
     private const string PREFAB_DIR_PATH = "Assets/AnoGame/Prefabs/EventZone";
     private const string TIMELINE_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Timelines";
     private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Events";
+    private readonly static Vector3 PLACEMENT_OFFSET = new Vector3(0, 0, 5f);
 
     [MenuItem("Tools/Run Batch Event Creation")]
     public static void RunBatch()
@@ -56,6 +57,7 @@ public class BatchEventCreator
         if (tplTrigger == null) Debug.LogError("Tpl_Trigger not found!");
 
         int count = 0;
+        Vector3 currentPos = Vector3.zero;
         foreach (var evt in dataList.events)
         {
             // 1. Create EventData Asset
@@ -89,7 +91,8 @@ public class BatchEventCreator
             }
 
             // 3. Create Scene Objects
-            CreateEventSet(evt, receptorPrefab, tplTrigger, root.transform);
+            CreateEventSet(evt, receptorPrefab, tplTrigger, root.transform, currentPos);
+            currentPos += PLACEMENT_OFFSET;
             count++;
         }
         
@@ -127,13 +130,14 @@ public class BatchEventCreator
         if (p != null) p.stringValue = val;
     }
 
-    private static void CreateEventSet(EventJsonItem evt, GameObject receptorPrefab, GameObject triggerPrefab, Transform parent)
+    private static void CreateEventSet(EventJsonItem evt, GameObject receptorPrefab, GameObject triggerPrefab, Transform parent, Vector3 localPosition)
     {
         // 1. Container Naming: ID + Name
         string containerName = $"{evt.eventId}_{evt.name}";
         
         GameObject container = new GameObject(containerName);
         container.transform.SetParent(parent);
+        container.transform.localPosition = localPosition;
         Undo.RegisterCreatedObjectUndo(container, StringPool.GetUniqueString());
 
         // Instantiate Receptor
@@ -142,7 +146,7 @@ public class BatchEventCreator
             GameObject receptor = (GameObject)PrefabUtility.InstantiatePrefab(receptorPrefab, container.transform);
             if (receptor != null)
             {
-                receptor.name = $"{evt.eventId}_Receptor"; // Clean English name for children
+                receptor.name = $"{evt.eventId}_Receptor_{evt.category}"; // Naming: {EventId}_Receptor_[CategoryName]
                 Undo.RegisterCreatedObjectUndo(receptor, StringPool.GetUniqueString());
                 ApplyReceptorData(receptor, evt);
             }
