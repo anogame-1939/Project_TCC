@@ -41,9 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6279467471242563708}
   - component: {fileID: 70149970920182345}
-  - component: {fileID: 2295593451900010211}
-  - component: {fileID: 3516847084442657856}
-  - component: {fileID: 1061425439487121026}
+  - component: {fileID: -5805049189520655947}
   m_Layer: 0
   m_Name: Tpl_ContactZone
   m_TagString: Untagged
@@ -88,24 +86,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!320 &2295593451900010211
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2909701691524350032}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: e029977a4404841ce974c7931e9dc38c, type: 2}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings: []
-  m_ExposedReferences:
-    m_References: []
---- !u!114 &3516847084442657856
+--- !u!114 &-5805049189520655947
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -114,43 +95,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2909701691524350032}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
+  m_Script: {fileID: 11500000, guid: 31d52375d3c5745b7b7620bb43fc2675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playableDirector: {fileID: 2295593451900010211}
-  OnSkip:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1061425439487121026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2909701691524350032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c305729e6b8b6204a92a479eb6cd3d2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerTag: Player
-  invokeOnce: 0
-  approachPath:
-  - {fileID: 575920405852051381}
-  moveSpeed: 2
-  stopDistance: 0.05
-  onPrepareBegin:
-    m_PersistentCalls:
-      m_Calls: []
-  onPrepare:
-    m_PersistentCalls:
-      m_Calls: []
-  onPrepareComplete:
-    m_PersistentCalls:
-      m_Calls: []
-  onPlayerEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onPlayerExit:
-    m_PersistentCalls:
-      m_Calls: []
+  targetEventId: 
+  triggerDistance: 2
+  once: 1

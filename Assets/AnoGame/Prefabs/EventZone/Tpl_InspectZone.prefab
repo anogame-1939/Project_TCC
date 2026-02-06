@@ -10,9 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7858281562813081223}
   - component: {fileID: 826567545230860753}
-  - component: {fileID: 748537585120891004}
-  - component: {fileID: 5517186305569985376}
-  - component: {fileID: 2301404210995826735}
+  - component: {fileID: 1252374850919546241}
   m_Layer: 0
   m_Name: Tpl_InspectZone
   m_TagString: Untagged
@@ -56,7 +54,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &748537585120891004
+--- !u!114 &1252374850919546241
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -65,51 +63,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8747550404984754096}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a280741a86bf1b742a4f8d5d6d2cfa17, type: 3}
+  m_Script: {fileID: 11500000, guid: 2bb6da7bfd0984ed59b5180a759af045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetEventId: 
+  prompt: "\u8ABF\u3079\u308B"
   maxDistance: 2
-  viewAngle: 120
-  losMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
+  priority: 100
   uiAnchor: {fileID: 0}
-  prompt: "\u8ABF\u3079\u308B\uFF08\u9577\u62BC\u3057\uFF09"
-  priority: 500
-  _once: 0
-  OnInspected:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!320 &5517186305569985376
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747550404984754096}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: e029977a4404841ce974c7931e9dc38c, type: 2}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings: []
-  m_ExposedReferences:
-    m_References: []
---- !u!114 &2301404210995826735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8747550404984754096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playableDirector: {fileID: 5517186305569985376}
-  OnSkip:
-    m_PersistentCalls:
-      m_Calls: []
