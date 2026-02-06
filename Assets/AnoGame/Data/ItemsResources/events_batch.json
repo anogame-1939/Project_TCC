@@ -2,24 +2,21 @@
     {
         "eventId": "EV_001_BigManEncounter",
         "name": "大男と初回遭遇",
-        "type": "Event",
-        "prefabType": "Tpl_ContactZone",
+        "category": "Event",
         "description": "演出・出現処理",
         "timeline": true
     },
     {
         "eventId": "EV_002_StreetlightStop",
         "name": "街灯で足止め",
-        "type": "Gimmick",
-        "prefabType": "Tpl_ContactZone",
+        "category": "Gimmick",
         "description": "プレイヤー移動制限",
         "timeline": true
     },
     {
         "eventId": "EV_003_Door1_Default",
         "name": "電子ロック式扉１（閉）",
-        "type": "Object",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Object",
         "description": "デフォルト：開かない",
         "paramText": "鍵がかかっている。",
         "timeline": true
@@ -27,8 +24,7 @@
     {
         "eventId": "EV_004_Door1_Unlock",
         "name": "電子ロック式扉１（開錠）",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "条件：制御盤の鍵を使用",
         "paramItemId": "Item_ControlPanelKey",
         "timeline": true
@@ -36,8 +32,7 @@
     {
         "eventId": "EV_005_Get_Magnet",
         "name": "磁石入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "取得処理",
         "paramText": "磁石を拾う",
         "timeline": true
@@ -45,8 +40,7 @@
     {
         "eventId": "EV_006_Get_KeyControlPanel",
         "name": "制御盤の鍵入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "取得処理",
         "paramText": "制御盤の鍵を拾う",
         "timeline": true
@@ -54,8 +48,7 @@
     {
         "eventId": "EV_007_Get_ManagerMemo",
         "name": "管理人のメモ入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "取得・UI表示",
         "paramText": "管理人のメモを読む",
         "timeline": true
@@ -63,8 +56,7 @@
     {
         "eventId": "EV_008_Inspect_MetalPlate",
         "name": "金属プレート",
-        "type": "Inspect",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Inspect",
         "description": "テキスト表示：赤さびだらけ",
         "paramText": "赤さびだらけのプレートだ。",
         "timeline": true
@@ -72,16 +64,14 @@
     {
         "eventId": "EV_009_FogWallFlower",
         "name": "霧壁の花",
-        "type": "Background",
-        "prefabType": "Tpl_ContactZone",
+        "category": "Background",
         "description": "配置・エフェクト",
         "timeline": true
     },
     {
         "eventId": "EV_010_Well_Default",
         "name": "井戸（覗く）",
-        "type": "Object",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Object",
         "description": "デフォルト：中に何かあるが取れない",
         "paramText": "暗くてよく見えない。",
         "timeline": true
@@ -89,8 +79,7 @@
     {
         "eventId": "EV_011_Well_String",
         "name": "井戸（タコ糸）",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "アイテム使用判定：タコ糸",
         "paramItemId": "Item_KiteString",
         "timeline": true
@@ -98,8 +87,7 @@
     {
         "eventId": "EV_012_Well_Magnet",
         "name": "井戸（磁石）",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "アイテム使用判定：磁石",
         "paramItemId": "Item_Magnet",
         "timeline": true
@@ -107,48 +95,42 @@
     {
         "eventId": "EV_013_Get_KeyChain",
         "name": "キーホルダー鍵入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_Trigger",
+        "category": "ItemGet",
         "description": "井戸イベントクリアで入手（自動）",
         "timeline": true
     },
     {
         "eventId": "EV_014_Door2",
         "name": "電子ロック式扉２",
-        "type": "Object",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Object",
         "description": "ドア開閉処理",
         "timeline": true
     },
     {
         "eventId": "EV_015_Door3",
         "name": "電子ロック式扉３",
-        "type": "Object",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Object",
         "description": "ドア開閉処理",
         "timeline": true
     },
     {
         "eventId": "EV_016_Get_KiteString",
         "name": "タコ糸入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "取得処理",
         "timeline": true
     },
     {
         "eventId": "EV_017_Get_ColleagueMemo",
         "name": "同僚のメモ入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "取得・UI表示",
         "timeline": true
     },
     {
         "eventId": "EV_018_Inspect_Locker",
         "name": "鍵のかかったロッカー",
-        "type": "Inspect",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Inspect",
         "description": "テキスト表示・状態確認",
         "paramText": "鍵がかかっている。",
         "timeline": true
@@ -156,16 +138,14 @@
     {
         "eventId": "EV_019_SunflowerManVanish",
         "name": "ひまわり男消失",
-        "type": "System",
-        "prefabType": "Tpl_Trigger",
+        "category": "System",
         "description": "トリガー：【タコ糸】【磁石】両方所持",
         "timeline": true
     },
     {
         "eventId": "EV_020_Unlock_NorthShed",
         "name": "北の小屋鍵開け",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "条件：キーホルダー付き鍵を使用",
         "paramItemId": "Item_KeyWithKeychain",
         "timeline": true
@@ -173,16 +153,14 @@
     {
         "eventId": "EV_021_Get_AluminumBall",
         "name": "アルミボール入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "北の小屋で入手",
         "timeline": true
     },
     {
         "eventId": "EV_022_Unlock_Plaza",
         "name": "広場の鍵開け",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "条件：キーホルダー付き鍵を使用",
         "paramItemId": "Item_KeyWithKeychain",
         "timeline": true
@@ -190,16 +168,14 @@
     {
         "eventId": "EV_023_Get_ColaCan",
         "name": "コーラ缶入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "広場で入手",
         "timeline": true
     },
     {
         "eventId": "EV_024_Synth_Cola",
         "name": "アイテム合成（コーラ）",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "コーラ缶を使用",
         "paramItemId": "Item_ColaCan",
         "timeline": true
@@ -207,8 +183,7 @@
     {
         "eventId": "EV_025_Synth_Alum",
         "name": "アイテム合成（アルミ）",
-        "type": "Action",
-        "prefabType": "Tpl_ItemZone",
+        "category": "Action",
         "description": "アルミボールを使用",
         "paramItemId": "Item_AluminumBall",
         "timeline": true
@@ -216,16 +191,14 @@
     {
         "eventId": "EV_026_Get_Flag_Code",
         "name": "ロッカー番号入手",
-        "type": "FlagGet",
-        "prefabType": "Tpl_Trigger",
+        "category": "FlagGet",
         "description": "番号情報を入手",
         "timeline": true
     },
     {
         "eventId": "EV_027_SouthLocker",
         "name": "南の小屋ロッカー",
-        "type": "Action",
-        "prefabType": "Tpl_InspectZone",
+        "category": "Action",
         "description": "条件：鍵の番号を持っている",
         "paramText": "ロッカーを開ける",
         "timeline": true
@@ -233,16 +206,14 @@
     {
         "eventId": "EV_028_Get_SunflowerOrigami",
         "name": "ひまわりの折り紙入手",
-        "type": "ItemGet",
-        "prefabType": "Tpl_InspectZone",
+        "category": "ItemGet",
         "description": "ロッカーから入手",
         "timeline": true
     },
     {
         "eventId": "EV_029_Ending",
         "name": "エンディング",
-        "type": "Event",
-        "prefabType": "Tpl_Trigger",
+        "category": "Event",
         "description": "シーン遷移・エンドロール",
         "timeline": true
     }

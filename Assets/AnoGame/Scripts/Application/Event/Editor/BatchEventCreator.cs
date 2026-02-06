@@ -6,7 +6,8 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using System.IO;
 using System.Collections.Generic;
-using AnoGame.Application.Event; // InstantEventTrigger, ContactReceptor, etc.
+using AnoGame.Application.Event;
+using AnoGame.Data;
 using System.Reflection;
 
 public class BatchEventCreator
@@ -14,6 +15,7 @@ public class BatchEventCreator
     private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_batch.json";
     private const string PREFAB_DIR_PATH = "Assets/AnoGame/Prefabs/EventZone";
     private const string TIMELINE_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Timelines";
+    private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Events";
 
     [MenuItem("Tools/Run Batch Event Creation")]
     public static void RunBatch()
@@ -35,142 +37,164 @@ public class BatchEventCreator
         }
 
         if (!Directory.Exists(TIMELINE_DIR_PATH)) Directory.CreateDirectory(TIMELINE_DIR_PATH);
+        if (!Directory.Exists(EVENTDATA_DIR_PATH)) Directory.CreateDirectory(EVENTDATA_DIR_PATH);
 
-        // Root Object for cleanup
+        // Root Object
         GameObject root = GameObject.Find("GeneratedEvents");
-        if (root == null) root = new GameObject("GeneratedEvents");
+        if (root == null)
+        {
+            root = new GameObject("GeneratedEvents");
+            Undo.RegisterCreatedObjectUndo(root, "Create GeneratedEvents Root");
+        }
 
         // Load Prefabs
-        Dictionary<string, GameObject> templates = new Dictionary<string, GameObject>();
-        foreach(var evt in dataList.events)
-        {
-            if (!templates.ContainsKey(evt.prefabType))
-            {
-                string path = $"{PREFAB_DIR_PATH}/{evt.prefabType}.prefab";
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                if (prefab == null)
-                {
-                    Debug.LogError($"Prefab not found: {path}");
-                }
-                else
-                {
-                    templates[evt.prefabType] = prefab;
-                }
-            }
-        }
-        
-        GameObject triggerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR_PATH}/Tpl_Trigger.prefab");
-        if(triggerPrefab == null)
-        {
-            Debug.LogError("Tpl_Trigger.prefab needed for Timeline/Trigger logic.");
-        }
+        var tplContact = AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR_PATH}/Tpl_ContactZone.prefab");
+        var tplInspect = AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR_PATH}/Tpl_InspectZone.prefab");
+        var tplItem = AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR_PATH}/Tpl_ItemZone.prefab");
+        var tplTrigger = AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR_PATH}/Tpl_Trigger.prefab");
+
+        if (tplTrigger == null) Debug.LogError("Tpl_Trigger not found!");
 
         int count = 0;
         foreach (var evt in dataList.events)
         {
-            if (!templates.ContainsKey(evt.prefabType)) continue;
+            // 1. Create EventData Asset
+            CreateEventData(evt);
 
-            CreateEventSet(evt, templates[evt.prefabType], triggerPrefab, root.transform);
+            // 2. Select Prefab based on Category
+            GameObject receptorPrefab = null;
+            switch (evt.category)
+            {
+                case "Event":
+                case "Gimmick":
+                case "Background":
+                    receptorPrefab = tplContact;
+                    break;
+                case "Object":
+                case "Inspect":
+                case "ItemGet":
+                    receptorPrefab = tplInspect;
+                    break;
+                case "Action":
+                    receptorPrefab = tplItem;
+                    break;
+                case "System":
+                case "FlagGet":
+                    // System events might just need the trigger without a receptor zone
+                    receptorPrefab = null; 
+                    break;
+                default:
+                    Debug.LogWarning($"Unknown category {evt.category} for {evt.eventId}, defaulting to Tpl_Trigger only.");
+                    break;
+            }
+
+            // 3. Create Scene Objects
+            CreateEventSet(evt, receptorPrefab, tplTrigger, root.transform);
             count++;
         }
         
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-        AssetDatabase.SaveAssets(); // Save Timelines
-        Debug.Log($"Batch Event Creation Complete! Created {count} events.");
+        AssetDatabase.SaveAssets(); 
+        
+        Selection.activeGameObject = root;
+        Debug.Log($"Batch Event Creation Complete! Created {count} events under 'GeneratedEvents'.");
+    }
+
+    private static void CreateEventData(EventJsonItem evt)
+    {
+        string path = $"{EVENTDATA_DIR_PATH}/{evt.eventId}.asset";
+        EventData asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
+        if (asset == null)
+        {
+            asset = ScriptableObject.CreateInstance<EventData>();
+            AssetDatabase.CreateAsset(asset, path);
+        }
+
+        SerializedObject so = new SerializedObject(asset);
+        so.Update();
+        
+        SetProp(so, "eventId", evt.eventId);
+        SetProp(so, "eventName", evt.name);
+        SetProp(so, "description", evt.description);
+        // IsOneTime Logic? Default to true/false based on type? User didn't specify. Assumed handled manually or by defaults.
+
+        so.ApplyModifiedProperties();
+    }
+
+    private static void SetProp(SerializedObject so, string name, string val)
+    {
+        var p = so.FindProperty(name);
+        if (p != null) p.stringValue = val;
     }
 
     private static void CreateEventSet(EventJsonItem evt, GameObject receptorPrefab, GameObject triggerPrefab, Transform parent)
     {
-        // 1. Create Container per event
         GameObject container = new GameObject(evt.eventId);
         container.transform.SetParent(parent);
-        
-        // 2. Instantiate Receptor (Zone)
+        Undo.RegisterCreatedObjectUndo(container, StringPool.GetUniqueString()); // Safe identifier
+
+        // Instantiate Receptor
         if (receptorPrefab != null)
         {
             GameObject receptor = (GameObject)PrefabUtility.InstantiatePrefab(receptorPrefab, container.transform);
-            receptor.name = $"{evt.eventId}_Receptor";
-            // Apply Data
-            ApplyReceptorData(receptor, evt);
+            if (receptor != null)
+            {
+                receptor.name = $"{evt.eventId}_Receptor";
+                Undo.RegisterCreatedObjectUndo(receptor, StringPool.GetUniqueString());
+                ApplyReceptorData(receptor, evt);
+            }
+            else Debug.LogError($"Failed instantiate receptor for {evt.eventId}");
         }
 
-        // 3. Instantiate Trigger (Logic/Timeline)
-        // Only if timeline is requested or implicitly needed
+        // Instantiate Trigger
         if (triggerPrefab != null)
         {
             GameObject trigger = (GameObject)PrefabUtility.InstantiatePrefab(triggerPrefab, container.transform);
-            trigger.name = $"{evt.eventId}_Trigger";
-            
-            // Apply Trigger Data (Set EventID)
-            ApplyTriggerData(trigger, evt);
-
-            // Create/Assign Timeline if needed
-            if (evt.timeline)
+            if (trigger != null)
             {
-                PrepareTimeline(trigger, evt);
+                trigger.name = $"{evt.eventId}_Trigger";
+                Undo.RegisterCreatedObjectUndo(trigger, StringPool.GetUniqueString());
+                ApplyTriggerData(trigger, evt);
+
+                if (evt.timeline) PrepareTimeline(trigger, evt);
             }
+            else Debug.LogError($"Failed instantiate trigger for {evt.eventId}");
         }
     }
 
     private static void ApplyReceptorData(GameObject goo, EventJsonItem evt)
     {
-        // Try known components
         var contact = goo.GetComponent<ContactReceptor>();
-        if (contact != null)
-        {
-            // use reflection or public field
-             var so = new SerializedObject(contact);
-             so.Update();
-             var p = so.FindProperty("targetEventId");
-             if(p!=null) p.stringValue = evt.eventId;
-             so.ApplyModifiedProperties();
-        }
+        if (contact != null) UpdateSO(contact, "targetEventId", evt.eventId);
 
         var inspect = goo.GetComponent<InspectReceptor>();
         if (inspect != null)
         {
-             var so = new SerializedObject(inspect);
-             so.Update();
-             var pId = so.FindProperty("targetEventId");
-             if(pId!=null) pId.stringValue = evt.eventId;
-             
-             if (!string.IsNullOrEmpty(evt.paramText))
-             {
-                 var pTxt = so.FindProperty("prompt");
-                 if(pTxt!=null) pTxt.stringValue = evt.paramText; // promptに表示するテキスト
-             }
-             so.ApplyModifiedProperties();
+             UpdateSO(inspect, "targetEventId", evt.eventId);
+             if (!string.IsNullOrEmpty(evt.paramText)) UpdateSO(inspect, "prompt", evt.paramText);
         }
         
         var itemRep = goo.GetComponent<ItemReceptor>();
         if (itemRep != null)
         {
-            var so = new SerializedObject(itemRep);
-             so.Update();
-             var pId = so.FindProperty("targetEventId");
-             if(pId!=null) pId.stringValue = evt.eventId;
-             
-             if(!string.IsNullOrEmpty(evt.paramItemId))
-             {
-                 var pItem = so.FindProperty("targetItemId");
-                 if(pItem!=null) pItem.stringValue = evt.paramItemId;
-             }
-             so.ApplyModifiedProperties();
+            UpdateSO(itemRep, "targetEventId", evt.eventId);
+            if (!string.IsNullOrEmpty(evt.paramItemId)) UpdateSO(itemRep, "targetItemId", evt.paramItemId);
         }
     }
 
     private static void ApplyTriggerData(GameObject goo, EventJsonItem evt)
     {
         var trig = goo.GetComponent<InstantEventTrigger>();
-        if (trig != null)
-        {
-             var so = new SerializedObject(trig);
-             so.Update();
-             // Find property backing the field 'targetEventId' 
-             var p = so.FindProperty("targetEventId");
-             if(p!=null) p.stringValue = evt.eventId;
-             so.ApplyModifiedProperties();
-        }
+        if (trig != null) UpdateSO(trig, "targetEventId", evt.eventId);
+    }
+
+    private static void UpdateSO(Object target, string propName, string value)
+    {
+        var so = new SerializedObject(target);
+        so.Update();
+        var p = so.FindProperty(propName);
+        if (p != null) p.stringValue = value;
+        so.ApplyModifiedProperties();
     }
 
     private static void PrepareTimeline(GameObject goo, EventJsonItem evt)
@@ -191,6 +215,8 @@ public class BatchEventCreator
         director.playableAsset = timeline;
     }
 
+    static class StringPool { public static string GetUniqueString() => System.Guid.NewGuid().ToString(); }
+
     [System.Serializable]
     private class EventList
     {
@@ -202,8 +228,7 @@ public class BatchEventCreator
     {
         public string eventId;
         public string name;
-        public string type;
-        public string prefabType;
+        public string category; // Changed from type/prefabType
         public string description;
         public string paramText;
         public string paramItemId;
@@ -211,3 +236,4 @@ public class BatchEventCreator
     }
 }
 #endif
+
