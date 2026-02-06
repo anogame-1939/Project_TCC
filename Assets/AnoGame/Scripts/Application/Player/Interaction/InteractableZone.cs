@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AnoGame.Application.Player.Interaction
 {
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(BoxCollider))]
     public abstract class InteractableZone : MonoBehaviour, IInteractable
     {
         [Header("Gate")]
