@@ -1,0 +1,1094 @@
+{
+  "ExportTimestamp": "2026-02-07 15:44:01",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "Multiple(3): _Startup, 01.MainGame, Chapter2-0",
+    "nodeCount": 84,
+    "maxDepth": 3
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "Chapter2-0",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 84,
+        "maxDepth": 3
+      },
+      "componentsLut": [
+        "Transform",
+        "ContactReceptor",
+        "PlayableDirector",
+        "TimelineController",
+        "InstantEventTrigger",
+        "InspectReceptor",
+        "ItemReceptor"
+      ],
+      "roots": [
+        {
+          "name": "GeneratedEvents",
+          "isActive": true,
+          "componentsIdx": [
+            0
+          ],
+          "siblingIndex": 5,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "EV_002_StreetlightStop_街灯で足止め",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_002_StreetlightStop_Receptor_Contact",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    1
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": [
+                    {
+                      "name": "移動先",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 0,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "EV_002_StreetlightStop_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_003_Door1_Default_電子ロック式扉１（閉）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_003_Door1_Default_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_003_Door1_Default_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_004_Door1_Unlock_電子ロック式扉１（開錠）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_004_Door1_Unlock_Receptor_Interact",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_004_Door1_Unlock_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_005_Get_Magnet_磁石入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_005_Get_Magnet_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_005_Get_Magnet_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_006_Get_KeyControlPanel_制御盤の鍵入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_006_Get_KeyControlPanel_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_006_Get_KeyControlPanel_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_007_Get_ManagerMemo_管理人のメモ入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_007_Get_ManagerMemo_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_007_Get_ManagerMemo_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_008_Inspect_MetalPlate_金属プレート",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_008_Inspect_MetalPlate_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_008_Inspect_MetalPlate_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_009_FogWallFlower_霧壁の花",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_009_FogWallFlower_Receptor_Contact",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    1
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": [
+                    {
+                      "name": "移動先",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 0,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "EV_009_FogWallFlower_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_010_Well_Default_井戸（覗く）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_010_Well_Default_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_010_Well_Default_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_011_Well_String_井戸（タコ糸）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_011_Well_String_Receptor_ItemUse",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_011_Well_String_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_012_Well_Magnet_井戸（磁石）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_012_Well_Magnet_Receptor_ItemUse",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_012_Well_Magnet_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_013_Get_KeyChain_キーホルダー鍵入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_013_Get_KeyChain_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_013_Get_KeyChain_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_014_Door2_電子ロック式扉２",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_014_Door2_Receptor_Interact",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_014_Door2_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_015_Door3_電子ロック式扉３",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 13,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_015_Door3_Receptor_Interact",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_015_Door3_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_016_Get_KiteString_タコ糸入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 14,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_016_Get_KiteString_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_016_Get_KiteString_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_017_Get_ColleagueMemo_同僚のメモ入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 15,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_017_Get_ColleagueMemo_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_017_Get_ColleagueMemo_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_018_Inspect_Locker_鍵のかかったロッカー",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 16,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_018_Inspect_Locker_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_018_Inspect_Locker_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_019_SunflowerManVanish_ひまわり男消失",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 17,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_019_SunflowerManVanish_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_020_Unlock_NorthShed_北の小屋鍵開け",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 18,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_020_Unlock_NorthShed_Receptor_ItemUse",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_020_Unlock_NorthShed_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_021_Get_AluminumBall_アルミボール入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 19,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_021_Get_AluminumBall_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_021_Get_AluminumBall_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_022_Unlock_Plaza_広場の鍵開け",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 20,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_022_Unlock_Plaza_Receptor_Interact",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_022_Unlock_Plaza_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_023_Get_ColaCan_コーラ缶入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 21,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_023_Get_ColaCan_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_023_Get_ColaCan_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_024_Synth_Cola_アイテム合成（コーラ）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 22,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_024_Synth_Cola_Receptor_ItemUse",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_024_Synth_Cola_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_025_Synth_Alum_アイテム合成（アルミ）",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 23,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_025_Synth_Alum_Receptor_ItemUse",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_025_Synth_Alum_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_026_Get_Flag_Code_ロッカー番号入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 24,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_026_Get_Flag_Code_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_027_SouthLocker_南の小屋ロッカー",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 25,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_027_SouthLocker_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_027_SouthLocker_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_028_Get_SunflowerOrigami_ひまわりの折り紙入手",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 26,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_028_Get_SunflowerOrigami_Receptor_Inspect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                },
+                {
+                  "name": "EV_028_Get_SunflowerOrigami_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "EV_029_Ending_エンディング",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 27,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "EV_029_Ending_Trigger",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    2,
+                    3,
+                    4
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

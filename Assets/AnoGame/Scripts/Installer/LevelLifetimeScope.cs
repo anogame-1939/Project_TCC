@@ -45,6 +45,25 @@ namespace AnoGame.Application.Core
                 builder.RegisterBuildCallback(resolver => resolver.Inject(eventOnConsume));
             }
 
+            // Provide dependencies to Receptors
+            var contactReceptors = FindObjectsByType<ContactReceptor>(FindObjectsSortMode.None);
+            foreach (var receptor in contactReceptors)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(receptor));
+            }
+
+            var inspectReceptors = FindObjectsByType<InspectReceptor>(FindObjectsSortMode.None);
+            foreach (var receptor in inspectReceptors)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(receptor));
+            }
+
+            var itemReceptors = FindObjectsByType<ItemReceptor>(FindObjectsSortMode.None);
+            foreach (var receptor in itemReceptors)
+            {
+                builder.RegisterBuildCallback(resolver => resolver.Inject(receptor));
+            }
+
 
             // builder.RegisterEntryPoint<LevelInitializer>();
             var proxies = FindObjectsByType<TimelineEventLockProxy>(FindObjectsSortMode.None);
