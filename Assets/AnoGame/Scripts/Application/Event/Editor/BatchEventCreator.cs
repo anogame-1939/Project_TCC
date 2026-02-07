@@ -67,22 +67,18 @@ public class BatchEventCreator
             GameObject receptorPrefab = null;
             switch (evt.category)
             {
-                case "Event":
-                case "Gimmick":
-                case "Background":
+                case "Contact": // 接触
                     receptorPrefab = tplContact;
                     break;
-                case "Object":
-                case "Inspect":
-                case "ItemGet":
+                case "Inspect": // 調べる
+                case "Interact": // 専用インタラクト
                     receptorPrefab = tplInspect;
                     break;
-                case "Action":
+                case "ItemUse": // アイテム使用
                     receptorPrefab = tplItem;
                     break;
-                case "System":
-                case "FlagGet":
-                    // System events might just need the trigger without a receptor zone
+                case "Chain": // 連鎖・システム
+                    // No receptor needed
                     receptorPrefab = null; 
                     break;
                 default:

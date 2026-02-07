@@ -30,14 +30,11 @@ CSV/JSONの `category` に応じて、使用するテンプレートプレハブ
 
 | カテゴリ | 使用プレハブ (Receptor) | 用途 |
 | :--- | :--- | :--- |
-| **Event** | `Tpl_ContactZone` | 接触・接近で発生するイベント |
-| **Gimmick** | `Tpl_ContactZone` | 接触・接近で発生するギミック |
-| **Background** | `Tpl_ContactZone` | 環境演出など |
-| **Object** | `Tpl_InspectZone` | 調べて発生（扉、井戸など） |
-| **Inspect** | `Tpl_InspectZone` | 調べてテキスト表示など |
-| **ItemGet** | `Tpl_InspectZone` | 調べてアイテム入手 |
-| **Action** | `Tpl_ItemZone` | 特定アイテム使用で発生 |
-| **System** | `Tpl_Trigger` (Receptorなし) | 条件達成時の自動実行など（実体のみ） |
+| **Contact** | `Tpl_ContactZone` | 接触・接近で発生するイベント（旧: Event, Gimmick, Background） |
+| **Inspect** | `Tpl_InspectZone` | 調べて発生するイベント（旧: Object, Inspect, ItemGet） |
+| **Interact** | `Tpl_InspectZone` | 専用インタラクト（扉鍵開けなど） |
+| **ItemUse** | `Tpl_ItemZone` | アクション・アイテム使用（旧: Action） |
+| **Chain** | `なし` | 連鎖イベント・システム自動実行（旧: System, FlagGet） |
 
 **必須プレハブ** (`Assets/AnoGame/Prefabs/EventZone/`):
 - `Tpl_ContactZone.prefab`
