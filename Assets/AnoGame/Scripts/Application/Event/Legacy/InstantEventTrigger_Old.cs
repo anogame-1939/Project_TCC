@@ -2,6 +2,7 @@ using UnityEngine;
 using VContainer;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Application.Event;
+using AnoGame.Domain.Inventory.Services;
 
 namespace AnoGame.Application.Event.Legacy
 {
@@ -17,10 +18,11 @@ namespace AnoGame.Application.Event.Legacy
 
         [Inject]
         public override void Construct(
-            IEventService eventService
+            IEventService eventService,
+             IInventoryService inventoryService
         )
         {
-            base.Construct(eventService);
+            base.Construct(eventService, inventoryService);
             // _eventManager = eventManager; // EventManager injection handled differently in base or here? 
             // Original code had Construct(EventManager).
             // But base has Construct(IEventService).

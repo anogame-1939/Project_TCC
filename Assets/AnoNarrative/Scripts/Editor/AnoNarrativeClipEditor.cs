@@ -31,6 +31,17 @@ namespace AnoGame.AnoNarrative.Editor
             _dialogueStyleName = serializedObject.FindProperty("dialogueStyleName");
 
             _drawer = new DialogueCandidateDrawer();
+
+            // If current values are all -1 (default), try to load from last session
+            if (_targetEpisode.intValue == -1 && _targetChapter.intValue == -1 && _targetSection.intValue == -1)
+            {
+                DialogueCandidateDrawer.LoadFilters(out int ep, out int ch, out int sec);
+                _targetEpisode.intValue = ep;
+                _targetChapter.intValue = ch;
+                _targetSection.intValue = sec;
+                serializedObject.ApplyModifiedProperties(); // Apply immediately
+            }
+
             _drawer.Initialize(_targetEpisode.intValue, _targetChapter.intValue, _targetSection.intValue);
 
             FindMasterData();

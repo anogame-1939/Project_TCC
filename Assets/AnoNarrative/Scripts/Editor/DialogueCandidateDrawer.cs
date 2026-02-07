@@ -18,6 +18,17 @@ namespace AnoGame.AnoNarrative.Editor
         // Last Filter Values for force refresh
         private int LastEp, LastCh, LastSec;
 
+        private const string PrefsKeyEp = "AnoNarrative_Filter_Ep";
+        private const string PrefsKeyCh = "AnoNarrative_Filter_Ch";
+        private const string PrefsKeySec = "AnoNarrative_Filter_Sec";
+
+        public static void LoadFilters(out int ep, out int ch, out int sec)
+        {
+            ep = EditorPrefs.GetInt(PrefsKeyEp, -1);
+            ch = EditorPrefs.GetInt(PrefsKeyCh, -1);
+            sec = EditorPrefs.GetInt(PrefsKeySec, -1);
+        }
+
         public void Draw(
             SerializedProperty convIDProp,
             SerializedProperty episodeProp,
@@ -33,6 +44,16 @@ namespace AnoGame.AnoNarrative.Editor
 
             // Horizontal Layout for Filters
             EditorGUILayout.BeginHorizontal();
+
+            // Clear Button
+            if (GUILayout.Button("Clear", GUILayout.Width(45)))
+            {
+                if (episodeProp != null) episodeProp.intValue = -1;
+                if (chapterProp != null) chapterProp.intValue = -1;
+                if (sectionProp != null) sectionProp.intValue = -1;
+                GUI.FocusControl(null); // Unfocus any field
+            }
+
             float originalLabelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 25; // Short label width
 
@@ -259,7 +280,12 @@ namespace AnoGame.AnoNarrative.Editor
             _filteredIDs.Clear();
             if (_masterData == null) return;
 
-            // 1. Identify all referenced IDs to find Roots (if needed)
+            // Save to EditorPrefs
+            EditorPrefs.SetInt(PrefsKeyEp, LastEp);
+            EditorPrefs.SetInt(PrefsKeyCh, LastCh);
+            EditorPrefs.SetInt(PrefsKeySec, LastSec);
+
+            // 1. Identify all referenced IDs to find Roots (if needed) (Code remains same)
             HashSet<string> referencedIDs = new HashSet<string>();
             if (_showRootsOnly)
             {

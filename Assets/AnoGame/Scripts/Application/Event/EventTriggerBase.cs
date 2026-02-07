@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using VContainer;
 using AnoGame.Domain.Event.Services;
+using AnoGame.Domain.Inventory.Services;
 using AnoGame.Domain.Event.Types;
 using AnoGame.Data;
 using AnoGame.Domain.Event.Conditions;
@@ -23,7 +24,13 @@ namespace AnoGame.Application.Event
         // クリア後のイベント
         [SerializeField] protected UnityEvent onEventDone;
         [SerializeField] protected UnityEvent onEventFailed;
+        [Header("Legacy")]
+        [SerializeField] private List<EventData> supersededByEvents;
         [SerializeField] protected EventConditionComponent[] conditionComponents;
+
+        [Header("Conditions")]
+        [SerializeField] protected List<ItemData> requiredItems = new List<ItemData>();
+        [SerializeField] protected List<EventData> requiredEvents = new List<EventData>();
 
         private List<IEventCondition> _conditions = new List<IEventCondition>();
 
@@ -32,12 +39,14 @@ namespace AnoGame.Application.Event
 
         [Inject] protected IEventService _eventService;
 
+        [Inject] protected IInventoryService _inventoryService;
+
         [Inject]
-        public virtual void Construct(IEventService eventService)
+        public virtual void Construct(IEventService eventService, IInventoryService inventoryService)
         {
             _eventService = eventService;
+            _inventoryService = inventoryService;
             _eventService.LoadedClearEvent += InitializeEvents;
-
         }
 
         protected virtual void Start()
@@ -48,7 +57,7 @@ namespace AnoGame.Application.Event
 
         [SerializeField] protected bool checkConditionsOnDone = false;
 
-        [SerializeField] private List<EventData> supersededByEvents;
+
 
         protected virtual void InitializeEvents()
         {
@@ -93,6 +102,39 @@ namespace AnoGame.Application.Event
 
         protected virtual void InitializeConditions()
         {
+            // 新しいIDベースの条件を追加
+            if (requiredItems != null)
+            {
+                foreach (var item in requiredItems)
+                {
+                    if (item != null)
+                    {
+                        var condition = new KeyItemCondition(_inventoryService, item.ItemId);
+                        _conditions.Add(condition);
+                        if (condition is IObservableCondition observableCondition)
+                        {
+                            observableCondition.OnConditionChanged += StartEvent;
+                        }
+                    }
+                }
+            }
+
+            if (requiredEvents != null)
+            {
+                foreach (var evt in requiredEvents)
+                {
+                    if (evt != null)
+                    {
+                        var condition = new EventClearedCondition(_eventService, evt.EventId);
+                        _conditions.Add(condition);
+                        if (condition is IObservableCondition observableCondition)
+                        {
+                            observableCondition.OnConditionChanged += StartEvent;
+                        }
+                    }
+                }
+            }
+
             if (conditionComponents == null) return;
 
             foreach (var component in conditionComponents)
