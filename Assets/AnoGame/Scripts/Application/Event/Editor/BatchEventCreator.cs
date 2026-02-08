@@ -190,11 +190,6 @@ public class BatchEventCreator
     private static void ApplyTriggerData(GameObject goo, EventJsonItem evt)
     {
         // 1. Remove Old Component if exists
-        // We use reflection/string check to avoid strict dependency if possible, or use the type if widely available.
-        // Assuming Legacy namespace is available or we add using.
-        // For safety, let's use string checks or GetComponent by name if we want to be loose, 
-        // but explicit type is better. We need to add 'using AnoGame.Application.Event.Legacy;' to the file top or use full name.
-        
         var oldComp = goo.GetComponent("AnoGame.Application.Event.Legacy.InstantEventTrigger_Old");
         if (oldComp != null)
         {
@@ -210,6 +205,46 @@ public class BatchEventCreator
 
         // 3. Set Data
         UpdateSO(trig, "targetEventId", evt.eventId);
+
+        // 4. Apply Conditions (Required Items / Events)
+        if (evt.conditions != null && evt.conditions.Count > 0)
+        {
+            SerializedObject so = new SerializedObject(trig);
+            so.Update();
+
+            var requiredItemsProp = so.FindProperty("requiredItems");
+            var requiredEventsProp = so.FindProperty("requiredEvents");
+
+            requiredItemsProp.ClearArray();
+            requiredEventsProp.ClearArray();
+
+            foreach (var condId in evt.conditions)
+            {
+                // Try to find as ItemData
+                var item = FindItemData(condId);
+                if (item != null)
+                {
+                    int index = requiredItemsProp.arraySize;
+                    requiredItemsProp.InsertArrayElementAtIndex(index);
+                    requiredItemsProp.GetArrayElementAtIndex(index).objectReferenceValue = item;
+                    continue;
+                }
+
+                // Try to find as EventData
+                var eventData = FindEventData(condId);
+                if (eventData != null)
+                {
+                    int index = requiredEventsProp.arraySize;
+                    requiredEventsProp.InsertArrayElementAtIndex(index);
+                    requiredEventsProp.GetArrayElementAtIndex(index).objectReferenceValue = eventData;
+                    continue;
+                }
+                
+                Debug.LogWarning($"Condition ID '{condId}' not found as ItemData or EventData for event '{evt.eventId}'");
+            }
+
+            so.ApplyModifiedProperties();
+        }
     }
 
     private static void UpdateSO(Object target, string propName, string value)
@@ -239,6 +274,36 @@ public class BatchEventCreator
         director.playableAsset = timeline;
     }
 
+    private static ItemData FindItemData(string itemId)
+    {
+        string[] guids = AssetDatabase.FindAssets("t:ItemData");
+        foreach (var guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            ItemData asset = AssetDatabase.LoadAssetAtPath<ItemData>(path);
+            if (asset != null && asset.ItemId == itemId) return asset;
+        }
+        return null;
+    }
+
+    private static EventData FindEventData(string eventId)
+    {
+        // First check the standard path to avoid full search if possible
+        string path = $"{EVENTDATA_DIR_PATH}/{eventId}.asset";
+        EventData asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
+        if (asset != null) return asset;
+
+        // Fallback to search
+        string[] guids = AssetDatabase.FindAssets("t:EventData");
+        foreach (var guid in guids)
+        {
+            string p = AssetDatabase.GUIDToAssetPath(guid);
+            EventData a = AssetDatabase.LoadAssetAtPath<EventData>(p);
+            if (a != null && a.EventId == eventId) return a;
+        }
+        return null;
+    }
+
     static class StringPool { public static string GetUniqueString() => System.Guid.NewGuid().ToString(); }
 
     [System.Serializable]
@@ -257,6 +322,8 @@ public class BatchEventCreator
         public string paramText;
         public string paramItemId;
         public bool timeline;
+        public List<string> conditions;
+        public List<string> results;
     }
 }
 #endif

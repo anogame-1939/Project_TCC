@@ -1,220 +1,318 @@
 [
     {
-        "eventId": "EV_001_BigManEncounter",
+        "eventId": "1",
         "name": "大男と初回遭遇",
         "category": "Contact",
         "description": "演出・出現処理",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "State_Met_BigMan"
+        ]
     },
     {
-        "eventId": "EV_002_StreetlightStop",
+        "eventId": "2",
         "name": "街灯で足止め",
         "category": "Contact",
         "description": "プレイヤー移動制限",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "State_Blocked_Streetlight"
+        ]
     },
     {
-        "eventId": "EV_003_Door1_Default",
-        "name": "電子ロック式扉１（閉）",
+        "eventId": "3",
+        "name": "電子ロック式扉１(開かない)",
         "category": "Inspect",
         "description": "デフォルト：開かない",
-        "paramText": "鍵がかかっている。",
-        "timeline": true
+        "conditions": [],
+        "results": []
     },
     {
-        "eventId": "EV_004_Door1_Unlock",
-        "name": "電子ロック式扉１（開錠）",
+        "eventId": "4",
+        "name": "電子ロック式扉１(開く)",
         "category": "Interact",
-        "description": "条件：制御盤の鍵を使用",
-        "paramItemId": "Item_ControlPanelKey",
-        "timeline": true
+        "description": "条件：制御盤の鍵を使用で開く",
+        "conditions": [
+            "Has_ControlKey"
+        ],
+        "results": [
+            "State_Door1_Open"
+        ]
     },
     {
-        "eventId": "EV_005_Get_Magnet",
-        "name": "磁石入手",
+        "eventId": "5",
+        "name": "磁石",
         "category": "Inspect",
         "description": "取得処理",
-        "paramText": "磁石を拾う",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_Magnet"
+        ]
     },
     {
-        "eventId": "EV_006_Get_KeyControlPanel",
-        "name": "制御盤の鍵入手",
+        "eventId": "6",
+        "name": "制御盤の鍵",
         "category": "Inspect",
         "description": "取得処理",
-        "paramText": "制御盤の鍵を拾う",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_ControlKey"
+        ]
     },
     {
-        "eventId": "EV_007_Get_ManagerMemo",
-        "name": "管理人のメモ入手",
+        "eventId": "7",
+        "name": "管理人のメモ",
         "category": "Inspect",
         "description": "取得・UI表示",
-        "paramText": "管理人のメモを読む",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_ManagerNote"
+        ]
     },
     {
-        "eventId": "EV_008_Inspect_MetalPlate",
+        "eventId": "8",
         "name": "金属プレート",
         "category": "Inspect",
         "description": "テキスト表示：赤さびだらけ",
-        "paramText": "赤さびだらけのプレートだ。",
-        "timeline": true
+        "conditions": [],
+        "results": []
     },
     {
-        "eventId": "EV_009_FogWallFlower",
+        "eventId": "9",
         "name": "霧壁の花",
         "category": "Contact",
         "description": "配置・エフェクト",
-        "timeline": true
+        "conditions": [],
+        "results": []
     },
     {
-        "eventId": "EV_010_Well_Default",
-        "name": "井戸（覗く）",
+        "eventId": "10",
+        "name": "井戸(取れない)",
         "category": "Inspect",
         "description": "デフォルト：中に何かあるが取れない",
-        "paramText": "暗くてよく見えない。",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Checked_Well"
+        ]
     },
     {
-        "eventId": "EV_011_Well_String",
+        "eventId": "11",
         "name": "井戸（タコ糸）",
         "category": "ItemUse",
         "description": "アイテム使用判定：タコ糸",
-        "paramItemId": "Item_KiteString",
-        "timeline": true
+        "conditions": [
+            "Has_String"
+        ],
+        "results": [
+            "State_Well_String"
+        ]
     },
     {
-        "eventId": "EV_012_Well_Magnet",
+        "eventId": "12",
         "name": "井戸（磁石）",
         "category": "ItemUse",
         "description": "アイテム使用判定：磁石",
-        "paramItemId": "Item_Magnet",
-        "timeline": true
+        "conditions": [
+            "State_Well_String",
+            "Has_Magnet"
+        ],
+        "results": [
+            "State_Well_Magnet"
+        ]
     },
     {
-        "eventId": "EV_013_Get_KeyChain",
-        "name": "キーホルダー鍵入手",
+        "eventId": "13",
+        "name": "キーホルダーのついた鍵",
         "category": "Inspect",
-        "description": "井戸イベントクリアで入手（自動）",
-        "timeline": true
+        "description": "井戸イベントクリアで入手",
+        "conditions": [
+            "State_Well_Magnet"
+        ],
+        "results": [
+            "Has_KeyHolderKey"
+        ]
     },
     {
-        "eventId": "EV_014_Door2",
+        "eventId": "14",
         "name": "電子ロック式扉２",
         "category": "Interact",
         "description": "ドア開閉処理",
-        "timeline": true
+        "conditions": [
+            "Has_KeyHolderKey"
+        ],
+        "results": [
+            "State_Door2_Open"
+        ]
     },
     {
-        "eventId": "EV_015_Door3",
+        "eventId": "15",
         "name": "電子ロック式扉３",
         "category": "Interact",
         "description": "ドア開閉処理",
-        "timeline": true
+        "conditions": [
+            "Has_KeyHolderKey"
+        ],
+        "results": [
+            "State_Door3_Open"
+        ]
     },
     {
-        "eventId": "EV_016_Get_KiteString",
-        "name": "タコ糸入手",
+        "eventId": "16",
+        "name": "タコ糸",
         "category": "Inspect",
         "description": "取得処理",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_String"
+        ]
     },
     {
-        "eventId": "EV_017_Get_ColleagueMemo",
-        "name": "同僚のメモ入手",
+        "eventId": "17",
+        "name": "同僚のメモ",
         "category": "Inspect",
         "description": "取得・UI表示",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_ColleagueNote"
+        ]
     },
     {
-        "eventId": "EV_018_Inspect_Locker",
+        "eventId": "18",
         "name": "鍵のかかったロッカー",
         "category": "Inspect",
         "description": "テキスト表示・状態確認",
-        "paramText": "鍵がかかっている。",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Checked_Locker"
+        ]
     },
     {
-        "eventId": "EV_019_SunflowerManVanish",
+        "eventId": "19",
         "name": "ひまわり男消失",
         "category": "Chain",
         "description": "トリガー：【タコ糸】【磁石】両方所持",
-        "timeline": true
+        "conditions": [
+            "Has_String",
+            "Has_Magnet"
+        ],
+        "results": [
+            "State_SunflowerMan_Gone"
+        ]
     },
     {
-        "eventId": "EV_020_Unlock_NorthShed",
-        "name": "北の小屋鍵開け",
+        "eventId": "20",
+        "name": "北の小屋の鍵開け",
         "category": "ItemUse",
         "description": "条件：キーホルダー付き鍵を使用",
-        "paramItemId": "Item_KeyWithKeychain",
-        "timeline": true
+        "conditions": [
+            "Has_KeyHolderKey"
+        ],
+        "results": [
+            "State_NorthShed_Open"
+        ]
     },
     {
-        "eventId": "EV_021_Get_AluminumBall",
-        "name": "アルミボール入手",
-        "category": "Inspect",
+        "eventId": "21",
+        "name": "アルミボール",
+        "category": "ItemUse",
         "description": "北の小屋で入手",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_AluminumBall"
+        ]
     },
     {
-        "eventId": "EV_022_Unlock_Plaza",
+        "eventId": "22",
         "name": "広場の鍵開け",
         "category": "Interact",
         "description": "条件：キーホルダー付き鍵を使用",
-        "paramItemId": "Item_KeyWithKeychain",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "State_Plaza_Open"
+        ]
     },
     {
-        "eventId": "EV_023_Get_ColaCan",
-        "name": "コーラ缶入手",
-        "category": "Inspect",
+        "eventId": "23",
+        "name": "コーラ缶",
+        "category": "Interact",
         "description": "広場で入手",
-        "timeline": true
+        "conditions": [],
+        "results": [
+            "Has_Cola"
+        ]
     },
     {
-        "eventId": "EV_024_Synth_Cola",
-        "name": "アイテム合成（コーラ）",
+        "eventId": "24",
+        "name": "北の小屋：アイテム合成(コーラ)",
         "category": "ItemUse",
-        "description": "コーラ缶を使用",
-        "paramItemId": "Item_ColaCan",
-        "timeline": true
+        "description": "コーラ缶を使用（アルミボールと？）",
+        "conditions": [
+            "Has_AluminumBall",
+            "Has_Cola"
+        ],
+        "results": [
+            "State_Reaction_Done"
+        ]
     },
     {
-        "eventId": "EV_025_Synth_Alum",
-        "name": "アイテム合成（アルミ）",
+        "eventId": "25",
+        "name": "北の小屋：アイテム合成(アルミ)",
         "category": "ItemUse",
-        "description": "アルミボールを使用",
-        "paramItemId": "Item_AluminumBall",
-        "timeline": true
+        "description": "アルミボールを使用（コーラ缶と？）",
+        "conditions": [
+            "Has_Cola",
+            "Has_AluminumBall"
+        ],
+        "results": [
+            "State_Reaction_Done"
+        ]
     },
     {
-        "eventId": "EV_026_Get_Flag_Code",
-        "name": "ロッカー番号入手",
-        "category": "Chain",
-        "description": "番号情報を入手",
-        "timeline": true
-    },
-    {
-        "eventId": "EV_027_SouthLocker",
-        "name": "南の小屋ロッカー",
+        "eventId": "26",
+        "name": "ロッカーの鍵の番号",
         "category": "Inspect",
-        "description": "条件：鍵の番号を持っている",
-        "paramText": "ロッカーを開ける",
-        "timeline": true
+        "description": "上記イベント完了で番号情報を入手",
+        "conditions": [
+            "State_Reaction_Done"
+        ],
+        "results": [
+            "Knowledge_LockerCode"
+        ]
     },
     {
-        "eventId": "EV_028_Get_SunflowerOrigami",
-        "name": "ひまわりの折り紙入手",
+        "eventId": "27",
+        "name": "南の小屋：ロッカー",
+        "category": "Inspect",
+        "description": "条件：鍵の番号を持っている状態で調べる",
+        "conditions": [
+            "Knowledge_LockerCode"
+        ],
+        "results": [
+            "State_Locker_Open"
+        ]
+    },
+    {
+        "eventId": "28",
+        "name": "ひまわりの折り紙",
         "category": "Inspect",
         "description": "ロッカーから入手",
-        "timeline": true
+        "conditions": [
+            "State_Locker_Open"
+        ],
+        "results": [
+            "Has_Origami"
+        ]
     },
     {
-        "eventId": "EV_029_Ending",
+        "eventId": "29",
         "name": "エンディング",
         "category": "Chain",
         "description": "シーン遷移・エンドロール",
-        "timeline": true
+        "conditions": [
+            "Has_Origami"
+        ],
+        "results": [
+            "Game_Clear"
+        ]
     }
 ]
