@@ -10,7 +10,7 @@ namespace AnoGame.Application.Event.Editor
     public class EventGraphWindow : EditorWindow
     {
         private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_batch.json";
-        
+
         [MenuItem("Window/AnoGame/Event Graph")]
         public static void Open()
         {
@@ -22,7 +22,7 @@ namespace AnoGame.Application.Event.Editor
         private float zoom = 1.0f;
         private const float MIN_ZOOM = 0.1f;
         private const float MAX_ZOOM = 2.0f;
-        
+
         private Node selectedNode;
         private bool isDraggingNode;
 
@@ -49,12 +49,18 @@ namespace AnoGame.Application.Event.Editor
             nodeHeaderStyle.normal.textColor = Color.white;
         }
 
+        // Debug Vars
+        private float _debugClipWidth = 2000;
+        private float _debugClipHeight = 2000;
+        private bool _useDebugClip = false;
+
         private void OnGUI()
         {
             SetupStyles();
 
+            // Toolbar
             DrawToolbar();
-            
+
             // Handle Input (Pan/Zoom/Drag)
             HandleEvents(UnityEngine.Event.current);
 
@@ -65,35 +71,44 @@ namespace AnoGame.Application.Event.Editor
             // Begin Zoom Area
             // We use a matrix to handle zoom and pan for the graph content
             Rect graphRect = new Rect(0, 20, position.width, position.height - 20);
-            
+
             // Define Rects
             float redBorder = 5f;
             float cyanBorder = 2f;
-            
+
             // Window Rect (Full area below toolbar)
             Rect windowRect = new Rect(0, 20, position.width, position.height - 20);
-            
+
             // View Area (Inside Window Red Border)
             Rect viewRect = new Rect(
-                windowRect.x + redBorder, 
-                windowRect.y + redBorder, 
-                windowRect.width - redBorder * 2, 
+                windowRect.x + redBorder,
+                windowRect.y + redBorder,
+                windowRect.width - redBorder * 2,
                 windowRect.height - redBorder * 2
             );
 
             // Clip Area (Inside Cyan Border) - This is where content lives
+            float clipWidth = viewRect.width - cyanBorder * 2;
+            float clipHeight = viewRect.height - cyanBorder * 2;
+
+            if (_useDebugClip)
+            {
+                clipWidth = _debugClipWidth;
+                clipHeight = _debugClipHeight;
+            }
+
             Rect clipRect = new Rect(
-                viewRect.x + cyanBorder, 
-                viewRect.y + cyanBorder, 
-                viewRect.width - cyanBorder * 2, 
-                viewRect.height - cyanBorder * 2
+                viewRect.x + cyanBorder,
+                viewRect.y + cyanBorder,
+                clipWidth,
+                clipHeight
             );
 
             // 1. Draw Content (Clipped)
             GUI.BeginGroup(clipRect);
-            
+
             Matrix4x4 prevMatrix = GUI.matrix;
-            
+
             // Matrix construction:
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(zoom, zoom, 1.0f)) * Matrix4x4.TRS(new Vector3(panOffset.x, panOffset.y, 0), Quaternion.identity, Vector3.one);
 
@@ -134,7 +149,7 @@ namespace AnoGame.Application.Event.Editor
             GUI.EndGroup();
 
             // 2. Draw Borders (On Top)
-            
+
             // Red Border (Window Frame) - Outer
             Color red = Color.red;
             EditorGUI.DrawRect(new Rect(windowRect.x, windowRect.y, windowRect.width, redBorder), red); // Top
@@ -149,24 +164,48 @@ namespace AnoGame.Application.Event.Editor
             EditorGUI.DrawRect(new Rect(viewRect.x, viewRect.y, cyanBorder, viewRect.height), cyan); // Left
             EditorGUI.DrawRect(new Rect(viewRect.xMax - cyanBorder, viewRect.y, cyanBorder, viewRect.height), cyan); // Right
 
+            // Orange Border (Clip Area)
+            Color orange = new Color(1f, 0.5f, 0f);
+            float orangeBorder = 2f;
+            EditorGUI.DrawRect(new Rect(clipRect.x, clipRect.y, clipRect.width, orangeBorder), orange); // Top
+            EditorGUI.DrawRect(new Rect(clipRect.x, clipRect.yMax - orangeBorder, clipRect.width, orangeBorder), orange); // Bottom
+            EditorGUI.DrawRect(new Rect(clipRect.x, clipRect.y, orangeBorder, clipRect.height), orange); // Left
+            EditorGUI.DrawRect(new Rect(clipRect.xMax - orangeBorder, clipRect.y, orangeBorder, clipRect.height), orange); // Right
+
+
             // 3. Draw Debug Info Overlay
             string debugInfo = $"Window (Red): {windowRect.width:F0}x{windowRect.height:F0}\n" +
                                $"View (Cyan): {viewRect.width:F0}x{viewRect.height:F0}\n" +
-                               $"Clip Area: {clipRect.width:F0}x{clipRect.height:F0}\n" +
+                               $"Content (Yellow): {contentRect.width:F0}x{contentRect.height:F0}\n" +
+                               $"Clip Area (Orange): {clipRect.width:F0}x{clipRect.height:F0}\n" +
                                $"Zoom: {zoom:F2}\n" +
-                               $"Content (Yellow): {contentRect.width:F0}x{contentRect.height:F0}";
-            
+                               $"Pan: {panOffset.x:F0}, {panOffset.y:F0}";
+
             GUIStyle debugStyle = new GUIStyle(GUI.skin.box);
             debugStyle.alignment = TextAnchor.UpperLeft;
             debugStyle.fontSize = 11;
             debugStyle.normal.textColor = Color.white;
-            
-            float overlayWidth = 220f;
-            float overlayHeight = 85f;
+
+            float overlayWidth = 240f;
+            float overlayHeight = 110f;
             Rect overlayRect = new Rect(windowRect.xMax - overlayWidth - 10, windowRect.y + 10, overlayWidth, overlayHeight);
-            
-            GUI.Box(overlayRect, debugInfo, debugStyle);
-            
+
+            GUILayout.BeginArea(overlayRect, debugStyle);
+            GUILayout.Label(debugInfo);
+
+            GUILayout.Space(5);
+            _useDebugClip = GUILayout.Toggle(_useDebugClip, "Override Clip Area");
+            if (_useDebugClip)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("W:", GUILayout.Width(20));
+                _debugClipWidth = EditorGUILayout.FloatField(_debugClipWidth, GUILayout.Width(50));
+                GUILayout.Label("H:", GUILayout.Width(20));
+                _debugClipHeight = EditorGUILayout.FloatField(_debugClipHeight, GUILayout.Width(50));
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndArea();
+
             Repaint();
         }
 
@@ -207,22 +246,22 @@ namespace AnoGame.Application.Event.Editor
             {
                 Vector2 mousePos = e.mousePosition;
                 // Ignore if mouse is in toolbar
-                if (mousePos.y > 20) 
+                if (mousePos.y > 20)
                 {
                     float zoomDelta = -e.delta.y / 150.0f;
                     float oldZoom = zoom;
                     float newZoom = Mathf.Clamp(zoom + zoomDelta, MIN_ZOOM, MAX_ZOOM);
-                    
+
                     // Zoom towards mouse:
                     // WorldMouse = (ScreenMouse - GroupOffset) / OldZoom - OldPan
                     // NewPan = (ScreenMouse - GroupOffset) / NewZoom - WorldMouse
-                    
+
                     Vector2 outputRectOffset = new Vector2(0, 20); // The graph area offset
                     Vector2 screenMouseInGraph = mousePos - outputRectOffset;
-                    
+
                     Vector2 worldMouse = screenMouseInGraph / oldZoom - panOffset;
                     panOffset = screenMouseInGraph / newZoom - worldMouse;
-                    
+
                     zoom = newZoom;
                     e.Use();
                 }
@@ -234,7 +273,7 @@ namespace AnoGame.Application.Event.Editor
                 panOffset += e.delta / zoom;
                 e.Use();
             }
-            
+
             // Allow panning with Left Click on empty space
             if (e.type == EventType.MouseDrag && e.button == 0 && selectedNode == null)
             {
@@ -248,11 +287,11 @@ namespace AnoGame.Application.Event.Editor
                 // Calculate Mouse World Pos
                 Vector2 outputRectOffset = new Vector2(0, 20);
                 Vector2 mousePos = e.mousePosition;
-                
+
                 if (mousePos.y > 20) // Check inside graph area
                 {
                     Vector2 worldMouse = (mousePos - outputRectOffset) / zoom - panOffset;
-                    
+
                     // Select Node (Iterate reverse to pick top one)
                     selectedNode = null;
                     for (int i = nodes.Count - 1; i >= 0; i--)
@@ -285,7 +324,7 @@ namespace AnoGame.Application.Event.Editor
             // Grid logic:
             // We want the grid to move with Pan and scale with Zoom.
             // We can just draw it using Handles in screen space.
-            
+
             int widthDivs = Mathf.CeilToInt(position.width / gridSpacing / zoom);
             int heightDivs = Mathf.CeilToInt(position.height / gridSpacing / zoom);
 
@@ -294,7 +333,7 @@ namespace AnoGame.Application.Event.Editor
 
             // Calculate offset in screen space
             Vector3 offset = new Vector3((panOffset.x * zoom) % (gridSpacing * zoom), (panOffset.y * zoom) % (gridSpacing * zoom), 0);
-            
+
             float scaledSpacing = gridSpacing * zoom;
 
             for (int i = 0; i <= position.width / scaledSpacing + 1; i++)
@@ -307,10 +346,10 @@ namespace AnoGame.Application.Event.Editor
 
             for (int j = 0; j <= position.height / scaledSpacing + 1; j++)
             {
-                 Handles.DrawLine(
-                    new Vector3(0, scaledSpacing * j, 0) + offset + new Vector3(0, 20, 0),
-                    new Vector3(position.width, scaledSpacing * j, 0) + offset
-                );
+                Handles.DrawLine(
+                   new Vector3(0, scaledSpacing * j, 0) + offset + new Vector3(0, 20, 0),
+                   new Vector3(position.width, scaledSpacing * j, 0) + offset
+               );
             }
 
             Handles.color = Color.white;
@@ -323,17 +362,17 @@ namespace AnoGame.Application.Event.Editor
             {
                 Node node = nodes[i];
                 Rect nodeRect = node.rect;
-                
+
                 // Draw Box
                 GUI.Box(nodeRect, "", nodeStyle);
-                
+
                 // Header
                 Rect headerRect = new Rect(nodeRect.x, nodeRect.y, nodeRect.width, 25);
                 GUI.Label(headerRect, node.title, nodeHeaderStyle);
-                
+
                 // Content Area
                 GUILayout.BeginArea(new Rect(nodeRect.x + 10, nodeRect.y + 25, nodeRect.width - 20, nodeRect.height - 35));
-                
+
                 if (!string.IsNullOrEmpty(node.category))
                     GUILayout.Label($"[{node.category}]", EditorStyles.miniLabel);
 
@@ -347,10 +386,10 @@ namespace AnoGame.Application.Event.Editor
                     foreach (var c in node.conditions)
                     {
                         if (!nodes.Any(n => n.id == c)) // Only show if not linked
-                             GUILayout.Label($"- {c}", EditorStyles.miniLabel);
+                            GUILayout.Label($"- {c}", EditorStyles.miniLabel);
                     }
                 }
-                
+
                 if (node.results != null && node.results.Count > 0)
                 {
                     GUILayout.Space(2);
@@ -365,7 +404,7 @@ namespace AnoGame.Application.Event.Editor
 
         private void DrawConnections()
         {
-             Dictionary<string, Node> resultToNodeMap = new Dictionary<string, Node>();
+            Dictionary<string, Node> resultToNodeMap = new Dictionary<string, Node>();
             foreach (var node in nodes)
             {
                 if (node.results != null)
@@ -404,7 +443,7 @@ namespace AnoGame.Application.Event.Editor
             Vector3 endPos = new Vector3(end.x, end.y + end.height / 2, 0);
             Vector3 startTan = startPos + Vector3.right * 50;
             Vector3 endTan = endPos + Vector3.left * 50;
-            
+
             Handles.DrawBezier(startPos, endPos, startTan, endTan, color, null, width);
         }
 
@@ -430,7 +469,7 @@ namespace AnoGame.Application.Event.Editor
                         node.description = evt.description;
                         node.conditions = evt.conditions ?? new List<string>();
                         node.results = evt.results ?? new List<string>();
-                        
+
                         node.rect = new Rect(100, 100, 200, 150);
                         nodes.Add(node);
                     }
@@ -447,7 +486,7 @@ namespace AnoGame.Application.Event.Editor
         {
             if (nodes.Count == 0) return;
 
-             Dictionary<string, Node> resultToNodeMap = new Dictionary<string, Node>();
+            Dictionary<string, Node> resultToNodeMap = new Dictionary<string, Node>();
             foreach (var node in nodes)
             {
                 if (node.results != null)
@@ -485,7 +524,7 @@ namespace AnoGame.Application.Event.Editor
                             }
                         }
                     }
-                    
+
                     int newDepth = currentMax + 1;
                     if (newDepth > depths[node.id])
                     {
@@ -497,7 +536,7 @@ namespace AnoGame.Application.Event.Editor
             }
 
             var grouped = nodes.GroupBy(n => depths[n.id]).OrderBy(g => g.Key);
-            
+
             float xSpacing = 250f;
             float ySpacing = 180f;
             float startX = 50f;
