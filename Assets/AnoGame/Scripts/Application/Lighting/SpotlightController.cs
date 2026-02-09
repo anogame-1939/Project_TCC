@@ -6,12 +6,28 @@ using System.Threading;
 using System;
 using VLB;
 using System.Collections.Generic;
+using AnoGame.Application.Interfaces;
+using AnoGame.Application.Managers;
 
 namespace AnoGame.Application.Lighting
 {
-    public class SpotlightController : MonoBehaviour
+    public class SpotlightController : MonoBehaviour, IEnergyConsumer
     {
         [SerializeField] private string lightId;
+
+        // IEnergyConsumer Implementation
+        public string DeviceName => $"Spotlight_{lightId}";
+
+        public void OnEnergySupplied()
+        {
+            // 無期限で点灯
+            ActivateForDuration(-1);
+        }
+
+        public void OnEnergyCut()
+        {
+            Deactivate();
+        }
         [SerializeField] private Light targetLight;
         [SerializeField] private VolumetricLightBeamAbstractBase[] vlbBeams;
         [SerializeField] private GameObject[] additionalVisuals; // VLB or other visual objects
@@ -24,6 +40,12 @@ namespace AnoGame.Application.Lighting
 
         private void Start()
         {
+            // EnergyManagerに登録（存在する場合）
+            if (EnergyManager.Instance != null)
+            {
+                EnergyManager.Instance.Register(this);
+            }
+
             if (targetLight != null)
             {
                 originalIntensity = targetLight.intensity;
@@ -260,6 +282,11 @@ namespace AnoGame.Application.Lighting
 
         private void OnDestroy()
         {
+            if (EnergyManager.Instance != null)
+            {
+                EnergyManager.Instance.Unregister(this);
+            }
+
             cts?.Cancel();
             cts?.Dispose();
         }
