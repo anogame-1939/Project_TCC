@@ -10,7 +10,7 @@ namespace AnoGame.AnoNarrative.UI
     public class DialogueUIController : DialogueUIBase
     {
         [Header("UI Components")]
-        [SerializeField] private GameObject itemsParent; // The main panel to show/hide
+        [SerializeField] private CanvasGroup ConversationPanel; // The main panel to show/hide
         [SerializeField] private TextMeshProUGUI speakerNameText;
         [SerializeField] private TextMeshProUGUI bodyText;
         [SerializeField] private Image portraitImage;
@@ -39,7 +39,7 @@ namespace AnoGame.AnoNarrative.UI
         private bool isSkipping = false;
         private float inputCooldown = 0f;
 
-        public override bool IsDialogueActive => itemsParent != null && itemsParent.activeSelf;
+        public override bool IsDialogueActive => ConversationPanel != null && ConversationPanel.blocksRaycasts;
 
         public bool IsAutoAdvance
         {
@@ -68,8 +68,19 @@ namespace AnoGame.AnoNarrative.UI
 
         private void Awake()
         {
-            if (itemsParent) itemsParent.SetActive(false);
+            SetPanelActive(false);
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
+            if (portraitImage) portraitImage.enabled = false;
+        }
+
+        private void SetPanelActive(bool isActive)
+        {
+            if (ConversationPanel != null)
+            {
+                ConversationPanel.alpha = isActive ? 1f : 0f;
+                ConversationPanel.interactable = isActive;
+                ConversationPanel.blocksRaycasts = isActive;
+            }
         }
 
         // Start/OnEnable handled by Base, but we can override if needed. 
@@ -78,7 +89,7 @@ namespace AnoGame.AnoNarrative.UI
         public override void ShowConversation(ConversationUnit unit)
         {
             currentUnit = unit;
-            if (itemsParent) itemsParent.SetActive(true);
+            if (ConversationPanel) SetPanelActive(true);
             inputCooldown = 0.2f; // Prevent immediate skip input
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
@@ -98,7 +109,7 @@ namespace AnoGame.AnoNarrative.UI
         public override void PreviewConversation(ConversationUnit unit)
         {
             currentUnit = unit;
-            if (itemsParent) itemsParent.SetActive(true);
+            if (ConversationPanel) SetPanelActive(true);
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
 
@@ -266,11 +277,11 @@ namespace AnoGame.AnoNarrative.UI
             if (activeChoiceRoutine != null) StopCoroutine(activeChoiceRoutine);
             if (currentPortraitRoutine != null) StopCoroutine(currentPortraitRoutine);
 
-            if (itemsParent) itemsParent.SetActive(false);
+            SetPanelActive(false);
 
             if (portraitImage)
             {
-                portraitImage.gameObject.SetActive(false);
+                portraitImage.enabled = false;
                 // Reset color opacity just in case it was fading
                 Color c = portraitImage.color;
                 c.a = 0f;
@@ -285,7 +296,7 @@ namespace AnoGame.AnoNarrative.UI
             if (inputCooldown > 0f) inputCooldown -= Time.deltaTime;
 
             // Only listen if dialogue is active and cooldown passed
-            if (itemsParent != null && itemsParent.activeSelf && inputCooldown <= 0f)
+            if (IsDialogueActive && inputCooldown <= 0f)
             {
                 if (Keyboard.current != null && Keyboard.current[advanceKey].wasPressedThisFrame)
                 {
@@ -310,14 +321,14 @@ namespace AnoGame.AnoNarrative.UI
                 // If visible, just swap sprite (instant) or quick fade out/in?
                 // Let's go with: If active, swap immediately. If inactive, fade in.
 
-                if (portraitImage.gameObject.activeSelf && portraitImage.color.a > 0.9f)
+                if (portraitImage.enabled && portraitImage.color.a > 0.9f)
                 {
                     portraitImage.sprite = newSprite;
                     yield break;
                 }
 
                 portraitImage.sprite = newSprite;
-                portraitImage.gameObject.SetActive(true);
+                portraitImage.enabled = true;
 
                 Color c = portraitImage.color;
                 float startAlpha = c.a;
@@ -336,7 +347,7 @@ namespace AnoGame.AnoNarrative.UI
             else
             {
                 // Fade out
-                if (!portraitImage.gameObject.activeSelf) yield break;
+                if (!portraitImage.enabled) yield break;
 
                 Color c = portraitImage.color;
                 float startAlpha = c.a;
@@ -351,7 +362,7 @@ namespace AnoGame.AnoNarrative.UI
                 }
                 c.a = 0f;
                 portraitImage.color = c;
-                portraitImage.gameObject.SetActive(false);
+                portraitImage.enabled = false;
             }
         }
 
