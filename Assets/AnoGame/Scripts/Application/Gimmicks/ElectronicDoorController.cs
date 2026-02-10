@@ -23,6 +23,32 @@ namespace AnoGame.Application.Gimmicks
 
         public string DeviceName => $"ElectronicDoor_{_doorId}";
 
+        /// <summary>
+        /// UnityEventなどから呼び出すためのメソッド
+        /// </summary>
+        public void RequestActivation()
+        {
+            if (EnergyManager.Instance != null)
+            {
+                EnergyManager.Instance.RequestPower(this);
+            }
+        }
+
+        private void OnValidate()
+        {
+            if (string.IsNullOrEmpty(_doorId))
+            {
+                _doorId = gameObject.name;
+            }
+
+            // Automatically register to EnergyManager in Editor
+            var manager = FindAnyObjectByType<EnergyManager>();
+            if (manager != null)
+            {
+                manager.Register(this);
+            }
+        }
+
         private void Start()
         {
             if (EnergyManager.Instance != null)

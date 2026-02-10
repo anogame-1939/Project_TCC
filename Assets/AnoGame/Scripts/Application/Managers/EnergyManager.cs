@@ -18,6 +18,7 @@ namespace AnoGame.Application.Managers
         [SerializeField] private string _currentActiveDeviceName;
 
         private IEnergyConsumer _currentActiveDevice;
+        [SerializeField] private List<UnityEngine.Object> _debugRegisteredDevices = new List<UnityEngine.Object>();
         private List<IEnergyConsumer> _registeredDevices = new List<IEnergyConsumer>();
 
         public bool IsSystemActive
@@ -25,14 +26,30 @@ namespace AnoGame.Application.Managers
             get => _isSystemActive;
             set
             {
+                if (_isSystemActive == value) return;
                 _isSystemActive = value;
                 Debug.Log($"[EnergyManager] System Active: {_isSystemActive}");
                 if (!_isSystemActive)
                 {
-                    // システム停止時は全てオフにする？仕様確認要だが、ひとまず現状維持または全部オフ
                     CutAllPower();
                 }
             }
+        }
+
+        /// <summary>
+        /// システムを有効化する
+        /// </summary>
+        public void Activate()
+        {
+            IsSystemActive = true;
+        }
+
+        /// <summary>
+        /// システムを無効化する
+        /// </summary>
+        public void Deactivate()
+        {
+            IsSystemActive = false;
         }
 
         private void Awake()
@@ -40,6 +57,7 @@ namespace AnoGame.Application.Managers
             if (Instance == null)
             {
                 Instance = this;
+                _debugRegisteredDevices.Clear();
             }
             else
             {
@@ -63,6 +81,13 @@ namespace AnoGame.Application.Managers
             if (!_registeredDevices.Contains(device))
             {
                 _registeredDevices.Add(device);
+                if (device is UnityEngine.Object obj)
+                {
+                    if (!_debugRegisteredDevices.Contains(obj))
+                    {
+                        _debugRegisteredDevices.Add(obj);
+                    }
+                }
             }
         }
 
@@ -74,6 +99,13 @@ namespace AnoGame.Application.Managers
             if (_registeredDevices.Contains(device))
             {
                 _registeredDevices.Remove(device);
+                if (device is UnityEngine.Object obj)
+                {
+                    if (_debugRegisteredDevices.Contains(obj))
+                    {
+                        _debugRegisteredDevices.Remove(obj);
+                    }
+                }
             }
             if (_currentActiveDevice == device)
             {
