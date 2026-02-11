@@ -278,25 +278,48 @@
 .dialogue-node .choice-row {
     flex-direction: row;
     align-items: center;
-    padding: 1px 4px;
+    padding: 2px 4px;
 }
 
 .dialogue-node .choice-text-field {
     flex-grow: 1;
+    margin-right: 4px;
+    min-width: 100px;
+}
+
+.dialogue-node .choice-port {
+    height: 24px;
+    align-self: center;
+    justify-content: center;
+    margin-left: 2px;
     margin-right: 2px;
+    padding: 0;
+    background-color: transparent;
+    border-width: 0;
 }
 
-.dialogue-node .choice-link-btn {
-    width: 35px;
-    height: 18px;
-    font-size: 10px;
+.dialogue-node .choice-port > .unity-port__label {
+    display: none;
 }
 
-.dialogue-node .choice-delete-btn {
+.dialogue-node .choice-port > .unity-port__connector {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.dialogue-node .choice-delete-button {
     width: 20px;
     height: 18px;
     font-size: 10px;
-    color: red;
+    color: #ff6666;
+    margin-left: 4px;
+    background-color: #444;
+    border-width: 0;
+    border-radius: 3px;
+}
+
+.dialogue-node .choice-delete-button:hover {
+    background-color: #555;
 }
 
 /* No data warning */

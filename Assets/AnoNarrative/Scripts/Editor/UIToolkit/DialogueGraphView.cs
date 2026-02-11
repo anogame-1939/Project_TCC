@@ -55,7 +55,17 @@ namespace AnoGame.AnoNarrative.Editor
             _debugOverlayLabel = new Label();
             _debugOverlayLabel.AddToClassList("debug-overlay-label");
             _debugOverlayLabel.pickingMode = PickingMode.Ignore;
+            _debugOverlayLabel.pickingMode = PickingMode.Ignore;
             Add(_debugOverlayLabel);
+
+            // Reorder layers to ensure connections are drawn on top of nodes
+            schedule.Execute(() =>
+            {
+                // Typically GraphView has: Grid(0), Connections(1), Nodes(2)
+                // We want: Grid(0), Nodes(1), Connections(2)
+                var connectionsLayer = this.Q("connections");
+                connectionsLayer?.BringToFront();
+            });
 
             // Edge connection listener
             graphViewChanged = OnGraphViewChanged;
@@ -135,7 +145,13 @@ namespace AnoGame.AnoNarrative.Editor
                 if (!string.IsNullOrEmpty(unit.NextID) && _nodeViewMap.ContainsKey(unit.NextID))
                 {
                     var targetView = _nodeViewMap[unit.NextID];
-                    var edge = sourceView.OutputPort.ConnectTo(targetView.InputPort);
+                    var edge = new ManhattanEdge
+                    {
+                        output = sourceView.OutputPort,
+                        input = targetView.InputPort
+                    };
+                    edge.output.Connect(edge);
+                    edge.input.Connect(edge);
                     AddElement(edge);
                 }
 
@@ -148,7 +164,13 @@ namespace AnoGame.AnoNarrative.Editor
                         if (!string.IsNullOrEmpty(choice.TargetID) && _nodeViewMap.ContainsKey(choice.TargetID))
                         {
                             var targetView = _nodeViewMap[choice.TargetID];
-                            var edge = sourceView.ChoicePorts[i].ConnectTo(targetView.InputPort);
+                            var edge = new ManhattanEdge
+                            {
+                                output = sourceView.ChoicePorts[i],
+                                input = targetView.InputPort
+                            };
+                            edge.output.Connect(edge);
+                            edge.input.Connect(edge);
                             AddElement(edge);
                         }
                     }

@@ -69,6 +69,22 @@ namespace AnoGame.AnoNarrative.Editor
             OutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
             OutputPort.portName = "";
             OutputPort.AddToClassList("bottom-port");
+
+            // OutputPort.edgeConnector = ... is read-only, use reflection
+            var connectorListener = new DialogueEdgeConnectorListener();
+            var connector = new EdgeConnector<ManhattanEdge>(connectorListener);
+            // Try property set, fallback to field
+            var prop = typeof(Port).GetProperty("edgeConnector", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            if (prop != null && prop.GetSetMethod(true) != null)
+            {
+                prop.SetValue(OutputPort, connector);
+            }
+            else
+            {
+                var field = typeof(Port).GetField("m_EdgeConnector", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (field != null) field.SetValue(OutputPort, connector);
+            }
+
             _bottomPortContainer.Add(OutputPort);
 
             // ---- Content ----
@@ -171,71 +187,91 @@ namespace AnoGame.AnoNarrative.Editor
         {
             _choicesContainer.Clear();
 
-            // Remove old choice ports from bottom container
+            // Remove old choice ports from bottom container and their connections
             foreach (var p in _choicePorts)
             {
                 // Disconnect edges
-                foreach (var edge in p.connections.ToList())
+                if (p.connections != null)
                 {
-                    edge.input?.Disconnect(edge);
-                    edge.output?.Disconnect(edge);
-                    edge.RemoveFromHierarchy();
+                    foreach (var edge in p.connections.ToList())
+                    {
+                        edge.input?.Disconnect(edge);
+                        edge.output?.Disconnect(edge);
+                        edge.RemoveFromHierarchy();
+                    }
                 }
                 if (p.parent != null) p.parent.Remove(p);
             }
             _choicePorts.Clear();
 
+            // Clear bottom container (except Next port if we want to keep it there, though we might not need to touch it if we only add choice ports to rows)
+            // But previous logic added choice ports to _bottomPortContainer, we need to ensure they are gone.
+            // The loop above removes from parent, so it should be fine.
+
+            // However, let's make sure _bottomPortContainer only contains the main output port
+            _bottomPortContainer.Clear();
+            _bottomPortContainer.Add(OutputPort);
+
             if (Unit.Choices == null) Unit.Choices = new List<Choice>();
 
-            for (int i = 0; i < Unit.Choices.Count; i++)
+            var choices = Unit.Choices;
+            for (int i = 0; i < choices.Count; i++)
             {
-                int idx = i; // closure capture
-                var choice = Unit.Choices[i];
+                var choice = choices[i];
+                int index = i;
 
-                var row = new VisualElement();
-                row.AddToClassList("choice-row");
+                // Create a row for the choice UI
+                var choiceRow = new VisualElement();
+                choiceRow.AddToClassList("choice-row");
 
-                var choiceField = new TextField();
-                choiceField.AddToClassList("choice-text-field");
-                choiceField.value = choice.ChoiceText ?? "";
-                choiceField.RegisterValueChangedCallback(evt =>
+                // Text Field
+                var textField = new TextField
+                {
+                    value = choice.ChoiceText,
+                    multiline = false
+                };
+                textField.AddToClassList("choice-text-field");
+                textField.RegisterValueChangedCallback(evt =>
                 {
                     choice.ChoiceText = evt.newValue;
                     _onDataChanged?.Invoke();
                 });
-                row.Add(choiceField);
+                choiceRow.Add(textField);
 
-                // Link / Jump button
-                if (!string.IsNullOrEmpty(choice.TargetID))
+                // Port (Next to text field)
+                var choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
+                choicePort.portName = ""; // No label
+                choicePort.AddToClassList("choice-port");
+
+                var cConnector = new EdgeConnector<ManhattanEdge>(new DialogueEdgeConnectorListener());
+
+                // Reflection for edgeConnector
+                var cProp = typeof(Port).GetProperty("edgeConnector", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (cProp != null && cProp.GetSetMethod(true) != null)
                 {
-                    var linkBtn = new Button(() =>
-                    {
-                        // This will be handled by the graph view
-                    })
-                    { text = "->" };
-                    linkBtn.AddToClassList("choice-link-btn");
-                    row.Add(linkBtn);
+                    cProp.SetValue(choicePort, cConnector);
+                }
+                else
+                {
+                    var field = typeof(Port).GetField("m_EdgeConnector", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    if (field != null) field.SetValue(choicePort, cConnector);
                 }
 
-                // Delete
-                var delBtn = new Button(() =>
+                choiceRow.Add(choicePort);
+                _choicePorts.Add(choicePort);
+
+                // Delete Button
+                var deleteBtn = new Button(() =>
                 {
-                    Unit.Choices.RemoveAt(idx);
-                    RebuildChoices();
+                    choices.RemoveAt(index);
                     _onDataChanged?.Invoke();
+                    RebuildChoices();
                 })
                 { text = "x" };
-                delBtn.AddToClassList("choice-delete-btn");
-                row.Add(delBtn);
+                deleteBtn.AddToClassList("choice-delete-button");
+                choiceRow.Add(deleteBtn);
 
-                _choicesContainer.Add(row);
-
-                // Choice output port - added to bottom port container
-                var choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
-                choicePort.portName = $"Choice {i}";
-                choicePort.portColor = Color.cyan;
-                _bottomPortContainer.Add(choicePort);
-                _choicePorts.Add(choicePort);
+                _choicesContainer.Add(choiceRow);
             }
 
             RefreshExpandedState();
