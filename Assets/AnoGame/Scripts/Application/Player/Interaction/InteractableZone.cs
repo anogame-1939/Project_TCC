@@ -8,7 +8,7 @@ namespace AnoGame.Application.Player.Interaction
     {
         [Header("Gate")]
         [SerializeField] protected float maxDistance = 2.0f;
-        [SerializeField] protected float viewAngle = 120f;
+        [SerializeField] protected float viewAngle = 360f;
         [SerializeField] protected LayerMask losMask = ~0;
         [SerializeField] protected Transform uiAnchor;
 
