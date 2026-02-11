@@ -1,0 +1,273 @@
+/* ================================================
+   DialogueGraphWindow UIToolkit - Style Sheet
+   ================================================ */
+
+/* --- Main Window --- */
+.dialogue-graph-root {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+/* --- Toolbar --- */
+.dialogue-toolbar {
+    flex-direction: row;
+    height: 24px;
+    background-color: #383838;
+    border-bottom-width: 1px;
+    border-bottom-color: #1a1a1a;
+}
+
+.dialogue-toolbar .unity-toolbar-button {
+    -unity-text-align: middle-center;
+}
+
+/* --- Content Area (Sidebar + GraphView) --- */
+.dialogue-content {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+/* --- Sidebar --- */
+.dialogue-sidebar {
+    width: 250px;
+    min-width: 180px;
+    max-width: 400px;
+    background-color: #333333;
+    border-right-width: 1px;
+    border-right-color: #1a1a1a;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 6px 8px;
+    -unity-font-style: bold;
+    font-size: 13px;
+    color: #ddd;
+    border-bottom-width: 1px;
+    border-bottom-color: #222;
+}
+
+.sidebar-search {
+    margin: 4px 6px;
+    flex-shrink: 0;
+}
+
+.sidebar-search > .unity-toolbar-search-field__search-text-field {
+    flex-grow: 1;
+}
+
+.sidebar-scroll {
+    flex-grow: 1;
+}
+
+.sidebar-scroll-content {
+    padding: 4px 0;
+}
+
+/* Episode Foldout */
+.episode-foldout {
+    margin-left: 4px;
+    margin-top: 4px;
+}
+
+.episode-foldout > .unity-foldout__toggle > .unity-toggle__input > .unity-label {
+    -unity-font-style: bold;
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* Chapter Row */
+.chapter-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 8px 2px 12px;
+    margin-top: 2px;
+}
+
+.chapter-label {
+    -unity-font-style: bold;
+    font-size: 11px;
+    color: #bbb;
+    flex-grow: 1;
+}
+
+.chapter-btn {
+    width: 20px;
+    height: 18px;
+    font-size: 11px;
+    -unity-text-align: middle-center;
+    margin-left: 2px;
+    padding: 0;
+}
+
+/* Section Row */
+.section-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 1px 8px 1px 24px;
+}
+
+.section-handle {
+    width: 16px;
+    font-size: 10px;
+    color: #888;
+    -unity-text-align: middle-center;
+    cursor: move-arrow;
+}
+
+.section-btn {
+    flex-grow: 1;
+    height: 20px;
+    font-size: 11px;
+    -unity-text-align: middle-left;
+    padding-left: 4px;
+    background-color: #444;
+    border-radius: 3px;
+    border-width: 0;
+    color: #ddd;
+    margin-left: 2px;
+}
+
+.section-btn:hover {
+    background-color: #555;
+}
+
+.section-btn:active {
+    background-color: #3a6ea5;
+}
+
+.section-delete-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    -unity-text-align: middle-center;
+    padding: 0;
+    margin-left: 2px;
+    color: #ff6666;
+    background-color: transparent;
+    border-width: 0;
+}
+
+.section-delete-btn:hover {
+    background-color: #553333;
+}
+
+.sidebar-add-episode-btn {
+    margin: 8px;
+    height: 24px;
+}
+
+/* --- GraphView --- */
+.dialogue-graph-view {
+    flex-grow: 1;
+}
+
+/* --- Overlay Label --- */
+.filter-overlay-label {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.debug-overlay-label {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    font-size: 11px;
+    color: yellow;
+    -unity-text-align: lower-right;
+}
+
+/* --- Node Styles --- */
+.dialogue-node {
+    min-width: 250px;
+    background-color: #2d2d2d;
+}
+
+.dialogue-node #title {
+    background-color: #3e3e3e;
+    color: white;
+}
+
+.dialogue-node #title-label {
+    color: white;
+}
+
+.dialogue-node #contents {
+    background-color: #2d2d2d;
+}
+
+.dialogue-node .node-speaker-label {
+    font-size: 10px;
+    color: #aaa;
+    margin: 2px 4px 0 4px;
+}
+
+.dialogue-node .node-speaker-dropdown {
+    margin: 2px 4px;
+    flex-grow: 1;
+}
+
+.dialogue-node .node-body-text {
+    min-height: 50px;
+    margin: 2px 4px;
+    white-space: normal;
+}
+
+.dialogue-node .choices-header {
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 4px;
+}
+
+.dialogue-node .choices-label {
+    -unity-font-style: bold;
+    font-size: 11px;
+    flex-grow: 1;
+}
+
+.dialogue-node .choice-add-btn {
+    width: 20px;
+    height: 18px;
+    font-size: 12px;
+}
+
+.dialogue-node .choice-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 1px 4px;
+}
+
+.dialogue-node .choice-text-field {
+    flex-grow: 1;
+    margin-right: 2px;
+}
+
+.dialogue-node .choice-link-btn {
+    width: 35px;
+    height: 18px;
+    font-size: 10px;
+}
+
+.dialogue-node .choice-delete-btn {
+    width: 20px;
+    height: 18px;
+    font-size: 10px;
+    color: red;
+}
+
+/* No data warning */
+.no-data-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-data-label {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 10px;
+}
