@@ -10,6 +10,7 @@ namespace AnoGame.AnoNarrative.Editor
 {
     /// <summary>
     /// GraphView Node representing a single ConversationUnit.
+    /// Ports are placed top (In) and bottom (Next) for natural vertical flow.
     /// </summary>
     public class DialogueNodeView : Node
     {
@@ -17,13 +18,17 @@ namespace AnoGame.AnoNarrative.Editor
         public Port InputPort { get; private set; }
         public Port OutputPort { get; private set; }
 
-        /// <summary>NextID output port (bottom).</summary>
+        /// <summary>Choice output ports.</summary>
         private readonly List<Port> _choicePorts = new List<Port>();
         public IReadOnlyList<Port> ChoicePorts => _choicePorts;
 
         private PopupField<string> _speakerDropdown;
         private TextField _bodyTextField;
         private VisualElement _choicesContainer;
+
+        // Custom containers for vertical port placement
+        private VisualElement _topPortContainer;
+        private VisualElement _bottomPortContainer;
 
         private MasterDialogueData _data;
         private Action _onDataChanged;
@@ -41,17 +46,36 @@ namespace AnoGame.AnoNarrative.Editor
             title = displayTitle;
             tooltip = $"ID:{unit.ID}\nEp:{unit.EpisodeID} Ch:{unit.ChapterID} Sec:{unit.SectionID}";
 
-            // ---- Ports ----
-            InputPort = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Multi, typeof(bool));
-            InputPort.portName = "In";
-            inputContainer.Add(InputPort);
+            // ---- Top Port (Input) ----
+            _topPortContainer = new VisualElement();
+            _topPortContainer.AddToClassList("top-port-container");
 
-            OutputPort = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
-            OutputPort.portName = "Next";
-            outputContainer.Add(OutputPort);
+            InputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
+            InputPort.portName = "";
+            InputPort.AddToClassList("top-port");
+            _topPortContainer.Add(InputPort);
+
+            // Insert at the very top of the node (before the title)
+            Insert(0, _topPortContainer);
+
+            // Hide default input/output containers (we use custom ones)
+            inputContainer.style.display = DisplayStyle.None;
+            outputContainer.style.display = DisplayStyle.None;
+
+            // ---- Bottom Port (Output / Next) ---- (must init before BuildContent because RebuildChoices uses it)
+            _bottomPortContainer = new VisualElement();
+            _bottomPortContainer.AddToClassList("bottom-port-container");
+
+            OutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
+            OutputPort.portName = "";
+            OutputPort.AddToClassList("bottom-port");
+            _bottomPortContainer.Add(OutputPort);
 
             // ---- Content ----
             BuildContent();
+
+            // Add bottom port container after content
+            Add(_bottomPortContainer);
 
             // ---- Appearance ----
             ApplyActorColor();
@@ -147,7 +171,7 @@ namespace AnoGame.AnoNarrative.Editor
         {
             _choicesContainer.Clear();
 
-            // Remove old choice ports
+            // Remove old choice ports from bottom container
             foreach (var p in _choicePorts)
             {
                 // Disconnect edges
@@ -157,7 +181,7 @@ namespace AnoGame.AnoNarrative.Editor
                     edge.output?.Disconnect(edge);
                     edge.RemoveFromHierarchy();
                 }
-                outputContainer.Remove(p);
+                if (p.parent != null) p.parent.Remove(p);
             }
             _choicePorts.Clear();
 
@@ -206,11 +230,11 @@ namespace AnoGame.AnoNarrative.Editor
 
                 _choicesContainer.Add(row);
 
-                // Choice output port
+                // Choice output port - added to bottom port container
                 var choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
                 choicePort.portName = $"Choice {i}";
                 choicePort.portColor = Color.cyan;
-                outputContainer.Add(choicePort);
+                _bottomPortContainer.Add(choicePort);
                 _choicePorts.Add(choicePort);
             }
 

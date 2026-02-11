@@ -187,6 +187,46 @@
     background-color: #2d2d2d;
 }
 
+/* Top port container (Input) */
+.top-port-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    background-color: #2a2a2a;
+    border-bottom-width: 1px;
+    border-bottom-color: #1a1a1a;
+}
+
+.top-port-container .top-port {
+    align-self: center;
+}
+
+.top-port-container .top-port .unity-port__connector {
+    border-color: #aaa;
+}
+
+/* Bottom port container (Output / Next / Choices) */
+.bottom-port-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    min-height: 20px;
+    background-color: #2a2a2a;
+    border-top-width: 1px;
+    border-top-color: #1a1a1a;
+    padding: 2px 4px;
+    flex-wrap: wrap;
+}
+
+.bottom-port-container .bottom-port {
+    align-self: center;
+}
+
+.bottom-port-container .bottom-port .unity-port__connector {
+    border-color: #aaa;
+}
+
 .dialogue-node #title {
     background-color: #3e3e3e;
     color: white;
