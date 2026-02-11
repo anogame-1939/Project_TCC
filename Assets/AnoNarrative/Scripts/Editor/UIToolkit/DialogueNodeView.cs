@@ -238,7 +238,18 @@ namespace AnoGame.AnoNarrative.Editor
                 });
                 choiceRow.Add(textField);
 
-                // Port (Next to text field)
+                // Delete Button first (so it's to the left of port)
+                var deleteBtn = new Button(() =>
+                {
+                    choices.RemoveAt(index);
+                    _onDataChanged?.Invoke();
+                    RebuildChoices();
+                })
+                { text = "x" };
+                deleteBtn.AddToClassList("choice-delete-button");
+                choiceRow.Add(deleteBtn);
+
+                // Port (Right-most)
                 var choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
                 choicePort.portName = ""; // No label
                 choicePort.AddToClassList("choice-port");
@@ -259,17 +270,6 @@ namespace AnoGame.AnoNarrative.Editor
 
                 choiceRow.Add(choicePort);
                 _choicePorts.Add(choicePort);
-
-                // Delete Button
-                var deleteBtn = new Button(() =>
-                {
-                    choices.RemoveAt(index);
-                    _onDataChanged?.Invoke();
-                    RebuildChoices();
-                })
-                { text = "x" };
-                deleteBtn.AddToClassList("choice-delete-button");
-                choiceRow.Add(deleteBtn);
 
                 _choicesContainer.Add(choiceRow);
             }

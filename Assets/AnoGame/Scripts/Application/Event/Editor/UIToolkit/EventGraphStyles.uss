@@ -1,0 +1,95 @@
+/* ================================================
+   EventGraphWindow UIToolkit - Style Sheet
+   ================================================ */
+
+/* --- Main Window --- */
+.event-graph-root {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+/* --- Toolbar --- */
+.event-toolbar {
+    flex-direction: row;
+    height: 24px;
+    background-color: #383838;
+    border-bottom-width: 1px;
+    border-bottom-color: #1a1a1a;
+}
+
+/* --- Content Area --- */
+.event-content {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+/* --- GraphView --- */
+.event-graph-view {
+    flex-grow: 1;
+}
+
+/* --- Node Styles --- */
+.event-node {
+    min-width: 250px;
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: #1a1a1a;
+}
+
+.event-node #title {
+    background-color: #3e3e3e;
+    color: white;
+    height: 30px;
+    justify-content: center;
+    padding-left: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.event-node #contents {
+    background-color: #2d2d2d;
+    padding: 8px;
+}
+
+.section-header {
+    -unity-font-style: bold;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    color: #ccc;
+    font-size: 11px;
+}
+
+.node-field {
+    margin-bottom: 4px;
+}
+
+.node-text-area {
+    min-height: 40px;
+    white-space: normal;
+}
+
+/* Port containers */
+.port-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top-width: 1px;
+    border-top-color: #444;
+}
+
+.input-port-container {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 4px;
+    background-color: #2a2a2a;
+}
+
+.output-port-container {
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 4px;
+    background-color: #2a2a2a;
+}
