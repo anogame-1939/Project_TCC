@@ -31,6 +31,9 @@ namespace AnoGame.AnoNarrative.Editor
         // Events
         public Action OnGraphDataChanged;
 
+        /// <summary>Whether to use Manhattan (right-angle) edges or default Bezier edges.</summary>
+        public bool UseManhattanEdges { get; set; } = false;
+
         public DialogueGraphView(MasterDialogueData data)
         {
             Data = data;
@@ -145,11 +148,7 @@ namespace AnoGame.AnoNarrative.Editor
                 if (!string.IsNullOrEmpty(unit.NextID) && _nodeViewMap.ContainsKey(unit.NextID))
                 {
                     var targetView = _nodeViewMap[unit.NextID];
-                    var edge = new ManhattanEdge
-                    {
-                        output = sourceView.OutputPort,
-                        input = targetView.InputPort
-                    };
+                    var edge = CreateEdge(sourceView.OutputPort, targetView.InputPort);
                     edge.output.Connect(edge);
                     edge.input.Connect(edge);
                     AddElement(edge);
@@ -164,11 +163,7 @@ namespace AnoGame.AnoNarrative.Editor
                         if (!string.IsNullOrEmpty(choice.TargetID) && _nodeViewMap.ContainsKey(choice.TargetID))
                         {
                             var targetView = _nodeViewMap[choice.TargetID];
-                            var edge = new ManhattanEdge
-                            {
-                                output = sourceView.ChoicePorts[i],
-                                input = targetView.InputPort
-                            };
+                            var edge = CreateEdge(sourceView.ChoicePorts[i], targetView.InputPort);
                             edge.output.Connect(edge);
                             edge.input.Connect(edge);
                             AddElement(edge);
@@ -464,6 +459,29 @@ namespace AnoGame.AnoNarrative.Editor
                 AssetDatabase.SaveAssetIfDirty(Data);
             }
             OnGraphDataChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Create an edge based on the current edge type setting.
+        /// </summary>
+        private Edge CreateEdge(Port outputPort, Port inputPort)
+        {
+            if (UseManhattanEdges)
+            {
+                return new ManhattanEdge
+                {
+                    output = outputPort,
+                    input = inputPort
+                };
+            }
+            else
+            {
+                return new Edge
+                {
+                    output = outputPort,
+                    input = inputPort
+                };
+            }
         }
 
         /// <summary>

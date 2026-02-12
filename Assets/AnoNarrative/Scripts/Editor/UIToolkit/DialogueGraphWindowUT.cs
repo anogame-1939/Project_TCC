@@ -27,6 +27,8 @@ namespace AnoGame.AnoNarrative.Editor
         private int _lastFilterSection = int.MinValue;
         [SerializeField]
         private string _lastFilterSectionName = null;
+        [SerializeField]
+        private bool _useManhattanEdges = false;
 
         [MenuItem("AnoGame/Dialogue System/Open Graph Editor (UIToolkit)")]
         public static void ShowWindow()
@@ -120,6 +122,7 @@ namespace AnoGame.AnoNarrative.Editor
             // GraphView
             _graphView = new DialogueGraphView(_data);
             _graphView.AddToClassList("dialogue-graph-view");
+            _graphView.UseManhattanEdges = _useManhattanEdges;
             _graphView.OnGraphDataChanged = () =>
             {
                 _sidebar?.RebuildTree();
@@ -191,6 +194,19 @@ namespace AnoGame.AnoNarrative.Editor
             var spacer = new VisualElement();
             spacer.style.flexGrow = 1;
             toolbar.Add(spacer);
+
+            // Edge type toggle (right side)
+            var edgeToggle = new ToolbarToggle { text = "Manhattan Edge", value = _useManhattanEdges };
+            edgeToggle.RegisterValueChangedCallback(evt =>
+            {
+                _useManhattanEdges = evt.newValue;
+                if (_graphView != null)
+                {
+                    _graphView.UseManhattanEdges = evt.newValue;
+                    _graphView.PopulateGraph();
+                }
+            });
+            toolbar.Add(edgeToggle);
 
             return toolbar;
         }
