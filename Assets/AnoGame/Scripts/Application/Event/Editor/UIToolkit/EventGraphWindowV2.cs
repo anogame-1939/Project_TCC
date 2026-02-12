@@ -11,7 +11,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 {
     public class EventGraphWindowV2 : EditorWindow
     {
-        private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_batch.json";
+        private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_story2.json";
 
         private EventGraphViewV2 _graphView;
         private EventList _data;
@@ -100,8 +100,8 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             try
             {
                 string jsonContent = File.ReadAllText(JSON_PATH);
-                string wrappedJson = "{\"events\":" + jsonContent + "}";
-                _data = JsonUtility.FromJson<EventList>(wrappedJson);
+                // string wrappedJson = "{\"events\":" + jsonContent + "}"; // Removed wrapping as file has root
+                _data = JsonUtility.FromJson<EventList>(jsonContent);
             }
             catch (Exception ex)
             {

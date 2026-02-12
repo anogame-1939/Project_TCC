@@ -14,20 +14,22 @@ namespace AnoGame.Data
     {
         [SerializeField] private string eventId;
         [SerializeField] private string eventName;
+        [SerializeField] private string category;
         [SerializeField] private string description;
         [SerializeField] private bool isOneTime; // 一回限りのイベントかどうか
 
         public string EventId => eventId;
         public string EventName => eventName;
+        public string Category => category;
         public string Description => description;
         public bool IsOneTime => isOneTime;
 
         [Header("Conditions")]
-        [SerializeField, ItemSelector] private List<string> requiredItemIds = new List<string>();
-        [SerializeField, EventSelector] private List<string> requiredEventIds = new List<string>();
+        [SerializeField] private List<ItemCondition> requiredItemIds = new List<ItemCondition>();
+        [SerializeField] private List<EventCondition> requiredEventIds = new List<EventCondition>();
 
-        public List<string> RequiredItemIds => requiredItemIds;
-        public List<string> RequiredEventIds => requiredEventIds;
+        public List<string> RequiredItemIds => System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(requiredItemIds, x => x.itemId));
+        public List<string> RequiredEventIds => System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(requiredEventIds, x => x.eventId));
 
         public bool HasConditions => (requiredItemIds != null && requiredItemIds.Count > 0) || (requiredEventIds != null && requiredEventIds.Count > 0);
 
@@ -41,5 +43,17 @@ namespace AnoGame.Data
             }
         }
 #endif
+    }
+
+    [System.Serializable]
+    public class ItemCondition
+    {
+        [ItemSelector] public string itemId;
+    }
+
+    [System.Serializable]
+    public class EventCondition
+    {
+        [EventSelector] public string eventId;
     }
 }

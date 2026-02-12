@@ -12,10 +12,10 @@ using System.Reflection;
 
 public class BatchEventCreatorV2
 {
-    private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_batch.json";
+    private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_story2.json";
     private const string PREFAB_DIR_PATH = "Assets/AnoGame/Prefabs/EventZone";
     private const string TIMELINE_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Timelines";
-    private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Events";
+    private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/Events/Story2";
     private readonly static Vector3 PLACEMENT_OFFSET = new Vector3(0, 0, 5f);
 
     [MenuItem("Tools/Run Batch Event Creation V2")]
@@ -28,8 +28,8 @@ public class BatchEventCreatorV2
         }
 
         string jsonContent = File.ReadAllText(JSON_PATH);
-        string wrappedJson = "{\"events\":" + jsonContent + "}";
-        EventList dataList = JsonUtility.FromJson<EventList>(wrappedJson);
+        // string wrappedJson = "{\"events\":" + jsonContent + "}"; // Removed wrapping as file has root
+        EventList dataList = JsonUtility.FromJson<EventList>(jsonContent);
 
         if (dataList == null || dataList.events == null)
         {
@@ -58,35 +58,65 @@ public class BatchEventCreatorV2
 
         int count = 0;
         Vector3 currentPos = Vector3.zero;
+
+        // 1. First Pass: Update/Create all EventData Assets from JSON (Migration)
+        // This ensures the Assets are the Source of Truth and contain all necessary data including Category.
         foreach (var evt in dataList.events)
         {
-            // 1. Create EventData Asset and Set Conditions (V2 Change)
             CreateEventData(evt);
+        }
+        AssetDatabase.SaveAssets(); // Ensure assets are written
 
-            // 2. Select Prefab based on Category
+        // 2. Second Pass: Build Scene from EventData ASSETS
+        // We reload them from disk to ensure we are using the Asset data.
+        var eventAssets = LoadAllEventDataInFolder(EVENTDATA_DIR_PATH);
+        
+        // Sort specifically to match the order in JSON for layout consistency? 
+        // Or just trust the folder order? The user table implies an order (ID order).
+        // Let's sort by ID to be safe and consistent.
+        eventAssets.Sort((a, b) => string.Compare(a.EventId, b.EventId, System.StringComparison.Ordinal));
+
+        foreach (var data in eventAssets)
+        {
+            // Select Prefab based on Category stored in ASSET
             GameObject receptorPrefab = null;
-            switch (evt.category)
+            switch (data.Category) // Uses the new field
             {
+                case "初回": // "Contact" mapped to Japanese category
                 case "Contact":
                     receptorPrefab = tplContact;
                     break;
+                case "井戸": // "Inspect" mapped to Japanese category
+                case "ラスト":
                 case "Inspect":
                 case "Interact":
+                case "Search": // "調べる"
+                case "調べる":
                     receptorPrefab = tplInspect;
                     break;
                 case "ItemUse":
+                case "アイテム使用":
                     receptorPrefab = tplItem;
                     break;
                 case "Chain":
+                case "連鎖":
                     receptorPrefab = null; 
                     break;
+                case "専用インタラクト":
+                case "UniqueInteract":
+                    receptorPrefab = tplInspect; // Default to Inspect for unique?
+                    break;
                 default:
-                    Debug.LogWarning($"Unknown category {evt.category} for {evt.eventId}, defaulting to Tpl_Trigger only.");
+                    // Fallback based on name or just Trigger
+                    if (data.EventName.Contains("接触")) receptorPrefab = tplContact;
+                    else if (data.EventName.Contains("調べる")) receptorPrefab = tplInspect;
+                    else if (data.EventName.Contains("アイテム")) receptorPrefab = tplItem;
+                    else receptorPrefab = null;
                     break;
             }
 
-            // 3. Create Scene Objects
-            CreateEventSet(evt, receptorPrefab, tplTrigger, root.transform, currentPos);
+            // Create Scene Objects using the ASSET data
+            CreateEventSet(data, receptorPrefab, tplTrigger, root.transform, currentPos);
             currentPos += PLACEMENT_OFFSET;
             count++;
         }
@@ -95,7 +125,7 @@ public class BatchEventCreatorV2
         AssetDatabase.SaveAssets(); 
         
         Selection.activeGameObject = root;
-        Debug.Log($"Batch Event Creation V2 Complete! Created {count} events under 'GeneratedEventsV2'.");
+        Debug.Log($"Batch Event Creation V2 Complete! Created {count} events using EventData Assets.");
     }
 
     private static void CreateEventData(EventJsonItem evt)
@@ -114,6 +144,7 @@ public class BatchEventCreatorV2
         SetProp(so, "eventId", evt.eventId);
         SetProp(so, "eventName", evt.name);
         SetProp(so, "description", evt.description);
+        SetProp(so, "category", evt.category); // Populate Category
         
         // --- V2: Apply Conditions to EventData ---
         var requiredItemsProp = so.FindProperty("requiredItemIds");
@@ -129,7 +160,8 @@ public class BatchEventCreatorV2
                 for (int i = 0; i < evt.requiredItemIds.Count; i++)
                 {
                     requiredItemsProp.InsertArrayElementAtIndex(i);
-                    requiredItemsProp.GetArrayElementAtIndex(i).stringValue = evt.requiredItemIds[i];
+                    var itemElem = requiredItemsProp.GetArrayElementAtIndex(i);
+                    itemElem.FindPropertyRelative("itemId").stringValue = evt.requiredItemIds[i];
                 }
             }
 
@@ -138,12 +170,26 @@ public class BatchEventCreatorV2
                 for (int i = 0; i < evt.requiredEventIds.Count; i++)
                 {
                     requiredEventsProp.InsertArrayElementAtIndex(i);
-                    requiredEventsProp.GetArrayElementAtIndex(i).stringValue = evt.requiredEventIds[i];
+                    var eventElem = requiredEventsProp.GetArrayElementAtIndex(i);
+                    eventElem.FindPropertyRelative("eventId").stringValue = evt.requiredEventIds[i];
                 }
             }
         }
 
         so.ApplyModifiedProperties();
+    }
+
+    private static List<EventData> LoadAllEventDataInFolder(string folderPath)
+    {
+        var list = new List<EventData>();
+        var guids = AssetDatabase.FindAssets("t:EventData", new[] { folderPath });
+        foreach (var guid in guids)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            var asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
+            if (asset != null) list.Add(asset);
+        }
+        return list;
     }
 
     private static void SetProp(SerializedObject so, string name, string val)
@@ -152,10 +198,10 @@ public class BatchEventCreatorV2
         if (p != null) p.stringValue = val;
     }
 
-    private static void CreateEventSet(EventJsonItem evt, GameObject receptorPrefab, GameObject triggerPrefab, Transform parent, Vector3 localPosition)
+    private static void CreateEventSet(EventData evtData, GameObject receptorPrefab, GameObject triggerPrefab, Transform parent, Vector3 localPosition)
     {
         // 1. Container Naming: ID + Name
-        string containerName = $"{evt.eventId}_{evt.name}";
+        string containerName = $"{evtData.EventId}_{evtData.EventName}";
         
         GameObject container = new GameObject(containerName);
         container.transform.SetParent(parent);
@@ -168,11 +214,11 @@ public class BatchEventCreatorV2
             GameObject receptor = (GameObject)PrefabUtility.InstantiatePrefab(receptorPrefab, container.transform);
             if (receptor != null)
             {
-                receptor.name = $"{evt.eventId}_Receptor_{evt.category}";
+                receptor.name = $"{evtData.EventId}_Receptor_{evtData.Category}";
                 Undo.RegisterCreatedObjectUndo(receptor, StringPool.GetUniqueString());
-                ApplyReceptorData(receptor, evt);
+                ApplyReceptorData(receptor, evtData);
             }
-            else Debug.LogError($"Failed instantiate receptor for {evt.eventId}");
+            else Debug.LogError($"Failed instantiate receptor for {evtData.EventId}");
         }
 
         // Instantiate Trigger
@@ -181,37 +227,45 @@ public class BatchEventCreatorV2
             GameObject trigger = (GameObject)PrefabUtility.InstantiatePrefab(triggerPrefab, container.transform);
             if (trigger != null)
             {
-                trigger.name = $"{evt.eventId}_Trigger";
+                trigger.name = $"{evtData.EventId}_Trigger";
                 Undo.RegisterCreatedObjectUndo(trigger, StringPool.GetUniqueString());
                 
-                ApplyTriggerData(trigger, evt);
+                ApplyTriggerData(trigger, evtData);
 
-                if (evt.timeline) PrepareTimeline(trigger, evt);
+                // Check timeline requirement? 
+                // Currently stored in JSON 'timeline' bool. 
+                // We might need to add this to EventData or infer it.
+                // For now, let's assume if category is specific or by name?
+                // Or purely rely on existing timeline assets matching the name?
+                PrepareTimeline(trigger, evtData);
             }
-            else Debug.LogError($"Failed instantiate trigger for {evt.eventId}");
+            else Debug.LogError($"Failed instantiate trigger for {evtData.EventId}");
         }
     }
 
-    private static void ApplyReceptorData(GameObject goo, EventJsonItem evt)
+    private static void ApplyReceptorData(GameObject goo, EventData evtData)
     {
-        var eventData = FindEventData(evt.eventId);
-
         var contact = goo.GetComponent<ContactReceptor>();
-        if (contact != null) UpdateSO(contact, "targetEventId", evt.eventId);
+        if (contact != null) UpdateSO(contact, "targetEventId", evtData.EventId);
 
         var inspect = goo.GetComponent<InspectReceptor>();
         if (inspect != null)
         {
-             UpdateSO(inspect, "targetEventId", evt.eventId);
-             if (!string.IsNullOrEmpty(evt.paramText)) UpdateSO(inspect, "prompt", evt.paramText);
+             UpdateSO(inspect, "targetEventId", evtData.EventId);
+             
+             // Prompt text logic? 
+             // If Description is used as prompt? Or we need a specific prompt field?
+             // For now, let's use Description if it's short, or generic "Check". 
+             // Or leave it to manual edit.
+             if (!string.IsNullOrEmpty(evtData.Description)) UpdateSO(inspect, "prompt", evtData.Description);
              
              // V2: Set EventData reference
-             if (eventData != null)
+             if (evtData != null)
              {
                  var so = new SerializedObject(inspect);
                  so.Update();
                  var p = so.FindProperty("eventData");
-                 if (p != null) p.objectReferenceValue = eventData;
+                 if (p != null) p.objectReferenceValue = evtData;
                  so.ApplyModifiedProperties();
              }
         }
@@ -219,12 +273,14 @@ public class BatchEventCreatorV2
         var itemRep = goo.GetComponent<ItemReceptor>();
         if (itemRep != null)
         {
-            UpdateSO(itemRep, "targetEventId", evt.eventId);
-            if (!string.IsNullOrEmpty(evt.paramItemId)) UpdateSO(itemRep, "targetItemId", evt.paramItemId);
+            UpdateSO(itemRep, "targetEventId", evtData.EventId);
+            // paramItemId logic needs to be in EventData if we want validation?
+            // If Category is ItemUse, we might need a "TargetItemId" field in EventData.
+            // For now, skip auto-setting targetItemId from EventData unless we add it.
         }
     }
 
-    private static void ApplyTriggerData(GameObject goo, EventJsonItem evt)
+    private static void ApplyTriggerData(GameObject goo, EventData evtData)
     {
         // 1. Component check
         var oldComp = goo.GetComponent("AnoGame.Application.Event.Legacy.InstantEventTrigger_Old");
@@ -234,7 +290,7 @@ public class BatchEventCreatorV2
         if (trig == null) trig = goo.AddComponent<InstantEventTrigger>();
 
         // 3. Set Data
-        UpdateSO(trig, "targetEventId", evt.eventId);
+        UpdateSO(trig, "targetEventId", evtData.EventId);
 
         // 4. V2: Clear local conditions as they are now in EventData
         SerializedObject so = new SerializedObject(trig);
@@ -258,40 +314,22 @@ public class BatchEventCreatorV2
         so.ApplyModifiedProperties();
     }
 
-    private static void PrepareTimeline(GameObject goo, EventJsonItem evt)
+    private static void PrepareTimeline(GameObject goo, EventData evtData)
     {
         var director = goo.GetComponent<PlayableDirector>();
         if (director == null) return;
 
-        string assetName = $"{evt.eventId}_Timeline";
+        string assetName = $"{evtData.EventId}_Timeline";
         string path = $"{TIMELINE_DIR_PATH}/{assetName}.playable";
         
         TimelineAsset timeline = AssetDatabase.LoadAssetAtPath<TimelineAsset>(path);
-        if (timeline == null)
+        
+        // If timeline exists, assign it. We don't auto-create unless logic dictates.
+        // If we want to support auto-creation for specific events:
+        if (timeline != null)
         {
-            timeline = ScriptableObject.CreateInstance<TimelineAsset>();
-            AssetDatabase.CreateAsset(timeline, path);
+            director.playableAsset = timeline;
         }
-
-        director.playableAsset = timeline;
-    }
-
-
-
-    private static EventData FindEventData(string eventId)
-    {
-        string path = $"{EVENTDATA_DIR_PATH}/{eventId}.asset";
-        EventData asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
-        if (asset != null) return asset;
-
-        string[] guids = AssetDatabase.FindAssets("t:EventData");
-        foreach (var guid in guids)
-        {
-            string p = AssetDatabase.GUIDToAssetPath(guid);
-            EventData a = AssetDatabase.LoadAssetAtPath<EventData>(p);
-            if (a != null && a.EventId == eventId) return a;
-        }
-        return null; // Return null if not found (might be created later in loop)
     }
 
     static class StringPool { public static string GetUniqueString() => System.Guid.NewGuid().ToString(); }

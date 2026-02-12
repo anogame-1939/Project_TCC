@@ -14,6 +14,7 @@ namespace AnoGame.Data.Editor
     {
         SerializedProperty _eventId;
         SerializedProperty _eventName;
+        SerializedProperty _category;
         SerializedProperty _description;
         SerializedProperty _isOneTime;
         SerializedProperty _requiredItems;
@@ -23,6 +24,7 @@ namespace AnoGame.Data.Editor
         {
             _eventId = serializedObject.FindProperty("eventId");
             _eventName = serializedObject.FindProperty("eventName");
+            _category = serializedObject.FindProperty("category");
             _description = serializedObject.FindProperty("description");
             _isOneTime = serializedObject.FindProperty("isOneTime");
             _requiredItems = serializedObject.FindProperty("requiredItemIds");
@@ -78,6 +80,7 @@ namespace AnoGame.Data.Editor
 
             // Other Properties
             root.Add(new PropertyField(_eventName));
+            root.Add(new PropertyField(_category));
             root.Add(new PropertyField(_description));
             root.Add(new PropertyField(_isOneTime));
 
