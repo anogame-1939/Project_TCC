@@ -39,6 +39,10 @@ namespace AnoGame.AnoNarrative.Editor
             Data = data;
 
             // Standard manipulators
+            // TrackpadPanManipulator must be registered before ContentZoomer
+            // so that unmodified scroll events are consumed as pan (trackpad two-finger swipe)
+            // while Ctrl/Cmd + scroll is left for ContentZoomer (pinch zoom).
+            this.AddManipulator(new TrackpadPanManipulator());
             this.AddManipulator(new ContentZoomer());
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
@@ -720,6 +724,52 @@ namespace AnoGame.AnoNarrative.Editor
             }
 
             return EditorUtility.NaturalCompare(idA, idB);
+        }
+
+        // --- Trackpad Pan Support ---
+
+        /// <summary>
+        /// Manipulator that converts unmodified scroll (trackpad two-finger swipe) into
+        /// a pan operation on the GraphView. When Ctrl/Cmd is held the event is ignored
+        /// so that ContentZoomer can handle it as zoom.
+        /// </summary>
+        private class TrackpadPanManipulator : Manipulator
+        {
+            /// <summary>
+            /// Scaling factor applied to the scroll delta to control pan speed.
+            /// </summary>
+            private const float PanSpeed = 3f;
+
+            protected override void RegisterCallbacksOnTarget()
+            {
+                target.RegisterCallback<WheelEvent>(OnWheel, TrickleDown.TrickleDown);
+            }
+
+            protected override void UnregisterCallbacksFromTarget()
+            {
+                target.UnregisterCallback<WheelEvent>(OnWheel, TrickleDown.TrickleDown);
+            }
+
+            private void OnWheel(WheelEvent evt)
+            {
+                // If any modifier key is held, let other manipulators (ContentZoomer) handle it.
+                // On macOS trackpad, pinch-to-zoom sends scroll events with Ctrl held.
+                if (evt.ctrlKey || evt.commandKey || evt.altKey || evt.shiftKey)
+                    return;
+
+                var graphView = target as GraphView;
+                if (graphView == null) return;
+
+                // Convert scroll delta into a pan offset.
+                // WheelEvent.delta is (x, y, 0); positive y = scroll down.
+                Vector3 currentPos = graphView.contentViewContainer.transform.position;
+                Vector3 delta = new Vector3(-evt.delta.x, -evt.delta.y, 0f) * PanSpeed;
+
+                graphView.contentViewContainer.transform.position = currentPos + delta;
+
+                evt.StopPropagation();
+                evt.PreventDefault();
+            }
         }
     }
 }
