@@ -461,6 +461,7 @@ namespace AnoGame.AnoNarrative.Editor
             if (Data != null)
             {
                 EditorUtility.SetDirty(Data);
+                AssetDatabase.SaveAssetIfDirty(Data);
             }
             OnGraphDataChanged?.Invoke();
         }

@@ -12,11 +12,21 @@ namespace AnoGame.AnoNarrative.Editor
     /// </summary>
     public class DialogueGraphWindowUT : EditorWindow
     {
+        [SerializeField]
         private MasterDialogueData _data;
         private DialogueGraphView _graphView;
         private DialogueGraphSidebarUT _sidebar;
         private VisualElement _sidebarContainer;
+        [SerializeField]
         private bool _showSidebar = true;
+        [SerializeField]
+        private int _lastFilterEpisode = int.MinValue;
+        [SerializeField]
+        private int _lastFilterChapter = int.MinValue;
+        [SerializeField]
+        private int _lastFilterSection = int.MinValue;
+        [SerializeField]
+        private string _lastFilterSectionName = null;
 
         [MenuItem("AnoGame/Dialogue System/Open Graph Editor (UIToolkit)")]
         public static void ShowWindow()
@@ -93,6 +103,10 @@ namespace AnoGame.AnoNarrative.Editor
             _sidebar.OnSelectSection = (ep, ch, sec, name) =>
             {
                 _graphView?.SetFilter(ep, ch, sec, name);
+                _lastFilterEpisode = ep;
+                _lastFilterChapter = ch;
+                _lastFilterSection = sec;
+                _lastFilterSectionName = name;
                 _sidebar?.RebuildTree();
             };
             _sidebar.OnRequestPanTo = (pos) =>
@@ -112,13 +126,21 @@ namespace AnoGame.AnoNarrative.Editor
             };
             content.Add(_graphView);
 
-            // Default filter: show first section
-            if (_data.Conversations.Count > 0)
+            // Restore previous filter or set default
+            if (_lastFilterEpisode != int.MinValue)
+            {
+                // Restore previous filter state (e.g. after domain reload)
+                _graphView.SetFilter(_lastFilterEpisode, _lastFilterChapter, _lastFilterSection, _lastFilterSectionName);
+            }
+            else if (_data.Conversations.Count > 0)
             {
                 var first = _data.Conversations[0];
                 if (first.EpisodeID != int.MinValue)
                 {
                     _graphView.SetFilter(first.EpisodeID, first.ChapterID, first.SectionID);
+                    _lastFilterEpisode = first.EpisodeID;
+                    _lastFilterChapter = first.ChapterID;
+                    _lastFilterSection = first.SectionID;
                 }
             }
         }
