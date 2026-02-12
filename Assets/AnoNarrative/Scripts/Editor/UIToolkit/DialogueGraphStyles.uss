@@ -184,7 +184,14 @@
 /* --- Node Styles --- */
 .dialogue-node {
     min-width: 250px;
-    background-color: #2d2d2d;
+    background-color: #2d2d2d; /* Default, overridden by actor color */
+    border-radius: 8px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-color: #111;
+    overflow: hidden; /* Ensure content obeys border radius */
 }
 
 /* Top port container (Input) */
@@ -193,9 +200,8 @@
     justify-content: center;
     align-items: center;
     height: 20px;
-    background-color: #2a2a2a;
-    border-bottom-width: 1px;
-    border-bottom-color: #1a1a1a;
+    background-color: transparent;
+    border-width: 0;
 }
 
 .top-port-container .top-port {
@@ -212,9 +218,8 @@
     justify-content: center;
     align-items: center;
     min-height: 20px;
-    background-color: #2a2a2a;
-    border-top-width: 1px;
-    border-top-color: #1a1a1a;
+    background-color: transparent;
+    border-width: 0;
     padding: 2px 4px;
     flex-wrap: wrap;
 }
@@ -228,32 +233,50 @@
 }
 
 .dialogue-node #title {
-    background-color: #3e3e3e;
+    background-color: rgba(0, 0, 0, 0.1);
     color: white;
+    height: 30px;
 }
 
 .dialogue-node #title-label {
     color: white;
+    font-size: 12px;
+    -unity-font-style: bold;
+    margin-left: 4px;
 }
 
 .dialogue-node #contents {
-    background-color: #2d2d2d;
+    background-color: transparent;
+}
+
+.dialogue-node #divider {
+    display: none;
 }
 
 .dialogue-node .node-speaker-label {
-    font-size: 10px;
-    color: #aaa;
-    margin: 2px 4px 0 4px;
+    display: none; /* Removed in C#, but just in case */
 }
 
 .dialogue-node .node-speaker-dropdown {
-    margin: 2px 4px;
+    margin: 4px 8px;
     flex-grow: 1;
 }
 
 .dialogue-node .node-body-text {
-    min-height: 50px;
-    margin: 2px 4px;
+    min-height: 60px; /* Approx 3 lines */
+    margin: 4px 8px;
+    white-space: normal;
+    background-color: transparent;
+    border-width: 0;
+}
+
+.dialogue-node .node-body-text > .unity-text-field__input {
+    background-color: #1a1a1a;
+    border-radius: 4px;
+    border-color: #111;
+    border-width: 1px;
+    color: #eee;
+    padding: 4px;
     white-space: normal;
 }
 

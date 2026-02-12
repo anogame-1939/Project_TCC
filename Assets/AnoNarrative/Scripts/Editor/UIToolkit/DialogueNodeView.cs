@@ -41,10 +41,9 @@ namespace AnoGame.AnoNarrative.Editor
 
             AddToClassList("dialogue-node");
 
-            // Set title to speaker name (not GUID)
-            string displayTitle = !string.IsNullOrEmpty(unit.SpeakerName) ? unit.SpeakerName : "(No Speaker)";
-            title = displayTitle;
-            tooltip = $"ID:{unit.ID}\nEp:{unit.EpisodeID} Ch:{unit.ChapterID} Sec:{unit.SectionID}";
+            // Set title to first 10 chars of body text
+            title = GetTitleFromBody(unit.BodyText);
+            tooltip = $"ID:{unit.ID}\nEp:{unit.EpisodeID} Ch:{unit.ChapterID} Sec:{unit.SectionID}\nSpeaker:{unit.SpeakerName}";
 
             // ---- Top Port (Input) ----
             _topPortContainer = new VisualElement();
@@ -124,16 +123,13 @@ namespace AnoGame.AnoNarrative.Editor
             int currentIdx = actorNames.IndexOf(currentSpeaker);
             if (currentIdx < 0) currentIdx = 0;
 
-            var speakerLabel = new Label("Speaker");
-            speakerLabel.AddToClassList("node-speaker-label");
-            content.Add(speakerLabel);
+            // Speaker Dropdown (Label removed)
 
             _speakerDropdown = new PopupField<string>(actorNames, currentIdx);
             _speakerDropdown.AddToClassList("node-speaker-dropdown");
             _speakerDropdown.RegisterValueChangedCallback(evt =>
             {
                 Unit.SpeakerName = evt.newValue;
-                title = evt.newValue; // Update title to new speaker
                 ApplyActorColor();
                 _onDataChanged?.Invoke();
             });
@@ -147,6 +143,7 @@ namespace AnoGame.AnoNarrative.Editor
             _bodyTextField.RegisterValueChangedCallback(evt =>
             {
                 Unit.BodyText = evt.newValue;
+                title = GetTitleFromBody(evt.newValue);
                 _onDataChanged?.Invoke();
             });
             content.Add(_bodyTextField);
@@ -281,11 +278,14 @@ namespace AnoGame.AnoNarrative.Editor
         private void ApplyActorColor()
         {
             Color nodeColor = _data.GetActorColor(Unit.SpeakerName);
+            // Apply color to the main container (entire node background)
+            style.backgroundColor = new StyleColor(nodeColor);
+
+            // Reset title background so it's transparent (handled in USS, but ensure here just in case)
             var titleContainer = this.Q("title");
             if (titleContainer != null)
             {
-                titleContainer.style.backgroundColor = new StyleColor(nodeColor);
-                titleContainer.style.color = Color.white;
+                titleContainer.style.backgroundColor = StyleKeyword.Null; // or clear
             }
         }
 
@@ -296,6 +296,16 @@ namespace AnoGame.AnoNarrative.Editor
         {
             var pos = GetPosition();
             Unit.Position = new Vector2(pos.x, pos.y);
+        }
+
+        private string GetTitleFromBody(string bodyText)
+        {
+            if (string.IsNullOrEmpty(bodyText)) return "(Empty)";
+            // Take up to first line, max 10 chars
+            string firstLine = bodyText.Split('\n')[0];
+            if (firstLine.Length > 10)
+                return firstLine.Substring(0, 10) + "...";
+            return firstLine;
         }
     }
 }

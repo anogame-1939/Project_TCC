@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -22,6 +23,7 @@ namespace AnoGame.AnoNarrative.Editor
         private ToolbarSearchField _searchField;
         private ScrollView _scrollView;
         private string _searchFilter = "";
+        private Dictionary<int, bool> _foldoutStates = new Dictionary<int, bool>();
 
         public DialogueGraphSidebarUT(MasterDialogueData data)
         {
@@ -73,25 +75,32 @@ namespace AnoGame.AnoNarrative.Editor
 
             foreach (var epGroup in episodes)
             {
-                string epStr = epGroup.Key == -1 ? "Default" : epGroup.Key.ToString();
+                int epKey = epGroup.Key;
+                string epStr = epKey == -1 ? "Default" : epKey.ToString();
                 bool allowEp = string.IsNullOrEmpty(_searchFilter) || epStr.Contains(_searchFilter);
 
-                if (epGroup.Key == -1)
-                {
-                    // Default episode: show chapters directly
-                    BuildChapters(epGroup, allowEp);
-                }
-                else
-                {
-                    // Episode foldout
-                    var epFoldout = new Foldout { text = $"Episode: {epStr}", value = true };
-                    epFoldout.AddToClassList("episode-foldout");
+                // Get saved foldout state (default: open)
+                if (!_foldoutStates.ContainsKey(epKey))
+                    _foldoutStates[epKey] = true;
 
-                    // + button in header (add chapter)
+                string foldoutLabel = epKey == -1 ? "Chapter: Default" : $"Episode: {epStr}";
+                var epFoldout = new Foldout { text = foldoutLabel, value = _foldoutStates[epKey] };
+                epFoldout.AddToClassList("episode-foldout");
+
+                // Save foldout state on toggle
+                int capturedKey = epKey;
+                epFoldout.RegisterValueChangedCallback(evt =>
+                {
+                    _foldoutStates[capturedKey] = evt.newValue;
+                });
+
+                if (epKey != -1)
+                {
+                    // + button for add chapter
                     var epHeader = epFoldout.Q<Toggle>();
                     if (epHeader != null)
                     {
-                        var addChBtn = new Button(() => CreateChapter(epGroup.Key)) { text = "+" };
+                        var addChBtn = new Button(() => CreateChapter(epKey)) { text = "+" };
                         addChBtn.style.width = 20;
                         addChBtn.style.height = 18;
                         addChBtn.style.fontSize = 11;
@@ -105,10 +114,10 @@ namespace AnoGame.AnoNarrative.Editor
                         addChBtn.style.top = 2;
                         epHeader.Add(addChBtn);
                     }
-
-                    BuildChaptersIntoContainer(epFoldout, epGroup, allowEp);
-                    _scrollView.Add(epFoldout);
                 }
+
+                BuildChaptersIntoContainer(epFoldout, epGroup, allowEp);
+                _scrollView.Add(epFoldout);
             }
         }
 

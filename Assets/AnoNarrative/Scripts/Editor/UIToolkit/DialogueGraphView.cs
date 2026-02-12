@@ -509,8 +509,8 @@ namespace AnoGame.AnoNarrative.Editor
                 nodesByLevel[lvl].Add(node);
             }
 
-            float spacingX = 330f;
-            float spacingY = 180f;
+            float spacingX = 400f;
+            float spacingY = 250f;
             Vector2 startOffset = new Vector2(50, 50);
 
             foreach (var lvl in nodesByLevel.Keys)
@@ -554,8 +554,8 @@ namespace AnoGame.AnoNarrative.Editor
             int count = visibleNodes.Count;
             int rows = Mathf.Max(1, Mathf.CeilToInt(Mathf.Sqrt(count)));
 
-            float spacingX = 330f;
-            float spacingY = 180f;
+            float spacingX = 400f;
+            float spacingY = 250f;
             Vector2 startOffset = new Vector2(50, 50);
 
             for (int i = 0; i < count; i++)
