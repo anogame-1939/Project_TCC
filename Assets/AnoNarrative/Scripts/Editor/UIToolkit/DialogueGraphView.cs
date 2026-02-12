@@ -44,10 +44,6 @@ namespace AnoGame.AnoNarrative.Editor
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
-            // Mac trackpad support:
-            // two-finger gesture emits WheelEvent, so treat it as pan when no modifier is pressed.
-            RegisterCallback<WheelEvent>(OnWheelPan);
-
             // Grid background
             var gridBg = new GridBackground();
             Insert(0, gridBg);
@@ -83,25 +79,6 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 PopulateGraph();
             }
-        }
-
-        private void OnWheelPan(WheelEvent evt)
-        {
-            // Keep zoom behavior when modifier key is pressed (Cmd on macOS / Ctrl on Windows).
-            var hasZoomModifier = (evt.modifiers & EventModifiers.Command) != 0 ||
-                                  (evt.modifiers & EventModifiers.Control) != 0;
-            if (hasZoomModifier)
-            {
-                return;
-            }
-
-            // Convert two-finger wheel delta into graph panning.
-            // Delta direction is inverted here so content follows natural trackpad movement.
-            var currentPosition = contentViewContainer.transform.position;
-            var panDelta = new Vector3(-evt.delta.x, -evt.delta.y, 0f);
-            UpdateViewTransform(currentPosition + panDelta, contentViewContainer.transform.scale);
-
-            evt.StopPropagation();
         }
 
         /// <summary>
