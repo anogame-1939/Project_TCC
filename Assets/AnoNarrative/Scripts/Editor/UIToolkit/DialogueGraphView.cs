@@ -178,6 +178,9 @@ namespace AnoGame.AnoNarrative.Editor
             }
 
             UpdateOverlayLabel();
+
+            // Ensure connections layer is drawn on top of nodes
+            schedule.Execute(() => BringEdgeLayerToFront());
         }
 
         /// <summary>
@@ -460,6 +463,22 @@ namespace AnoGame.AnoNarrative.Editor
                 EditorUtility.SetDirty(Data);
             }
             OnGraphDataChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Bring the edge (connections) layer to the front so edges render on top of nodes.
+        /// GraphView layers are unnamed, so we find the layer containing Edge elements.
+        /// </summary>
+        private void BringEdgeLayerToFront()
+        {
+            foreach (var child in contentViewContainer.Children())
+            {
+                if (child.Children().Any(c => c is Edge))
+                {
+                    child.BringToFront();
+                    break;
+                }
+            }
         }
 
         private void UpdateOverlayLabel()
