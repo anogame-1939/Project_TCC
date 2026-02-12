@@ -15,7 +15,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private EventGraphView _graphView;
         private EventList _data;
 
-        [MenuItem("Window/AnoGame/Event Graph (UIToolkit)")]
+        [MenuItem("AnoGame/Event Graph")]
         public static void Open()
         {
             var window = GetWindow<EventGraphWindowUT>("Event Graph (UT)");

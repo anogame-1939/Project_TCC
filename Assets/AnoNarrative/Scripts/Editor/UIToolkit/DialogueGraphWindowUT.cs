@@ -30,7 +30,7 @@ namespace AnoGame.AnoNarrative.Editor
         [SerializeField]
         private bool _useManhattanEdges = false;
 
-        [MenuItem("AnoGame/Dialogue System/Open Graph Editor (UIToolkit)")]
+        [MenuItem("AnoGame/Dialogue System/Open Graph Editor")]
         public static void ShowWindow()
         {
             var window = GetWindow<DialogueGraphWindowUT>("Dialogue Graph (UT)");
