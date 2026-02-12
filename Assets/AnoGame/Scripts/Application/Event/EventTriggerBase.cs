@@ -119,6 +119,42 @@ namespace AnoGame.Application.Event
                 }
             }
 
+            // EventData defined conditions
+            if (eventData != null)
+            {
+                if (eventData.RequiredItemIds != null)
+                {
+                    foreach (var itemId in eventData.RequiredItemIds)
+                    {
+                        if (!string.IsNullOrEmpty(itemId))
+                        {
+                            var condition = new KeyItemCondition(_inventoryService, itemId);
+                            _conditions.Add(condition);
+                            if (condition is IObservableCondition observableCondition)
+                            {
+                                observableCondition.OnConditionChanged += StartEvent;
+                            }
+                        }
+                    }
+                }
+
+                if (eventData.RequiredEventIds != null)
+                {
+                    foreach (var evtId in eventData.RequiredEventIds)
+                    {
+                        if (!string.IsNullOrEmpty(evtId))
+                        {
+                            var condition = new EventClearedCondition(_eventService, evtId);
+                            _conditions.Add(condition);
+                            if (condition is IObservableCondition observableCondition)
+                            {
+                                observableCondition.OnConditionChanged += StartEvent;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (requiredEvents != null)
             {
                 foreach (var evt in requiredEvents)

@@ -1,5 +1,7 @@
 using UnityEngine;
 using AnoGame.Domain.Event.Types;
+using System.Collections.Generic;
+using AnoGame.Application.Attributes;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,6 +21,15 @@ namespace AnoGame.Data
         public string EventName => eventName;
         public string Description => description;
         public bool IsOneTime => isOneTime;
+
+        [Header("Conditions")]
+        [SerializeField, ItemSelector] private List<string> requiredItemIds = new List<string>();
+        [SerializeField, EventSelector] private List<string> requiredEventIds = new List<string>();
+
+        public List<string> RequiredItemIds => requiredItemIds;
+        public List<string> RequiredEventIds => requiredEventIds;
+
+        public bool HasConditions => (requiredItemIds != null && requiredItemIds.Count > 0) || (requiredEventIds != null && requiredEventIds.Count > 0);
 
 #if UNITY_EDITOR
         private void OnValidate()

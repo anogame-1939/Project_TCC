@@ -5,6 +5,10 @@ using AnoGame.Domain.Event.Services;
 using AnoGame.Application.Attributes;
 using AnoGame.Application.Player.Interaction;
 using AnoGame.Application.Player; // InteractionController
+using AnoGame.Domain.Inventory.Services;
+using AnoGame.Data;
+using AnoGame.Domain.Event.Conditions;
+using System.Linq;
 
 namespace AnoGame.Application.Event
 {
@@ -17,6 +21,7 @@ namespace AnoGame.Application.Event
         [Header("Event")]
         [EventSelector]
         [SerializeField] private string targetEventId;
+        [SerializeField] private EventData eventData; // V2: Direct reference for conditions
 
         [Header("Interaction Settings")]
         [SerializeField] private string prompt = "調べる";
@@ -27,11 +32,13 @@ namespace AnoGame.Application.Event
         [SerializeField] private Transform uiAnchor;
 
         [Inject] private IEventService _eventService;
+        [Inject] private IInventoryService _inventoryService;
 
         [Inject]
-        public void Construct(IEventService eventService)
+        public void Construct(IEventService eventService, IInventoryService inventoryService)
         {
             _eventService = eventService;
+            _inventoryService = inventoryService;
         }
 
         private void OnEnable()
@@ -63,6 +70,13 @@ namespace AnoGame.Application.Event
             // 距離チェックは Score で行われているが、念のため
             if (Vector3.Distance(transform.position, actor.position) > maxDistance) return false;
 
+            // Check conditions before showing option? Or show but locked?
+            // Usually "Inspect" options might be hidden if conditions not met, or shown.
+            // For now, let's consistency check: if conditions not met, maybe don't show or show different prompt?
+            // User requirement: "Condition check logic ... efficient ... accessible".
+            // If we hide it, we need to check conditions here.
+            if (!CheckConditions()) return false;
+
             buffer.Add(new InteractionOption
             {
                 Kind = InteractionKind.Inspect,
@@ -80,8 +94,42 @@ namespace AnoGame.Application.Event
             Debug.Log($"[InspectReceptor] Inspected: {targetEventId}");
             if (!string.IsNullOrEmpty(targetEventId))
             {
-                _eventService.TriggerEventStart(targetEventId);
+                if (CheckConditions())
+                {
+                    _eventService.TriggerEventStart(targetEventId);
+                }
             }
+        }
+
+        private bool CheckConditions()
+        {
+            if (eventData == null) return true; // No data, assume no conditions or legacy behavior (allow)
+
+            // Normalize
+            var items = eventData.RequiredItemIds;
+            var events = eventData.RequiredEventIds;
+
+            if (items != null)
+            {
+                foreach (var itemId in items)
+                {
+                    if (string.IsNullOrEmpty(itemId)) continue;
+                    // Check inventory
+                    if (!_inventoryService.HasItem(itemId)) return false;
+                }
+            }
+
+            if (events != null)
+            {
+                foreach (var evtId in events)
+                {
+                    if (string.IsNullOrEmpty(evtId)) continue;
+                    // Check event history
+                    if (!_eventService.IsEventCleared(evtId)) return false;
+                }
+            }
+
+            return true;
         }
 
         private void OnDrawGizmosSelected()

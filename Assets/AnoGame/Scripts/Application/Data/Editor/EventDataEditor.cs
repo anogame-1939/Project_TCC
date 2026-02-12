@@ -14,6 +14,8 @@ namespace AnoGame.Data.Editor
         SerializedProperty _eventName;
         SerializedProperty _description;
         SerializedProperty _isOneTime;
+        SerializedProperty _requiredItems;
+        SerializedProperty _requiredEvents;
 
         void OnEnable()
         {
@@ -21,6 +23,8 @@ namespace AnoGame.Data.Editor
             _eventName = serializedObject.FindProperty("eventName");
             _description = serializedObject.FindProperty("description");
             _isOneTime = serializedObject.FindProperty("isOneTime");
+            _requiredItems = serializedObject.FindProperty("requiredItemIds");
+            _requiredEvents = serializedObject.FindProperty("requiredEventIds");
         }
 
         public override void OnInspectorGUI()
@@ -57,6 +61,11 @@ namespace AnoGame.Data.Editor
             EditorGUILayout.PropertyField(_eventName);
             EditorGUILayout.PropertyField(_description);
             EditorGUILayout.PropertyField(_isOneTime);
+
+            EditorGUILayout.Space(8);
+            EditorGUILayout.LabelField("Conditions", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(_requiredItems);
+            EditorGUILayout.PropertyField(_requiredEvents);
 
             serializedObject.ApplyModifiedProperties();
         }
