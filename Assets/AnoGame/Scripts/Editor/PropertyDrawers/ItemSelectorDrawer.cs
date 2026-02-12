@@ -59,15 +59,7 @@ namespace AnoGame.Editor.PropertyDrawers
 
         private void LoadData()
         {
-            var guids = AssetDatabase.FindAssets("t:ItemDatabase");
-            if (guids.Length == 0) return;
-
-            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
-            var database = AssetDatabase.LoadAssetAtPath<ItemDatabase>(path);
-
-            if (database == null || database.Items == null) return;
-
-            var items = database.Items;
+            var guids = AssetDatabase.FindAssets("t:ItemData");
 
             var displayList = new List<string>();
             var idList = new List<string>();
@@ -75,11 +67,16 @@ namespace AnoGame.Editor.PropertyDrawers
             displayList.Add("None");
             idList.Add("");
 
-            foreach (var item in items)
+            foreach (var guid in guids)
             {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var item = AssetDatabase.LoadAssetAtPath<ItemData>(path);
+
                 if (item != null)
                 {
-                    displayList.Add($"{item.ItemName} ({item.ItemId})");
+                    // 名前 + (ID) の形式で表示
+                    string displayName = string.IsNullOrEmpty(item.ItemName) ? item.name : item.ItemName;
+                    displayList.Add($"{displayName} ({item.ItemId})");
                     idList.Add(item.ItemId);
                 }
             }

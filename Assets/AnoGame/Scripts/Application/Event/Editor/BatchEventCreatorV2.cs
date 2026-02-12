@@ -124,32 +124,21 @@ public class BatchEventCreatorV2
             requiredItemsProp.ClearArray();
             requiredEventsProp.ClearArray();
 
-            if (evt.conditions != null && evt.conditions.Count > 0)
+            if (evt.requiredItemIds != null && evt.requiredItemIds.Count > 0)
             {
-                 foreach (var condId in evt.conditions)
+                for (int i = 0; i < evt.requiredItemIds.Count; i++)
                 {
-                    // Check if Item ID exists (validation only, or trust ID)
-                    // Since we store string, we can just store condId if we assume it might be an item.
-                    // But we want to separate Items and Events.
-                    // Heuristic: Try FindItemData. If not null, it's an Item.
-                    
-                    var item = FindItemData(condId);
-                    if (item != null)
-                    {
-                        int itemIndex = requiredItemsProp.arraySize;
-                        requiredItemsProp.InsertArrayElementAtIndex(itemIndex);
-                        requiredItemsProp.GetArrayElementAtIndex(itemIndex).stringValue = condId; // Store ID
-                        continue;
-                    }
+                    requiredItemsProp.InsertArrayElementAtIndex(i);
+                    requiredItemsProp.GetArrayElementAtIndex(i).stringValue = evt.requiredItemIds[i];
+                }
+            }
 
-                    // Assume Event if not Item
-                    // Since we store string IDs, we don't need the Asset to exist yet (forward reference support).
-                    // Just add to RequiredEvents.
-                    
-                    int eventIndex = requiredEventsProp.arraySize;
-                    requiredEventsProp.InsertArrayElementAtIndex(eventIndex);
-                    requiredEventsProp.GetArrayElementAtIndex(eventIndex).stringValue = condId; // Store ID
-                    continue;
+            if (evt.requiredEventIds != null && evt.requiredEventIds.Count > 0)
+            {
+                for (int i = 0; i < evt.requiredEventIds.Count; i++)
+                {
+                    requiredEventsProp.InsertArrayElementAtIndex(i);
+                    requiredEventsProp.GetArrayElementAtIndex(i).stringValue = evt.requiredEventIds[i];
                 }
             }
         }
@@ -287,17 +276,7 @@ public class BatchEventCreatorV2
         director.playableAsset = timeline;
     }
 
-    private static ItemData FindItemData(string itemId)
-    {
-        string[] guids = AssetDatabase.FindAssets("t:ItemData");
-        foreach (var guid in guids)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            ItemData asset = AssetDatabase.LoadAssetAtPath<ItemData>(path);
-            if (asset != null && asset.ItemId == itemId) return asset;
-        }
-        return null;
-    }
+
 
     private static EventData FindEventData(string eventId)
     {
@@ -333,7 +312,8 @@ public class BatchEventCreatorV2
         public string paramText;
         public string paramItemId;
         public bool timeline;
-        public List<string> conditions;
+        public List<string> requiredItemIds;
+        public List<string> requiredEventIds;
         public List<string> results;
     }
 }

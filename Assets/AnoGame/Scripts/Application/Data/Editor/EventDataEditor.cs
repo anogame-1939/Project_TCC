@@ -4,6 +4,8 @@ using UnityEditor;
 using System;
 using System.Linq;
 using AnoGame.Data;
+using UnityEngine.UIElements;
+using UnityEditor.UIElements;
 
 namespace AnoGame.Data.Editor
 {
@@ -27,47 +29,71 @@ namespace AnoGame.Data.Editor
             _requiredEvents = serializedObject.FindProperty("requiredEventIds");
         }
 
-        public override void OnInspectorGUI()
+        public override VisualElement CreateInspectorGUI()
         {
-            serializedObject.Update();
+            var root = new VisualElement();
 
-            // eventId は誤編集防止のため読み取り専用表示
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.PropertyField(_eventId, new GUIContent("Event Id"));
-            }
+            // eventId (ReadOnly)
+            var eventIdField = new PropertyField(_eventId, "Event Id");
+            eventIdField.SetEnabled(false);
+            root.Add(eventIdField);
 
-            // 実用ボタン群
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("GUIDを生成/再割当"))
+            // Access to eventId string for buttons
+            var eventIdProp = serializedObject.FindProperty("eventId");
+
+            // Buttons Row
+            var buttonRow = new VisualElement();
+            buttonRow.style.flexDirection = FlexDirection.Row;
+            buttonRow.style.marginTop = 2;
+            buttonRow.style.marginBottom = 2;
+
+            var btnGenerate = new Button(() =>
             {
                 GenerateGuidForTargets(onlyIfEmpty: false);
-                return;
-            }
-            if (GUILayout.Button("空欄ならGUID自動生成"))
+            })
+            { text = "GUIDを生成/再割当" };
+            btnGenerate.style.flexGrow = 1;
+
+            var btnAuto = new Button(() =>
             {
                 GenerateGuidForTargets(onlyIfEmpty: true);
-                return;
-            }
-            if (GUILayout.Button("IDをコピー"))
+            })
+            { text = "空欄ならGUID自動生成" };
+            btnAuto.style.flexGrow = 1;
+
+            var btnCopy = new Button(() =>
             {
-                EditorGUIUtility.systemCopyBuffer = _eventId.stringValue ?? string.Empty;
-            }
-            EditorGUILayout.EndHorizontal();
+                EditorGUIUtility.systemCopyBuffer = eventIdProp.stringValue ?? string.Empty;
+            })
+            { text = "IDをコピー" };
+            btnCopy.style.flexGrow = 1;
 
-            EditorGUILayout.Space(8);
+            buttonRow.Add(btnGenerate);
+            buttonRow.Add(btnAuto);
+            buttonRow.Add(btnCopy);
+            root.Add(buttonRow);
 
-            // 残りのプロパティ
-            EditorGUILayout.PropertyField(_eventName);
-            EditorGUILayout.PropertyField(_description);
-            EditorGUILayout.PropertyField(_isOneTime);
+            // Spacer
+            root.Add(new VisualElement { style = { height = 8 } });
 
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Conditions", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(_requiredItems);
-            EditorGUILayout.PropertyField(_requiredEvents);
+            // Other Properties
+            root.Add(new PropertyField(_eventName));
+            root.Add(new PropertyField(_description));
+            root.Add(new PropertyField(_isOneTime));
 
-            serializedObject.ApplyModifiedProperties();
+            // Spacer
+            root.Add(new VisualElement { style = { height = 8 } });
+
+            // Conditions Header
+            var conditionsLabel = new Label("Conditions");
+            conditionsLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            root.Add(conditionsLabel);
+
+            // Condition Lists
+            root.Add(new PropertyField(_requiredItems));
+            root.Add(new PropertyField(_requiredEvents));
+
+            return root;
         }
 
         void GenerateGuidForTargets(bool onlyIfEmpty)
