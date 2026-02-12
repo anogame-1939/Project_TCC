@@ -187,77 +187,218 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         {
             if (_data == null || _data.events == null) return;
 
-            Dictionary<string, int> depths = new Dictionary<string, int>();
-            foreach (var evt in _data.events) depths[evt.eventId] = 0;
+            // Identify connected vs unconnected nodes
+            var allNodes = _nodeMap.Values.ToList();
+            var connectedNodes = new HashSet<EventNodeView>();
+            var unconnectedNodes = new List<EventNodeView>();
 
-            var nodeMap = _data.events.ToDictionary(e => e.eventId);
-            var resultToNodeId = new Dictionary<string, string>();
-            foreach (var evt in _data.events)
+            // Inputs/Outputs helper
+            Dictionary<EventNodeView, List<EventNodeView>> inputs = new Dictionary<EventNodeView, List<EventNodeView>>();
+            Dictionary<EventNodeView, List<EventNodeView>> outputs = new Dictionary<EventNodeView, List<EventNodeView>>();
+
+            foreach (var node in allNodes)
             {
-                if (evt.results != null)
+                inputs[node] = new List<EventNodeView>();
+                outputs[node] = new List<EventNodeView>();
+            }
+
+            // Build graph structure from edges/connections
+            // Direction: Input -> Output (Predecessor -> Successor)
+            foreach (var node in allNodes)
+            {
+                if (node.Data.conditions != null)
                 {
-                    foreach (var r in evt.results)
+                    foreach (var condId in node.Data.conditions)
                     {
-                        if (!string.IsNullOrEmpty(r)) resultToNodeId[r] = evt.eventId;
+                        if (_nodeMap.TryGetValue(condId, out var inputNode))
+                        {
+                            outputs[inputNode].Add(node);
+                            inputs[node].Add(inputNode);
+                        }
+                        // Check result-based connections
+                        else
+                        {
+                            // If condition is a result ID, find the node that produces it
+                            // Need reverse lookup for results
+                            var sourceNode = allNodes.FirstOrDefault(n => n.Data.results != null && n.Data.results.Contains(condId));
+                            if (sourceNode != null)
+                            {
+                                outputs[sourceNode].Add(node);
+                                inputs[node].Add(sourceNode);
+                            }
+                        }
                     }
                 }
             }
 
-            // Iterative depth calculation
-            for (int i = 0; i < _data.events.Count + 2; i++)
+            foreach (var node in allNodes)
             {
-                bool changed = false;
-                foreach (var evt in _data.events)
+                if (inputs[node].Count > 0 || outputs[node].Count > 0)
                 {
-                    int currentMax = -1;
-                    if (evt.conditions != null)
-                    {
-                        foreach (var c in evt.conditions)
-                        {
-                            string parentId = null;
-                            if (nodeMap.ContainsKey(c)) parentId = c;
-                            else if (resultToNodeId.ContainsKey(c)) parentId = resultToNodeId[c];
+                    connectedNodes.Add(node);
+                }
+                else
+                {
+                    unconnectedNodes.Add(node);
+                }
+            }
 
-                            if (parentId != null && depths.ContainsKey(parentId))
+            // --- Layout Connected Nodes (Pyramid/Tree: Goal on Right) ---
+            if (connectedNodes.Count > 0)
+            {
+                // Identify Goals (nodes with no outputs within the connected set)
+                var goals = connectedNodes.Where(n => outputs[n].Count == 0).ToList();
+
+                // Calculate Rank (distance from Goal)
+                // Goal = Rank 0
+                // Inputs to Goal = Rank 1, etc.
+                Dictionary<EventNodeView, int> ranks = new Dictionary<EventNodeView, int>();
+                foreach (var node in connectedNodes) ranks[node] = -1; // -1 = unvisited
+
+                Queue<EventNodeView> queue = new Queue<EventNodeView>();
+                foreach (var g in goals)
+                {
+                    ranks[g] = 0;
+                    queue.Enqueue(g);
+                }
+
+                while (queue.Count > 0)
+                {
+                    var current = queue.Dequeue();
+                    int currentRank = ranks[current];
+
+                    foreach (var input in inputs[current])
+                    {
+                        // Ensure input is part of connected set (it should be)
+                        if (!connectedNodes.Contains(input)) continue;
+
+                        // Assign rank: max(existing, current + 1)
+                        int newRank = currentRank + 1;
+                        if (newRank > ranks[input])
+                        {
+                            ranks[input] = newRank;
+                            queue.Enqueue(input); // Re-queue to propagate deeper ranks if needed
+                        }
+                    }
+                }
+
+                // Handle cycles or disconnected sub-graphs that weren't reached (shouldn't happen if logic is correct for "connected")
+                // If any node has rank -1, treat it as rank (max_rank + 1) or separate group
+                int maxRank = 0;
+                if (ranks.Values.Any(r => r > 0))
+                {
+                    maxRank = ranks.Values.Max();
+                }
+
+                // Layout Parameters
+                float xSpacing = 400f; // Horizontal spacing connects are longer
+                float ySpacing = 250f;
+                float startX = 1000f; // Goal starts here
+                float startY = 100f; // Center Y?
+
+                // Group by Rank
+                var rankGroups = connectedNodes.GroupBy(n => ranks[n]).OrderBy(g => g.Key);
+
+                // Y-positioning strategy:
+                // Simple approach: Center each "layer" vertically relative to layout center
+                // Better approach: Calculate desired Y based on children's Y (barycenter)
+                // But we are traversing Right-to-Left (Goal to Start).
+                // Let's position Goals first.
+                // Then inputs.
+                Dictionary<EventNodeView, float> yPositions = new Dictionary<EventNodeView, float>();
+
+                // Sort ranks 0..Max
+                for (int r = 0; r <= maxRank; r++)
+                {
+                    var nodesInRank = connectedNodes.Where(n => ranks[n] == r).OrderBy(n => int.TryParse(n.Data.eventId, out int id) ? id : 0).ToList();
+
+                    if (r == 0) // Goals
+                    {
+                        float currentY = startY;
+                        foreach (var node in nodesInRank)
+                        {
+                            yPositions[node] = currentY;
+                            currentY += ySpacing;
+                        }
+                    }
+                    else
+                    {
+                        // Position based on outputs (which are at rank r-1, or < r)
+                        foreach (var node in nodesInRank)
+                        {
+                            var connectedOutputs = outputs[node].Where(o => ranks[o] < r).ToList();
+                            if (connectedOutputs.Count > 0)
                             {
-                                if (depths[parentId] > currentMax) currentMax = depths[parentId];
+                                // Average Y of outputs
+                                float avgY = connectedOutputs.Average(o => yPositions.ContainsKey(o) ? yPositions[o] : startY);
+                                yPositions[node] = avgY;
+                            }
+                            else
+                            {
+                                // Fallback (shouldn't happen for connected nodes unless cycle issues)
+                                yPositions[node] = startY + (nodesInRank.IndexOf(node)) * ySpacing;
+                            }
+                        }
+
+                        // Collision resolution: prevent overlap in same rank
+                        nodesInRank = nodesInRank.OrderBy(n => yPositions[n]).ToList();
+                        for (int i = 0; i < nodesInRank.Count - 1; i++)
+                        {
+                            var n1 = nodesInRank[i];
+                            var n2 = nodesInRank[i + 1];
+                            if (yPositions[n2] - yPositions[n1] < ySpacing)
+                            {
+                                // Shift n2 down
+                                yPositions[n2] = yPositions[n1] + ySpacing;
                             }
                         }
                     }
 
-                    int newDepth = currentMax + 1;
-                    if (newDepth > depths[evt.eventId])
+                    // Apply Positions
+                    foreach (var node in nodesInRank)
                     {
-                        depths[evt.eventId] = newDepth;
-                        changed = true;
+                        float x = startX - (r * xSpacing);
+                        float y = yPositions[node];
+                        node.SetPosition(new Rect(x, y, 0, 0));
                     }
                 }
-                if (!changed) break;
             }
 
-            var grouped = _data.events.GroupBy(e => depths[e.eventId]).OrderBy(g => g.Key);
-
-            float xSpacing = 350f;
-            float ySpacing = 250f;
-            float startX = 50f;
-            float startY = 50f;
-
-            foreach (var group in grouped)
+            // --- Layout Unconnected Nodes (Grid) ---
+            if (unconnectedNodes.Count > 0)
             {
-                int depth = group.Key;
-                int row = 0;
-                foreach (var evt in group)
+                unconnectedNodes.Sort((a, b) =>
                 {
-                    if (_nodeMap.ContainsKey(evt.eventId))
-                    {
-                        var node = _nodeMap[evt.eventId];
-                        // node.GetPosition() returns Rect
-                        Rect r = node.GetPosition();
-                        r.x = startX + depth * xSpacing;
-                        r.y = startY + row * ySpacing;
-                        node.SetPosition(r);
-                    }
-                    row++;
+                    int idA = int.TryParse(a.Data.eventId, out int va) ? va : 0;
+                    int idB = int.TryParse(b.Data.eventId, out int vb) ? vb : 0;
+                    return idA.CompareTo(idB);
+                });
+
+                float gridStartX = 50f;
+                // Place grid below the connected graph or at a fixed Y
+                // Find max Y of connected graph to place below?
+                // Or just place at fixed Y=1000 if graph is small?
+                // Let's calculate bounds of connected graph
+                float maxConnectedY = 0f;
+                foreach (var n in connectedNodes)
+                {
+                    if (n.GetPosition().y > maxConnectedY) maxConnectedY = n.GetPosition().y;
+                }
+
+                float gridStartY = (connectedNodes.Count > 0) ? maxConnectedY + 400f : 100f;
+                float gridXSpacing = 350f;
+                float gridYSpacing = 250f;
+                int columns = 5;
+
+                for (int i = 0; i < unconnectedNodes.Count; i++)
+                {
+                    int row = i / columns;
+                    int col = i % columns;
+
+                    float x = gridStartX + col * gridXSpacing;
+                    float y = gridStartY + row * gridYSpacing;
+
+                    unconnectedNodes[i].SetPosition(new Rect(x, y, 0, 0));
                 }
             }
         }
