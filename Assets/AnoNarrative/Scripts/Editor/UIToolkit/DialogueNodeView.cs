@@ -278,15 +278,38 @@ namespace AnoGame.AnoNarrative.Editor
         private void ApplyActorColor()
         {
             Color nodeColor = _data.GetActorColor(Unit.SpeakerName);
-            // Apply color to the main container (entire node background)
-            style.backgroundColor = new StyleColor(nodeColor);
 
-            // Reset title background so it's transparent (handled in USS, but ensure here just in case)
+            // Node root → transparent
+            style.backgroundColor = new StyleColor(Color.clear);
+            style.borderTopColor = new StyleColor(Color.clear);
+            style.borderBottomColor = new StyleColor(Color.clear);
+            style.borderLeftColor = new StyleColor(Color.clear);
+            style.borderRightColor = new StyleColor(Color.clear);
+
+            // #node-border → red
+            var nodeBorder = this.Q("node-border");
+            if (nodeBorder != null)
+                nodeBorder.style.backgroundColor = new StyleColor(Color.red);
+
+            // #title → actor color
             var titleContainer = this.Q("title");
             if (titleContainer != null)
             {
-                titleContainer.style.backgroundColor = StyleKeyword.Null; // or clear
+                titleContainer.style.backgroundColor = new StyleColor(nodeColor);
+                titleContainer.style.color = Color.white;
             }
+
+            // #contents → actor color slightly darker
+            var contents = this.Q("contents");
+            if (contents != null)
+            {
+                Color darkerColor = nodeColor * 0.8f;
+                darkerColor.a = 1f;
+                contents.style.backgroundColor = new StyleColor(darkerColor);
+            }
+
+            // #extension → actor color
+            extensionContainer.style.backgroundColor = new StyleColor(nodeColor);
         }
 
         /// <summary>
