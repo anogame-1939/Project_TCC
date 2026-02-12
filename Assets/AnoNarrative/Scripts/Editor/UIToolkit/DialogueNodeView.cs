@@ -286,10 +286,10 @@ namespace AnoGame.AnoNarrative.Editor
             style.borderLeftColor = new StyleColor(Color.clear);
             style.borderRightColor = new StyleColor(Color.clear);
 
-            // #node-border → red
+            // #node-border → transparent (was red for debug)
             var nodeBorder = this.Q("node-border");
             if (nodeBorder != null)
-                nodeBorder.style.backgroundColor = new StyleColor(Color.red);
+                nodeBorder.style.backgroundColor = new StyleColor(Color.clear);
 
             // #title → actor color
             var titleContainer = this.Q("title");
@@ -299,17 +299,19 @@ namespace AnoGame.AnoNarrative.Editor
                 titleContainer.style.color = Color.white;
             }
 
-            // #contents → actor color slightly darker
+            // Darker color for contents/extension
+            Color darkerColor = nodeColor * 0.6f; // Make it significantly darker
+            darkerColor.a = 1f;
+
+            // #contents → darker actor color
             var contents = this.Q("contents");
             if (contents != null)
             {
-                Color darkerColor = nodeColor * 0.8f;
-                darkerColor.a = 1f;
                 contents.style.backgroundColor = new StyleColor(darkerColor);
             }
 
-            // #extension → actor color
-            extensionContainer.style.backgroundColor = new StyleColor(nodeColor);
+            // #extension → darker actor color
+            extensionContainer.style.backgroundColor = new StyleColor(darkerColor);
         }
 
         /// <summary>
