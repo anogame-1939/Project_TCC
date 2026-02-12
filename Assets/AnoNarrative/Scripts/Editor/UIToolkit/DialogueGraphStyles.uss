@@ -183,7 +183,7 @@
 
 /* --- Node Styles --- */
 .dialogue-node {
-    min-width: 250px;
+    width: 250px;
     background-color: #2d2d2d; /* Default, overridden by actor color */
     border-radius: 8px;
     border-top-width: 2px;
@@ -270,7 +270,9 @@
 }
 
 .dialogue-node .node-body-text {
-    min-height: 60px; /* Approx 3 lines */
+    height: 60px; /* Approx 3 lines */
+    min-height: 60px;
+    max-height: 60px;
     margin: 4px 8px;
     white-space: normal;
     background-color: transparent;
@@ -285,6 +287,7 @@
     color: #eee;
     padding: 4px;
     white-space: normal;
+    height: 100%;
 }
 
 .dialogue-node .choices-header {
