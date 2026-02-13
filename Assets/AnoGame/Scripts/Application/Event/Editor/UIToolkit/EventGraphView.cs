@@ -1,3 +1,5 @@
+// V1: Obsolete — replaced by EventGraphViewV2 which uses EventData (ScriptableObject) directly.
+#if OBSOLETE_V1
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -404,3 +406,4 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         }
     }
 }
+#endif

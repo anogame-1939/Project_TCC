@@ -28,8 +28,12 @@ namespace AnoGame.Data
         [SerializeField] private List<ItemCondition> requiredItemIds = new List<ItemCondition>();
         [SerializeField] private List<EventCondition> requiredEventIds = new List<EventCondition>();
 
+        [Header("Results")]
+        [SerializeField] private List<string> results = new List<string>();
+
         public List<string> RequiredItemIds => System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(requiredItemIds, x => x.itemId));
         public List<string> RequiredEventIds => System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(requiredEventIds, x => x.eventId));
+        public List<string> Results => results != null ? new List<string>(results) : new List<string>();
 
         public bool HasConditions => (requiredItemIds != null && requiredItemIds.Count > 0) || (requiredEventIds != null && requiredEventIds.Count > 0);
 

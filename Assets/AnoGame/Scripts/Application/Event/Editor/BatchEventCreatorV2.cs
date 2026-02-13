@@ -7,6 +7,7 @@ using UnityEngine.Timeline;
 using System.IO;
 using System.Collections.Generic;
 using AnoGame.Application.Event;
+using AnoGame.Application.Event.Editor.UIToolkit;
 using AnoGame.Data;
 using System.Reflection;
 
@@ -121,11 +122,54 @@ public class BatchEventCreatorV2
             count++;
         }
         
+        // 3. Update EventGraphMeta with scene bindings
+        var sceneName = EditorSceneManager.GetActiveScene().name;
+        var meta = EventGraphMeta.Load();
+        if (!meta.targetScenes.Contains(sceneName))
+        {
+            meta.targetScenes.Add(sceneName);
+        }
+        foreach (Transform child in root.transform)
+        {
+            // Find eventId from container name (format: "{eventId}_{eventName}")
+            string containerName = child.name;
+            int underscoreIdx = -1;
+            // EventId format: EV_XXX_Name — find the third section boundary
+            // We match against loaded EventData assets instead
+            EventData matchedData = null;
+            foreach (var ed in eventAssets)
+            {
+                if (containerName.StartsWith(ed.EventId))
+                {
+                    matchedData = ed;
+                    break;
+                }
+            }
+            if (matchedData == null) continue;
+
+            string receptorName = null;
+            string triggerName = null;
+            foreach (Transform grandchild in child)
+            {
+                if (grandchild.name.Contains("Receptor")) receptorName = grandchild.name;
+                if (grandchild.name.Contains("Trigger")) triggerName = grandchild.name;
+            }
+
+            meta.SetSceneBinding(
+                matchedData.EventId,
+                sceneName,
+                $"{root.name}/{containerName}",
+                receptorName ?? "",
+                triggerName ?? ""
+            );
+        }
+        meta.Save();
+
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-        AssetDatabase.SaveAssets(); 
-        
+        AssetDatabase.SaveAssets();
+
         Selection.activeGameObject = root;
-        Debug.Log($"Batch Event Creation V2 Complete! Created {count} events using EventData Assets.");
+        Debug.Log($"Batch Event Creation V2 Complete! Created {count} events using EventData Assets. Meta file updated.");
     }
 
     private static void CreateEventData(EventJsonItem evt)
@@ -172,6 +216,21 @@ public class BatchEventCreatorV2
                     requiredEventsProp.InsertArrayElementAtIndex(i);
                     var eventElem = requiredEventsProp.GetArrayElementAtIndex(i);
                     eventElem.FindPropertyRelative("eventId").stringValue = evt.requiredEventIds[i];
+                }
+            }
+        }
+
+        // --- V2: Apply Results to EventData ---
+        var resultsProp = so.FindProperty("results");
+        if (resultsProp != null)
+        {
+            resultsProp.ClearArray();
+            if (evt.results != null && evt.results.Count > 0)
+            {
+                for (int i = 0; i < evt.results.Count; i++)
+                {
+                    resultsProp.InsertArrayElementAtIndex(i);
+                    resultsProp.GetArrayElementAtIndex(i).stringValue = evt.results[i];
                 }
             }
         }

@@ -1,3 +1,5 @@
+// V1: Obsolete — replaced by EventGraphWindowV2.
+#if OBSOLETE_V1
 using System;
 using System.IO;
 using System.Linq;
@@ -164,3 +166,4 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         }
     }
 }
+#endif

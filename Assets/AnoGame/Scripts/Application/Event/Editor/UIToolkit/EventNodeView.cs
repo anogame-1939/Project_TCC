@@ -1,6 +1,9 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AnoGame.Data;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,28 +12,25 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 {
     public class EventNodeView : Node
     {
-        public EventJsonItem Data { get; private set; }
+        public EventData EventData { get; private set; }
         public Port InputPort { get; private set; }
         public Port OutputPort { get; private set; }
 
-        private TextField _idField;
-        private TextField _nameField;
-        private TextField _categoryField;
-        private TextField _descriptionField;
-
-        // Custom containers for ports
         private VisualElement _topPortContainer;
         private VisualElement _bottomPortContainer;
 
-        private Action _onDataChanged;
+        // Validation context: sets of known IDs provided by the graph
+        private HashSet<string> _knownEventIds;
+        private HashSet<string> _knownItemIds;
 
-        public EventNodeView(EventJsonItem data, Action onDataChanged)
+        public EventNodeView(EventData data, HashSet<string> knownEventIds, HashSet<string> knownItemIds)
         {
-            Data = data;
-            _onDataChanged = onDataChanged;
+            EventData = data;
+            _knownEventIds = knownEventIds ?? new HashSet<string>();
+            _knownItemIds = knownItemIds ?? new HashSet<string>();
 
             AddToClassList("event-node");
-            title = $"{Data.eventId}\n{Data.name}";
+            title = $"{EventData.EventId}\n{EventData.EventName}";
 
             // ---- Ports ----
 
@@ -53,13 +53,38 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             // ---- Content ----
             CreateContent();
 
-            // Default position (if we had position data, we'd use it)
-            // But JSON doesn't store position.
-            // So we rely on auto layout or GraphView persistence?
-            // GraphView persistence is tricky without saving position to file.
-            // For now, let's just use auto layout every time or rely on runtime layout.
-            // Or maybe add position fields to JSON? No, I shouldn't modify the data format if I can avoid it.
-            // The original IMGUI version runs AutoLayout every time or on button press.
+            // ---- Interactions ----
+            RegisterCallback<MouseDownEvent>(OnMouseDown);
+            RegisterCallback<ContextualMenuPopulateEvent>(OnContextMenu);
+        }
+
+        private void OnMouseDown(MouseDownEvent evt)
+        {
+            // Double-click: Select + Focus container in Hierarchy
+            if (evt.clickCount == 2 && evt.button == 0)
+            {
+                EventSceneBinder.SelectContainer(EventData.EventId);
+                evt.StopPropagation();
+            }
+            // Single-click: Ping container
+            else if (evt.clickCount == 1 && evt.button == 0 && evt.modifiers == EventModifiers.None)
+            {
+                // Delay to avoid conflicting with selection drag
+                schedule.Execute(() => EventSceneBinder.PingContainer(EventData.EventId)).ExecuteLater(200);
+            }
+        }
+
+        private void OnContextMenu(ContextualMenuPopulateEvent evt)
+        {
+            evt.menu.AppendAction("Ping Container", _ => EventSceneBinder.PingContainer(EventData.EventId));
+            evt.menu.AppendAction("Ping Receptor", _ => EventSceneBinder.PingReceptor(EventData.EventId));
+            evt.menu.AppendAction("Ping Trigger", _ => EventSceneBinder.PingTrigger(EventData.EventId));
+            evt.menu.AppendSeparator();
+            evt.menu.AppendAction("Select in Inspector", _ =>
+            {
+                Selection.activeObject = EventData;
+                EditorGUIUtility.PingObject(EventData);
+            });
         }
 
         private void CreateContent()
@@ -69,52 +94,168 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             container.style.paddingRight = 8;
             container.style.paddingBottom = 8;
 
-            // ID Field
-            _idField = new TextField("ID: ");
-            _idField.value = Data.eventId;
-            _idField.RegisterValueChangedCallback(evt =>
-            {
-                Data.eventId = evt.newValue;
-                title = $"{Data.eventId}\n{Data.name}";
-                _onDataChanged?.Invoke();
-            });
-            container.Add(_idField);
+            // Basic Info (Read-only labels)
+            AddInfoRow(container, "ID:", EventData.EventId);
+            AddInfoRow(container, "Name:", EventData.EventName);
+            AddInfoRow(container, "Category:", EventData.Category);
+            AddInfoRow(container, "Desc:", EventData.Description);
 
-            // Name Field
-            _nameField = new TextField("Name: ");
-            _nameField.value = Data.name;
-            _nameField.RegisterValueChangedCallback(evt =>
+            // --- Required Events ---
+            AddSectionHeader(container, "Required Events:");
+            var reqEvents = EventData.RequiredEventIds;
+            if (reqEvents != null && reqEvents.Count > 0)
             {
-                Data.name = evt.newValue;
-                title = $"{Data.eventId}\n{Data.name}";
-                _onDataChanged?.Invoke();
-            });
-            container.Add(_nameField);
+                var section = new VisualElement();
+                section.style.paddingLeft = 4;
+                foreach (var eid in reqEvents)
+                {
+                    bool exists = _knownEventIds.Contains(eid);
+                    var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {eid}");
+                    lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
+                    section.Add(lbl);
+                }
+                container.Add(section);
+            }
+            else
+            {
+                AddEmptyLabel(container);
+            }
 
-            // Category Field
-            _categoryField = new TextField("Category: ");
-            _categoryField.value = Data.category;
-            _categoryField.RegisterValueChangedCallback(evt =>
+            // --- Required Items ---
+            AddSectionHeader(container, "Required Items:");
+            var reqItems = EventData.RequiredItemIds;
+            if (reqItems != null && reqItems.Count > 0)
             {
-                Data.category = evt.newValue;
-                _onDataChanged?.Invoke();
-            });
-            container.Add(_categoryField);
+                var section = new VisualElement();
+                section.style.paddingLeft = 4;
+                foreach (var iid in reqItems)
+                {
+                    bool exists = _knownItemIds.Contains(iid);
+                    var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {iid}");
+                    lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
+                    section.Add(lbl);
+                }
+                container.Add(section);
+            }
+            else
+            {
+                AddEmptyLabel(container);
+            }
 
-            // Description Field
-            _descriptionField = new TextField("Desc: ");
-            _descriptionField.multiline = true;
-            _descriptionField.value = Data.description;
-            _descriptionField.AddToClassList("node-text-area");
-            _descriptionField.RegisterValueChangedCallback(evt =>
+            // --- Results ---
+            AddSectionHeader(container, "Results:");
+            var results = EventData.Results;
+            if (results != null && results.Count > 0)
             {
-                Data.description = evt.newValue;
-                _onDataChanged?.Invoke();
-            });
-            container.Add(_descriptionField);
+                var section = new VisualElement();
+                section.style.paddingLeft = 4;
+                foreach (var res in results)
+                {
+                    var lbl = new Label($"  {res}");
+                    lbl.style.color = new Color(0.7f, 0.85f, 1f);
+                    section.Add(lbl);
+                }
+                container.Add(section);
+            }
+            else
+            {
+                AddEmptyLabel(container);
+            }
+
+            // --- Condition Status Border ---
+            UpdateConditionBorder();
 
             extensionContainer.Add(container);
             RefreshExpandedState();
         }
+
+        private void AddInfoRow(VisualElement parent, string label, string value)
+        {
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.marginTop = 2;
+
+            var lbl = new Label(label);
+            lbl.style.minWidth = 70;
+            lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
+            row.Add(lbl);
+
+            var val = new Label(string.IsNullOrEmpty(value) ? "-" : value);
+            val.style.flexShrink = 1;
+            row.Add(val);
+
+            parent.Add(row);
+        }
+
+        private void AddSectionHeader(VisualElement parent, string text)
+        {
+            var lbl = new Label(text);
+            lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
+            lbl.style.marginTop = 8;
+            parent.Add(lbl);
+        }
+
+        private void AddEmptyLabel(VisualElement parent)
+        {
+            var lbl = new Label("(None)");
+            lbl.style.color = Color.gray;
+            lbl.style.paddingLeft = 4;
+            parent.Add(lbl);
+        }
+
+        private void UpdateConditionBorder()
+        {
+            var reqEvents = EventData.RequiredEventIds;
+            var reqItems = EventData.RequiredItemIds;
+
+            bool hasConditions = (reqEvents != null && reqEvents.Count > 0) || (reqItems != null && reqItems.Count > 0);
+            if (!hasConditions)
+            {
+                // No conditions = always executable
+                style.borderLeftColor = new Color(0.4f, 0.8f, 0.4f);
+                style.borderLeftWidth = 3;
+                return;
+            }
+
+            int total = 0;
+            int satisfied = 0;
+
+            if (reqEvents != null)
+            {
+                foreach (var eid in reqEvents)
+                {
+                    total++;
+                    if (_knownEventIds.Contains(eid)) satisfied++;
+                }
+            }
+            if (reqItems != null)
+            {
+                foreach (var iid in reqItems)
+                {
+                    total++;
+                    if (_knownItemIds.Contains(iid)) satisfied++;
+                }
+            }
+
+            if (total > 0 && satisfied == total)
+            {
+                // All satisfied
+                style.borderLeftColor = new Color(0.4f, 0.8f, 0.4f);
+                style.borderLeftWidth = 3;
+            }
+            else if (satisfied > 0)
+            {
+                // Partially satisfied
+                style.borderLeftColor = new Color(0.9f, 0.8f, 0.3f);
+                style.borderLeftWidth = 3;
+            }
+            else
+            {
+                // None satisfied
+                style.borderLeftColor = new Color(0.5f, 0.5f, 0.5f);
+                style.borderLeftWidth = 1;
+            }
+        }
     }
 }
+#endif
