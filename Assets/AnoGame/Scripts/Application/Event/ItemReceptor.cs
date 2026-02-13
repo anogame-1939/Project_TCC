@@ -2,8 +2,9 @@ using UnityEngine;
 using VContainer;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
-using AnoGame.Domain.Inventory; // For ItemConsumedArgs
-using AnoGame.Application.Attributes; // For Custom Attributes
+using AnoGame.Domain.Inventory;
+using AnoGame.Application.Attributes;
+using AnoGame.Data;
 using System;
 
 namespace AnoGame.Application.Event
@@ -25,6 +26,9 @@ namespace AnoGame.Application.Event
 
         [Tooltip("プレイヤーとの最大距離")]
         public float maxDistance = 3.0f;
+
+        [Header("条件データ")]
+        [SerializeField] private EventData eventData;
 
         // 依存性注入
         [Inject] private IInventoryService _inventory;
@@ -69,7 +73,14 @@ namespace AnoGame.Application.Event
                 return;
             }
 
-            // 3. 成功 -> イベントサービスへ開始要求を投げる
+            // 3. 条件チェック
+            if (!CheckConditions())
+            {
+                Debug.Log($"[ItemReceptor] {targetEventId} conditions not met.");
+                return;
+            }
+
+            // 4. 成功 -> イベントサービスへ開始要求を投げる
             Debug.Log($"[ItemReceptor] Hit! Request Event Start: {targetEventId}");
             if (!string.IsNullOrEmpty(targetEventId))
             {
@@ -81,10 +92,37 @@ namespace AnoGame.Application.Event
             }
         }
 
+        private bool CheckConditions()
+        {
+            if (eventData == null) return true;
+
+            var items = eventData.RequiredItemIds;
+            var events = eventData.RequiredEventIds;
+
+            if (items != null)
+            {
+                foreach (var itemId in items)
+                {
+                    if (string.IsNullOrEmpty(itemId)) continue;
+                    if (!_inventory.HasItem(itemId)) return false;
+                }
+            }
+
+            if (events != null)
+            {
+                foreach (var evtId in events)
+                {
+                    if (string.IsNullOrEmpty(evtId)) continue;
+                    if (!_eventService.IsEventCleared(evtId)) return false;
+                }
+            }
+
+            return true;
+        }
+
         private bool CheckProximity(ItemConsumedArgs args)
         {
             var userPos = args.User != null ? args.User.transform.position : Vector3.zero;
-            // argsに座標が入っていない場合はUser座標、それもなければ諦める
             var usePos = args.UsePosition != default ? args.UsePosition : userPos;
 
             return Vector3.Distance(transform.position, usePos) <= maxDistance;

@@ -71,7 +71,7 @@ public class BatchEventCreatorV2
         // 2. Second Pass: Build Scene from EventData ASSETS
         // We reload them from disk to ensure we are using the Asset data.
         var eventAssets = LoadAllEventDataInFolder(EVENTDATA_DIR_PATH);
-        
+
         // Sort specifically to match the order in JSON for layout consistency? 
         // Or just trust the folder order? The user table implies an order (ID order).
         // Let's sort by ID to be safe and consistent.
@@ -101,7 +101,7 @@ public class BatchEventCreatorV2
                     break;
                 case "Chain":
                 case "連鎖":
-                    receptorPrefab = null; 
+                    receptorPrefab = null;
                     break;
                 case "専用インタラクト":
                 case "UniqueInteract":
@@ -121,7 +121,7 @@ public class BatchEventCreatorV2
             currentPos += PLACEMENT_OFFSET;
             count++;
         }
-        
+
         // 3. Update EventGraphMeta with scene bindings
         var sceneName = EditorSceneManager.GetActiveScene().name;
         var meta = EventGraphMeta.Load();
@@ -184,12 +184,12 @@ public class BatchEventCreatorV2
 
         SerializedObject so = new SerializedObject(asset);
         so.Update();
-        
+
         SetProp(so, "eventId", evt.eventId);
         SetProp(so, "eventName", evt.name);
         SetProp(so, "description", evt.description);
         SetProp(so, "category", evt.category); // Populate Category
-        
+
         // --- V2: Apply Conditions to EventData ---
         var requiredItemsProp = so.FindProperty("requiredItemIds");
         var requiredEventsProp = so.FindProperty("requiredEventIds");
@@ -248,7 +248,7 @@ public class BatchEventCreatorV2
     {
         // 1. Container Naming: ID + Name
         string containerName = $"{evtData.EventId}_{evtData.EventName}";
-        
+
         GameObject container = new GameObject(containerName);
         container.transform.SetParent(parent);
         container.transform.localPosition = localPosition;
@@ -275,7 +275,7 @@ public class BatchEventCreatorV2
             {
                 trigger.name = $"{evtData.EventId}_Trigger";
                 Undo.RegisterCreatedObjectUndo(trigger, StringPool.GetUniqueString());
-                
+
                 ApplyTriggerData(trigger, evtData);
 
                 // Check timeline requirement? 
@@ -292,37 +292,47 @@ public class BatchEventCreatorV2
     private static void ApplyReceptorData(GameObject goo, EventData evtData)
     {
         var contact = goo.GetComponent<ContactReceptor>();
-        if (contact != null) UpdateSO(contact, "targetEventId", evtData.EventId);
+        if (contact != null)
+        {
+            UpdateSO(contact, "targetEventId", evtData.EventId);
+            var soContact = new SerializedObject(contact);
+            soContact.Update();
+            var pContact = soContact.FindProperty("eventData");
+            if (pContact != null) pContact.objectReferenceValue = evtData;
+            soContact.ApplyModifiedProperties();
+        }
 
         var inspect = goo.GetComponent<InspectReceptor>();
         if (inspect != null)
         {
-             UpdateSO(inspect, "targetEventId", evtData.EventId);
-             
-             // Prompt text logic? 
-             // If Description is used as prompt? Or we need a specific prompt field?
-             // For now, let's use Description if it's short, or generic "Check". 
-             // Or leave it to manual edit.
-             if (!string.IsNullOrEmpty(evtData.Description)) UpdateSO(inspect, "prompt", evtData.Description);
-             
-             // V2: Set EventData reference
-             if (evtData != null)
-             {
-                 var so = new SerializedObject(inspect);
-                 so.Update();
-                 var p = so.FindProperty("eventData");
-                 if (p != null) p.objectReferenceValue = evtData;
-                 so.ApplyModifiedProperties();
-             }
+            UpdateSO(inspect, "targetEventId", evtData.EventId);
+
+            // Prompt text logic? 
+            // If Description is used as prompt? Or we need a specific prompt field?
+            // For now, let's use Description if it's short, or generic "Check". 
+            // Or leave it to manual edit.
+            if (!string.IsNullOrEmpty(evtData.Description)) UpdateSO(inspect, "prompt", evtData.Description);
+
+            // V2: Set EventData reference
+            if (evtData != null)
+            {
+                var so = new SerializedObject(inspect);
+                so.Update();
+                var p = so.FindProperty("eventData");
+                if (p != null) p.objectReferenceValue = evtData;
+                so.ApplyModifiedProperties();
+            }
         }
-        
+
         var itemRep = goo.GetComponent<ItemReceptor>();
         if (itemRep != null)
         {
             UpdateSO(itemRep, "targetEventId", evtData.EventId);
-            // paramItemId logic needs to be in EventData if we want validation?
-            // If Category is ItemUse, we might need a "TargetItemId" field in EventData.
-            // For now, skip auto-setting targetItemId from EventData unless we add it.
+            var soItem = new SerializedObject(itemRep);
+            soItem.Update();
+            var pItem = soItem.FindProperty("eventData");
+            if (pItem != null) pItem.objectReferenceValue = evtData;
+            soItem.ApplyModifiedProperties();
         }
     }
 
@@ -341,13 +351,13 @@ public class BatchEventCreatorV2
         // 4. V2: Clear local conditions as they are now in EventData
         SerializedObject so = new SerializedObject(trig);
         so.Update();
-        
+
         var requiredItemsProp = so.FindProperty("requiredItems");
         var requiredEventsProp = so.FindProperty("requiredEvents");
 
         if (requiredItemsProp != null) requiredItemsProp.ClearArray();
         if (requiredEventsProp != null) requiredEventsProp.ClearArray();
-        
+
         so.ApplyModifiedProperties();
     }
 
@@ -367,9 +377,9 @@ public class BatchEventCreatorV2
 
         string assetName = $"{evtData.EventId}_Timeline";
         string path = $"{TIMELINE_DIR_PATH}/{assetName}.playable";
-        
+
         TimelineAsset timeline = AssetDatabase.LoadAssetAtPath<TimelineAsset>(path);
-        
+
         // If timeline exists, assign it. We don't auto-create unless logic dictates.
         // If we want to support auto-creation for specific events:
         if (timeline != null)
@@ -391,7 +401,7 @@ public class BatchEventCreatorV2
     {
         public string eventId;
         public string name;
-        public string category; 
+        public string category;
         public string description;
         public string paramText;
         public string paramItemId;

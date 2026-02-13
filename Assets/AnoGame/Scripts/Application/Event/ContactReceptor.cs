@@ -1,8 +1,9 @@
 using UnityEngine;
 using VContainer;
 using AnoGame.Domain.Event.Services;
-using AnoGame.Application.Attributes; // EventSelector if available
-using AnoGame.Application.Player.Interaction; // For distance/trigger logic if needed, but this is auto-trigger
+using AnoGame.Domain.Inventory.Services;
+using AnoGame.Application.Attributes;
+using AnoGame.Data;
 using System.Collections;
 
 namespace AnoGame.Application.Event
@@ -16,25 +17,27 @@ namespace AnoGame.Application.Event
         [Header("Event")]
         [EventSelector]
         [SerializeField] private string targetEventId;
+        [SerializeField] private EventData eventData;
 
         [Header("Settings")]
         [SerializeField] private float triggerDistance = 2.0f;
         [SerializeField] private bool once = true;
 
         [Inject] private IEventService _eventService;
+        [Inject] private IInventoryService _inventoryService;
         private Transform _playerTransform;
         private bool _isTriggered = false;
         private static readonly float CHECK_INTERVAL = 0.2f;
 
         [Inject]
-        public void Construct(IEventService eventService)
+        public void Construct(IEventService eventService, IInventoryService inventoryService)
         {
             _eventService = eventService;
+            _inventoryService = inventoryService;
         }
 
         private void Start()
         {
-            // Player検索 (Tag or DI) - ここでは簡易的にTag検索
             var p = GameObject.FindGameObjectWithTag("Player");
             if (p != null) _playerTransform = p.transform;
 
@@ -50,7 +53,6 @@ namespace AnoGame.Application.Event
                 if (once && _isTriggered) yield break;
                 if (_playerTransform == null)
                 {
-                    // 再検索
                     var p = GameObject.FindGameObjectWithTag("Player");
                     if (p != null) _playerTransform = p.transform;
                     yield return wait;
@@ -69,6 +71,8 @@ namespace AnoGame.Application.Event
         private void ExecuteEvent()
         {
             if (once && _isTriggered) return;
+            if (!CheckConditions()) return;
+
             _isTriggered = true;
 
             Debug.Log($"[ContactReceptor] Triggered: {targetEventId}");
@@ -76,6 +80,34 @@ namespace AnoGame.Application.Event
             {
                 _eventService.TriggerEventStart(targetEventId);
             }
+        }
+
+        private bool CheckConditions()
+        {
+            if (eventData == null) return true;
+
+            var items = eventData.RequiredItemIds;
+            var events = eventData.RequiredEventIds;
+
+            if (items != null)
+            {
+                foreach (var itemId in items)
+                {
+                    if (string.IsNullOrEmpty(itemId)) continue;
+                    if (!_inventoryService.HasItem(itemId)) return false;
+                }
+            }
+
+            if (events != null)
+            {
+                foreach (var evtId in events)
+                {
+                    if (string.IsNullOrEmpty(evtId)) continue;
+                    if (!_eventService.IsEventCleared(evtId)) return false;
+                }
+            }
+
+            return true;
         }
 
         private void OnDrawGizmos()

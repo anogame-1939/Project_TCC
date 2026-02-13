@@ -14,6 +14,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
     {
         public Action OnGraphDataChanged;
         private List<EventData> _eventDataList;
+        private HashSet<string> _knownItemIds;
         private Dictionary<string, EventNodeView> _nodeMap = new Dictionary<string, EventNodeView>();
 
         public EventGraphView()
@@ -31,6 +32,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         public void PopulateGraph(List<EventData> eventDataList, HashSet<string> knownItemIds)
         {
             _eventDataList = eventDataList;
+            _knownItemIds = knownItemIds;
 
             // Clear
             DeleteElements(graphElements);
@@ -48,7 +50,8 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             // 1. Create Nodes
             foreach (var ed in _eventDataList)
             {
-                var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>());
+                var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(), _eventDataList);
+                node.OnRequiredEventsChanged = () => RebuildGraph();
                 AddElement(node);
                 _nodeMap[ed.EventId] = node;
             }
@@ -104,6 +107,36 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 schedule.Execute(() => AutoLayout());
             }
         }
+
+        /// <summary>
+        /// Rebuild the graph preserving current node positions.
+        /// Called when RequiredEvents are edited on a node.
+        /// </summary>
+        private void RebuildGraph()
+        {
+            // Save current positions before rebuild
+            var positions = new Dictionary<string, Vector2>();
+            foreach (var kvp in _nodeMap)
+            {
+                var rect = kvp.Value.GetPosition();
+                positions[kvp.Key] = new Vector2(rect.x, rect.y);
+            }
+
+            // Rebuild
+            PopulateGraph(_eventDataList, _knownItemIds);
+
+            // Restore positions
+            foreach (var kvp in positions)
+            {
+                if (_nodeMap.TryGetValue(kvp.Key, out var node))
+                {
+                    node.SetPosition(new Rect(kvp.Value.x, kvp.Value.y, 0, 0));
+                }
+            }
+
+            OnGraphDataChanged?.Invoke();
+        }
+
 
         /// <summary>
         /// Save all current node positions to the meta file.
