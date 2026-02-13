@@ -95,6 +95,12 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             {
                 Selection.activeGameObject = go;
                 EditorGUIUtility.PingObject(go);
+
+                // シーンビューのカメラを選択オブジェクトにフレーミング
+                if (SceneView.lastActiveSceneView != null)
+                {
+                    SceneView.lastActiveSceneView.FrameSelected();
+                }
             }
             else
             {
