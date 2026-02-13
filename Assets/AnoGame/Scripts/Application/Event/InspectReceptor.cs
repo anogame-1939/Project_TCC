@@ -62,33 +62,19 @@ namespace AnoGame.Application.Event
             float dist = Vector3.Distance(transform.position, actor.position);
             if (dist > maxDistance)
             {
-                Debug.Log($"[InspectReceptor] {gameObject.name}: Score → -∞ (dist={dist:F2} > max={maxDistance})");
                 return float.NegativeInfinity;
             }
 
-            float score = priority - dist;
-            Debug.Log($"[InspectReceptor] {gameObject.name}: Score → {score:F2} (dist={dist:F2})");
-            return score;
+            return priority - dist;
         }
 
         public bool TryBuildOptions(Transform actor, List<InteractionOption> buffer)
         {
-            // 距離チェックは Score で行われているが、念のため
             float dist = Vector3.Distance(transform.position, actor.position);
-            if (dist > maxDistance)
-            {
-                Debug.Log($"[InspectReceptor] {gameObject.name}: TryBuildOptions → 距離超過 dist={dist:F2} > max={maxDistance}");
-                return false;
-            }
+            if (dist > maxDistance) return false;
 
-            bool condOk = CheckConditions();
-            if (!condOk)
-            {
-                Debug.Log($"[InspectReceptor] {gameObject.name}: TryBuildOptions → CheckConditions=false");
-                return false;
-            }
+            if (!CheckConditions()) return false;
 
-            Debug.Log($"[InspectReceptor] {gameObject.name}: TryBuildOptions → OK (dist={dist:F2}, cond=true)");
             buffer.Add(new InteractionOption
             {
                 Kind = InteractionKind.Inspect,
@@ -103,7 +89,6 @@ namespace AnoGame.Application.Event
 
         private void ExecuteEvent()
         {
-            Debug.Log($"[InspectReceptor] ExecuteEvent called: {targetEventId}");
             if (string.IsNullOrEmpty(targetEventId))
             {
                 Debug.LogWarning($"[InspectReceptor] {gameObject.name}: targetEventId is null or empty!");
@@ -111,35 +96,24 @@ namespace AnoGame.Application.Event
             }
             if (!CheckConditions())
             {
-                Debug.LogWarning($"[InspectReceptor] {gameObject.name}: ExecuteEvent blocked by conditions");
                 return;
             }
-            Debug.Log($"[InspectReceptor] {gameObject.name}: TriggerEventStart({targetEventId})");
             _eventService.TriggerEventStart(targetEventId);
         }
 
         private bool CheckConditions()
         {
-            if (eventData == null)
-            {
-                Debug.Log($"[InspectReceptor] {gameObject.name}: CheckConditions → eventData=null → true");
-                return true;
-            }
+            if (eventData == null) return true;
 
             var items = eventData.RequiredItemIds;
             var events = eventData.RequiredEventIds;
-            var condTags = eventData.ConditionTags;
-
-            Debug.Log($"[InspectReceptor] {gameObject.name}: CheckConditions → items={items?.Count ?? 0}, events={events?.Count ?? 0}, condTags={condTags?.Count ?? 0}");
 
             if (items != null)
             {
                 foreach (var itemId in items)
                 {
                     if (string.IsNullOrEmpty(itemId)) continue;
-                    bool has = _inventoryService.HasItem(itemId);
-                    Debug.Log($"[InspectReceptor] {gameObject.name}:   item '{itemId}' → HasItem={has}");
-                    if (!has) return false;
+                    if (!_inventoryService.HasItem(itemId)) return false;
                 }
             }
 
@@ -148,13 +122,10 @@ namespace AnoGame.Application.Event
                 foreach (var evtId in events)
                 {
                     if (string.IsNullOrEmpty(evtId)) continue;
-                    bool cleared = _eventService.IsEventCleared(evtId);
-                    Debug.Log($"[InspectReceptor] {gameObject.name}:   event '{evtId}' → IsCleared={cleared}");
-                    if (!cleared) return false;
+                    if (!_eventService.IsEventCleared(evtId)) return false;
                 }
             }
 
-            Debug.Log($"[InspectReceptor] {gameObject.name}: CheckConditions → true");
             return true;
         }
 
