@@ -202,6 +202,16 @@ namespace AnoGame.AnoNarrative.Editor
                     };
                     secBtn.AddToClassList("section-btn");
 
+                    // Double-click to rename
+                    secBtn.RegisterCallback<MouseDownEvent>(evt =>
+                    {
+                        if (evt.clickCount == 2 && evt.button == 0)
+                        {
+                            evt.StopImmediatePropagation();
+                            StartInlineRename(secBtn, capturedEp, capturedCh, capturedSec, displayName);
+                        }
+                    });
+
                     // Right-click context menu
                     secBtn.RegisterCallback<ContextualMenuPopulateEvent>(evt =>
                     {
