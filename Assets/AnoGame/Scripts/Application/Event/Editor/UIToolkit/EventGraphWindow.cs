@@ -76,6 +76,36 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             var savePositionsBtn = new ToolbarButton(() => _graphView?.SaveNodePositions()) { text = "Save Positions" };
             toolbar.Add(savePositionsBtn);
 
+            // Spacer
+            var spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            toolbar.Add(spacer);
+
+            // Section toggle buttons
+            var expandAllBtn = new ToolbarButton(() => _graphView?.ToggleAllSections(true)) { text = "\u25BC 全展開" };
+            toolbar.Add(expandAllBtn);
+
+            var collapseAllBtn = new ToolbarButton(() => _graphView?.ToggleAllSections(false)) { text = "\u25B6 全折畳" };
+            toolbar.Add(collapseAllBtn);
+
+            toolbar.Add(new ToolbarSpacer());
+
+            var toggleResult = new ToolbarButton(() => _graphView?.ToggleSection("ResultTags")) { text = "Result" };
+            toggleResult.tooltip = "Result Tags 表示切替";
+            toolbar.Add(toggleResult);
+
+            var toggleCondition = new ToolbarButton(() => _graphView?.ToggleSection("ConditionTags")) { text = "Condition" };
+            toggleCondition.tooltip = "Condition Tags 表示切替";
+            toolbar.Add(toggleCondition);
+
+            var toggleReqEvents = new ToolbarButton(() => _graphView?.ToggleSection("RequiredEvents")) { text = "Events" };
+            toggleReqEvents.tooltip = "Required Events 表示切替";
+            toolbar.Add(toggleReqEvents);
+
+            var toggleReqItems = new ToolbarButton(() => _graphView?.ToggleSection("RequiredItems")) { text = "Items" };
+            toggleReqItems.tooltip = "Required Items 表示切替";
+            toolbar.Add(toggleReqItems);
+
             root.Add(toolbar);
 
             // Graph View

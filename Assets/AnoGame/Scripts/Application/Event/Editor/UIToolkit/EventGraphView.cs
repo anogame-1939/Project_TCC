@@ -18,6 +18,12 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private Dictionary<string, string> _itemNameMap;
         private Dictionary<string, EventNodeView> _nodeMap = new Dictionary<string, EventNodeView>();
 
+        /// <summary>
+        /// Shared section visibility state for all nodes.
+        /// Toggled by toolbar buttons.
+        /// </summary>
+        public SectionVisibility SectionVis { get; } = new SectionVisibility();
+
         public EventGraphView()
         {
             this.AddManipulator(new ContentZoomer());
@@ -78,7 +84,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             foreach (var ed in _eventDataList)
             {
                 var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(),
-                    _eventDataList, allKnownTags, eventNameMap, _itemNameMap);
+                    _eventDataList, allKnownTags, eventNameMap, _itemNameMap, SectionVis);
                 node.OnRequiredEventsChanged = () => RebuildGraph(null);
                 node.OnTagsChanged = () => RebuildGraph(null);
                 AddElement(node);
@@ -207,6 +213,33 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         }
 
         /// <summary>
+        /// Toggle a section and rebuild.
+        /// </summary>
+        public void ToggleSection(string sectionName)
+        {
+            switch (sectionName)
+            {
+                case "ResultTags": SectionVis.ResultTags = !SectionVis.ResultTags; break;
+                case "ConditionTags": SectionVis.ConditionTags = !SectionVis.ConditionTags; break;
+                case "RequiredEvents": SectionVis.RequiredEvents = !SectionVis.RequiredEvents; break;
+                case "RequiredItems": SectionVis.RequiredItems = !SectionVis.RequiredItems; break;
+            }
+            RebuildGraph(null);
+        }
+
+        /// <summary>
+        /// Toggle all sections on or off.
+        /// </summary>
+        public void ToggleAllSections(bool expand)
+        {
+            SectionVis.ResultTags = expand;
+            SectionVis.ConditionTags = expand;
+            SectionVis.RequiredEvents = expand;
+            SectionVis.RequiredItems = expand;
+            RebuildGraph(null);
+        }
+
+        /// <summary>
         /// Save all current node positions to the meta file.
         /// </summary>
         public void SaveNodePositions()
@@ -306,10 +339,10 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 int maxRank = 0;
                 if (ranks.Values.Any(r => r > 0)) maxRank = ranks.Values.Max();
 
-                float xSpacing = 400f;
-                float ySpacing = 250f;
+                float xSpacing = 350f;
+                float ySpacing = 270f; // 1.5x spacing to prevent overlap
                 float startX = 1000f;
-                float startY = 100f;
+                float startY = 400f; // Below unconnected nodes
                 var yPositions = new Dictionary<EventNodeView, float>();
 
                 for (int r = 0; r <= maxRank; r++)
@@ -344,6 +377,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                             }
                         }
 
+                        // Ensure minimum spacing between nodes in same rank
                         nodesInRank = nodesInRank.OrderBy(n => yPositions[n]).ToList();
                         for (int i = 0; i < nodesInRank.Count - 1; i++)
                         {
@@ -363,21 +397,15 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 }
             }
 
-            // --- Layout Unconnected Nodes ---
+            // --- Layout Unconnected Nodes (top row) ---
             if (unconnectedNodes.Count > 0)
             {
                 unconnectedNodes.Sort((a, b) => string.Compare(a.EventData.EventId, b.EventData.EventId, StringComparison.Ordinal));
 
-                float maxConnectedY = 0f;
-                foreach (var n in connectedNodes)
-                {
-                    if (n.GetPosition().y > maxConnectedY) maxConnectedY = n.GetPosition().y;
-                }
-
-                float gridStartY = (connectedNodes.Count > 0) ? maxConnectedY + 400f : 100f;
+                float gridStartY = 50f; // Top of canvas
                 float gridStartX = 50f;
-                float gridXSpacing = 350f;
-                float gridYSpacing = 250f;
+                float gridXSpacing = 300f;
+                float gridYSpacing = 180f;
                 int columns = 5;
 
                 for (int i = 0; i < unconnectedNodes.Count; i++)
