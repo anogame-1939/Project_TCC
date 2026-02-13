@@ -40,30 +40,48 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             if (_eventDataList == null || _eventDataList.Count == 0) return;
 
-            // Build known event ID set for validation
+            // Build known event ID set
             var knownEventIds = new HashSet<string>();
             foreach (var ed in _eventDataList)
             {
                 knownEventIds.Add(ed.EventId);
             }
 
+            // Build tag→eventId lookup: which events produce each resultTag
+            var tagProducers = new Dictionary<string, List<string>>();
+            foreach (var ed in _eventDataList)
+            {
+                var tags = ed.ResultTags;
+                if (tags == null) continue;
+                foreach (var tag in tags)
+                {
+                    if (string.IsNullOrEmpty(tag)) continue;
+                    if (!tagProducers.ContainsKey(tag))
+                        tagProducers[tag] = new List<string>();
+                    tagProducers[tag].Add(ed.EventId);
+                }
+            }
+
+            // Collect all known tags for validation
+            var allKnownTags = new HashSet<string>(tagProducers.Keys);
+
             // 1. Create Nodes
             foreach (var ed in _eventDataList)
             {
-                var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(), _eventDataList);
-                node.OnRequiredEventsChanged = () => RebuildGraph();
+                var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(),
+                    _eventDataList, allKnownTags);
+                node.OnRequiredEventsChanged = () => RebuildGraph(null);
+                node.OnTagsChanged = () => RebuildGraph(null);
                 AddElement(node);
                 _nodeMap[ed.EventId] = node;
             }
 
-            // 2. Create Edges from RequiredEventIds (condition-based reverse lookup)
-            //    Each condition port on the target node connects to the source node's OutputPort
+            // 2. Create Edges from RequiredEventIds (legacy direct references)
             foreach (var ed in _eventDataList)
             {
                 if (!_nodeMap.ContainsKey(ed.EventId)) continue;
                 var targetNode = _nodeMap[ed.EventId];
 
-                // Event conditions → connect via condition ports
                 var reqEvents = ed.RequiredEventIds;
                 if (reqEvents != null)
                 {
@@ -71,12 +89,40 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                     {
                         if (_nodeMap.TryGetValue(reqId, out var sourceNode))
                         {
-                            // Connect source OutputPort → target's specific condition port
                             if (targetNode.ConditionPorts.TryGetValue(reqId, out var condPort))
                             {
                                 var edge = sourceNode.OutputPort.ConnectTo(condPort);
                                 AddElement(edge);
                             }
+                        }
+                    }
+                }
+            }
+
+            // 3. Create Edges from Tags (conditionTags ↔ resultTags)
+            foreach (var ed in _eventDataList)
+            {
+                if (!_nodeMap.ContainsKey(ed.EventId)) continue;
+                var targetNode = _nodeMap[ed.EventId];
+
+                var cTags = ed.ConditionTags;
+                if (cTags == null) continue;
+
+                foreach (var tag in cTags)
+                {
+                    if (string.IsNullOrEmpty(tag)) continue;
+                    if (!tagProducers.TryGetValue(tag, out var producers)) continue;
+
+                    foreach (var producerId in producers)
+                    {
+                        if (producerId == ed.EventId) continue; // skip self
+                        if (!_nodeMap.TryGetValue(producerId, out var sourceNode)) continue;
+
+                        // Connect source OutputPort → target's tag condition port
+                        if (targetNode.TagConditionPorts.TryGetValue(tag, out var tagPort))
+                        {
+                            var edge = sourceNode.OutputPort.ConnectTo(tagPort);
+                            AddElement(edge);
                         }
                     }
                 }
@@ -109,10 +155,10 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         }
 
         /// <summary>
-        /// Rebuild the graph preserving current node positions.
-        /// Called when RequiredEvents are edited on a node.
+        /// Rebuild the graph preserving existing node positions.
+        /// Optionally focus camera on a specific node.
         /// </summary>
-        private void RebuildGraph()
+        private void RebuildGraph(string focusNodeId)
         {
             // Save current positions before rebuild
             var positions = new Dictionary<string, Vector2>();
@@ -125,7 +171,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             // Rebuild
             PopulateGraph(_eventDataList, _knownItemIds);
 
-            // Restore positions
+            // Restore all saved positions (existing nodes don't move)
             foreach (var kvp in positions)
             {
                 if (_nodeMap.TryGetValue(kvp.Key, out var node))
@@ -134,9 +180,22 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 }
             }
 
+            // Focus camera on a specific node if requested
+            if (!string.IsNullOrEmpty(focusNodeId) && _nodeMap.TryGetValue(focusNodeId, out var focusNode))
+            {
+                schedule.Execute(() =>
+                {
+                    var nodeRect = focusNode.GetPosition();
+                    var center = new Vector3(nodeRect.x + 150, nodeRect.y + 100, 0);
+                    UpdateViewTransform(
+                        contentViewContainer.transform.position - center + new Vector3(layout.width / 2, layout.height / 2, 0),
+                        contentViewContainer.transform.scale
+                    );
+                }).ExecuteLater(50);
+            }
+
             OnGraphDataChanged?.Invoke();
         }
-
 
         /// <summary>
         /// Save all current node positions to the meta file.
@@ -174,7 +233,6 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             var connectedNodes = new HashSet<EventNodeView>();
             var unconnectedNodes = new List<EventNodeView>();
 
-            // Build adjacency from edges
             var inputs = new Dictionary<EventNodeView, List<EventNodeView>>();
             var outputs = new Dictionary<EventNodeView, List<EventNodeView>>();
 
@@ -184,7 +242,6 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 outputs[node] = new List<EventNodeView>();
             }
 
-            // Walk edges to build adjacency
             foreach (var edge in edges.ToList())
             {
                 var sourceNode = edge.output.node as EventNodeView;
@@ -201,13 +258,9 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             foreach (var node in allNodes)
             {
                 if (inputs[node].Count > 0 || outputs[node].Count > 0)
-                {
                     connectedNodes.Add(node);
-                }
                 else
-                {
                     unconnectedNodes.Add(node);
-                }
             }
 
             // --- Layout Connected Nodes (Pyramid: Goal on Right) ---
@@ -248,7 +301,6 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 float ySpacing = 250f;
                 float startX = 1000f;
                 float startY = 100f;
-
                 var yPositions = new Dictionary<EventNodeView, float>();
 
                 for (int r = 0; r <= maxRank; r++)
@@ -289,9 +341,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                             var n1 = nodesInRank[i];
                             var n2 = nodesInRank[i + 1];
                             if (yPositions[n2] - yPositions[n1] < ySpacing)
-                            {
                                 yPositions[n2] = yPositions[n1] + ySpacing;
-                            }
                         }
                     }
 
@@ -325,10 +375,8 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 {
                     int row = i / columns;
                     int col = i % columns;
-
                     float x = gridStartX + col * gridXSpacing;
                     float y = gridStartY + row * gridYSpacing;
-
                     unconnectedNodes[i].SetPosition(new Rect(x, y, 0, 0));
                 }
             }

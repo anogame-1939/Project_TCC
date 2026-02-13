@@ -16,49 +16,50 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         public Port OutputPort { get; private set; }
 
         /// <summary>
-        /// Condition ports keyed by RequiredEventId.
-        /// Each required event gets its own Input port for edge connection.
+        /// Condition ports keyed by RequiredEventId (legacy direct references).
         /// </summary>
         public Dictionary<string, Port> ConditionPorts { get; private set; } = new Dictionary<string, Port>();
 
         /// <summary>
-        /// Callback: fires when this node's RequiredEventIds have been edited.
-        /// The graph should rebuild edges in response.
+        /// Condition ports keyed by conditionTag.
         /// </summary>
+        public Dictionary<string, Port> TagConditionPorts { get; private set; } = new Dictionary<string, Port>();
+
         public Action OnRequiredEventsChanged;
+        public Action OnTagsChanged;
 
-        private VisualElement _bottomPortContainer;
         private VisualElement _conditionPortsContainer;
+        private VisualElement _tagConditionPortsContainer;
 
-        // Context passed from graph
         private HashSet<string> _knownEventIds;
         private HashSet<string> _knownItemIds;
-        private List<EventData> _allEventDataList; // for dropdown
+        private HashSet<string> _allKnownTags;
+        private List<EventData> _allEventDataList;
 
-        public EventNodeView(EventData data, HashSet<string> knownEventIds, HashSet<string> knownItemIds, List<EventData> allEventDataList)
+        public EventNodeView(EventData data, HashSet<string> knownEventIds, HashSet<string> knownItemIds,
+            List<EventData> allEventDataList, HashSet<string> allKnownTags)
         {
             EventData = data;
             _knownEventIds = knownEventIds ?? new HashSet<string>();
             _knownItemIds = knownItemIds ?? new HashSet<string>();
             _allEventDataList = allEventDataList ?? new List<EventData>();
+            _allKnownTags = allKnownTags ?? new HashSet<string>();
 
             AddToClassList("event-node");
             title = $"{EventData.EventId}\n{EventData.EventName}";
 
-            // ---- Output Port (Bottom) ----
-            _bottomPortContainer = new VisualElement();
-            _bottomPortContainer.AddToClassList("output-port-container");
+            // Output Port
+            var bottomContainer = new VisualElement();
+            bottomContainer.AddToClassList("output-port-container");
             OutputPort = InstantiatePort(Orientation.Horizontal,
                 UnityEditor.Experimental.GraphView.Direction.Output,
                 Port.Capacity.Multi, typeof(bool));
             OutputPort.portName = "Out";
-            _bottomPortContainer.Add(OutputPort);
-            Add(_bottomPortContainer);
+            bottomContainer.Add(OutputPort);
+            Add(bottomContainer);
 
-            // ---- Content ----
             CreateContent();
 
-            // ---- Interactions ----
             RegisterCallback<MouseDownEvent>(OnMouseDown);
             RegisterCallback<ContextualMenuPopulateEvent>(OnContextMenu);
         }
@@ -96,44 +97,178 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             container.style.paddingRight = 8;
             container.style.paddingBottom = 8;
 
-            // Basic Info
+            // --- Basic Info ---
             AddInfoRow(container, "ID:", EventData.EventId);
             AddInfoRow(container, "Name:", EventData.EventName);
             AddInfoRow(container, "Category:", EventData.Category);
-            AddInfoRow(container, "Desc:", EventData.Description);
 
-            // --- Required Events (with individual condition ports + edit buttons) ---
-            var reqEventsHeader = new VisualElement();
-            reqEventsHeader.style.flexDirection = FlexDirection.Row;
-            reqEventsHeader.style.alignItems = Align.Center;
-            reqEventsHeader.style.justifyContent = Justify.SpaceBetween;
-            reqEventsHeader.style.marginTop = 8;
+            // --- Result Tags ---
+            BuildResultTagsSection(container);
 
-            var reqEventsLabel = new Label("Required Events:");
-            reqEventsLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            reqEventsHeader.Add(reqEventsLabel);
+            // --- Condition Tags (with ports) ---
+            BuildConditionTagsSection(container);
 
-            // "+" button to add a new RequiredEvent
+            // --- Required Events (legacy, with ports) ---
+            BuildRequiredEventsSection(container);
+
+            // --- Required Items (labels only) ---
+            BuildRequiredItemsSection(container);
+
+            // Border
+            UpdateConditionBorder();
+
+            extensionContainer.Add(container);
+            RefreshExpandedState();
+        }
+
+        // ====== Result Tags ======
+        private void BuildResultTagsSection(VisualElement parent)
+        {
+            var header = new VisualElement();
+            header.style.flexDirection = FlexDirection.Row;
+            header.style.alignItems = Align.Center;
+            header.style.justifyContent = Justify.SpaceBetween;
+            header.style.marginTop = 8;
+
+            var lbl = new Label("Result Tags:");
+            lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
+            header.Add(lbl);
+
+            var addBtn = new Button(() => ShowAddTagMenu("resultTags", OnTagsChanged)) { text = "+" };
+            StyleSmallButton(addBtn, "ResultTag追加");
+            header.Add(addBtn);
+
+            parent.Add(header);
+
+            var tags = EventData.ResultTags;
+            if (tags != null && tags.Count > 0)
+            {
+                var section = new VisualElement();
+                section.style.paddingLeft = 4;
+                foreach (var tag in tags)
+                {
+                    var row = new VisualElement();
+                    row.style.flexDirection = FlexDirection.Row;
+                    row.style.alignItems = Align.Center;
+                    row.style.marginTop = 1;
+
+                    var tagLbl = new Label($"\u25cf {tag}");
+                    tagLbl.style.color = new Color(0.5f, 0.85f, 1f);
+                    tagLbl.style.flexGrow = 1;
+                    row.Add(tagLbl);
+
+                    var capturedTag = tag;
+                    var removeBtn = new Button(() => RemoveTag("resultTags", capturedTag, OnTagsChanged)) { text = "\u00d7" };
+                    StyleRemoveButton(removeBtn, $"Remove {tag}");
+                    row.Add(removeBtn);
+
+                    section.Add(row);
+                }
+                parent.Add(section);
+            }
+            else
+            {
+                AddEmptyLabel(parent);
+            }
+        }
+
+        // ====== Condition Tags ======
+        private void BuildConditionTagsSection(VisualElement parent)
+        {
+            var header = new VisualElement();
+            header.style.flexDirection = FlexDirection.Row;
+            header.style.alignItems = Align.Center;
+            header.style.justifyContent = Justify.SpaceBetween;
+            header.style.marginTop = 8;
+
+            var lbl = new Label("Condition Tags:");
+            lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
+            header.Add(lbl);
+
+            var addBtn = new Button(() => ShowAddTagMenu("conditionTags", OnTagsChanged)) { text = "+" };
+            StyleSmallButton(addBtn, "ConditionTag追加");
+            header.Add(addBtn);
+
+            parent.Add(header);
+
+            _tagConditionPortsContainer = new VisualElement();
+            _tagConditionPortsContainer.AddToClassList("condition-ports-container");
+
+            var cTags = EventData.ConditionTags;
+            if (cTags != null && cTags.Count > 0)
+            {
+                foreach (var tag in cTags)
+                {
+                    AddTagConditionPortRow(tag);
+                }
+            }
+            else
+            {
+                var emptyLbl = new Label("(None)");
+                emptyLbl.style.color = Color.gray;
+                emptyLbl.style.paddingLeft = 4;
+                _tagConditionPortsContainer.Add(emptyLbl);
+            }
+            parent.Add(_tagConditionPortsContainer);
+        }
+
+        private void AddTagConditionPortRow(string tag)
+        {
+            bool satisfied = _allKnownTags.Contains(tag);
+
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.alignItems = Align.Center;
+            row.style.marginTop = 2;
+
+            var condPort = InstantiatePort(Orientation.Horizontal,
+                UnityEditor.Experimental.GraphView.Direction.Input,
+                Port.Capacity.Multi, typeof(bool));
+            condPort.portName = "";
+            condPort.style.width = 16;
+            condPort.style.minWidth = 16;
+            row.Add(condPort);
+
+            TagConditionPorts[tag] = condPort;
+
+            var lbl = new Label($"{(satisfied ? "\u2713" : "\u2717")} {tag}");
+            lbl.style.color = satisfied ? new Color(0.5f, 0.85f, 1f) : new Color(1f, 0.5f, 0.5f);
+            lbl.style.marginLeft = 4;
+            lbl.style.flexGrow = 1;
+            row.Add(lbl);
+
+            var capturedTag = tag;
+            var removeBtn = new Button(() => RemoveTag("conditionTags", capturedTag, OnTagsChanged)) { text = "\u00d7" };
+            StyleRemoveButton(removeBtn, $"Remove {tag}");
+            row.Add(removeBtn);
+
+            _tagConditionPortsContainer.Add(row);
+        }
+
+        // ====== Required Events (Legacy) ======
+        private void BuildRequiredEventsSection(VisualElement parent)
+        {
+            var header = new VisualElement();
+            header.style.flexDirection = FlexDirection.Row;
+            header.style.alignItems = Align.Center;
+            header.style.justifyContent = Justify.SpaceBetween;
+            header.style.marginTop = 8;
+
+            var lbl = new Label("Required Events:");
+            lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
+            lbl.style.color = new Color(0.7f, 0.7f, 0.7f);
+            header.Add(lbl);
+
             var addBtn = new Button(() => ShowAddRequiredEventMenu()) { text = "+" };
-            addBtn.style.width = 22;
-            addBtn.style.height = 20;
-            addBtn.style.fontSize = 14;
-            addBtn.style.unityFontStyleAndWeight = FontStyle.Bold;
-            addBtn.style.paddingLeft = 0;
-            addBtn.style.paddingRight = 0;
-            addBtn.style.paddingTop = 0;
-            addBtn.style.paddingBottom = 0;
-            addBtn.style.marginLeft = 4;
-            addBtn.tooltip = "RequiredEvent追加";
-            reqEventsHeader.Add(addBtn);
+            StyleSmallButton(addBtn, "RequiredEvent追加");
+            header.Add(addBtn);
 
-            container.Add(reqEventsHeader);
+            parent.Add(header);
 
-            // Condition ports area
-            var reqEvents = EventData.RequiredEventIds;
             _conditionPortsContainer = new VisualElement();
             _conditionPortsContainer.AddToClassList("condition-ports-container");
 
+            var reqEvents = EventData.RequiredEventIds;
             if (reqEvents != null && reqEvents.Count > 0)
             {
                 foreach (var eid in reqEvents)
@@ -148,11 +283,51 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 emptyLbl.style.paddingLeft = 4;
                 _conditionPortsContainer.Add(emptyLbl);
             }
+            parent.Add(_conditionPortsContainer);
+        }
 
-            container.Add(_conditionPortsContainer);
+        private void AddConditionPortRow(string eid)
+        {
+            bool exists = _knownEventIds.Contains(eid);
 
-            // --- Required Items (label only, no ports) ---
-            AddSectionHeader(container, "Required Items:");
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.alignItems = Align.Center;
+            row.style.marginTop = 2;
+
+            var condPort = InstantiatePort(Orientation.Horizontal,
+                UnityEditor.Experimental.GraphView.Direction.Input,
+                Port.Capacity.Single, typeof(bool));
+            condPort.portName = "";
+            condPort.style.width = 16;
+            condPort.style.minWidth = 16;
+            row.Add(condPort);
+
+            ConditionPorts[eid] = condPort;
+
+            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {eid}");
+            lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
+            lbl.style.marginLeft = 4;
+            lbl.style.flexGrow = 1;
+            row.Add(lbl);
+
+            var capturedEid = eid;
+            var removeBtn = new Button(() => RemoveRequiredEvent(capturedEid)) { text = "\u00d7" };
+            StyleRemoveButton(removeBtn, $"Remove {eid}");
+            row.Add(removeBtn);
+
+            _conditionPortsContainer.Add(row);
+        }
+
+        // ====== Required Items ======
+        private void BuildRequiredItemsSection(VisualElement parent)
+        {
+            var header = new Label("Required Items:");
+            header.style.unityFontStyleAndWeight = FontStyle.Bold;
+            header.style.marginTop = 8;
+            header.style.color = new Color(0.7f, 0.7f, 0.7f);
+            parent.Add(header);
+
             var reqItems = EventData.RequiredItemIds;
             if (reqItems != null && reqItems.Count > 0)
             {
@@ -165,77 +340,112 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                     lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
                     section.Add(lbl);
                 }
-                container.Add(section);
+                parent.Add(section);
             }
             else
             {
-                AddEmptyLabel(container);
+                AddEmptyLabel(parent);
+            }
+        }
+
+        // ====== Tag Add/Remove ======
+        private void ShowAddTagMenu(string fieldName, Action callback)
+        {
+            var menu = new GenericMenu();
+
+            // Gather existing tags from all events for suggestions
+            var existingTags = new HashSet<string>();
+            foreach (var ed in _allEventDataList)
+            {
+                foreach (var t in ed.ResultTags) if (!string.IsNullOrEmpty(t)) existingTags.Add(t);
+                foreach (var t in ed.ConditionTags) if (!string.IsNullOrEmpty(t)) existingTags.Add(t);
             }
 
-            // --- Condition Status Border ---
-            UpdateConditionBorder();
+            // Get current tags on this event for this field to exclude
+            var currentTags = new HashSet<string>();
+            if (fieldName == "resultTags")
+                foreach (var t in EventData.ResultTags) currentTags.Add(t);
+            else
+                foreach (var t in EventData.ConditionTags) currentTags.Add(t);
 
-            extensionContainer.Add(container);
-            RefreshExpandedState();
+            // Existing tags section
+            var available = existingTags.Where(t => !currentTags.Contains(t)).OrderBy(t => t).ToList();
+            foreach (var tag in available)
+            {
+                var capturedTag = tag;
+                menu.AddItem(new GUIContent($"Existing/{capturedTag}"), false, () => AddTag(fieldName, capturedTag, callback));
+            }
+
+            // New tag entry (opens input dialog)
+            menu.AddSeparator("");
+            menu.AddItem(new GUIContent("New Tag..."), false, () =>
+            {
+                var input = EditorInputDialog.Show("New Tag", "タグ名を入力:", "");
+                if (!string.IsNullOrEmpty(input))
+                {
+                    AddTag(fieldName, input.Trim(), callback);
+                }
+            });
+
+            menu.ShowAsContext();
         }
 
-        /// <summary>
-        /// Add one condition port row: [Port] [✓/✗ label] [× button]
-        /// </summary>
-        private void AddConditionPortRow(string eid)
+        private void AddTag(string fieldName, string tag, Action callback)
         {
-            bool exists = _knownEventIds.Contains(eid);
+            var so = new SerializedObject(EventData);
+            so.Update();
 
-            var row = new VisualElement();
-            row.style.flexDirection = FlexDirection.Row;
-            row.style.alignItems = Align.Center;
-            row.style.marginTop = 2;
+            var prop = so.FindProperty(fieldName);
+            if (prop == null) return;
 
-            // Input port for this condition
-            var condPort = InstantiatePort(Orientation.Horizontal,
-                UnityEditor.Experimental.GraphView.Direction.Input,
-                Port.Capacity.Single, typeof(bool));
-            condPort.portName = "";
-            condPort.style.width = 16;
-            condPort.style.minWidth = 16;
-            row.Add(condPort);
+            // Duplicate check
+            for (int i = 0; i < prop.arraySize; i++)
+            {
+                if (prop.GetArrayElementAtIndex(i).stringValue == tag) return;
+            }
 
-            ConditionPorts[eid] = condPort;
+            int idx = prop.arraySize;
+            prop.InsertArrayElementAtIndex(idx);
+            prop.GetArrayElementAtIndex(idx).stringValue = tag;
 
-            // Label with validation indicator
-            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {eid}");
-            lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
-            lbl.style.marginLeft = 4;
-            lbl.style.flexGrow = 1;
-            row.Add(lbl);
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(EventData);
+            AssetDatabase.SaveAssetIfDirty(EventData);
 
-            // "×" button to remove this condition
-            var capturedEid = eid; // capture for closure
-            var removeBtn = new Button(() => RemoveRequiredEvent(capturedEid)) { text = "\u00d7" };
-            removeBtn.style.width = 18;
-            removeBtn.style.height = 18;
-            removeBtn.style.fontSize = 12;
-            removeBtn.style.paddingLeft = 0;
-            removeBtn.style.paddingRight = 0;
-            removeBtn.style.paddingTop = 0;
-            removeBtn.style.paddingBottom = 0;
-            removeBtn.style.marginLeft = 2;
-            removeBtn.style.color = new Color(1f, 0.5f, 0.5f);
-            removeBtn.tooltip = $"Remove {eid}";
-            row.Add(removeBtn);
-
-            _conditionPortsContainer.Add(row);
+            Debug.Log($"[EventGraph] Added tag '{tag}' to {EventData.EventId}.{fieldName}");
+            callback?.Invoke();
         }
 
-        /// <summary>
-        /// Show GenericMenu dropdown listing all EventData (excluding self and already-added).
-        /// </summary>
+        private void RemoveTag(string fieldName, string tag, Action callback)
+        {
+            var so = new SerializedObject(EventData);
+            so.Update();
+
+            var prop = so.FindProperty(fieldName);
+            if (prop == null) return;
+
+            for (int i = 0; i < prop.arraySize; i++)
+            {
+                if (prop.GetArrayElementAtIndex(i).stringValue == tag)
+                {
+                    prop.DeleteArrayElementAtIndex(i);
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(EventData);
+                    AssetDatabase.SaveAssetIfDirty(EventData);
+
+                    Debug.Log($"[EventGraph] Removed tag '{tag}' from {EventData.EventId}.{fieldName}");
+                    callback?.Invoke();
+                    return;
+                }
+            }
+        }
+
+        // ====== RequiredEvent Add/Remove (Legacy) ======
         private void ShowAddRequiredEventMenu()
         {
             var currentIds = EventData.RequiredEventIds ?? new List<string>();
             var menu = new GenericMenu();
 
-            // Group by category
             var grouped = _allEventDataList
                 .Where(ed => ed.EventId != EventData.EventId && !currentIds.Contains(ed.EventId))
                 .GroupBy(ed => string.IsNullOrEmpty(ed.Category) ? "(未分類)" : ed.Category)
@@ -255,16 +465,11 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             }
 
             if (menu.GetItemCount() == 0)
-            {
                 menu.AddDisabledItem(new GUIContent("(追加可能なイベントなし)"));
-            }
 
             menu.ShowAsContext();
         }
 
-        /// <summary>
-        /// Add a RequiredEventId to the EventData SO and notify the graph.
-        /// </summary>
         private void AddRequiredEvent(string eventId)
         {
             var so = new SerializedObject(EventData);
@@ -273,12 +478,10 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             var prop = so.FindProperty("requiredEventIds");
             if (prop == null) return;
 
-            // Check for duplicates
             for (int i = 0; i < prop.arraySize; i++)
             {
-                var elem = prop.GetArrayElementAtIndex(i);
-                var eidProp = elem.FindPropertyRelative("eventId");
-                if (eidProp != null && eidProp.stringValue == eventId) return; // already exists
+                var eidProp = prop.GetArrayElementAtIndex(i).FindPropertyRelative("eventId");
+                if (eidProp != null && eidProp.stringValue == eventId) return;
             }
 
             int idx = prop.arraySize;
@@ -295,9 +498,6 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             OnRequiredEventsChanged?.Invoke();
         }
 
-        /// <summary>
-        /// Remove a RequiredEventId from the EventData SO and notify the graph.
-        /// </summary>
         private void RemoveRequiredEvent(string eventId)
         {
             var so = new SerializedObject(EventData);
@@ -308,8 +508,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             for (int i = 0; i < prop.arraySize; i++)
             {
-                var elem = prop.GetArrayElementAtIndex(i);
-                var eidProp = elem.FindPropertyRelative("eventId");
+                var eidProp = prop.GetArrayElementAtIndex(i).FindPropertyRelative("eventId");
                 if (eidProp != null && eidProp.stringValue == eventId)
                 {
                     prop.DeleteArrayElementAtIndex(i);
@@ -324,30 +523,20 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             }
         }
 
+        // ====== Helpers ======
         private void AddInfoRow(VisualElement parent, string label, string value)
         {
             var row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
             row.style.marginTop = 2;
-
             var lbl = new Label(label);
             lbl.style.minWidth = 70;
             lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
             row.Add(lbl);
-
             var val = new Label(string.IsNullOrEmpty(value) ? "-" : value);
             val.style.flexShrink = 1;
             row.Add(val);
-
             parent.Add(row);
-        }
-
-        private void AddSectionHeader(VisualElement parent, string text)
-        {
-            var lbl = new Label(text);
-            lbl.style.unityFontStyleAndWeight = FontStyle.Bold;
-            lbl.style.marginTop = 8;
-            parent.Add(lbl);
         }
 
         private void AddEmptyLabel(VisualElement parent)
@@ -358,12 +547,44 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             parent.Add(lbl);
         }
 
+        private void StyleSmallButton(Button btn, string tooltip)
+        {
+            btn.style.width = 22;
+            btn.style.height = 20;
+            btn.style.fontSize = 14;
+            btn.style.unityFontStyleAndWeight = FontStyle.Bold;
+            btn.style.paddingLeft = 0;
+            btn.style.paddingRight = 0;
+            btn.style.paddingTop = 0;
+            btn.style.paddingBottom = 0;
+            btn.style.marginLeft = 4;
+            btn.tooltip = tooltip;
+        }
+
+        private void StyleRemoveButton(Button btn, string tooltip)
+        {
+            btn.style.width = 18;
+            btn.style.height = 18;
+            btn.style.fontSize = 12;
+            btn.style.paddingLeft = 0;
+            btn.style.paddingRight = 0;
+            btn.style.paddingTop = 0;
+            btn.style.paddingBottom = 0;
+            btn.style.marginLeft = 2;
+            btn.style.color = new Color(1f, 0.5f, 0.5f);
+            btn.tooltip = tooltip;
+        }
+
         private void UpdateConditionBorder()
         {
             var reqEvents = EventData.RequiredEventIds;
             var reqItems = EventData.RequiredItemIds;
+            var cTags = EventData.ConditionTags;
 
-            bool hasConditions = (reqEvents != null && reqEvents.Count > 0) || (reqItems != null && reqItems.Count > 0);
+            bool hasConditions = (reqEvents != null && reqEvents.Count > 0)
+                || (reqItems != null && reqItems.Count > 0)
+                || (cTags != null && cTags.Count > 0);
+
             if (!hasConditions)
             {
                 style.borderLeftColor = new Color(0.4f, 0.8f, 0.4f);
@@ -371,41 +592,56 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 return;
             }
 
-            int total = 0;
-            int satisfied = 0;
+            int total = 0, satisfied = 0;
 
-            if (reqEvents != null)
-            {
-                foreach (var eid in reqEvents)
-                {
-                    total++;
-                    if (_knownEventIds.Contains(eid)) satisfied++;
-                }
-            }
-            if (reqItems != null)
-            {
-                foreach (var iid in reqItems)
-                {
-                    total++;
-                    if (_knownItemIds.Contains(iid)) satisfied++;
-                }
-            }
+            if (reqEvents != null) foreach (var eid in reqEvents) { total++; if (_knownEventIds.Contains(eid)) satisfied++; }
+            if (reqItems != null) foreach (var iid in reqItems) { total++; if (_knownItemIds.Contains(iid)) satisfied++; }
+            if (cTags != null) foreach (var t in cTags) { total++; if (_allKnownTags.Contains(t)) satisfied++; }
 
-            if (total > 0 && satisfied == total)
+            if (total > 0 && satisfied == total) { style.borderLeftColor = new Color(0.4f, 0.8f, 0.4f); style.borderLeftWidth = 3; }
+            else if (satisfied > 0) { style.borderLeftColor = new Color(0.9f, 0.8f, 0.3f); style.borderLeftWidth = 3; }
+            else { style.borderLeftColor = new Color(0.5f, 0.5f, 0.5f); style.borderLeftWidth = 1; }
+        }
+    }
+
+    /// <summary>
+    /// Simple editor input dialog for entering new tag names.
+    /// </summary>
+    public class EditorInputDialog : EditorWindow
+    {
+        private string _input = "";
+        private string _message = "";
+        private string _result = null;
+        private bool _confirmed = false;
+
+        public static string Show(string title, string message, string defaultValue)
+        {
+            var dialog = CreateInstance<EditorInputDialog>();
+            dialog.titleContent = new GUIContent(title);
+            dialog._message = message;
+            dialog._input = defaultValue ?? "";
+            dialog.minSize = new Vector2(300, 100);
+            dialog.maxSize = new Vector2(400, 120);
+            dialog.ShowModalUtility();
+            return dialog._confirmed ? dialog._result : null;
+        }
+
+        private void OnGUI()
+        {
+            EditorGUILayout.LabelField(_message);
+            _input = EditorGUILayout.TextField(_input);
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("OK"))
             {
-                style.borderLeftColor = new Color(0.4f, 0.8f, 0.4f);
-                style.borderLeftWidth = 3;
+                _result = _input;
+                _confirmed = true;
+                Close();
             }
-            else if (satisfied > 0)
+            if (GUILayout.Button("Cancel"))
             {
-                style.borderLeftColor = new Color(0.9f, 0.8f, 0.3f);
-                style.borderLeftWidth = 3;
+                Close();
             }
-            else
-            {
-                style.borderLeftColor = new Color(0.5f, 0.5f, 0.5f);
-                style.borderLeftWidth = 1;
-            }
+            EditorGUILayout.EndHorizontal();
         }
     }
 }
