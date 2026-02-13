@@ -35,15 +35,20 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private HashSet<string> _knownItemIds;
         private HashSet<string> _allKnownTags;
         private List<EventData> _allEventDataList;
+        private Dictionary<string, string> _eventNameMap;
+        private Dictionary<string, string> _itemNameMap;
 
         public EventNodeView(EventData data, HashSet<string> knownEventIds, HashSet<string> knownItemIds,
-            List<EventData> allEventDataList, HashSet<string> allKnownTags)
+            List<EventData> allEventDataList, HashSet<string> allKnownTags,
+            Dictionary<string, string> eventNameMap = null, Dictionary<string, string> itemNameMap = null)
         {
             EventData = data;
             _knownEventIds = knownEventIds ?? new HashSet<string>();
             _knownItemIds = knownItemIds ?? new HashSet<string>();
             _allEventDataList = allEventDataList ?? new List<EventData>();
             _allKnownTags = allKnownTags ?? new HashSet<string>();
+            _eventNameMap = eventNameMap ?? new Dictionary<string, string>();
+            _itemNameMap = itemNameMap ?? new Dictionary<string, string>();
 
             AddToClassList("event-node");
             title = $"{EventData.EventId}\n{EventData.EventName}";
@@ -305,7 +310,9 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             ConditionPorts[eid] = condPort;
 
-            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {eid}");
+            var displayName = _eventNameMap.TryGetValue(eid, out var eName) ? eName : eid;
+            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {displayName}");
+            lbl.tooltip = eid;
             lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
             lbl.style.marginLeft = 4;
             lbl.style.flexGrow = 1;
@@ -336,7 +343,9 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 foreach (var iid in reqItems)
                 {
                     bool exists = _knownItemIds.Contains(iid);
-                    var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {iid}");
+                    var itemDisplayName = _itemNameMap.TryGetValue(iid, out var iName) ? iName : iid;
+                    var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {itemDisplayName}");
+                    lbl.tooltip = iid;
                     lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
                     section.Add(lbl);
                 }

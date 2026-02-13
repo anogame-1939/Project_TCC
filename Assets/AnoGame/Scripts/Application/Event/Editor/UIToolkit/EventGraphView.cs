@@ -15,6 +15,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         public Action OnGraphDataChanged;
         private List<EventData> _eventDataList;
         private HashSet<string> _knownItemIds;
+        private Dictionary<string, string> _itemNameMap;
         private Dictionary<string, EventNodeView> _nodeMap = new Dictionary<string, EventNodeView>();
 
         public EventGraphView()
@@ -29,10 +30,11 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             grid.StretchToParentSize();
         }
 
-        public void PopulateGraph(List<EventData> eventDataList, HashSet<string> knownItemIds)
+        public void PopulateGraph(List<EventData> eventDataList, HashSet<string> knownItemIds, Dictionary<string, string> itemNameMap = null)
         {
             _eventDataList = eventDataList;
             _knownItemIds = knownItemIds;
+            _itemNameMap = itemNameMap ?? new Dictionary<string, string>();
 
             // Clear
             DeleteElements(graphElements);
@@ -65,11 +67,18 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             // Collect all known tags for validation
             var allKnownTags = new HashSet<string>(tagProducers.Keys);
 
+            // Build eventId→eventName lookup
+            var eventNameMap = new Dictionary<string, string>();
+            foreach (var ed in _eventDataList)
+            {
+                eventNameMap[ed.EventId] = ed.EventName;
+            }
+
             // 1. Create Nodes
             foreach (var ed in _eventDataList)
             {
                 var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(),
-                    _eventDataList, allKnownTags);
+                    _eventDataList, allKnownTags, eventNameMap, _itemNameMap);
                 node.OnRequiredEventsChanged = () => RebuildGraph(null);
                 node.OnTagsChanged = () => RebuildGraph(null);
                 AddElement(node);
@@ -169,7 +178,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             }
 
             // Rebuild
-            PopulateGraph(_eventDataList, _knownItemIds);
+            PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
 
             // Restore all saved positions (existing nodes don't move)
             foreach (var kvp in positions)

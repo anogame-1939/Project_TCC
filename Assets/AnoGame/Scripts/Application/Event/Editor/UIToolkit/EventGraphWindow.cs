@@ -19,6 +19,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private EventGraphView _graphView;
         private List<EventData> _eventDataList;
         private HashSet<string> _knownItemIds;
+        private Dictionary<string, string> _itemNameMap;
 
         [MenuItem("AnoGame/Event Graph")]
         public static void Open()
@@ -64,7 +65,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             var reloadBtn = new ToolbarButton(() =>
             {
                 LoadData();
-                _graphView?.PopulateGraph(_eventDataList, _knownItemIds);
+                _graphView?.PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
             })
             { text = "Reload" };
             toolbar.Add(reloadBtn);
@@ -85,7 +86,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             if (_eventDataList != null && _eventDataList.Count > 0)
             {
-                _graphView.PopulateGraph(_eventDataList, _knownItemIds);
+                _graphView.PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
             }
         }
 
@@ -104,6 +105,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             // Load known item IDs from items_batch.json
             _knownItemIds = new HashSet<string>();
+            _itemNameMap = new Dictionary<string, string>();
             if (File.Exists(ITEMS_JSON_PATH))
             {
                 try
@@ -115,7 +117,11 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                         foreach (var item in itemList.items)
                         {
                             if (!string.IsNullOrEmpty(item.id))
+                            {
                                 _knownItemIds.Add(item.id);
+                                if (!string.IsNullOrEmpty(item.name))
+                                    _itemNameMap[item.id] = item.name;
+                            }
                         }
                     }
                 }
@@ -138,6 +144,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private class ItemEntry
         {
             public string id;
+            public string name;
         }
     }
 }
