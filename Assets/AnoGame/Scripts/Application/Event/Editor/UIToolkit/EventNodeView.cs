@@ -547,6 +547,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         // ====== Helpers ======
         private void StyleSmallButton(Button btn, string tooltip)
         {
+            btn.AddToClassList("edit-btn");
             btn.style.width = 20;
             btn.style.height = 16;
             btn.style.fontSize = 12;
@@ -560,6 +561,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
         private void StyleMiniButton(Button btn, string tooltip)
         {
+            btn.AddToClassList("edit-btn");
             btn.style.width = 16;
             btn.style.height = 14;
             btn.style.fontSize = 8;
@@ -574,6 +576,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
         private void StyleRemoveButton(Button btn, string tooltip)
         {
+            btn.AddToClassList("edit-btn");
             btn.style.width = 16;
             btn.style.height = 16;
             btn.style.fontSize = 10;

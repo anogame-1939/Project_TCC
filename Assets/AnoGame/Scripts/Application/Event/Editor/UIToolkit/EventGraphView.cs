@@ -17,6 +17,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private HashSet<string> _knownItemIds;
         private Dictionary<string, string> _itemNameMap;
         private Dictionary<string, EventNodeView> _nodeMap = new Dictionary<string, EventNodeView>();
+        private bool _editMode = false;
 
         /// <summary>
         /// Shared section visibility state for all nodes.
@@ -167,6 +168,9 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             {
                 schedule.Execute(() => AutoLayout());
             }
+
+            // Re-apply edit mode after rebuild
+            SetEditMode(_editMode);
         }
 
         /// <summary>
@@ -240,6 +244,22 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         }
 
         /// <summary>
+        /// Show or hide all edit buttons (+, ▲, ▼, ×) across all nodes.
+        /// </summary>
+        public void SetEditMode(bool enabled)
+        {
+            _editMode = enabled;
+            var display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+            foreach (var node in _nodeMap.Values)
+            {
+                node.Query(className: "edit-btn").ForEach(el =>
+                {
+                    el.style.display = display;
+                });
+            }
+        }
+
+        /// <summary>
         /// Save all current node positions to the meta file.
         /// </summary>
         public void SaveNodePositions()
@@ -305,7 +325,35 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                     unconnectedNodes.Add(node);
             }
 
-            // --- Layout Connected Nodes (Pyramid: Goal on Right) ---
+            // --- 1. Layout Unconnected Nodes first (top of canvas) ---
+            float unconnectedMaxX = 0f;
+            float unconnectedMaxY = 0f;
+
+            if (unconnectedNodes.Count > 0)
+            {
+                unconnectedNodes.Sort((a, b) => string.Compare(a.EventData.EventId, b.EventData.EventId, StringComparison.Ordinal));
+
+                float gridStartY = 0f;
+                float gridStartX = 50f;
+                float gridXSpacing = 300f;
+                float gridYSpacing = 270f;
+                int columns = 5;
+
+                for (int i = 0; i < unconnectedNodes.Count; i++)
+                {
+                    int row = i / columns;
+                    int col = i % columns;
+                    float x = gridStartX + col * gridXSpacing;
+                    float y = gridStartY + row * gridYSpacing;
+                    unconnectedNodes[i].SetPosition(new Rect(x, y, 0, 0));
+
+                    if (x + 250f > unconnectedMaxX) unconnectedMaxX = x + 250f;
+                    if (y + 200f > unconnectedMaxY) unconnectedMaxY = y + 200f;
+                }
+            }
+
+            // --- 2. Layout Connected Nodes (Pyramid: Goal on Right) ---
+            // Start below unconnected nodes with padding
             if (connectedNodes.Count > 0)
             {
                 var goals = connectedNodes.Where(n => outputs[n].Count == 0).ToList();
@@ -340,9 +388,11 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 if (ranks.Values.Any(r => r > 0)) maxRank = ranks.Values.Max();
 
                 float xSpacing = 350f;
-                float ySpacing = 270f; // 1.5x spacing to prevent overlap
-                float startX = 1000f;
-                float startY = 400f; // Below unconnected nodes
+                float ySpacing = 270f;
+                // Goal X = right side of unconnected area, or default 1000
+                float startX = Math.Max(unconnectedMaxX, 1000f);
+                // Start Y = below unconnected nodes + padding
+                float startY = unconnectedMaxY + 100f;
                 var yPositions = new Dictionary<EventNodeView, float>();
 
                 for (int r = 0; r <= maxRank; r++)
@@ -394,27 +444,6 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                         float y = yPositions[node];
                         node.SetPosition(new Rect(x, y, 0, 0));
                     }
-                }
-            }
-
-            // --- Layout Unconnected Nodes (top row) ---
-            if (unconnectedNodes.Count > 0)
-            {
-                unconnectedNodes.Sort((a, b) => string.Compare(a.EventData.EventId, b.EventData.EventId, StringComparison.Ordinal));
-
-                float gridStartY = 50f; // Top of canvas
-                float gridStartX = 50f;
-                float gridXSpacing = 300f;
-                float gridYSpacing = 180f;
-                int columns = 5;
-
-                for (int i = 0; i < unconnectedNodes.Count; i++)
-                {
-                    int row = i / columns;
-                    int col = i % columns;
-                    float x = gridStartX + col * gridXSpacing;
-                    float y = gridStartY + row * gridYSpacing;
-                    unconnectedNodes[i].SetPosition(new Rect(x, y, 0, 0));
                 }
             }
         }

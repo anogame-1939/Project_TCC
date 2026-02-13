@@ -20,6 +20,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private List<EventData> _eventDataList;
         private HashSet<string> _knownItemIds;
         private Dictionary<string, string> _itemNameMap;
+        private bool _isEditMode = false;
 
         [MenuItem("AnoGame/Event Graph")]
         public static void Open()
@@ -106,6 +107,23 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             toggleReqItems.tooltip = "Required Items 表示切替";
             toolbar.Add(toggleReqItems);
 
+            toolbar.Add(new ToolbarSpacer());
+
+            // Edit mode toggle
+            ToolbarToggle editToggle = null;
+            editToggle = new ToolbarToggle()
+            {
+                text = "✏ Edit",
+                value = _isEditMode
+            };
+            editToggle.tooltip = "編集モードのON/OFF\n+▲▼×ボタンの表示切替";
+            editToggle.RegisterValueChangedCallback(evt =>
+            {
+                _isEditMode = evt.newValue;
+                _graphView?.SetEditMode(_isEditMode);
+            });
+            toolbar.Add(editToggle);
+
             root.Add(toolbar);
 
             // Graph View
@@ -117,6 +135,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             if (_eventDataList != null && _eventDataList.Count > 0)
             {
                 _graphView.PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
+                _graphView.SetEditMode(_isEditMode);
             }
         }
 
