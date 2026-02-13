@@ -28,6 +28,7 @@ namespace AnoGame.Application.Event
         public float maxDistance = 3.0f;
 
         [Header("条件データ")]
+        [HideInInspector]
         [SerializeField] private EventData eventData;
 
         // 依存性注入
@@ -127,6 +128,29 @@ namespace AnoGame.Application.Event
 
             return Vector3.Distance(transform.position, usePos) <= maxDistance;
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (!string.IsNullOrEmpty(targetEventId))
+            {
+                if (eventData != null && eventData.EventId == targetEventId) return;
+
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:EventData");
+                foreach (var guid in guids)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<EventData>(path);
+                    if (asset != null && asset.EventId == targetEventId)
+                    {
+                        eventData = asset;
+                        UnityEditor.EditorUtility.SetDirty(this);
+                        break;
+                    }
+                }
+            }
+        }
+#endif
 
         // デバッグ用可視化
         private void OnDrawGizmosSelected()

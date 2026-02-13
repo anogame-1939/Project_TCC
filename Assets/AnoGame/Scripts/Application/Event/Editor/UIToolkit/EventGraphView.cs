@@ -171,6 +171,34 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             // Re-apply edit mode after rebuild
             SetEditMode(_editMode);
+
+            // エッジレイヤーをノードレイヤーの前面に移動
+            schedule.Execute(BringEdgesToFront);
+        }
+
+        /// <summary>
+        /// GraphView内部のレイヤー構造を操作し、エッジが含まれるレイヤーを
+        /// 最前面に移動してノードの上にエッジが描画されるようにする。
+        /// </summary>
+        private void BringEdgesToFront()
+        {
+            var layers = contentViewContainer.Children().ToList();
+            foreach (var layer in layers)
+            {
+                bool containsEdge = false;
+                foreach (var child in layer.Children())
+                {
+                    if (child is Edge)
+                    {
+                        containsEdge = true;
+                        break;
+                    }
+                }
+                if (containsEdge)
+                {
+                    layer.BringToFront();
+                }
+            }
         }
 
         /// <summary>

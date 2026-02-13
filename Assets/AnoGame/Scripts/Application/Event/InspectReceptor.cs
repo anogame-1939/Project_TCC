@@ -21,6 +21,7 @@ namespace AnoGame.Application.Event
         [Header("Event")]
         [EventSelector]
         [SerializeField] private string targetEventId;
+        [HideInInspector]
         [SerializeField] private EventData eventData; // V2: Direct reference for conditions
 
         [Header("Interaction Settings")]
@@ -59,30 +60,41 @@ namespace AnoGame.Application.Event
         public float Score(Transform actor)
         {
             float dist = Vector3.Distance(transform.position, actor.position);
-            if (dist > maxDistance) return float.NegativeInfinity;
+            if (dist > maxDistance)
+            {
+                Debug.Log($"[InspectReceptor] {gameObject.name}: Score → -∞ (dist={dist:F2} > max={maxDistance})");
+                return float.NegativeInfinity;
+            }
 
-            // 近いほど優先
-            return priority - dist;
+            float score = priority - dist;
+            Debug.Log($"[InspectReceptor] {gameObject.name}: Score → {score:F2} (dist={dist:F2})");
+            return score;
         }
 
         public bool TryBuildOptions(Transform actor, List<InteractionOption> buffer)
         {
             // 距離チェックは Score で行われているが、念のため
-            if (Vector3.Distance(transform.position, actor.position) > maxDistance) return false;
+            float dist = Vector3.Distance(transform.position, actor.position);
+            if (dist > maxDistance)
+            {
+                Debug.Log($"[InspectReceptor] {gameObject.name}: TryBuildOptions → 距離超過 dist={dist:F2} > max={maxDistance}");
+                return false;
+            }
 
-            // Check conditions before showing option? Or show but locked?
-            // Usually "Inspect" options might be hidden if conditions not met, or shown.
-            // For now, let's consistency check: if conditions not met, maybe don't show or show different prompt?
-            // User requirement: "Condition check logic ... efficient ... accessible".
-            // If we hide it, we need to check conditions here.
-            if (!CheckConditions()) return false;
+            bool condOk = CheckConditions();
+            if (!condOk)
+            {
+                Debug.Log($"[InspectReceptor] {gameObject.name}: TryBuildOptions → CheckConditions=false");
+                return false;
+            }
 
+            Debug.Log($"[InspectReceptor] {gameObject.name}: TryBuildOptions → OK (dist={dist:F2}, cond=true)");
             buffer.Add(new InteractionOption
             {
                 Kind = InteractionKind.Inspect,
                 Prompt = prompt,
                 Priority = priority,
-                RequiresHold = false, // タップで即実行ならfalse, 長押しならtrue
+                RequiresHold = false,
                 Execute = () => ExecuteEvent()
             });
 
@@ -91,31 +103,43 @@ namespace AnoGame.Application.Event
 
         private void ExecuteEvent()
         {
-            Debug.Log($"[InspectReceptor] Inspected: {targetEventId}");
-            if (!string.IsNullOrEmpty(targetEventId))
+            Debug.Log($"[InspectReceptor] ExecuteEvent called: {targetEventId}");
+            if (string.IsNullOrEmpty(targetEventId))
             {
-                if (CheckConditions())
-                {
-                    _eventService.TriggerEventStart(targetEventId);
-                }
+                Debug.LogWarning($"[InspectReceptor] {gameObject.name}: targetEventId is null or empty!");
+                return;
             }
+            if (!CheckConditions())
+            {
+                Debug.LogWarning($"[InspectReceptor] {gameObject.name}: ExecuteEvent blocked by conditions");
+                return;
+            }
+            Debug.Log($"[InspectReceptor] {gameObject.name}: TriggerEventStart({targetEventId})");
+            _eventService.TriggerEventStart(targetEventId);
         }
 
         private bool CheckConditions()
         {
-            if (eventData == null) return true; // No data, assume no conditions or legacy behavior (allow)
+            if (eventData == null)
+            {
+                Debug.Log($"[InspectReceptor] {gameObject.name}: CheckConditions → eventData=null → true");
+                return true;
+            }
 
-            // Normalize
             var items = eventData.RequiredItemIds;
             var events = eventData.RequiredEventIds;
+            var condTags = eventData.ConditionTags;
+
+            Debug.Log($"[InspectReceptor] {gameObject.name}: CheckConditions → items={items?.Count ?? 0}, events={events?.Count ?? 0}, condTags={condTags?.Count ?? 0}");
 
             if (items != null)
             {
                 foreach (var itemId in items)
                 {
                     if (string.IsNullOrEmpty(itemId)) continue;
-                    // Check inventory
-                    if (!_inventoryService.HasItem(itemId)) return false;
+                    bool has = _inventoryService.HasItem(itemId);
+                    Debug.Log($"[InspectReceptor] {gameObject.name}:   item '{itemId}' → HasItem={has}");
+                    if (!has) return false;
                 }
             }
 
@@ -124,13 +148,38 @@ namespace AnoGame.Application.Event
                 foreach (var evtId in events)
                 {
                     if (string.IsNullOrEmpty(evtId)) continue;
-                    // Check event history
-                    if (!_eventService.IsEventCleared(evtId)) return false;
+                    bool cleared = _eventService.IsEventCleared(evtId);
+                    Debug.Log($"[InspectReceptor] {gameObject.name}:   event '{evtId}' → IsCleared={cleared}");
+                    if (!cleared) return false;
                 }
             }
 
+            Debug.Log($"[InspectReceptor] {gameObject.name}: CheckConditions → true");
             return true;
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (!string.IsNullOrEmpty(targetEventId))
+            {
+                if (eventData != null && eventData.EventId == targetEventId) return;
+
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:EventData");
+                foreach (var guid in guids)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<EventData>(path);
+                    if (asset != null && asset.EventId == targetEventId)
+                    {
+                        eventData = asset;
+                        UnityEditor.EditorUtility.SetDirty(this);
+                        break;
+                    }
+                }
+            }
+        }
+#endif
 
         private void OnDrawGizmosSelected()
         {

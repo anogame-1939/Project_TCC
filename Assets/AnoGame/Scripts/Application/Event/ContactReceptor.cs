@@ -17,6 +17,7 @@ namespace AnoGame.Application.Event
         [Header("Event")]
         [EventSelector]
         [SerializeField] private string targetEventId;
+        [HideInInspector]
         [SerializeField] private EventData eventData;
 
         [Header("Settings")]
@@ -109,6 +110,29 @@ namespace AnoGame.Application.Event
 
             return true;
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (!string.IsNullOrEmpty(targetEventId))
+            {
+                if (eventData != null && eventData.EventId == targetEventId) return;
+
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:EventData");
+                foreach (var guid in guids)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<EventData>(path);
+                    if (asset != null && asset.EventId == targetEventId)
+                    {
+                        eventData = asset;
+                        UnityEditor.EditorUtility.SetDirty(this);
+                        break;
+                    }
+                }
+            }
+        }
+#endif
 
         private void OnDrawGizmos()
         {

@@ -11,6 +11,7 @@ namespace AnoGame.Editor.PropertyDrawers
     {
         private static string[] _cachedIds;
         private static string[] _cachedDisplayOptions;
+        private static int _lastAssetCount = -1;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -20,47 +21,57 @@ namespace AnoGame.Editor.PropertyDrawers
                 return;
             }
 
-            // キャッシュがない場合のみロード
-            if (_cachedIds == null || _cachedDisplayOptions == null)
+            // アセット数が変わったらキャッシュをリフレッシュ
+            var guids = AssetDatabase.FindAssets("t:EventData");
+            if (_cachedIds == null || _cachedDisplayOptions == null || guids.Length != _lastAssetCount)
             {
-                LoadData();
+                LoadData(guids);
             }
 
             // 現在の選択値のインデックスを探す
             int currentIndex = 0;
             string currentId = property.stringValue;
 
-            // キャッシュが有効な場合のみ処理
-            if (_cachedIds != null)
+            if (_cachedIds != null && _cachedIds.Length > 0)
             {
+                bool found = false;
                 for (int i = 0; i < _cachedIds.Length; i++)
                 {
                     if (_cachedIds[i] == currentId)
                     {
                         currentIndex = i;
+                        found = true;
                         break;
                     }
                 }
 
+                // 現在の値がリストに見つからない場合、警告表示
+                if (!found && !string.IsNullOrEmpty(currentId))
+                {
+                    // 不正な値（インデックス番号など）が入っている場合
+                    Debug.LogWarning($"[EventSelector] プロパティ '{label.text}' に不正な値 '{currentId}' が設定されています。ドロップダウンから正しいイベントを選択してください。 (Object: {property.serializedObject.targetObject.name})");
+                }
+
                 // ドロップダウン描画
+                EditorGUI.BeginChangeCheck();
                 int newIndex = EditorGUI.Popup(position, label.text, currentIndex, _cachedDisplayOptions);
 
-                if (newIndex != currentIndex && newIndex >= 0 && newIndex < _cachedIds.Length)
+                if (EditorGUI.EndChangeCheck())
                 {
-                    property.stringValue = _cachedIds[newIndex];
+                    if (newIndex >= 0 && newIndex < _cachedIds.Length)
+                    {
+                        property.stringValue = _cachedIds[newIndex];
+                    }
                 }
             }
             else
             {
-                EditorGUI.PropertyField(position, property, label);
+                EditorGUI.LabelField(position, label.text, "No EventData assets found.");
             }
         }
 
-        private void LoadData()
+        private void LoadData(string[] guids)
         {
-            // EventDataアセットをすべて検索
-            var guids = AssetDatabase.FindAssets("t:EventData");
-
             var displayList = new List<string>();
             var idList = new List<string>();
 
@@ -74,15 +85,17 @@ namespace AnoGame.Editor.PropertyDrawers
 
                 if (eventData != null)
                 {
-                    // 名前 + (ID) の形式で表示
-                    string displayName = string.IsNullOrEmpty(eventData.EventName) ? eventData.name : eventData.EventName;
-                    displayList.Add($"{displayName} ({eventData.EventId})");
+                    string displayName = string.IsNullOrEmpty(eventData.EventName)
+                        ? eventData.name
+                        : eventData.EventName;
+                    displayList.Add(displayName);
                     idList.Add(eventData.EventId);
                 }
             }
 
             _cachedDisplayOptions = displayList.ToArray();
             _cachedIds = idList.ToArray();
+            _lastAssetCount = guids.Length;
         }
     }
 }
