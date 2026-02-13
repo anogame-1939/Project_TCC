@@ -11,19 +11,19 @@ using UnityEngine.UIElements;
 
 namespace AnoGame.Application.Event.Editor.UIToolkit
 {
-    public class EventGraphWindowV2 : EditorWindow
+    public class EventGraphWindow : EditorWindow
     {
         private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/Events/Story2";
         private const string ITEMS_JSON_PATH = "Assets/AnoGame/Data/ItemsResources/items_batch.json";
 
-        private EventGraphViewV2 _graphView;
+        private EventGraphView _graphView;
         private List<EventData> _eventDataList;
         private HashSet<string> _knownItemIds;
 
-        [MenuItem("AnoGame/Event Graph V2")]
+        [MenuItem("AnoGame/Event Graph")]
         public static void Open()
         {
-            var window = GetWindow<EventGraphWindowV2>("Event Graph V2");
+            var window = GetWindow<EventGraphWindow>("Event Graph");
             window.minSize = new Vector2(800, 600);
         }
 
@@ -77,8 +77,8 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
 
             root.Add(toolbar);
 
-            // Graph View V2
-            _graphView = new EventGraphViewV2();
+            // Graph View
+            _graphView = new EventGraphView();
             _graphView.AddToClassList("event-graph-view");
 
             root.Add(_graphView);
@@ -125,7 +125,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                 }
             }
 
-            Debug.Log($"Event Graph V2: Loaded {_eventDataList.Count} EventData assets, {_knownItemIds.Count} known items.");
+            Debug.Log($"Event Graph: Loaded {_eventDataList.Count} EventData assets, {_knownItemIds.Count} known items.");
         }
 
         [Serializable]

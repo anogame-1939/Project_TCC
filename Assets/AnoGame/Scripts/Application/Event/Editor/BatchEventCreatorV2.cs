@@ -220,20 +220,7 @@ public class BatchEventCreatorV2
             }
         }
 
-        // --- V2: Apply Results to EventData ---
-        var resultsProp = so.FindProperty("results");
-        if (resultsProp != null)
-        {
-            resultsProp.ClearArray();
-            if (evt.results != null && evt.results.Count > 0)
-            {
-                for (int i = 0; i < evt.results.Count; i++)
-                {
-                    resultsProp.InsertArrayElementAtIndex(i);
-                    resultsProp.GetArrayElementAtIndex(i).stringValue = evt.results[i];
-                }
-            }
-        }
+
 
         so.ApplyModifiedProperties();
     }
@@ -411,7 +398,7 @@ public class BatchEventCreatorV2
         public bool timeline;
         public List<string> requiredItemIds;
         public List<string> requiredEventIds;
-        public List<string> results;
+
     }
 }
 #endif

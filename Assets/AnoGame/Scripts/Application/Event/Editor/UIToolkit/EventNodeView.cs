@@ -13,11 +13,17 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
     public class EventNodeView : Node
     {
         public EventData EventData { get; private set; }
-        public Port InputPort { get; private set; }
         public Port OutputPort { get; private set; }
+
+        /// <summary>
+        /// Condition ports keyed by RequiredEventId.
+        /// Each required event gets its own Input port for edge connection.
+        /// </summary>
+        public Dictionary<string, Port> ConditionPorts { get; private set; } = new Dictionary<string, Port>();
 
         private VisualElement _topPortContainer;
         private VisualElement _bottomPortContainer;
+        private VisualElement _conditionPortsContainer;
 
         // Validation context: sets of known IDs provided by the graph
         private HashSet<string> _knownEventIds;
@@ -32,20 +38,12 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             AddToClassList("event-node");
             title = $"{EventData.EventId}\n{EventData.EventName}";
 
-            // ---- Ports ----
-
-            // Top (Input / Prev)
-            _topPortContainer = new VisualElement();
-            _topPortContainer.AddToClassList("input-port-container");
-            InputPort = InstantiatePort(Orientation.Horizontal, UnityEditor.Experimental.GraphView.Direction.Input, Port.Capacity.Multi, typeof(bool));
-            InputPort.portName = "In";
-            _topPortContainer.Add(InputPort);
-            Insert(0, _topPortContainer);
-
-            // Bottom (Output / Next)
+            // ---- Output Port (Bottom) ----
             _bottomPortContainer = new VisualElement();
             _bottomPortContainer.AddToClassList("output-port-container");
-            OutputPort = InstantiatePort(Orientation.Horizontal, UnityEditor.Experimental.GraphView.Direction.Output, Port.Capacity.Multi, typeof(bool));
+            OutputPort = InstantiatePort(Orientation.Horizontal,
+                UnityEditor.Experimental.GraphView.Direction.Output,
+                Port.Capacity.Multi, typeof(bool));
             OutputPort.portName = "Out";
             _bottomPortContainer.Add(OutputPort);
             Add(_bottomPortContainer);
@@ -100,28 +98,51 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             AddInfoRow(container, "Category:", EventData.Category);
             AddInfoRow(container, "Desc:", EventData.Description);
 
-            // --- Required Events ---
+            // --- Required Events (with individual condition ports) ---
             AddSectionHeader(container, "Required Events:");
             var reqEvents = EventData.RequiredEventIds;
             if (reqEvents != null && reqEvents.Count > 0)
             {
-                var section = new VisualElement();
-                section.style.paddingLeft = 4;
+                _conditionPortsContainer = new VisualElement();
+                _conditionPortsContainer.AddToClassList("condition-ports-container");
+
                 foreach (var eid in reqEvents)
                 {
                     bool exists = _knownEventIds.Contains(eid);
+
+                    // Row: [ConditionPort] [Label]
+                    var row = new VisualElement();
+                    row.style.flexDirection = FlexDirection.Row;
+                    row.style.alignItems = Align.Center;
+                    row.style.marginTop = 2;
+
+                    // Create individual input port for this condition
+                    var condPort = InstantiatePort(Orientation.Horizontal,
+                        UnityEditor.Experimental.GraphView.Direction.Input,
+                        Port.Capacity.Single, typeof(bool));
+                    condPort.portName = "";
+                    condPort.style.width = 16;
+                    condPort.style.minWidth = 16;
+                    row.Add(condPort);
+
+                    ConditionPorts[eid] = condPort;
+
+                    // Label with validation indicator
                     var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {eid}");
                     lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
-                    section.Add(lbl);
+                    lbl.style.marginLeft = 4;
+                    row.Add(lbl);
+
+                    _conditionPortsContainer.Add(row);
                 }
-                container.Add(section);
+                container.Add(_conditionPortsContainer);
             }
             else
             {
                 AddEmptyLabel(container);
             }
 
-            // --- Required Items ---
+            // --- Required Items (label only, no ports) ---
             AddSectionHeader(container, "Required Items:");
             var reqItems = EventData.RequiredItemIds;
             if (reqItems != null && reqItems.Count > 0)
@@ -133,26 +154,6 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
                     bool exists = _knownItemIds.Contains(iid);
                     var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {iid}");
                     lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
-                    section.Add(lbl);
-                }
-                container.Add(section);
-            }
-            else
-            {
-                AddEmptyLabel(container);
-            }
-
-            // --- Results ---
-            AddSectionHeader(container, "Results:");
-            var results = EventData.Results;
-            if (results != null && results.Count > 0)
-            {
-                var section = new VisualElement();
-                section.style.paddingLeft = 4;
-                foreach (var res in results)
-                {
-                    var lbl = new Label($"  {res}");
-                    lbl.style.color = new Color(0.7f, 0.85f, 1f);
                     section.Add(lbl);
                 }
                 container.Add(section);
