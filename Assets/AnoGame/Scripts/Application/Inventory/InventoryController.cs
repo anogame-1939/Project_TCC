@@ -278,6 +278,9 @@ namespace AnoGame.Application.Inventory
                 title: titleText,
                 onYes: () =>
                 {
+                    // Consume 後にスロットが再バインドされるため、先に名前をキャプチャ
+                    var consumedItemName = slot.LocalizedName;
+
                     var nextSel = ComputeNextSelectable(slot);
                     _pendingSelectGO = nextSel ? nextSel.gameObject : null;
                     _pendingSelectIndex = ComputeSelectableIndexUnderRoot(_inventoryViewer.gameObject, _pendingSelectGO);
@@ -289,7 +292,7 @@ namespace AnoGame.Application.Inventory
 
                     CloseDialogAndUnlockUI();
 
-                    AnoGame.AnoNarrative.DialogueManager.Instance.SetVariable("itemName", slot.LocalizedName);
+                    AnoGame.AnoNarrative.DialogueManager.Instance.SetVariable("itemName", consumedItemName);
 
                     Hide();
                 },
