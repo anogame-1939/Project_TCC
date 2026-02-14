@@ -30,6 +30,9 @@ namespace AnoGame.AnoNarrative
         // Runtime cache for O(1) lookup
         private Dictionary<string, ConversationUnit> conversationCache;
 
+        // ── テンプレート変数 ──
+        private readonly Dictionary<string, string> _variables = new Dictionary<string, string>();
+
         private void Awake()
         {
             if (_instance == null)
@@ -61,6 +64,40 @@ namespace AnoGame.AnoNarrative
                     }
                 }
             }
+        }
+
+        // ── テンプレート変数 API ──
+
+        /// <summary>
+        /// テンプレート変数を設定する。
+        /// BodyText 内の {key} が value に置換される。
+        /// </summary>
+        public void SetVariable(string key, string value)
+        {
+            _variables[key] = value;
+        }
+
+        /// <summary>
+        /// 全テンプレート変数をクリアする。
+        /// </summary>
+        public void ClearVariables()
+        {
+            _variables.Clear();
+        }
+
+        /// <summary>
+        /// テキスト内の {key} をセット済みの変数値で置換する。
+        /// </summary>
+        public string ResolveVariables(string text)
+        {
+            if (string.IsNullOrEmpty(text) || _variables.Count == 0)
+                return text;
+
+            foreach (var kv in _variables)
+            {
+                text = text.Replace($"{{{kv.Key}}}", kv.Value);
+            }
+            return text;
         }
 
         public ConversationUnit GetConversation(string id)
@@ -137,13 +174,42 @@ namespace AnoGame.AnoNarrative
                     }
 
                     activeUI = targetUI;
-                    activeUI.ShowConversation(unit);
+
+                    // テンプレート変数を適用（元データを汚さないようコピーして置換）
+                    var resolved = ResolveUnit(unit);
+                    activeUI.ShowConversation(resolved);
                 }
                 else
                 {
                     UnityEngine.Debug.LogWarning($"[DialogueManager] No UI registered for style: {(styleName ?? "Default")}. Content: {unit.BodyText}");
                 }
             }
+        }
+
+        /// <summary>
+        /// ConversationUnit の BodyText にテンプレート変数を適用したコピーを返す。
+        /// 変数が未設定、またはプレースホルダーが無い場合は元のインスタンスをそのまま返す。
+        /// </summary>
+        private ConversationUnit ResolveUnit(ConversationUnit unit)
+        {
+            if (_variables.Count == 0 || unit.BodyText == null || !unit.BodyText.Contains("{"))
+                return unit;
+
+            var resolved = new ConversationUnit
+            {
+                ID = unit.ID,
+                EpisodeID = unit.EpisodeID,
+                ChapterID = unit.ChapterID,
+                SectionID = unit.SectionID,
+                NodeNumber = unit.NodeNumber,
+                SectionName = unit.SectionName,
+                SpeakerName = unit.SpeakerName,
+                BodyText = ResolveVariables(unit.BodyText),
+                NextID = unit.NextID,
+                Choices = unit.Choices,
+                Position = unit.Position,
+            };
+            return resolved;
         }
 
         private UI.DialogueUIBase ResolveUI(string styleName)
@@ -193,7 +259,10 @@ namespace AnoGame.AnoNarrative
                 {
                     if (activeUI != null && activeUI != targetUI) activeUI.Close();
                     activeUI = targetUI;
-                    activeUI.PreviewConversation(unit);
+
+                    // テンプレート変数を適用
+                    var resolved = ResolveUnit(unit);
+                    activeUI.PreviewConversation(resolved);
                 }
                 else
                 {
