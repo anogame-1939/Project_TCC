@@ -13,7 +13,7 @@ namespace AnoGame.Application.Event
     /// Story 2用: アイテム使用を検知して、イベントサービスに「開始合図」を送るだけのセンサー
     /// </summary>
     [AddComponentMenu("AnoGame/Event/ItemReceptor")]
-    public class ItemReceptor : MonoBehaviour
+    public class ItemReceptor : MonoBehaviour, IConsumeZone
     {
         [Header("検知設定")]
         [Tooltip("このアイテムが使われたら反応する")]
@@ -128,6 +128,54 @@ namespace AnoGame.Application.Event
 
             return Vector3.Distance(transform.position, usePos) <= maxDistance;
         }
+
+        // ── IConsumeZone 実装 ──────────────────────────────
+
+        public bool CanConsume(string itemId, GameObject user, Vector3 usePos, out string reason)
+        {
+            reason = null;
+
+            // アイテムIDチェック
+            if (!string.Equals(itemId, targetItemId, StringComparison.Ordinal))
+            {
+                reason = "このアイテムではここで実行できるイベントがありません。";
+                return false;
+            }
+
+            // 距離チェック（既存ロジック再利用）
+            var args = new ItemConsumedArgs(itemId, 1, user, usePos);
+            if (!CheckProximity(args))
+            {
+                reason = "距離が遠すぎます。近づいてから使用してください。";
+                return false;
+            }
+
+            // 条件チェック（既存ロジック再利用）
+            if (!CheckConditions())
+            {
+                reason = "条件が満たされていません。";
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool TryStart(string itemId, GameObject user, Vector3 usePos)
+        {
+            if (!CanConsume(itemId, user, usePos, out _)) return false;
+
+            if (!string.IsNullOrEmpty(targetEventId))
+            {
+                Debug.Log($"[ItemReceptor] IConsumeZone.TryStart: {targetEventId}");
+                _eventService.TriggerEventStart(targetEventId);
+                return true;
+            }
+
+            Debug.LogWarning("[ItemReceptor] Target Event ID is not set.");
+            return false;
+        }
+
+        public string GetDebugName() => $"ItemReceptor({name}:{targetItemId})";
 
 #if UNITY_EDITOR
         private void OnValidate()

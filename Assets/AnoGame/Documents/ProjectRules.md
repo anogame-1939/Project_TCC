@@ -61,6 +61,14 @@ Chapter 2-0 のイベントでは以下の値を使用：
 
 ---
 
+## 会話・対話システム
+
+- 会話・対話は **AnoNarative** を使用すること
+- 旧 Pixel Crushers Dialogue System は使用しない
+- 使い方の詳細は [`AnoNarrative/Docs/AnoNarativeGuide.md`](file:///c:/Users/krsmg/Documents/GitHub/Project_TCC/Assets/AnoNarrative/Docs/AnoNarativeGuide.md) を参照
+
+---
+
 ## セリフ・テキストルール
 
 ### 女言葉の禁止
