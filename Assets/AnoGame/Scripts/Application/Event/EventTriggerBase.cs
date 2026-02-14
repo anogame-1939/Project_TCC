@@ -34,6 +34,15 @@ namespace AnoGame.Application.Event
 
         private List<IEventCondition> _conditions = new List<IEventCondition>();
 
+        /// <summary>
+        /// サブクラスが OnConditionChanged 購読なしで条件を追加するためのヘルパー。
+        /// ConsumeEventTrigger 等、自動発火を抑止したいトリガーで使用する。
+        /// </summary>
+        protected void AddConditionWithoutSubscription(IEventCondition condition)
+        {
+            _conditions.Add(condition);
+        }
+
         // NOTE:重複登録防止。本来ならライフサイクルで制御したいところ
         private bool _registeredEvent = false;
 

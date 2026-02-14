@@ -1061,7 +1061,7 @@ Transform:
   m_GameObject: {fileID: 128536154}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -5.21, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2787,10 +2787,14 @@ PrefabInstance:
       propertyPath: m_PlayableAsset
       value: 
       objectReference: {fileID: 11400000, guid: 5db9d2bbae19941d6885e434d910ef49, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -1672289960120745703, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1261318680}
   m_SourcePrefab: {fileID: 100100000, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
 --- !u!4 &325571562 stripped
 Transform:
@@ -3116,6 +3120,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2032865915273944860, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
   m_PrefabInstance: {fileID: 386488088}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &388387555 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+  m_PrefabInstance: {fileID: 1838907284}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &394573892
 PrefabInstance:
@@ -8925,6 +8934,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &989890919 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+  m_PrefabInstance: {fileID: 1596458869}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &999029967
 GameObject:
   m_ObjectHideFlags: 0
@@ -9167,10 +9181,14 @@ PrefabInstance:
       propertyPath: m_SceneBindings.Array.data[1].value
       value: 
       objectReference: {fileID: 1688076726}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -1672289960120745703, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1368604543}
   m_SourcePrefab: {fileID: 100100000, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
 --- !u!4 &1013046084 stripped
 Transform:
@@ -9182,7 +9200,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3156746451325396747, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
   m_PrefabInstance: {fileID: 1013046083}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1368604540}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
@@ -10232,7 +10250,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3156746451325396747, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
   m_PrefabInstance: {fileID: 325571561}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1261318677}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
@@ -12810,6 +12828,57 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237251250}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1261318677 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+  m_PrefabInstance: {fileID: 325571561}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1261318680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261318677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335b0bbd5cb8cd84bb37ff1a20902292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: 5f55ff5de2de94f049576735d0879da7, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1082620675}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  supersededByEvents: []
+  conditionComponents: []
+  requiredItems: []
+  requiredEvents: []
+  checkConditionsOnDone: 0
+  targetEventId: EV_020_Unlock_NorthShed
 --- !u!1 &1265082461
 GameObject:
   m_ObjectHideFlags: 0
@@ -13873,6 +13942,57 @@ Transform:
   - {fileID: 1745330017}
   m_Father: {fileID: 789299879}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1368604540 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+  m_PrefabInstance: {fileID: 1013046083}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1368604543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368604540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335b0bbd5cb8cd84bb37ff1a20902292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: 15ee3d324e5cf46ef9308fcfcbc9a3cb, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1013046086}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  supersededByEvents: []
+  conditionComponents: []
+  requiredItems: []
+  requiredEvents: []
+  checkConditionsOnDone: 0
+  targetEventId: EV_011_Well_String
 --- !u!1001 &1370870843
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16498,10 +16618,14 @@ PrefabInstance:
       propertyPath: m_SceneBindings.Array.data[1].value
       value: 
       objectReference: {fileID: 1688076726}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -1672289960120745703, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2140074594}
   m_SourcePrefab: {fileID: 100100000, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
 --- !u!4 &1596458870 stripped
 Transform:
@@ -16638,7 +16762,7 @@ Transform:
   m_GameObject: {fileID: 1603676249}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -5.21, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -18752,6 +18876,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1970293410127840113, guid: e81cb023a6e6a423a9b12c5d8dafc211, type: 3}
   m_PrefabInstance: {fileID: 1780743976}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1771509407 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+  m_PrefabInstance: {fileID: 1798780990}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1780743976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19325,10 +19454,14 @@ PrefabInstance:
       propertyPath: m_SceneBindings.Array.data[1].value
       value: 
       objectReference: {fileID: 1688076726}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -1672289960120745703, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1798780996}
   m_SourcePrefab: {fileID: 100100000, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
 --- !u!4 &1798780991 stripped
 Transform:
@@ -19340,12 +19473,58 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3156746451325396747, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
   m_PrefabInstance: {fileID: 1798780990}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1771509407}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1798780996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771509407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335b0bbd5cb8cd84bb37ff1a20902292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: 138b493042f4a44e485a246c6937489b, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1798780993}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  supersededByEvents: []
+  conditionComponents: []
+  requiredItems: []
+  requiredEvents: []
+  checkConditionsOnDone: 0
+  targetEventId: EV_012_Well_Magnet
 --- !u!1 &1803583847
 GameObject:
   m_ObjectHideFlags: 0
@@ -19705,10 +19884,14 @@ PrefabInstance:
       propertyPath: m_SceneBindings.Array.data[1].value
       value: 
       objectReference: {fileID: 1688076726}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -1672289960120745703, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3594770337869902066, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1838907290}
   m_SourcePrefab: {fileID: 100100000, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
 --- !u!4 &1838907285 stripped
 Transform:
@@ -19720,12 +19903,58 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3156746451325396747, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
   m_PrefabInstance: {fileID: 1838907284}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 388387555}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1838907290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388387555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335b0bbd5cb8cd84bb37ff1a20902292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: f8453da34725b4ef99f11ab53f940a2b, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1838907287}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  supersededByEvents: []
+  conditionComponents: []
+  requiredItems: []
+  requiredEvents: []
+  checkConditionsOnDone: 0
+  targetEventId: EV_024_Synth_Cola
 --- !u!1001 &1840291330
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22593,12 +22822,58 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3156746451325396747, guid: 382fa6fbb1ebf4abe869b298564e1fd7, type: 3}
   m_PrefabInstance: {fileID: 1596458869}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 989890919}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2140074594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989890919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335b0bbd5cb8cd84bb37ff1a20902292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventData: {fileID: 11400000, guid: d6912d710dcdf46b39f6a2c0d0656e72, type: 2}
+  onPrepareEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventStart:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2140074591}
+        m_TargetAssemblyTypeName: AnoGame.Application.Event.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onEventFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventDone:
+    m_PersistentCalls:
+      m_Calls: []
+  onEventFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  supersededByEvents: []
+  conditionComponents: []
+  requiredItems: []
+  requiredEvents: []
+  checkConditionsOnDone: 0
+  targetEventId: EV_025_Synth_Alum
 --- !u!1001 &3613761558303574252
 PrefabInstance:
   m_ObjectHideFlags: 0
