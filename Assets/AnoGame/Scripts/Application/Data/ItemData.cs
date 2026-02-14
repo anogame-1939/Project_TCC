@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using AnoGame.Domain.Inventory.Models;
+using System.Collections.Generic;
 
 namespace AnoGame.Data
 {
@@ -17,6 +18,10 @@ namespace AnoGame.Data
         [SerializeField] private int maxStackSize = 99;    // 最大スタック数
         [SerializeField] private bool isConsumable = true; // 消費するかどうか
 
+        [Header("メタデータ（デバッグ/フィルタ用）")]
+        [SerializeField] private Episode episode;               // エピソード
+        [SerializeField] private List<string> tags = new();     // フィルタ用タグ
+
         public string ItemName => itemName;
         public string Description => description;
         public AssetReference AssetReference => assetReference;
@@ -24,6 +29,8 @@ namespace AnoGame.Data
         public bool IsStackable => isStackable;
         public int MaxStackSize => maxStackSize;
         public bool IsConsumable => isConsumable;
+        public Episode Episode => episode;
+        public IReadOnlyList<string> Tags => tags;
 
 #if UNITY_EDITOR
         private void OnValidate()
