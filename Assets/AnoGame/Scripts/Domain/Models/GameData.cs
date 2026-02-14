@@ -275,8 +275,14 @@ namespace AnoGame.Domain.Data.Models
         [JsonProperty("ClearedEvents")]
         private readonly HashSet<string> _clearedEvents = new();
 
+        [JsonProperty("ActiveTags")]
+        private readonly HashSet<string> _activeTags = new();
+
         [JsonIgnore]
         public IReadOnlyCollection<string> ClearedEvents => _clearedEvents;
+
+        [JsonIgnore]
+        public IReadOnlyCollection<string> ActiveTags => _activeTags;
 
         [JsonConstructor]
         public EventHistory()
@@ -299,6 +305,32 @@ namespace AnoGame.Domain.Data.Models
             {
                 _clearedEvents.Remove(eventId);
             }
+        }
+
+        public void AddTag(string tag)
+        {
+            _activeTags.Add(tag);
+        }
+
+        public void AddTags(IEnumerable<string> tags)
+        {
+            foreach (var tag in tags)
+            {
+                if (!string.IsNullOrEmpty(tag))
+                {
+                    _activeTags.Add(tag);
+                }
+            }
+        }
+
+        public bool HasTag(string tag)
+        {
+            return _activeTags.Contains(tag);
+        }
+
+        public HashSet<string> GetActiveTags()
+        {
+            return new HashSet<string>(_activeTags);
         }
     }
 }

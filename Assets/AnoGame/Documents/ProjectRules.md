@@ -95,3 +95,44 @@ Chapter 2-0 のイベントでは以下の値を使用：
 
 > [!NOTE]
 > 既存セリフでは句読点の有無が混在している。新規セリフから統一し、既存セリフは順次修正する。
+
+---
+
+## イベントトリガーシステム
+
+### 変遷
+
+| 世代 | 使用箇所 | 方式 | 備考 |
+|---|---|---|---|
+| 第1世代 | ストーリー1 | `EventTriggerBase` 継承 + `InstantEventTrigger` | Collider依存、条件チェックが基底クラスに集約 |
+| 第2世代 | ストーリー2（現行） | **Receptor系** + `InstantEventTrigger` | Collider不要、軽量・単機能 |
+
+> [!IMPORTANT]
+> 新規イベントの実装は **第2世代（Receptor系 + InstantEventTrigger）** を使用すること。
+> `EventTriggerBase` を直接継承する方式はストーリー1のレガシーであり、新規では使用しない。
+
+### 第1世代：EventTriggerBase 方式（ストーリー1）
+
+- `EventTriggerBase`（基底クラス）に条件チェック・イベントライフサイクルを集約
+- `InstantEventTrigger` が `EventTriggerBase` を継承し、開始と同時にクリア
+- `SimpleEventTrigger`、`SimpleEnterEventTrigger` 等のサブクラスが存在
+- Collider + UnityEvent ベースのトリガー方式
+
+### 第2世代：Receptor 方式（ストーリー2・現行）
+
+Collider不要の軽量コンポーネント群。各Receptorが「検知」を担当し、`IEventService.TriggerEventStart()` でイベントサービスに開始合図を送る。
+
+| クラス | 役割 | トリガー条件 |
+|---|---|---|
+| `ContactReceptor` | 接近検知 | プレイヤーとの距離が `triggerDistance` 以下 |
+| `InspectReceptor` | 調べるアクション | `IInteractable` 実装、`InteractionController` に自動登録 |
+| `ItemReceptor` | アイテム使用検知 | アイテム消費イベントを購読、近接チェック付き |
+| `InstantEventTrigger` | 即時クリア | イベント開始と同時にクリア済みにする（両世代で共用） |
+
+### InstantEventTrigger のバージョン
+
+| クラス | 備考 |
+|---|---|
+| `InstantEventTrigger` | 現行版。`targetEventId` から `EventData` を自動解決 |
+| `InstantEventTrigger_V2` | 改良版（条件チェックを `Start` で実行）。チャプター3-1のみ使用 |
+| `InstantEventTrigger_Old` | レガシー版。`Legacy/` フォルダに退避済み |

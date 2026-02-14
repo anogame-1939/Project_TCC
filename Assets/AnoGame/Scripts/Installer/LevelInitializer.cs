@@ -41,7 +41,7 @@ namespace AnoGame.Application.Core
             if (_gameManager.CurrentGameData.EventHistory != null)
             {
                 _eventService.SetClearedEvents(_gameManager.CurrentGameData.EventHistory.ClearedEvents.ToHashSet());
-
+                _eventService.SetActiveTags(_gameManager.CurrentGameData.EventHistory.GetActiveTags());
             }
 
             var itemNames = _gameManager.CurrentGameData.Inventory.Items

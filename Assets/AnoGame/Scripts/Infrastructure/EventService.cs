@@ -17,6 +17,9 @@ namespace AnoGame.Infrastructure.Services
         private readonly Dictionary<string, List<Action>> _cpmpleteEventHandlers = new();
         private readonly Dictionary<string, List<Action>> _failedEventHandlers = new();
 
+        // --- Tag System ---
+        private readonly HashSet<string> _activeTags = new();
+
 
         public void SetClearedEvents(HashSet<string> clearedEventIDs)
         {
@@ -148,8 +151,42 @@ namespace AnoGame.Infrastructure.Services
             }
         }
 
+        // --- Tag System Implementation ---
 
+        public bool HasTag(string tag)
+        {
+            return _activeTags.Contains(tag);
+        }
 
+        public void AddTags(IEnumerable<string> tags)
+        {
+            if (tags == null) return;
+            foreach (var tag in tags)
+            {
+                if (!string.IsNullOrEmpty(tag))
+                {
+                    _activeTags.Add(tag);
+                }
+            }
+        }
+
+        public HashSet<string> GetActiveTags()
+        {
+            return new HashSet<string>(_activeTags);
+        }
+
+        public void SetActiveTags(HashSet<string> tags)
+        {
+            _activeTags.Clear();
+            if (tags != null)
+            {
+                foreach (var tag in tags)
+                {
+                    _activeTags.Add(tag);
+                }
+            }
+        }
     }
 }
+
 

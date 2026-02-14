@@ -89,6 +89,11 @@ namespace AnoGame.Application.Event
             if (!string.IsNullOrEmpty(targetEventId))
             {
                 _eventService.TriggerEventStart(targetEventId);
+                // ResultTags を付与
+                if (eventData != null && eventData.ResultTags.Count > 0)
+                {
+                    _eventService.AddTags(eventData.ResultTags);
+                }
             }
             else
             {
@@ -118,6 +123,17 @@ namespace AnoGame.Application.Event
                 {
                     if (string.IsNullOrEmpty(evtId)) continue;
                     if (!_eventService.IsEventCleared(evtId)) return false;
+                }
+            }
+
+            // ConditionTags チェック
+            var tags = eventData.ConditionTags;
+            if (tags != null)
+            {
+                foreach (var tag in tags)
+                {
+                    if (string.IsNullOrEmpty(tag)) continue;
+                    if (!_eventService.HasTag(tag)) return false;
                 }
             }
 
@@ -176,6 +192,11 @@ namespace AnoGame.Application.Event
             {
                 Debug.Log($"[ItemReceptor] IConsumeZone.TryStart: {targetEventId}");
                 _eventService.TriggerEventStart(targetEventId);
+                // ResultTags を付与
+                if (eventData != null && eventData.ResultTags.Count > 0)
+                {
+                    _eventService.AddTags(eventData.ResultTags);
+                }
                 return true;
             }
 
