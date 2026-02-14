@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -25,9 +26,9 @@ namespace AnoGame.Application.Event
             _gameManager.CurrentGameData.EventHistory.AddEvent(eventId);
         }
 
-
-
-
-
+        public void AddTags(IEnumerable<string> tags)
+        {
+            _gameManager.CurrentGameData.EventHistory.AddTags(tags);
+        }
     }
 }

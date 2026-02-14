@@ -171,6 +171,19 @@ namespace AnoGame.Application.Event
                 }
             }
 
+            // ConditionTagsベースの条件を追加
+            if (eventData != null && eventData.ConditionTags != null)
+            {
+                foreach (var tag in eventData.ConditionTags)
+                {
+                    if (!string.IsNullOrEmpty(tag))
+                    {
+                        var condition = new TagCondition(_eventService, tag);
+                        _conditions.Add(condition);
+                    }
+                }
+            }
+
             if (conditionComponents == null) return;
 
             foreach (var component in conditionComponents)
@@ -247,6 +260,12 @@ namespace AnoGame.Application.Event
                 return;
 
             onEventStart?.Invoke();
+
+            // ResultTags を付与
+            if (eventData != null && eventData.ResultTags != null && eventData.ResultTags.Count > 0)
+            {
+                _eventService.AddTags(eventData.ResultTags);
+            }
         }
 
         public virtual void OnFinishEvent()

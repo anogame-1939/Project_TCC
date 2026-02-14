@@ -62,6 +62,12 @@ namespace AnoGame.Application.Event
                 // スタートと同時にイベントをクリアする
                 _eventService.TriggerEventComplete(eventData.EventId);
                 _eventManager.AddClearedEvent(eventData.EventId);
+
+                // ResultTags の永続化
+                if (eventData.ResultTags != null && eventData.ResultTags.Count > 0)
+                {
+                    _eventManager.AddTags(eventData.ResultTags);
+                }
             }
 
         }

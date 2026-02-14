@@ -113,7 +113,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
             ToolbarToggle editToggle = null;
             editToggle = new ToolbarToggle()
             {
-                text = "✏ Edit",
+                text = "Edit",
                 value = _isEditMode
             };
             editToggle.tooltip = "編集モードのON/OFF\n+▲▼×ボタンの表示切替";
