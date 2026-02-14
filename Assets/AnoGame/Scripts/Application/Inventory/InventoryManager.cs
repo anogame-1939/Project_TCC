@@ -179,7 +179,7 @@ namespace AnoGame.Application.Inventory
             else
             {
                 // 数量を減らす
-                existingItem.AddQuantity(-quantity);
+                existingItem.RemoveQuantity(quantity);
             }
 
             _gameManager.UpdateGameState(_gameManager.CurrentGameData);
