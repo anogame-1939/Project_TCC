@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     public class TextInputPopup : EditorWindow
     {

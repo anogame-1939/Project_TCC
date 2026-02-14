@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public abstract class EventTriggerBase : MonoBehaviour
     {

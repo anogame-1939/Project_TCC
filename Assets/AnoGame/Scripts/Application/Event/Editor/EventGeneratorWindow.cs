@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine.Playables;
 using UnityEngine.Timeline; // Timeline用
 
-namespace AnoGame.Event.Editor
+namespace AnoGame.AnoFlow.Editor
 {
     // --- AIからの入力JSONデータ構造 ---
     [Serializable]

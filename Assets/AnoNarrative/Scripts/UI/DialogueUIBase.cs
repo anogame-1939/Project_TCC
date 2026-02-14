@@ -1,7 +1,7 @@
 using UnityEngine;
-using AnoGame.AnoNarrative.Data;
+using AnoGame.AnoDialogue.Data;
 
-namespace AnoGame.AnoNarrative.UI
+namespace AnoGame.AnoDialogue.UI
 {
     public abstract class DialogueUIBase : MonoBehaviour
     {

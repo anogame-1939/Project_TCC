@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// スタート時に必ずイベント実行したいだけ

@@ -2,7 +2,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     /// <summary>
     /// Custom listener to create ManhattanEdge instead of default Edge when connecting ports.

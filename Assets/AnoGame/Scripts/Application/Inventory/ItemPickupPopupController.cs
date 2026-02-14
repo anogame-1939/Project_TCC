@@ -4,7 +4,7 @@ using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
 using AnoGame.Messages;
-using AnoGame.Application.Event;
+using AnoGame.AnoFlow;
 
 namespace AnoGame.Application.Inventory
 {

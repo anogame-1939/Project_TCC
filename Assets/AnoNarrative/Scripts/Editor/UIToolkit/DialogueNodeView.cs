@@ -6,7 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     /// <summary>
     /// GraphView Node representing a single ConversationUnit.

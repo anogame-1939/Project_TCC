@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     public class DragDropTestWindow : EditorWindow
     {

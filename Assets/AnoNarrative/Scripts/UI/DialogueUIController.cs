@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 
-namespace AnoGame.AnoNarrative.UI
+namespace AnoGame.AnoDialogue.UI
 {
     public class DialogueUIController : DialogueUIBase
     {

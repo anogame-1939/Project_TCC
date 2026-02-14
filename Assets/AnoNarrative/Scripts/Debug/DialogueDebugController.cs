@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UDebug = UnityEngine.Debug;
 
-namespace AnoGame.AnoNarrative.Debug
+namespace AnoGame.AnoDialogue.Debug
 {
     public class DialogueDebugController : MonoBehaviour
     {

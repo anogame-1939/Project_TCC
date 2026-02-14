@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using VContainer;
 using AnoGame.Application.Input;
 using UnityEngine.EventSystems;
-using AnoGame.Application.Event;
+using AnoGame.AnoFlow;
 using AnoGame.Domain.Inventory.Services;
 using PixelCrushers.DialogueSystem;
 using UnityEngine.Events;
@@ -292,7 +292,7 @@ namespace AnoGame.Application.Inventory
 
                     CloseDialogAndUnlockUI();
 
-                    AnoGame.AnoNarrative.DialogueManager.Instance.SetVariable("itemName", consumedItemName);
+                    AnoGame.AnoDialogue.DialogueManager.Instance.SetVariable("itemName", consumedItemName);
 
                     Hide();
                 },

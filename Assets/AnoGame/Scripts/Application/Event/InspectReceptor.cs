@@ -10,7 +10,9 @@ using AnoGame.Data;
 using AnoGame.Domain.Event.Conditions;
 using System.Linq;
 
-namespace AnoGame.Application.Event
+using AnoGame.Application;
+
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// 調べるイベント（Collider不要、InteractionControllerに登録）

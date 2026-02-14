@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     public class SectionCreatePopup : EditorWindow
     {

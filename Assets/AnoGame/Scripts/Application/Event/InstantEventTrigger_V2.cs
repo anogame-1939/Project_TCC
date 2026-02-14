@@ -1,7 +1,7 @@
 using UnityEngine;
 using VContainer;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     // NOTE:コンディションチェックをStartでやった方がよさそうということで改良版
     // 影響範囲がわからんのでとりあえずチャプター3-1のみで使用

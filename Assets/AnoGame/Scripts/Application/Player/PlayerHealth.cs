@@ -1,6 +1,6 @@
 using UnityEngine;
 using AnoGame.Application.Damage;
-using AnoGame.Application.Event;
+using AnoGame.AnoFlow;
 using AnoGame.Domain.Event;
 using UniRx;
 

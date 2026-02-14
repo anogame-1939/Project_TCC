@@ -1,5 +1,5 @@
 using UnityEngine;
-using AnoGame.Application.Event;
+using AnoGame.AnoFlow;
 using AnoGame.Application.UI;
 
 namespace AnoGame.Application.GameOver

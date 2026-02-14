@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using PixelCrushers.DialogueSystem;
-using AnoGame.AnoNarrative;
+using AnoGame.AnoDialogue;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     public class PixelCrushersConverter : EditorWindow
     {

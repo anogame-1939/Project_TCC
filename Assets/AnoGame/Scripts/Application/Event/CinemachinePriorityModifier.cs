@@ -1,7 +1,7 @@
 using UnityEngine;
 using Cinemachine;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public class CinemachinePriorityModifier : MonoBehaviour
     {

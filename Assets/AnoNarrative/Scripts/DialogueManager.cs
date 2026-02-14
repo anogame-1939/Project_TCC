@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using AnoGame.AnoNarrative.Data;
+using AnoGame.AnoDialogue.Data;
 
-namespace AnoGame.AnoNarrative
+namespace AnoGame.AnoDialogue
 {
     public class DialogueManager : MonoBehaviour
     {

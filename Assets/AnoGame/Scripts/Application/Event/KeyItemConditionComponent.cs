@@ -4,7 +4,7 @@ using AnoGame.Domain.Inventory.Services;
 using VContainer;
 using AnoGame.Data;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public class KeyItemConditionComponent : EventConditionComponent
     {

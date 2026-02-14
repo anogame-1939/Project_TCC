@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AnoGame.AnoNarrative.Timeline
+namespace AnoGame.AnoDialogue.Timeline
 {
     /// <summary>
     /// Handler component for Timeline integration.

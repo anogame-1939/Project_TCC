@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AnoGame.AnoNarrative
+namespace AnoGame.AnoDialogue
 {
     [Serializable]
     public class ConversationUnit

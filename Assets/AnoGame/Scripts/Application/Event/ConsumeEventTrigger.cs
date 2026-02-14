@@ -7,7 +7,7 @@ using AnoGame.Domain.Inventory.Services;
 using AnoGame.Domain.Event.Services;
 using System.Collections.Generic;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// ItemReceptor専用のイベントトリガー。

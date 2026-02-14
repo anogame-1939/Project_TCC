@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using Cysharp.Threading.Tasks;
 
-namespace AnoGame.AnoNarrative.Timeline
+namespace AnoGame.AnoDialogue.Timeline
 {
     public class AnoNarrativeBehaviour : PlayableBehaviour
     {

@@ -8,7 +8,7 @@
 
 | メニューパス | スクリプト | 種別 | 説明 |
 |---|---|---|---|
-| `AnoGame/Event Graph` | EventGraphWindow.cs | EditorWindow | イベント依存関係のグラフ可視化ツール |
+| `AnoGame/AnoFlow/Event Graph` | EventGraphWindow.cs | EditorWindow | イベント依存関係のグラフ可視化ツール |
 | `Tools/SLFB Event Generator` | EventGeneratorWindow.cs | EditorWindow | イベントデータの一括生成 |
 | `Tools/SLFB Item Generator` | ItemGeneratorWindow.cs | EditorWindow | アイテムデータの一括生成 |
 | `Tools/Procedural Placement Tool` | ProceduralPlacementTool.cs | EditorWindow | プロシージャル配置ツール |
@@ -41,7 +41,7 @@
 | EventLockControl | EventLockControlEditor.cs | Application/Player/Editor/ |
 | InventoryItemClip | InventoryItemClipEditor.cs | Application/Direction/Timeline/Editor/ |
 | EventData | EventDataEditor.cs | Application/Data/Editor/ |
-| AnoNarrativeClip | AnoNarrativeClipEditorUITK.cs | AnoNarrative/Scripts/Editor/ (UI Toolkit) |
+| AnoNarrativeClip | AnoNarrativeClipEditorUITK.cs | AnoDialogue/Scripts/Editor/ (UI Toolkit) |
 | ItemDatabase | ItemDatabaseEditor.cs | Application/Data/Editor/ |
 | StoryData | StoryData.cs (内部クラス) | Application/Data/ |
 | PlayerSpawnManager | PlayerSpawnManager.cs (内部クラス) | Application/Story/ |
@@ -70,7 +70,7 @@
 
 ---
 
-## EventGraph UIToolkit
+## AnoFlow EventGraph
 
 | スクリプト | 説明 |
 |---|---|

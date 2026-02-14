@@ -9,7 +9,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AnoGame.Application.Event.Editor.UIToolkit
+namespace AnoGame.AnoFlow.Editor
 {
     public class EventGraphWindow : EditorWindow
     {
@@ -22,7 +22,7 @@ namespace AnoGame.Application.Event.Editor.UIToolkit
         private Dictionary<string, string> _itemNameMap;
         private bool _isEditMode = false;
 
-        [MenuItem("AnoGame/Event Graph")]
+        [MenuItem("AnoGame/AnoFlow/Event Graph")]
         public static void Open()
         {
             var window = GetWindow<EventGraphWindow>("Event Graph");

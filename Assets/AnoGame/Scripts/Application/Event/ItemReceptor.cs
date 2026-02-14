@@ -7,7 +7,7 @@ using AnoGame.Application.Attributes;
 using AnoGame.Data;
 using System;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// Story 2用: アイテム使用を検知して、イベントサービスに「開始合図」を送るだけのセンサー

@@ -8,7 +8,7 @@ using AnoGame.Domain.Event.Conditions;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Data;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// Listens for Player life events (Miss, Death) and triggers UnityEvents.

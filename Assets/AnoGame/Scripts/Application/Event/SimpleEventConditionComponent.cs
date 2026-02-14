@@ -5,7 +5,7 @@ using AnoGame.Data;
 using AnoGame.Domain.Event.Services;
 using VContainer;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public class SimpleEventConditionComponent : EventConditionComponent
     {

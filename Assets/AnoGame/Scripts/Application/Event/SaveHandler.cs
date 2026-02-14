@@ -1,7 +1,9 @@
 using AnoGame.Application.Story;
 using AnoGame.Application.Story.Manager;
 using UnityEngine;
-namespace AnoGame.Application.Event
+using AnoGame.Application;
+
+namespace AnoGame.AnoFlow
 {
     public class SaveHandler : MonoBehaviour
     {

@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.Playables;
-using AnoGame.AnoNarrative;
+using AnoGame.AnoDialogue;
 
-namespace AnoGame.AnoNarrative.Timeline
+namespace AnoGame.AnoDialogue.Timeline
 {
     // Simple mixer that currently passes through logic.
     // Can be used for cross-fading or conflict resolution if multiple clips overlap.

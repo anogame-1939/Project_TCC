@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.InputSystem;
 
-namespace AnoGame.AnoNarrative.UI
+namespace AnoGame.AnoDialogue.UI
 {
     public class FlashbackUIController : DialogueUIBase
     {

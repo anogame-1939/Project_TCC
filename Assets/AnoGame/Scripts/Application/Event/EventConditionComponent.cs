@@ -1,7 +1,7 @@
 using UnityEngine;
 using AnoGame.Domain.Event.Conditions;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public abstract class EventConditionComponent : MonoBehaviour
     {

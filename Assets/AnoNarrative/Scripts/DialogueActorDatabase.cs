@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AnoGame.AnoNarrative
+namespace AnoGame.AnoDialogue
 {
     [System.Serializable]
     public class ActorProfile

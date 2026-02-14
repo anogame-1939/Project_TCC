@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace AnoGame.Application.Event.Editor.UIToolkit
+namespace AnoGame.AnoFlow.Editor
 {
     /// <summary>
     /// Utility to find and ping scene GameObjects linked to an EventData by eventId.

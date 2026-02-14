@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEditor;
-using AnoGame.AnoNarrative.UI;
+using AnoGame.AnoDialogue.UI;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     [CustomEditor(typeof(DialogueUIBase), true)]
     public class DialogueUIBaseEditor : UnityEditor.Editor
@@ -32,7 +32,7 @@ namespace AnoGame.AnoNarrative.Editor
             {
                 EditorGUILayout.PropertyField(_styleData, new GUIContent("Style Database"));
 
-                var db = (AnoGame.AnoNarrative.Data.DialogueStyle)_styleData.objectReferenceValue;
+                var db = (AnoGame.AnoDialogue.Data.DialogueStyle)_styleData.objectReferenceValue;
 
                 if (db == null)
                 {
@@ -41,7 +41,7 @@ namespace AnoGame.AnoNarrative.Editor
                     if (guids.Length > 0)
                     {
                         string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                        db = AssetDatabase.LoadAssetAtPath<AnoGame.AnoNarrative.Data.DialogueStyle>(path);
+                        db = AssetDatabase.LoadAssetAtPath<AnoGame.AnoDialogue.Data.DialogueStyle>(path);
                         if (db != null)
                         {
                             _styleData.objectReferenceValue = db;
@@ -53,7 +53,7 @@ namespace AnoGame.AnoNarrative.Editor
                         if (guids.Length > 0)
                         {
                             string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                            _styleData.objectReferenceValue = AssetDatabase.LoadAssetAtPath<AnoGame.AnoNarrative.Data.DialogueStyle>(path);
+                            _styleData.objectReferenceValue = AssetDatabase.LoadAssetAtPath<AnoGame.AnoDialogue.Data.DialogueStyle>(path);
                         }
                     }
                 }

@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
-namespace AnoGame.Application.Event
+using AnoGame.Application;
+
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// EventManager呼び出してるけど、あまり意味ない

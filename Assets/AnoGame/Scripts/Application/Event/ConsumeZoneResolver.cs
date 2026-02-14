@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public sealed class ConsumeZoneResolver : IConsumeZoneResolver
     {

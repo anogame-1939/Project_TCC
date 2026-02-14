@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     public interface IConsumeZone
     {

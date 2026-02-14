@@ -1,7 +1,7 @@
 using UnityEngine;
-using AnoGame.AnoNarrative.UI;
+using AnoGame.AnoDialogue.UI;
 
-namespace AnoGame.AnoNarrative
+namespace AnoGame.AnoDialogue
 {
     /// <summary>
     /// Controller to trigger specific dialogues based on filtered criteria (Episode/Chapter/Section).

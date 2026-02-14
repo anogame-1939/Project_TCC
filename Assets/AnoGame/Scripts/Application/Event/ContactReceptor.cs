@@ -6,7 +6,7 @@ using AnoGame.Application.Attributes;
 using AnoGame.Data;
 using System.Collections;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// 指定距離に近づいたらイベントを実行する（Collider不要）

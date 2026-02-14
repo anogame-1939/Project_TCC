@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using AnoGame.AnoNarrative;
-using AnoGame.AnoNarrative.UI;
+using AnoGame.AnoDialogue;
+using AnoGame.AnoDialogue.UI;
 
-namespace AnoGame.AnoNarrative.Timeline
+namespace AnoGame.AnoDialogue.Timeline
 {
     [TrackClipType(typeof(AnoNarrativeClip))]
     [TrackBindingType(typeof(DialogueTimelineReceiver))]

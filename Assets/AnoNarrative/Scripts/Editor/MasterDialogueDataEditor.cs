@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     [CustomEditor(typeof(MasterDialogueData))]
     public class MasterDialogueDataEditor : UnityEditor.Editor

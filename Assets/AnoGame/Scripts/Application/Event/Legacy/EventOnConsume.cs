@@ -6,7 +6,7 @@ using AnoGame.Data;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     [AddComponentMenu("Event/EventOnConsume")]
     public class EventOnConsume : MonoBehaviour, IConsumeZone

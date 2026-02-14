@@ -4,7 +4,7 @@ using AnoGame.Data;
 using AnoGame.Application.Attributes;
 using System.Reflection;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     /// <summary>
     /// イベントがスタートしたら即時にクリアする

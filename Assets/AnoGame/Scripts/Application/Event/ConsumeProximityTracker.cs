@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace AnoGame.Application.Event
+namespace AnoGame.AnoFlow
 {
     [AddComponentMenu("Event/ConsumeProximityTracker")]
     public class ConsumeProximityTracker : MonoBehaviour

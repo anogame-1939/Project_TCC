@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using AnoGame.AnoNarrative;
+using AnoGame.AnoDialogue;
 
-namespace AnoGame.AnoNarrative.Timeline
+namespace AnoGame.AnoDialogue.Timeline
 {
     public class AnoNarrativeClip : PlayableAsset, ITimelineClipAsset
     {
@@ -14,7 +14,7 @@ namespace AnoGame.AnoNarrative.Timeline
         public string conversationID;
         public string dialogueStyleName;
         // public AnoGame.AnoNarrative.Data.DialogueStyle dialogueStyle; // Changed to string
-        public AnoGame.AnoNarrative.Data.DialogueStyle styleDatabase; // Reference to DB for dropdown
+        public AnoGame.AnoDialogue.Data.DialogueStyle styleDatabase; // Reference to DB for dropdown
         public bool pauseTimeline = true;
 
         // ITimelineClipAsset implementation

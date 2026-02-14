@@ -8,7 +8,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AnoGame.Application.Event.Editor.UIToolkit
+namespace AnoGame.AnoFlow.Editor
 {
     public class EventGraphView : GraphView
     {

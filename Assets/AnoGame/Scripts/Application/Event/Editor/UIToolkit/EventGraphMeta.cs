@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace AnoGame.Application.Event.Editor.UIToolkit
+namespace AnoGame.AnoFlow.Editor
 {
     [Serializable]
     public class EventGraphMeta

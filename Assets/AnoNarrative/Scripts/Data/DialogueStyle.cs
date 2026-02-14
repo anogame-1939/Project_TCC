@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace AnoGame.AnoNarrative.Data
+namespace AnoGame.AnoDialogue.Data
 {
     [CreateAssetMenu(fileName = "DialogueStyleValues", menuName = "AnoGame/AnoNarrative/Dialogue Style Values")]
     public class DialogueStyle : ScriptableObject

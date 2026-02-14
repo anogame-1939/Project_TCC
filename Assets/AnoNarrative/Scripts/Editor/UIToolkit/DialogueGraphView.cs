@@ -6,7 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace AnoGame.AnoNarrative.Editor
+namespace AnoGame.AnoDialogue.Editor
 {
     /// <summary>
     /// GraphView-based canvas for the Dialogue Graph, replacing the IMGUI DialogueGraphCanvas.

@@ -1,10 +1,10 @@
 using UnityEngine;
 using VContainer;
 using AnoGame.Domain.Event.Services;
-using AnoGame.Application.Event;
+using AnoGame.AnoFlow;
 using AnoGame.Domain.Inventory.Services;
 
-namespace AnoGame.Application.Event.Legacy
+namespace AnoGame.AnoFlow.Legacy
 {
     /// <summary>
     /// イベントがスタートしたら即時にクリアする (Legacy Backup)
