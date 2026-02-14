@@ -108,6 +108,10 @@ namespace AnoGame.Application.Event
 
         private bool CheckConditions()
         {
+            // 自分自身のイベントがクリア済みなら再実行不可
+            if (!string.IsNullOrEmpty(targetEventId) && _eventService.IsEventCleared(targetEventId))
+                return false;
+
             if (eventData == null) return true;
 
             var items = eventData.RequiredItemIds;
