@@ -41,6 +41,7 @@
 | EventLockControl | EventLockControlEditor.cs | Application/Player/Editor/ |
 | InventoryItemClip | InventoryItemClipEditor.cs | Application/Direction/Timeline/Editor/ |
 | EventData | EventDataEditor.cs | Application/Data/Editor/ |
+| AnoNarrativeClip | AnoNarrativeClipEditorUITK.cs | AnoNarrative/Scripts/Editor/ (UI Toolkit) |
 | ItemDatabase | ItemDatabaseEditor.cs | Application/Data/Editor/ |
 | StoryData | StoryData.cs (内部クラス) | Application/Data/ |
 | PlayerSpawnManager | PlayerSpawnManager.cs (内部クラス) | Application/Story/ |

@@ -180,12 +180,30 @@ namespace AnoGame.AnoNarrative.Editor
             }
         }
 
+        /// <summary>
+        /// 選択中IDを先頭に移動したリストを返す
+        /// </summary>
+        private List<string> GetOrderedIDs(string selectedID)
+        {
+            if (string.IsNullOrEmpty(selectedID) || !_filteredIDs.Contains(selectedID))
+                return _filteredIDs;
+
+            var ordered = new List<string>(_filteredIDs.Count);
+            ordered.Add(selectedID);
+            foreach (var id in _filteredIDs)
+            {
+                if (id != selectedID) ordered.Add(id);
+            }
+            return ordered;
+        }
+
         private void DrawListCandidates(SerializedProperty targetIDProp)
         {
             GUIStyle leftAlignedButtonStyle = new GUIStyle(GUI.skin.button);
             leftAlignedButtonStyle.alignment = TextAnchor.MiddleLeft;
 
-            foreach (var id in _filteredIDs)
+            var orderedIDs = GetOrderedIDs(targetIDProp.stringValue);
+            foreach (var id in orderedIDs)
             {
                 GUILayout.BeginHorizontal();
                 if (id == targetIDProp.stringValue)
@@ -223,8 +241,9 @@ namespace AnoGame.AnoNarrative.Editor
             GUIStyle leftAlignedButtonStyle = new GUIStyle(GUI.skin.button);
             leftAlignedButtonStyle.alignment = TextAnchor.MiddleLeft;
 
+            var orderedIDs = GetOrderedIDs(targetIDProp.stringValue);
             GUILayout.BeginHorizontal();
-            foreach (var id in _filteredIDs)
+            foreach (var id in orderedIDs)
             {
                 string displayName = id;
                 string tooltip = id;

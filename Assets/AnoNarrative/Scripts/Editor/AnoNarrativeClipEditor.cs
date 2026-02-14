@@ -6,7 +6,7 @@ using AnoGame.AnoNarrative.Timeline;
 
 namespace AnoGame.AnoNarrative.Editor
 {
-    [CustomEditor(typeof(AnoNarrativeClip))]
+    // [CustomEditor] は AnoNarrativeClipEditorUITK.cs に移行済み
     public class AnoNarrativeClipEditor : UnityEditor.Editor
     {
         private SerializedProperty _targetEpisode;
