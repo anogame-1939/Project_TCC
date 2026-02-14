@@ -362,7 +362,7 @@ namespace AnoGame.Application.Inventory
                 return;
             }
 
-            var itemId = item.ItemName; // TODO: 将来は安定IDへ
+            var itemId = item.ItemName; // InventoryはItemName（表示名）ベース
             var player = GameObject.FindWithTag("Player"); // TODO: 参照改善（DI等）
             var usePos = player ? player.transform.position : Vector3.zero;
 

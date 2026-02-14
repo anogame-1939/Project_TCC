@@ -31,6 +31,9 @@ namespace AnoGame.Application.Event
         [HideInInspector]
         [SerializeField] private EventData eventData;
 
+        [HideInInspector]
+        [SerializeField] private ItemData itemData; // targetItemIdから自動解決
+
         // 依存性注入
         [Inject] private IInventoryService _inventory;
         [Inject] private IEventService _eventService;
@@ -135,8 +138,13 @@ namespace AnoGame.Application.Event
         {
             reason = null;
 
-            // アイテムIDチェック
-            if (!string.Equals(itemId, targetItemId, StringComparison.Ordinal))
+            // アイテムIDチェック: 安定ID (targetItemId) と表示名 (ItemData.ItemName) の両方でマッチング
+            bool idMatch = string.Equals(itemId, targetItemId, StringComparison.Ordinal);
+            if (!idMatch && itemData != null)
+            {
+                idMatch = string.Equals(itemId, itemData.ItemName, StringComparison.Ordinal);
+            }
+            if (!idMatch)
             {
                 reason = "このアイテムではここで実行できるイベントがありません。";
                 return false;
@@ -180,20 +188,42 @@ namespace AnoGame.Application.Event
 #if UNITY_EDITOR
         private void OnValidate()
         {
+            // EventData の自動解決
             if (!string.IsNullOrEmpty(targetEventId))
             {
-                if (eventData != null && eventData.EventId == targetEventId) return;
-
-                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:EventData");
-                foreach (var guid in guids)
+                if (eventData == null || eventData.EventId != targetEventId)
                 {
-                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                    var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<EventData>(path);
-                    if (asset != null && asset.EventId == targetEventId)
+                    string[] guids = UnityEditor.AssetDatabase.FindAssets("t:EventData");
+                    foreach (var guid in guids)
                     {
-                        eventData = asset;
-                        UnityEditor.EditorUtility.SetDirty(this);
-                        break;
+                        string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                        var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<EventData>(path);
+                        if (asset != null && asset.EventId == targetEventId)
+                        {
+                            eventData = asset;
+                            UnityEditor.EditorUtility.SetDirty(this);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // ItemData の自動解決（targetItemId → ItemData）
+            if (!string.IsNullOrEmpty(targetItemId))
+            {
+                if (itemData == null || itemData.ItemId != targetItemId)
+                {
+                    string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemData");
+                    foreach (var guid in guids)
+                    {
+                        string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                        var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemData>(path);
+                        if (asset != null && asset.ItemId == targetItemId)
+                        {
+                            itemData = asset;
+                            UnityEditor.EditorUtility.SetDirty(this);
+                            break;
+                        }
                     }
                 }
             }

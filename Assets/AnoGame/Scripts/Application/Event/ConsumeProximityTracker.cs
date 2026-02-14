@@ -35,29 +35,35 @@ namespace AnoGame.Application.Event
 
         void OnTriggerEnter(Collider other)
         {
-            if (((1 << other.gameObject.layer) & _zoneLayers) == 0) return;
+            var layerMatch = ((1 << other.gameObject.layer) & _zoneLayers) != 0;
+            Debug.Log($"[ConsumeTracker] OnTriggerEnter: {other.gameObject.name} layer={other.gameObject.layer} layerMatch={layerMatch}");
+            if (!layerMatch) return;
 
             // ゾーンは EventOnConsume 本体 or その子に置かれる想定
             var zone = other.GetComponentInParent<IConsumeZone>();
-            if (zone != null && _nearby.Add(zone) && _logDebug)
-                Debug.Log($"[ConsumeTracker] Enter: {zone.GetDebugName()}");
+            Debug.Log($"[ConsumeTracker] zone found: {(zone != null ? zone.GetDebugName() : "null")}");
+            if (zone != null && _nearby.Add(zone))
+                Debug.Log($"[ConsumeTracker] Added to _nearby: {zone.GetDebugName()} (total={_nearby.Count})");
         }
 
         void OnTriggerExit(Collider other)
         {
             if (((1 << other.gameObject.layer) & _zoneLayers) == 0) return;
             var zone = other.GetComponentInParent<IConsumeZone>();
-            if (zone != null && _nearby.Remove(zone) && _logDebug)
-                Debug.Log($"[ConsumeTracker] Exit: {zone.GetDebugName()}");
+            if (zone != null && _nearby.Remove(zone))
+                Debug.Log($"[ConsumeTracker] Exit: {zone.GetDebugName()} (remaining={_nearby.Count})");
         }
 
         /// もっとも適合するゾーンを返す（最初にOKなものを採用：必要なら優先度付けして拡張）
         public bool TryPickUsableZone(string itemId, GameObject user, Vector3 usePos,
                                     out IConsumeZone zone, out string reason)
         {
+            Debug.Log($"[ConsumeTracker] TryPickUsableZone: itemId={itemId}, _nearby.Count={_nearby.Count}");
             foreach (var z in _nearby)
             {
-                if (z.CanConsume(itemId, user, usePos, out reason))
+                var canConsume = z.CanConsume(itemId, user, usePos, out reason);
+                Debug.Log($"[ConsumeTracker]   zone={z.GetDebugName()} canConsume={canConsume} reason={reason}");
+                if (canConsume)
                 {
                     zone = z;
                     return true;
@@ -65,6 +71,7 @@ namespace AnoGame.Application.Event
             }
             zone = null;
             reason = "付近に使用可能なイベントがありません。";
+            Debug.Log($"[ConsumeTracker] TryPickUsableZone FAILED: {reason}");
             return false;
         }
 
