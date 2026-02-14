@@ -267,6 +267,13 @@ namespace AnoGame.Domain.Data.Models
             if (amount < 0) throw new ArgumentException("Amount must be positive");
             Quantity += amount;
         }
+
+        public void RemoveQuantity(int amount)
+        {
+            if (amount < 0) throw new ArgumentException("Amount must be positive");
+            if (amount > Quantity) throw new ArgumentException($"Cannot remove {amount} from {Quantity}");
+            Quantity -= amount;
+        }
     }
 
     [Serializable]
