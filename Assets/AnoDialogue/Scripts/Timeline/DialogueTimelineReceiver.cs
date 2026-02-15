@@ -35,27 +35,17 @@ namespace AnoGame.AnoDialogue.Timeline
             }
         }
 
-        public void Play(string conversationID, string styleName, Sprite backgroundSprite, Sprite locationSprite)
+        public void Play(string conversationID, string styleName, Sprite sceneImage)
         {
             if (DialogueManager.Instance != null)
             {
-                // Flashback用背景画像
-                if (backgroundSprite != null)
+                // スタイルに応じたシーン画像設定（ロケーション画像/背景等）
+                if (sceneImage != null)
                 {
-                    var flashbackUI = DialogueManager.Instance.GetUI(styleName) as UI.FlashbackUIController;
-                    if (flashbackUI != null)
+                    var ui = DialogueManager.Instance.GetUI(styleName);
+                    if (ui != null)
                     {
-                        flashbackUI.SetBackgroundImage(backgroundSprite);
-                    }
-                }
-
-                // ロケーション画像
-                if (locationSprite != null)
-                {
-                    var dialogueUI = DialogueManager.Instance.GetUI(styleName) as UI.DialogueUIController;
-                    if (dialogueUI != null)
-                    {
-                        dialogueUI.SetLocationImage(locationSprite);
+                        ui.SetSceneImage(sceneImage);
                     }
                 }
             }

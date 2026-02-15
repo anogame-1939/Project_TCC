@@ -36,9 +36,9 @@ namespace AnoGame.AnoDialogue.UI
         }
 
         /// <summary>
-        /// 背景画像を設定する。Timeline等から呼ばれる。
+        /// シーン画像を設定する（回想スタイルでは背景として使用）。
         /// </summary>
-        public void SetBackgroundImage(Sprite sprite)
+        public override void SetSceneImage(Sprite sprite)
         {
             if (backgroundImage != null)
             {
@@ -47,9 +47,9 @@ namespace AnoGame.AnoDialogue.UI
         }
 
         /// <summary>
-        /// 背景画像をクリアする。
+        /// シーン画像をクリアする。
         /// </summary>
-        public void ClearBackgroundImage()
+        public override void ClearSceneImage()
         {
             if (backgroundImage != null)
             {

@@ -29,7 +29,7 @@ namespace AnoGame.AnoDialogue.Editor
         private HelpBox _selectionInfo;
         private TextField _convIDField;
         private Foldout _candidatesFoldout;
-        private VisualElement _flashbackSection;
+        private VisualElement _sceneImageSection;
 
         private const string PrefsKeyEp = "AnoNarrative_Filter_Ep";
         private const string PrefsKeyCh = "AnoNarrative_Filter_Ch";
@@ -62,16 +62,8 @@ namespace AnoGame.AnoDialogue.Editor
             // ── Style Database ──
             BuildStyleSection(root);
 
-            // ── Location Image ──
-            var locProp = serializedObject.FindProperty("locationSprite");
-            if (locProp != null)
-            {
-                var locField = new PropertyField(locProp, "Location Image");
-                root.Add(locField);
-            }
-
-            // ── Flashback Settings ──
-            BuildFlashbackSection(root);
+            // ── Scene Image ──
+            BuildSceneImageSection(root);
 
             // ── Separator ──
             root.Add(CreateSeparator());
@@ -165,43 +157,46 @@ namespace AnoGame.AnoDialogue.Editor
             {
                 styleNameProp.stringValue = evt.newValue;
                 serializedObject.ApplyModifiedProperties();
-                UpdateFlashbackSectionVisibility(evt.newValue);
+                UpdateSceneImageSectionVisibility(evt.newValue);
             });
             container.Add(dropdown);
 
             // 初期表示時にも可視性を更新
-            container.schedule.Execute(() => UpdateFlashbackSectionVisibility(styleNameProp.stringValue));
+            container.schedule.Execute(() => UpdateSceneImageSectionVisibility(styleNameProp.stringValue));
         }
 
         // ────────────────────────────────────────────────
-        // Flashback Settings
+        // Scene Image Section
         // ────────────────────────────────────────────────
-        private void BuildFlashbackSection(VisualElement root)
+        private void BuildSceneImageSection(VisualElement root)
         {
-            _flashbackSection = new VisualElement();
-            _flashbackSection.style.display = DisplayStyle.None;
+            _sceneImageSection = new VisualElement();
 
-            var sectionLabel = new Label("Flashback Settings");
-            sectionLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            sectionLabel.style.marginTop = 6;
-            _flashbackSection.Add(sectionLabel);
-
-            var bgProp = serializedObject.FindProperty("backgroundSprite");
-            if (bgProp != null)
+            var sceneImageProp = serializedObject.FindProperty("sceneImage");
+            if (sceneImageProp != null)
             {
-                var bgField = new PropertyField(bgProp, "Background Image");
-                _flashbackSection.Add(bgField);
+                var imgField = new PropertyField(sceneImageProp, "Scene Image");
+                _sceneImageSection.Add(imgField);
             }
 
-            root.Add(_flashbackSection);
+            root.Add(_sceneImageSection);
         }
 
-        private void UpdateFlashbackSectionVisibility(string styleName)
+        private void UpdateSceneImageSectionVisibility(string styleName)
         {
-            if (_flashbackSection == null) return;
-            bool isFlashback = !string.IsNullOrEmpty(styleName) &&
-                               styleName.Equals("Flashback", System.StringComparison.OrdinalIgnoreCase);
-            _flashbackSection.style.display = isFlashback ? DisplayStyle.Flex : DisplayStyle.None;
+            if (_sceneImageSection == null) return;
+
+            // StyleDatabase から supportsSceneImage を取得
+            var styleDbProp = serializedObject.FindProperty("styleDatabase");
+            var db = styleDbProp?.objectReferenceValue as AnoGame.AnoDialogue.Data.DialogueStyle;
+
+            bool supports = true;
+            if (db != null)
+            {
+                supports = db.GetSupportsSceneImage(styleName);
+            }
+
+            _sceneImageSection.style.display = supports ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         // ────────────────────────────────────────────────

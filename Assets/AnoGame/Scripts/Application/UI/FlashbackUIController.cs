@@ -13,11 +13,10 @@ namespace AnoGame.Application.UI
         {
             if (AnoGame.AnoDialogue.DialogueManager.Instance != null)
             {
-                var flashbackUI = AnoGame.AnoDialogue.DialogueManager.Instance.GetUI("Flashback")
-                    as AnoGame.AnoDialogue.UI.FlashbackUIController;
+                var flashbackUI = AnoGame.AnoDialogue.DialogueManager.Instance.GetUI("Flashback");
                 if (flashbackUI != null)
                 {
-                    flashbackUI.SetBackgroundImage(sprite);
+                    flashbackUI.SetSceneImage(sprite);
                 }
             }
         }
@@ -26,11 +25,10 @@ namespace AnoGame.Application.UI
         {
             if (AnoGame.AnoDialogue.DialogueManager.Instance != null)
             {
-                var flashbackUI = AnoGame.AnoDialogue.DialogueManager.Instance.GetUI("Flashback")
-                    as AnoGame.AnoDialogue.UI.FlashbackUIController;
+                var flashbackUI = AnoGame.AnoDialogue.DialogueManager.Instance.GetUI("Flashback");
                 if (flashbackUI != null)
                 {
-                    flashbackUI.ClearBackgroundImage();
+                    flashbackUI.ClearSceneImage();
                 }
             }
         }

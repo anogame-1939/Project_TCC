@@ -76,9 +76,9 @@ namespace AnoGame.AnoDialogue.UI
         }
 
         /// <summary>
-        /// ロケーション画像を設定する。Timeline等から呼ばれる。
+        /// シーン画像を設定する（通常スタイルではロケーション画像として使用）。
         /// </summary>
-        public void SetLocationImage(Sprite sprite)
+        public override void SetSceneImage(Sprite sprite)
         {
             if (locationImage != null)
             {
@@ -87,9 +87,9 @@ namespace AnoGame.AnoDialogue.UI
         }
 
         /// <summary>
-        /// ロケーション画像をクリアする。
+        /// シーン画像をクリアする。
         /// </summary>
-        public void ClearLocationImage()
+        public override void ClearSceneImage()
         {
             if (locationImage != null)
             {

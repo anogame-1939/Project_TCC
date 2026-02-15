@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
+using UnityEngine.Serialization;
 using AnoGame.AnoDialogue;
 
 namespace AnoGame.AnoDialogue.Timeline
@@ -13,11 +14,12 @@ namespace AnoGame.AnoDialogue.Timeline
 
         public string conversationID;
         public string dialogueStyleName;
-        // public AnoGame.AnoNarrative.Data.DialogueStyle dialogueStyle; // Changed to string
         public AnoGame.AnoDialogue.Data.DialogueStyle styleDatabase; // Reference to DB for dropdown
         public bool pauseTimeline = true;
-        public Sprite backgroundSprite; // Flashback用背景画像
-        public Sprite locationSprite;   // ロケーション画像
+
+        [FormerlySerializedAs("locationSprite")]
+        [FormerlySerializedAs("backgroundSprite")]
+        public Sprite sceneImage;   // スタイルに応じてロケーション画像/背景として使用
 
         // ITimelineClipAsset implementation
         public ClipCaps clipCaps => ClipCaps.None;
@@ -30,8 +32,7 @@ namespace AnoGame.AnoDialogue.Timeline
             behaviour.conversationID = conversationID;
             behaviour.dialogueStyleName = dialogueStyleName;
             behaviour.pauseTimeline = pauseTimeline;
-            behaviour.backgroundSprite = backgroundSprite;
-            behaviour.locationSprite = locationSprite;
+            behaviour.sceneImage = sceneImage;
 
             // Resolve director to allow pausing
             var director = go.GetComponent<PlayableDirector>();
@@ -41,3 +42,4 @@ namespace AnoGame.AnoDialogue.Timeline
         }
     }
 }
+
