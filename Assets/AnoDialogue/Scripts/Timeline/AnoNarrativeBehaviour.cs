@@ -11,6 +11,8 @@ namespace AnoGame.AnoDialogue.Timeline
         // public DialogueController targetController; // Removed
         public bool pauseTimeline;
         public PlayableDirector director;
+        public Sprite backgroundSprite;
+        public Sprite locationSprite;
         public DialogueTimelineReceiver receiver;
 
         private bool _isTriggered;
@@ -70,7 +72,7 @@ namespace AnoGame.AnoDialogue.Timeline
             }
 
             // Debug.Log($"[AnoNarrativeBehaviour] Calling receiver.Play({conversationID}).");
-            receiver.Play(conversationID, dialogueStyleName);
+            receiver.Play(conversationID, dialogueStyleName, backgroundSprite, locationSprite);
 
             // Wait for conversation to end
             // Debug.Log("[AnoNarrativeBehaviour] Starting MonitorConversationEnd Coroutine.");

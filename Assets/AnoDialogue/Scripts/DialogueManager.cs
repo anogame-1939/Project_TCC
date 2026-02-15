@@ -146,6 +146,16 @@ namespace AnoGame.AnoDialogue
             }
         }
 
+        /// <summary>
+        /// スタイル名に対応する登録済みUIを取得する。
+        /// </summary>
+        public UI.DialogueUIBase GetUI(string styleName)
+        {
+            if (string.IsNullOrEmpty(styleName)) return null;
+            registeredUIs.TryGetValue(styleName, out var ui);
+            return ui;
+        }
+
         public bool IsConversationActive => activeUI != null && activeUI.IsDialogueActive;
 
         public void StopConversation()

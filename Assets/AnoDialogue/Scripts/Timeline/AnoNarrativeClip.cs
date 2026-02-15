@@ -16,6 +16,8 @@ namespace AnoGame.AnoDialogue.Timeline
         // public AnoGame.AnoNarrative.Data.DialogueStyle dialogueStyle; // Changed to string
         public AnoGame.AnoDialogue.Data.DialogueStyle styleDatabase; // Reference to DB for dropdown
         public bool pauseTimeline = true;
+        public Sprite backgroundSprite; // Flashback用背景画像
+        public Sprite locationSprite;   // ロケーション画像
 
         // ITimelineClipAsset implementation
         public ClipCaps clipCaps => ClipCaps.None;
@@ -28,6 +30,8 @@ namespace AnoGame.AnoDialogue.Timeline
             behaviour.conversationID = conversationID;
             behaviour.dialogueStyleName = dialogueStyleName;
             behaviour.pauseTimeline = pauseTimeline;
+            behaviour.backgroundSprite = backgroundSprite;
+            behaviour.locationSprite = locationSprite;
 
             // Resolve director to allow pausing
             var director = go.GetComponent<PlayableDirector>();

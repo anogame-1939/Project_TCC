@@ -16,6 +16,9 @@ namespace AnoGame.AnoDialogue.UI
         [SerializeField] private Image portraitImage;
         [SerializeField] private Button continueButton;
 
+        [Header("Location")]
+        [SerializeField] private Image locationImage;
+
         [Header("Choices")]
         [SerializeField] private Transform choiceContainer;
         [SerializeField] private Button choiceButtonPrefab;
@@ -71,6 +74,7 @@ namespace AnoGame.AnoDialogue.UI
             SetPanelActive(false);
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
             if (portraitImage) portraitImage.enabled = false;
+            if (locationImage) locationImage.enabled = false;
         }
 
         private void SetPanelActive(bool isActive)
@@ -80,6 +84,29 @@ namespace AnoGame.AnoDialogue.UI
                 ConversationPanel.alpha = isActive ? 1f : 0f;
                 ConversationPanel.interactable = isActive;
                 ConversationPanel.blocksRaycasts = isActive;
+            }
+        }
+
+        /// <summary>
+        /// ロケーション画像を設定する。Timeline等から呼ばれる。
+        /// </summary>
+        public void SetLocationImage(Sprite sprite)
+        {
+            if (locationImage != null)
+            {
+                locationImage.sprite = sprite;
+            }
+        }
+
+        /// <summary>
+        /// ロケーション画像をクリアする。
+        /// </summary>
+        public void ClearLocationImage()
+        {
+            if (locationImage != null)
+            {
+                locationImage.sprite = null;
+                locationImage.enabled = false;
             }
         }
 
@@ -98,6 +125,12 @@ namespace AnoGame.AnoDialogue.UI
             {
                 var sprite = DialogueManager.Instance.GetActorSprite(unit.SpeakerName);
                 UpdatePortrait(sprite);
+            }
+
+            // ロケーション画像の表示
+            if (locationImage && locationImage.sprite != null)
+            {
+                locationImage.enabled = true;
             }
 
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
@@ -286,6 +319,12 @@ namespace AnoGame.AnoDialogue.UI
                 Color c = portraitImage.color;
                 c.a = 0f;
                 portraitImage.color = c;
+            }
+
+            // ロケーション画像を非表示
+            if (locationImage)
+            {
+                locationImage.enabled = false;
             }
 
             // Notify Manager?

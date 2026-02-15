@@ -9,7 +9,7 @@ namespace AnoGame.AnoDialogue.UI
     public class NarrationUIController : DialogueUIBase
     {
         [Header("UI Components")]
-        [SerializeField] private GameObject panelObject;
+        [SerializeField] private CanvasGroup ConversationPanel;
         [SerializeField] private TextMeshProUGUI narrationText;
         [SerializeField] private Button continueButton;
 
@@ -21,18 +21,30 @@ namespace AnoGame.AnoDialogue.UI
         private Coroutine typingCoroutine;
         private bool isTyping = false;
         private bool isSkipping = false;
+        private float inputCooldown = 0f;
 
-        public override bool IsDialogueActive => panelObject != null && panelObject.activeSelf;
+        public override bool IsDialogueActive => ConversationPanel != null && ConversationPanel.blocksRaycasts;
 
         private void Awake()
         {
-            if (panelObject) panelObject.SetActive(false);
+            SetPanelActive(false);
+        }
+
+        private void SetPanelActive(bool isActive)
+        {
+            if (ConversationPanel != null)
+            {
+                ConversationPanel.alpha = isActive ? 1f : 0f;
+                ConversationPanel.interactable = isActive;
+                ConversationPanel.blocksRaycasts = isActive;
+            }
         }
 
         public override void ShowConversation(ConversationUnit unit)
         {
             currentUnit = unit;
-            if (panelObject) panelObject.SetActive(true);
+            SetPanelActive(true);
+            inputCooldown = 0.2f;
 
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
@@ -41,13 +53,13 @@ namespace AnoGame.AnoDialogue.UI
         public override void PreviewConversation(ConversationUnit unit)
         {
             currentUnit = unit;
-            if (panelObject) panelObject.SetActive(true);
+            SetPanelActive(true);
             if (narrationText) narrationText.text = unit.BodyText;
         }
 
         public override void Close()
         {
-            if (panelObject) panelObject.SetActive(false);
+            SetPanelActive(false);
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         }
 
@@ -98,7 +110,9 @@ namespace AnoGame.AnoDialogue.UI
 
         private void Update()
         {
-            if (IsDialogueActive)
+            if (inputCooldown > 0f) inputCooldown -= Time.deltaTime;
+
+            if (IsDialogueActive && inputCooldown <= 0f)
             {
                 if (Keyboard.current != null && Keyboard.current[advanceKey].wasPressedThisFrame)
                 {
