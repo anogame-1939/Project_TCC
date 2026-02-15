@@ -37,14 +37,6 @@ namespace AnoGame.AnoDialogue.UI
             }
         }
 
-        protected virtual void OnEnable()
-        {
-            if (DialogueManager.Instance != null)
-            {
-                DialogueManager.Instance.RegisterUI(this, styleName);
-            }
-        }
-
         /// <summary>
         /// CanvasGroup の alpha / interactable / blocksRaycasts を一括制御。
         /// </summary>
