@@ -2,35 +2,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
-using AnoGame.Application;
-
 namespace AnoGame.AnoFlow
 {
     /// <summary>
-    /// EventManager呼び出してるけど、あまり意味ない
-    /// _gameManager.CurrentGameData.EventHistoryも参照してるけど多分使ってない
-    /// いや、使ってるわ
-    /// ゲームデータとしてクリア済みイベントを保持させて、セーブ時に書き込んでる
+    /// クリア済みイベントの記録を管理する。
+    /// IEventStore経由でゲームデータへの永続化を委譲する。
     /// </summary>
     public class EventManager
     {
-        private readonly GameManager _gameManager;
+        private readonly IEventStore _eventStore;
 
         [Inject]
-        public EventManager(GameManager gameManager)
+        public EventManager(IEventStore eventStore)
         {
             Debug.Log("EventManager initialized");
-            _gameManager = gameManager;
+            _eventStore = eventStore;
         }
 
         public void AddClearedEvent(string eventId)
         {
-            _gameManager.CurrentGameData.EventHistory.AddEvent(eventId);
+            _eventStore.AddEvent(eventId);
         }
 
         public void AddTags(IEnumerable<string> tags)
         {
-            _gameManager.CurrentGameData.EventHistory.AddTags(tags);
+            _eventStore.AddTags(tags);
         }
     }
 }

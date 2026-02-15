@@ -56,6 +56,10 @@ namespace AnoGame.Application.Core
 
             // インベントリマネージャの登録
             builder.Register<InventoryManager>(Lifetime.Singleton);
+
+            // AnoFlow インターフェース実装の登録
+            builder.Register<IEventStore, GameEventStore>(Lifetime.Singleton);
+            builder.Register<IInteractionRegistry, InteractionRegistryAdapter>(Lifetime.Singleton);
             builder.Register<EventManager>(Lifetime.Singleton);
 
             // 

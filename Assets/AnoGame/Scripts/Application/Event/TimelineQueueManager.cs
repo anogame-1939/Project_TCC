@@ -1,10 +1,9 @@
 using System.Collections.Generic;
+using AnoGame.AnoFlow;
 using AnoGame.Application.Core;
 using UnityEngine.Events;
 
-using AnoGame.Application;
-
-namespace AnoGame.AnoFlow
+namespace AnoGame.Application
 {
     /// <summary>
     /// タイムラインをキューで順番に再生するマネージャー

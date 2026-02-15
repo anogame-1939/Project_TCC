@@ -8,9 +8,8 @@ using UniRx;
 using AnoGame.Domain.Event;
 
 
-using AnoGame.Application;
 
-namespace AnoGame.AnoFlow
+namespace AnoGame.Application
 {
     public class GameOverManager : SingletonMonoBehaviour<GameOverManager>
     {

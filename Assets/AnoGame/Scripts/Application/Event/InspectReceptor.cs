@@ -4,13 +4,10 @@ using VContainer;
 using AnoGame.Domain.Event.Services;
 using AnoGame.Application.Attributes;
 using AnoGame.Application.Player.Interaction;
-using AnoGame.Application.Player; // InteractionController
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Data;
 using AnoGame.Domain.Event.Conditions;
 using System.Linq;
-
-using AnoGame.Application;
 
 namespace AnoGame.AnoFlow
 {
@@ -36,23 +33,24 @@ namespace AnoGame.AnoFlow
 
         [Inject] private IEventService _eventService;
         [Inject] private IInventoryService _inventoryService;
+        [Inject] private IInteractionRegistry _interactionRegistry;
 
         [Inject]
-        public void Construct(IEventService eventService, IInventoryService inventoryService)
+        public void Construct(IEventService eventService, IInventoryService inventoryService, IInteractionRegistry interactionRegistry)
         {
             _eventService = eventService;
             _inventoryService = inventoryService;
+            _interactionRegistry = interactionRegistry;
         }
 
         private void OnEnable()
         {
-            // Colliderを使わないため、手動で登録
-            InteractionController.RegisterManual(this);
+            _interactionRegistry?.Register(this);
         }
 
         private void OnDisable()
         {
-            InteractionController.UnregisterManual(this);
+            _interactionRegistry?.Unregister(this);
         }
 
         // --- IInteractable Implementation ---

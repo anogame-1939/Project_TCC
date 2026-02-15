@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace AnoGame.AnoFlow
+namespace AnoGame.Application
 {
     public class GameOverHandler : MonoBehaviour
     {
