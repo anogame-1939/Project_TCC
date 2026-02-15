@@ -41,7 +41,7 @@ namespace AnoGame.AnoDialogue.Editor
         {
             // Load USS
             var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
-                "Assets/AnoNarrative/Scripts/Editor/UIToolkit/DialogueGraphStyles.uss");
+                "Assets/AnoDialogue/Scripts/Editor/UIToolkit/DialogueGraphStyles.uss");
 
             if (styleSheet != null)
             {

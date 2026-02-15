@@ -9,7 +9,6 @@ namespace AnoGame.AnoDialogue.UI
     public class FlashbackUIController : DialogueUIBase
     {
         [Header("UI Components")]
-        [SerializeField] private CanvasGroup ConversationPanel;
         [SerializeField] private TextMeshProUGUI speakerNameText;
         [SerializeField] private TextMeshProUGUI bodyText;
         [SerializeField] private Button continueButton;
@@ -29,22 +28,11 @@ namespace AnoGame.AnoDialogue.UI
         private bool isSkipping = false;
         private float inputCooldown = 0f;
 
-        public override bool IsDialogueActive => ConversationPanel != null && ConversationPanel.blocksRaycasts;
 
-        private void Awake()
+        protected override void Awake()
         {
-            SetPanelActive(false);
+            base.Awake();
             if (backgroundImage) backgroundImage.enabled = false;
-        }
-
-        private void SetPanelActive(bool isActive)
-        {
-            if (ConversationPanel != null)
-            {
-                ConversationPanel.alpha = isActive ? 1f : 0f;
-                ConversationPanel.interactable = isActive;
-                ConversationPanel.blocksRaycasts = isActive;
-            }
         }
 
         /// <summary>

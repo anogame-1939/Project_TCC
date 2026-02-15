@@ -10,7 +10,6 @@ namespace AnoGame.AnoDialogue.UI
     public class DialogueUIController : DialogueUIBase
     {
         [Header("UI Components")]
-        [SerializeField] private CanvasGroup ConversationPanel; // The main panel to show/hide
         [SerializeField] private TextMeshProUGUI speakerNameText;
         [SerializeField] private TextMeshProUGUI bodyText;
         [SerializeField] private Image portraitImage;
@@ -42,7 +41,6 @@ namespace AnoGame.AnoDialogue.UI
         private bool isSkipping = false;
         private float inputCooldown = 0f;
 
-        public override bool IsDialogueActive => ConversationPanel != null && ConversationPanel.blocksRaycasts;
 
         public bool IsAutoAdvance
         {
@@ -69,22 +67,12 @@ namespace AnoGame.AnoDialogue.UI
             IsAutoAdvance = !IsAutoAdvance;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
-            SetPanelActive(false);
+            base.Awake();
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
             if (portraitImage) portraitImage.enabled = false;
             if (locationImage) locationImage.enabled = false;
-        }
-
-        private void SetPanelActive(bool isActive)
-        {
-            if (ConversationPanel != null)
-            {
-                ConversationPanel.alpha = isActive ? 1f : 0f;
-                ConversationPanel.interactable = isActive;
-                ConversationPanel.blocksRaycasts = isActive;
-            }
         }
 
         /// <summary>
@@ -116,7 +104,7 @@ namespace AnoGame.AnoDialogue.UI
         public override void ShowConversation(ConversationUnit unit)
         {
             currentUnit = unit;
-            if (ConversationPanel) SetPanelActive(true);
+            SetPanelActive(true);
             inputCooldown = 0.2f; // Prevent immediate skip input
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
@@ -142,7 +130,7 @@ namespace AnoGame.AnoDialogue.UI
         public override void PreviewConversation(ConversationUnit unit)
         {
             currentUnit = unit;
-            if (ConversationPanel) SetPanelActive(true);
+            SetPanelActive(true);
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
 

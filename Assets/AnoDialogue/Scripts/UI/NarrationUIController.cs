@@ -9,7 +9,6 @@ namespace AnoGame.AnoDialogue.UI
     public class NarrationUIController : DialogueUIBase
     {
         [Header("UI Components")]
-        [SerializeField] private CanvasGroup ConversationPanel;
         [SerializeField] private TextMeshProUGUI narrationText;
         [SerializeField] private Button continueButton;
 
@@ -23,22 +22,7 @@ namespace AnoGame.AnoDialogue.UI
         private bool isSkipping = false;
         private float inputCooldown = 0f;
 
-        public override bool IsDialogueActive => ConversationPanel != null && ConversationPanel.blocksRaycasts;
-
-        private void Awake()
-        {
-            SetPanelActive(false);
-        }
-
-        private void SetPanelActive(bool isActive)
-        {
-            if (ConversationPanel != null)
-            {
-                ConversationPanel.alpha = isActive ? 1f : 0f;
-                ConversationPanel.interactable = isActive;
-                ConversationPanel.blocksRaycasts = isActive;
-            }
-        }
+        // Awake は基底クラスで CanvasGroup 初期化 + SetPanelActive(false) を行う
 
         public override void ShowConversation(ConversationUnit unit)
         {

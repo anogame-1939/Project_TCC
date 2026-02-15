@@ -47,6 +47,7 @@
 | PlayerSpawnManager | PlayerSpawnManager.cs (内部クラス) | Application/Story/ |
 | ObjectMover | ObjectMover.cs (内部クラス) | Application/Common/Movement/ |
 | LoreSceneManager | LoreSceneManager.cs (内部クラス) | Application/Lore/ |
+| CanvasGroup | CanvasGroupEditor.cs | Editor/ |
 
 ---
 
