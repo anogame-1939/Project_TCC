@@ -131,6 +131,14 @@ namespace AnoGame.AnoFlow.Editor
             _resultTagsSection = BuildAccordionSection(container, "Result Tags",
                 _sectionVisibility.ResultTags, BuildResultTagsContent,
                 () => ShowAddTagMenu("resultTags", OnTagsChanged));
+            // Override header color to green for Result Tags (only when has items)
+            var rtCount = EventData.ResultTags?.Count ?? 0;
+            if (rtCount > 0)
+            {
+                var rtHeader = _resultTagsSection.ElementAt(0).ElementAt(0) as Label;
+                if (rtHeader != null)
+                    rtHeader.style.color = new Color(0.4f, 0.9f, 0.4f);
+            }
 
             // --- Condition Tags (accordion, with ports) ---
             _conditionTagsSection = BuildAccordionSection(container, "Condition Tags",
@@ -428,8 +436,10 @@ namespace AnoGame.AnoFlow.Editor
             int count = GetSectionCount(label);
             string arrowDown = "\u25BE"; // small down triangle
             string arrowRight = "\u25B8"; // small right triangle
-            string arrow = expanded ? arrowDown : arrowRight;
-            var headerLabel = new Label($"{arrow} {label} ({count})");
+            // Hide arrow when count is 0
+            string arrow = count > 0 ? (expanded ? arrowDown : arrowRight) : "";
+            string prefix = count > 0 ? $"{arrow} " : "  ";
+            var headerLabel = new Label($"{prefix}{label} ({count})");
             headerLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             headerLabel.style.fontSize = 12;
             headerLabel.style.color = count > 0 ? Color.white : new Color(0.5f, 0.5f, 0.5f);
@@ -465,6 +475,8 @@ namespace AnoGame.AnoFlow.Editor
             header.RegisterCallback<MouseDownEvent>(evt =>
             {
                 if (evt.button != 0) return;
+                // Do nothing when section has no items
+                if (capturedCount == 0) { evt.StopPropagation(); return; }
                 bool isVisible = capturedBody.resolvedStyle.height > 0;
                 Debug.Log($"[PortDbg][USER] SectionToggle '{capturedArrowLabel}' in '{EventData.EventId}': wasVisible={isVisible} -> collapsed={isVisible} nodeExpanded={expanded}");
                 SetBodyCollapsed(capturedBody, isVisible);
@@ -517,7 +529,7 @@ namespace AnoGame.AnoFlow.Editor
                     row.style.alignItems = Align.Center;
 
                     var tagLbl = new Label($"\u25cf {tag}");
-                    tagLbl.style.color = new Color(0.5f, 0.85f, 1f);
+                    tagLbl.style.color = new Color(0.4f, 0.9f, 0.4f);
                     tagLbl.style.flexGrow = 1;
                     row.Add(tagLbl);
 
