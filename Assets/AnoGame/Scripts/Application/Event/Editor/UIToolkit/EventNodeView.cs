@@ -151,14 +151,26 @@ namespace AnoGame.AnoFlow.Editor
             extensionContainer.Add(container);
             RefreshExpandedState();
 
-            // Defer port position update after initial layout
-            _portPositionDirty = true;
+            // Defer initial port position update after layout settles
+            schedule.Execute(() =>
+            {
+                schedule.Execute(() =>
+                {
+                    SyncExtensionContainerState();
+                    ApplyPortPositions();
+                });
+            });
 
-            // Single GeometryChanged handler on the node itself detects:
-            // 1. Initial layout completion → applies port positions
-            // 2. Expand/collapse state changes → syncs extension container + repositions ports
-            // 3. Section toggle layout changes → repositions ports
-            this.RegisterCallback<GeometryChangedEvent>(_ => OnNodeGeometryChanged());
+            // GeometryChanged detects expand/collapse state changes.
+            // Uses schedule.Execute to defer processing after RefreshExpandedState
+            // has finished updating extensionContainer styles internally.
+            this.RegisterCallback<GeometryChangedEvent>(_ =>
+            {
+                if (expanded != _lastExpanded)
+                {
+                    OnExpandCollapseChanged();
+                }
+            });
         }
 
         /// <summary>
@@ -167,26 +179,81 @@ namespace AnoGame.AnoFlow.Editor
         private bool _lastExpanded = true;
 
         /// <summary>
-        /// When true, the next GeometryChanged will trigger port position recalculation.
-        /// Using this flag instead of frame-delayed schedules ensures layout is settled.
+        /// All accordion section bodies, used for collapse/restore on node collapse.
+        /// Populated by BuildAccordionSection.
         /// </summary>
-        private bool _portPositionDirty = false;
+        private readonly List<VisualElement> _sectionBodies = new List<VisualElement>();
+
+        /// <summary>
+        /// Saved expanded states of sections before node collapse.
+        /// Used to restore section states when node is expanded again.
+        /// </summary>
+        private readonly List<bool> _savedSectionStates = new List<bool>();
+
+        /// <summary>
+        /// Generation counter for debouncing deferred port updates.
+        /// </summary>
+        private int _portUpdateGen = 0;
+
+        /// <summary>
+        /// Called when expand/collapse state changes.
+        /// Defers processing by 1 frame so that RefreshExpandedState() has finished
+        /// updating extensionContainer styles before we override them.
+        /// </summary>
+        private void OnExpandCollapseChanged()
+        {
+            _lastExpanded = expanded;
+            int gen = ++_portUpdateGen;
+
+            Debug.Log($"[PortDbg] OnExpandCollapseChanged '{EventData.EventId}' expanded={expanded} gen={gen} extDisplay={extensionContainer?.resolvedStyle.display} extH={extensionContainer?.resolvedStyle.height:F0}");
+
+            // Defer 1 frame: RefreshExpandedState sets display:none on extensionContainer.
+            // We need to wait for that to finish before overriding with our styles.
+            schedule.Execute(() =>
+            {
+                if (gen != _portUpdateGen)
+                {
+                    Debug.Log($"[PortDbg] SyncExt STALE '{EventData.EventId}' gen={gen} current={_portUpdateGen}");
+                    return;
+                }
+
+                Debug.Log($"[PortDbg] SyncExt PRE '{EventData.EventId}' gen={gen} extDisplay={extensionContainer?.resolvedStyle.display} extPos={extensionContainer?.resolvedStyle.position} extH={extensionContainer?.resolvedStyle.height:F0}");
+                SyncExtensionContainerState();
+                Debug.Log($"[PortDbg] SyncExt POST '{EventData.EventId}' gen={gen} extDisplay={extensionContainer?.resolvedStyle.display} extPos={extensionContainer?.resolvedStyle.position} extH={extensionContainer?.resolvedStyle.height:F0}");
+
+                // Wait 1 more frame for layout to settle after style changes
+                schedule.Execute(() =>
+                {
+                    if (gen != _portUpdateGen)
+                    {
+                        Debug.Log($"[PortDbg] Apply STALE '{EventData.EventId}' gen={gen} current={_portUpdateGen}");
+                        return;
+                    }
+
+                    Debug.Log($"[PortDbg] Apply PRE '{EventData.EventId}' gen={gen} expanded={expanded} nodeH={resolvedStyle.height:F0} extH={extensionContainer?.resolvedStyle.height:F0}");
+                    for (int i = 0; i < _sectionBodies.Count; i++)
+                        Debug.Log($"[PortDbg]   body[{i}] h={_sectionBodies[i].resolvedStyle.height:F0}");
+
+                    ApplyPortPositions();
+                });
+            });
+        }
 
         /// <summary>
         /// Synchronize extensionContainer style with the current expanded state.
-        /// When collapsed, override display:none with position:absolute + height:0
-        /// so ports remain in the layout tree for edge routing.
-        /// Idempotent: skips if expanded state hasn't changed since last call.
+        /// When collapsed, also collapse all accordion sections so ports compact.
+        /// When expanded, restore section states and extensionContainer styles.
         /// </summary>
         private void SyncExtensionContainerState()
         {
             if (extensionContainer == null) return;
 
-            // Skip if no state change
-            if (expanded == _lastExpanded) return;
-
             if (!expanded)
             {
+                // Save each section's expanded state, then collapse all
+                SaveAndCollapseSections();
+
+                // Override RefreshExpandedState's display:none
                 extensionContainer.style.display = DisplayStyle.Flex;
                 extensionContainer.style.position = Position.Absolute;
                 extensionContainer.style.height = 0;
@@ -201,24 +268,56 @@ namespace AnoGame.AnoFlow.Editor
                 extensionContainer.style.height = new StyleLength(StyleKeyword.Auto);
                 extensionContainer.style.overflow = Overflow.Visible;
                 extensionContainer.style.top = StyleKeyword.Null;
-            }
 
-            _lastExpanded = expanded;
-            SchedulePortPositionUpdate();
+                // Restore section states saved before collapse
+                RestoreSectionStates();
+            }
         }
 
         /// <summary>
-        /// Schedule port position recalculation.
-        /// Resets transforms immediately, then marks dirty so the next
-        /// GeometryChanged event (which fires after layout settles)
-        /// will apply correct positions.
+        /// Save the expanded state of all accordion sections, then collapse them all.
+        /// </summary>
+        private void SaveAndCollapseSections()
+        {
+            _savedSectionStates.Clear();
+            for (int i = 0; i < _sectionBodies.Count; i++)
+            {
+                var body = _sectionBodies[i];
+                bool wasExpanded = body.resolvedStyle.height > 0;
+                _savedSectionStates.Add(wasExpanded);
+                Debug.Log($"[PortDbg]   SaveSection[{i}] wasExpanded={wasExpanded} h={body.resolvedStyle.height:F0}");
+                SetBodyCollapsed(body, true);
+            }
+        }
+
+        /// <summary>
+        /// Restore accordion sections to their previously saved states.
+        /// </summary>
+        private void RestoreSectionStates()
+        {
+            for (int i = 0; i < _sectionBodies.Count && i < _savedSectionStates.Count; i++)
+            {
+                bool wasExpanded = _savedSectionStates[i];
+                Debug.Log($"[PortDbg]   RestoreSection[{i}] wasExpanded={wasExpanded}");
+                SetBodyCollapsed(_sectionBodies[i], !wasExpanded);
+            }
+            _savedSectionStates.Clear();
+        }
+
+        /// <summary>
+        /// Schedule port position recalculation for section toggle.
+        /// Uses generation counter to debounce: only the latest call applies.
         /// </summary>
         private void SchedulePortPositionUpdate()
         {
-            // Reset all port transforms immediately so layout recalculates from clean state
             ResetPortTransforms();
-            // Mark dirty — the ApplyPortPositions will run from the GeometryChanged handler
-            _portPositionDirty = true;
+            int gen = ++_portUpdateGen;
+            Debug.Log($"[PortDbg] SchedulePortPositionUpdate '{EventData.EventId}' gen={gen}");
+            schedule.Execute(() =>
+            {
+                if (gen != _portUpdateGen) return;
+                ApplyPortPositions();
+            });
         }
 
         /// <summary>
@@ -229,25 +328,6 @@ namespace AnoGame.AnoFlow.Editor
             foreach (var kvp in TagConditionPorts) kvp.Value.transform.position = Vector3.zero;
             foreach (var kvp in NegativeTagPorts) kvp.Value.transform.position = Vector3.zero;
             foreach (var kvp in ConditionPorts) kvp.Value.transform.position = Vector3.zero;
-        }
-
-        /// <summary>
-        /// Called from GeometryChanged on the node.
-        /// If ports are dirty, applies correct positions now that layout is settled.
-        /// </summary>
-        private void OnNodeGeometryChanged()
-        {
-            // Check for expand/collapse state change first
-            if (expanded != _lastExpanded)
-            {
-                SyncExtensionContainerState();
-                return; // SyncExt will reset transforms and set dirty again
-            }
-
-            if (!_portPositionDirty) return;
-            _portPositionDirty = false;
-
-            ApplyPortPositions();
         }
 
         /// <summary>
@@ -270,13 +350,20 @@ namespace AnoGame.AnoFlow.Editor
             if (!currentExpanded)
             {
                 float nodeH = resolvedStyle.height;
-                if (nodeH <= 0) return; // layout not ready
+                if (nodeH <= 0)
+                {
+                    Debug.Log($"[PortDbg] ApplyPortPositions '{EventData.EventId}' State A: nodeH={nodeH} NOT READY");
+                    return;
+                }
                 float targetY = worldBound.y + nodeH * 0.5f;
 
+                Debug.Log($"[PortDbg] ApplyPortPositions '{EventData.EventId}' State A: nodeH={nodeH:F0} targetY={targetY:F0} portCount={allPorts.Count}");
                 foreach (var port in allPorts)
                 {
                     float portCY = port.worldBound.center.y;
-                    port.transform.position = new Vector3(0, targetY - portCY, 0);
+                    var newPos = new Vector3(0, targetY - portCY, 0);
+                    Debug.Log($"[PortDbg]   port portCY={portCY:F1} -> transform.y={newPos.y:F1}");
+                    port.transform.position = newPos;
                 }
                 ForceEdgeRepaint();
                 return;
@@ -312,7 +399,6 @@ namespace AnoGame.AnoFlow.Editor
         /// </summary>
         private void ForceEdgeRepaint()
         {
-            // Get the GraphView and mark edges for repaint
             var graphView = GetFirstAncestorOfType<GraphView>();
             if (graphView != null)
             {
@@ -367,6 +453,9 @@ namespace AnoGame.AnoFlow.Editor
             SetBodyCollapsed(body, !expanded);
             buildContent(body);
             section.Add(body);
+
+            // Register body for node collapse/restore
+            _sectionBodies.Add(body);
 
             // Click header to toggle body
             var capturedLabel = headerLabel;
