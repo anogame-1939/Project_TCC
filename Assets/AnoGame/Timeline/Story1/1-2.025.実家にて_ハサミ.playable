@@ -48,6 +48,26 @@ MonoBehaviour:
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: 152278c7dbc3b7a49b00d16580a4e6d7, type: 2}
+--- !u!114 &-1675708017635105714
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ed68ee5f3575f8439a90743bd341d1c, type: 3}
+  m_Name: AnoNarrativeClip
+  m_EditorClassIdentifier: 
+  targetEpisode: -1
+  targetChapter: -1
+  targetSection: -1
+  conversationID: 81067626-beee-4529-b6eb-f75cf67f9a7c
+  dialogueStyleName: "\u901A\u5E38"
+  styleDatabase: {fileID: 0}
+  pauseTimeline: 1
+  sceneImage: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,18 +78,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
-  m_Name: "1-2.025.\u5B9F\u5BB6\u306B\u3066"
+  m_Name: "1-2.025.\u5B9F\u5BB6\u306B\u3066_\u30CF\u30B5\u30DF"
   m_EditorClassIdentifier: 
   m_Version: 0
   m_Tracks:
-  - {fileID: 2422705429479404269}
+  - {fileID: 813493076336923681}
   m_FixedDuration: 0
   m_EditorSettings:
     m_Framerate: 60
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: 0}
---- !u!114 &2422705429479404269
+--- !u!114 &813493076336923681
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,14 +113,14 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: 8783409659370466338}
+    m_Asset: {fileID: -1675708017635105714}
     m_Duration: 0.5333333333333333
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 2422705429479404269}
+    m_ParentTrack: {fileID: 813493076336923681}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
+    m_BlendInDuration: -1
+    m_BlendOutDuration: -1
     m_MixInCurve:
       serializedVersion: 2
       m_Curve:
@@ -158,7 +178,7 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
-    m_DisplayName: "\u3088\u304F\u898B\u308B\u3068\u9727\u58C1\u306E\u4E0B\u306B\u8349"
+    m_DisplayName: "\u5B9F\u5BB6\u3067\u30CF\u30B5\u30DF\u3092\u898B\u3064\u3051\u308B"
   m_Markers:
     m_Objects: []
   defaultClipDuration: 0.5
@@ -194,26 +214,6 @@ MonoBehaviour:
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: 5d839a960cedaf44b9cd62d33bc38ab4, type: 2}
---- !u!114 &8783409659370466338
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ed68ee5f3575f8439a90743bd341d1c, type: 3}
-  m_Name: AnoNarrativeClip
-  m_EditorClassIdentifier: 
-  targetEpisode: -1
-  targetChapter: -1
-  targetSection: -1
-  conversationID: 4be1312b-c5d5-4ce3-a7a6-97c53d6144a7
-  dialogueStyleName: "\u901A\u5E38"
-  styleDatabase: {fileID: 11400000, guid: f2be86183cd92044c884d519222012b3, type: 2}
-  pauseTimeline: 1
-  sceneImage: {fileID: 0}
 --- !u!114 &8928508227526868527
 MonoBehaviour:
   m_ObjectHideFlags: 1

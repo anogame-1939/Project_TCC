@@ -17,6 +17,26 @@ MonoBehaviour:
   m_bufferingTime: 0.1
   m_ClipProperties:
     volume: 1
+--- !u!114 &-6681657017693070795
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ed68ee5f3575f8439a90743bd341d1c, type: 3}
+  m_Name: AnoNarrativeClip
+  m_EditorClassIdentifier: 
+  targetEpisode: -1
+  targetChapter: -1
+  targetSection: -1
+  conversationID: 783f6ee4-2e34-49af-8cef-680731ba14d0
+  dialogueStyleName: "\u901A\u5E38"
+  styleDatabase: {fileID: 11400000, guid: f2be86183cd92044c884d519222012b3, type: 2}
+  pauseTimeline: 1
+  sceneImage: {fileID: 0}
 --- !u!114 &-3104032321964325513
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -64,7 +84,7 @@ MonoBehaviour:
   m_Version: 0
   m_Tracks:
   - {fileID: 80401704361642150}
-  - {fileID: 1586763660075433895}
+  - {fileID: 6927480579355041832}
   m_FixedDuration: 0
   m_EditorSettings:
     m_Framerate: 60
@@ -149,7 +169,7 @@ MonoBehaviour:
     volume: 1
     stereoPan: 0
     spatialBlend: 0
---- !u!114 &1586763660075433895
+--- !u!114 &5760711385004744505
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -158,8 +178,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 976fe2996ecf9db4d8c14ff0c660b91d, type: 3}
-  m_Name: Dialogue Conversation Track
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter
+  m_EditorClassIdentifier: 
+  m_Time: 0
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: 522a92ddb360bd740ad260c04d10f9ad, type: 2}
+--- !u!114 &6927480579355041832
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 715762f68eae57048a1135c74ca1eb7d, type: 3}
+  m_Name: Ano Narrative Track
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -173,10 +209,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: 9030707657896368514}
+    m_Asset: {fileID: -6681657017693070795}
     m_Duration: 3
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 1586763660075433895}
+    m_ParentTrack: {fileID: 6927480579355041832}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -238,27 +274,10 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
-    m_DisplayName: "\u4F1A\u8A71-\u300C\u3042\u300D-\u7F36\u3092\u8E74\u98DB\u3070\u3057\u305F"
+    m_DisplayName: "\u300C\u3042\u300D-\u7F36\u3092\u8E74\u98DB\u3070\u3057\u305F"
   m_Markers:
     m_Objects: []
-  newClipLengthScale: 0.3333333333333333
-  minNewClipSeconds: 0.25
---- !u!114 &5760711385004744505
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: 
-  m_Time: 0
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 11400000, guid: 522a92ddb360bd740ad260c04d10f9ad, type: 2}
+  defaultClipDuration: 0.5
 --- !u!114 &8597492090673089731
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -275,25 +294,3 @@ MonoBehaviour:
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: 5d839a960cedaf44b9cd62d33bc38ab4, type: 2}
---- !u!114 &9030707657896368514
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e7ff2d2dc30ed04eb9db90e6ae6a722, type: 3}
-  m_Name: DialogueConversationClip
-  m_EditorClassIdentifier: 
-  triggerOverride:
-    exposedName: 0d355c70d93f06444bcc07c8bb8e72a1
-    defaultValue: {fileID: 0}
-  actor:
-    exposedName: 
-    defaultValue: {fileID: 0}
-  conversant:
-    exposedName: 
-    defaultValue: {fileID: 0}
-  pauseDuringConversation: 1

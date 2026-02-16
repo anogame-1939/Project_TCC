@@ -152,62 +152,111 @@ namespace AnoGame.AnoFlow.Editor
             RefreshExpandedState();
 
             // Defer port position update after initial layout
-            SchedulePortPositionUpdate();
+            _portPositionDirty = true;
 
-            // Monitor extensionContainer collapse (node's built-in collapse button)
-            // RefreshExpandedState is not virtual, so we detect changes via GeometryChanged
-            extensionContainer.RegisterCallback<GeometryChangedEvent>(_ => OnExtensionGeometryChanged());
+            // Single GeometryChanged handler on the node itself detects:
+            // 1. Initial layout completion → applies port positions
+            // 2. Expand/collapse state changes → syncs extension container + repositions ports
+            // 3. Section toggle layout changes → repositions ports
+            this.RegisterCallback<GeometryChangedEvent>(_ => OnNodeGeometryChanged());
         }
 
         /// <summary>
-        /// Detect when extensionContainer is hidden by GraphView's collapse
-        /// and override display:none with position:absolute + height:0.
+        /// Track the last known expanded state to detect changes.
         /// </summary>
-        private void OnExtensionGeometryChanged()
+        private bool _lastExpanded = true;
+
+        /// <summary>
+        /// When true, the next GeometryChanged will trigger port position recalculation.
+        /// Using this flag instead of frame-delayed schedules ensures layout is settled.
+        /// </summary>
+        private bool _portPositionDirty = false;
+
+        /// <summary>
+        /// Synchronize extensionContainer style with the current expanded state.
+        /// When collapsed, override display:none with position:absolute + height:0
+        /// so ports remain in the layout tree for edge routing.
+        /// Idempotent: skips if expanded state hasn't changed since last call.
+        /// </summary>
+        private void SyncExtensionContainerState()
         {
             if (extensionContainer == null) return;
 
+            // Skip if no state change
+            if (expanded == _lastExpanded) return;
+
             if (!expanded)
             {
-                // Node is collapsed by the built-in toggle
-                if (extensionContainer.resolvedStyle.display == DisplayStyle.None)
-                {
-                    extensionContainer.style.display = DisplayStyle.Flex;
-                    extensionContainer.style.position = Position.Absolute;
-                    extensionContainer.style.height = 0;
-                    extensionContainer.style.overflow = Overflow.Hidden;
-                    extensionContainer.style.left = 0;
-                    extensionContainer.style.right = 0;
-                    extensionContainer.style.top = 0;
-                    SchedulePortPositionUpdate();
-                }
+                extensionContainer.style.display = DisplayStyle.Flex;
+                extensionContainer.style.position = Position.Absolute;
+                extensionContainer.style.height = 0;
+                extensionContainer.style.overflow = Overflow.Hidden;
+                extensionContainer.style.left = 0;
+                extensionContainer.style.right = 0;
+                extensionContainer.style.top = 0;
             }
             else
             {
-                // Node is expanded: ensure normal layout
                 extensionContainer.style.position = Position.Relative;
                 extensionContainer.style.height = new StyleLength(StyleKeyword.Auto);
                 extensionContainer.style.overflow = Overflow.Visible;
                 extensionContainer.style.top = StyleKeyword.Null;
-                SchedulePortPositionUpdate();
             }
+
+            _lastExpanded = expanded;
+            SchedulePortPositionUpdate();
         }
 
         /// <summary>
-        /// Schedule a deferred port position update after layout.
+        /// Schedule port position recalculation.
+        /// Resets transforms immediately, then marks dirty so the next
+        /// GeometryChanged event (which fires after layout settles)
+        /// will apply correct positions.
         /// </summary>
         private void SchedulePortPositionUpdate()
         {
-            schedule.Execute(() => UpdatePortPositions());
+            // Reset all port transforms immediately so layout recalculates from clean state
+            ResetPortTransforms();
+            // Mark dirty — the ApplyPortPositions will run from the GeometryChanged handler
+            _portPositionDirty = true;
         }
 
         /// <summary>
-        /// Adjust port transforms so edges connect at the correct visual position.
-        /// - Section collapsed (header visible): ports moved to header Y
-        /// - Node fully collapsed: ports moved to node vertical center
-        /// - Expanded: transforms reset to zero
+        /// Reset all port transforms to zero.
         /// </summary>
-        private void UpdatePortPositions()
+        private void ResetPortTransforms()
+        {
+            foreach (var kvp in TagConditionPorts) kvp.Value.transform.position = Vector3.zero;
+            foreach (var kvp in NegativeTagPorts) kvp.Value.transform.position = Vector3.zero;
+            foreach (var kvp in ConditionPorts) kvp.Value.transform.position = Vector3.zero;
+        }
+
+        /// <summary>
+        /// Called from GeometryChanged on the node.
+        /// If ports are dirty, applies correct positions now that layout is settled.
+        /// </summary>
+        private void OnNodeGeometryChanged()
+        {
+            // Check for expand/collapse state change first
+            if (expanded != _lastExpanded)
+            {
+                SyncExtensionContainerState();
+                return; // SyncExt will reset transforms and set dirty again
+            }
+
+            if (!_portPositionDirty) return;
+            _portPositionDirty = false;
+
+            ApplyPortPositions();
+        }
+
+        /// <summary>
+        /// Apply correct port positions based on the combined state:
+        ///   State A: Node collapsed -> all ports to node vertical center
+        ///   State B: Node expanded + section collapsed -> ports to section header Y
+        ///   State C: Node expanded + section expanded -> ports at normal position (zero)
+        /// </summary>
+        private void ApplyPortPositions()
         {
             var allPorts = new List<Port>();
             foreach (var kvp in TagConditionPorts) allPorts.Add(kvp.Value);
@@ -215,32 +264,35 @@ namespace AnoGame.AnoFlow.Editor
             foreach (var kvp in ConditionPorts) allPorts.Add(kvp.Value);
             if (allPorts.Count == 0) return;
 
-            if (!expanded)
+            bool currentExpanded = expanded;
+
+            // --- State A: Node collapsed ---
+            if (!currentExpanded)
             {
-                // Node fully collapsed: move all ports to node's vertical center
-                float nodeTop = worldBound.y;
                 float nodeH = resolvedStyle.height;
-                float targetY = nodeTop + nodeH * 0.5f;
+                if (nodeH <= 0) return; // layout not ready
+                float targetY = worldBound.y + nodeH * 0.5f;
+
                 foreach (var port in allPorts)
                 {
-                    float portY = port.worldBound.center.y;
-                    port.transform.position = new Vector3(0, targetY - portY, 0);
+                    float portCY = port.worldBound.center.y;
+                    port.transform.position = new Vector3(0, targetY - portCY, 0);
                 }
+                ForceEdgeRepaint();
                 return;
             }
 
-            // Node expanded: check each port's section collapse state
+            // --- State B/C: Node expanded, check each section ---
             foreach (var port in allPorts)
             {
-                // Navigate: port -> row -> body -> section, section[0] = header
                 var row = port.parent;
                 var body = row?.parent;
-                if (body == null) { port.transform.position = Vector3.zero; continue; }
+                if (body == null) continue;
 
                 float bodyHeight = body.resolvedStyle.height;
                 if (bodyHeight < 1f)
                 {
-                    // Section is collapsed: move port to header center Y
+                    // State B: Section collapsed -> move port to header center Y
                     var section = body.parent;
                     var header = section?.ElementAt(0);
                     if (header != null)
@@ -250,10 +302,24 @@ namespace AnoGame.AnoFlow.Editor
                         port.transform.position = new Vector3(0, headerCY - portCY, 0);
                     }
                 }
-                else
+                // State C: Section expanded -> transform already zero
+            }
+            ForceEdgeRepaint();
+        }
+
+        /// <summary>
+        /// Force edge/connector repaint after port transforms change.
+        /// </summary>
+        private void ForceEdgeRepaint()
+        {
+            // Get the GraphView and mark edges for repaint
+            var graphView = GetFirstAncestorOfType<GraphView>();
+            if (graphView != null)
+            {
+                foreach (var edge in graphView.edges.ToList())
                 {
-                    // Section is expanded: reset transform
-                    port.transform.position = Vector3.zero;
+                    edge.MarkDirtyRepaint();
+                    edge.UpdateEdgeControl();
                 }
             }
         }
@@ -311,6 +377,7 @@ namespace AnoGame.AnoFlow.Editor
             {
                 if (evt.button != 0) return;
                 bool isVisible = capturedBody.resolvedStyle.height > 0;
+                Debug.Log($"[PortDbg][USER] SectionToggle '{capturedArrowLabel}' in '{EventData.EventId}': wasVisible={isVisible} -> collapsed={isVisible} nodeExpanded={expanded}");
                 SetBodyCollapsed(capturedBody, isVisible);
                 string newArrow = isVisible ? arrowRight : arrowDown;
                 capturedLabel.text = $"{newArrow} {capturedArrowLabel} ({capturedCount})";

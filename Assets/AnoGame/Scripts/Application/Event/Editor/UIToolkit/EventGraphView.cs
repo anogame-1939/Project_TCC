@@ -288,6 +288,7 @@ namespace AnoGame.AnoFlow.Editor
         /// </summary>
         public void ToggleSection(string sectionName)
         {
+            UnityEngine.Debug.Log($"[PortDbg][USER] Toolbar ToggleSection '{sectionName}'");
             switch (sectionName)
             {
                 case "ResultTags": SectionVis.ResultTags = !SectionVis.ResultTags; break;
@@ -303,6 +304,7 @@ namespace AnoGame.AnoFlow.Editor
         /// </summary>
         public void ToggleAllSections(bool expand)
         {
+            UnityEngine.Debug.Log($"[PortDbg][USER] Toolbar ToggleAllSections expand={expand}");
             SectionVis.ResultTags = expand;
             SectionVis.ConditionTags = expand;
             SectionVis.RequiredEvents = expand;
