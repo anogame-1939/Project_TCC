@@ -18,6 +18,7 @@ namespace AnoGame.AnoFlow.Editor
         private Dictionary<string, string> _itemNameMap;
         private Dictionary<string, EventNodeView> _nodeMap = new Dictionary<string, EventNodeView>();
         private bool _editMode = false;
+        private bool _showNegativeEdges = false;
 
         /// <summary>
         /// Shared section visibility state for all nodes.
@@ -131,6 +132,8 @@ namespace AnoGame.AnoFlow.Editor
                 foreach (var tag in cTags)
                 {
                     if (string.IsNullOrEmpty(tag)) continue;
+                    // ネガティブタグはここではスキップ（後のブロックで処理）
+                    if (tag.StartsWith("!")) continue;
                     if (!tagProducers.TryGetValue(tag, out var producers)) continue;
 
                     foreach (var producerId in producers)
@@ -143,6 +146,38 @@ namespace AnoGame.AnoFlow.Editor
                         {
                             var edge = sourceNode.OutputPort.ConnectTo(tagPort);
                             AddElement(edge);
+                        }
+                    }
+                }
+            }
+
+            // 4. Create Negative Edges from conditionTags with "!" prefix
+            if (_showNegativeEdges)
+            {
+                foreach (var ed in _eventDataList)
+                {
+                    if (!_nodeMap.ContainsKey(ed.EventId)) continue;
+                    var targetNode = _nodeMap[ed.EventId];
+
+                    var cTags2 = ed.ConditionTags;
+                    if (cTags2 == null) continue;
+
+                    foreach (var tag in cTags2)
+                    {
+                        if (string.IsNullOrEmpty(tag) || !tag.StartsWith("!")) continue;
+                        var realTag = tag.Substring(1);
+                        if (!tagProducers.TryGetValue(realTag, out var producers)) continue;
+
+                        foreach (var producerId in producers)
+                        {
+                            if (producerId == ed.EventId) continue;
+                            if (!_nodeMap.TryGetValue(producerId, out var sourceNode)) continue;
+
+                            if (targetNode.NegativeTagPorts.TryGetValue(tag, out var negPort))
+                            {
+                                var edge = sourceNode.OutputPort.ConnectTo(negPort);
+                                AddElement(edge);
+                            }
                         }
                     }
                 }
@@ -289,6 +324,15 @@ namespace AnoGame.AnoFlow.Editor
                     el.style.display = display;
                 });
             }
+        }
+
+        /// <summary>
+        /// Toggle negative edge visibility and rebuild.
+        /// </summary>
+        public void SetShowNegativeEdges(bool show)
+        {
+            _showNegativeEdges = show;
+            RebuildGraph(null);
         }
 
         /// <summary>

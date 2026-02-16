@@ -29,6 +29,7 @@ namespace AnoGame.AnoFlow.Editor
 
         public Dictionary<string, Port> ConditionPorts { get; private set; } = new Dictionary<string, Port>();
         public Dictionary<string, Port> TagConditionPorts { get; private set; } = new Dictionary<string, Port>();
+        public Dictionary<string, Port> NegativeTagPorts { get; private set; } = new Dictionary<string, Port>();
 
         public Action OnRequiredEventsChanged;
         public Action OnTagsChanged;
@@ -149,6 +150,112 @@ namespace AnoGame.AnoFlow.Editor
 
             extensionContainer.Add(container);
             RefreshExpandedState();
+
+            // Defer port position update after initial layout
+            SchedulePortPositionUpdate();
+
+            // Monitor extensionContainer collapse (node's built-in collapse button)
+            // RefreshExpandedState is not virtual, so we detect changes via GeometryChanged
+            extensionContainer.RegisterCallback<GeometryChangedEvent>(_ => OnExtensionGeometryChanged());
+        }
+
+        /// <summary>
+        /// Detect when extensionContainer is hidden by GraphView's collapse
+        /// and override display:none with position:absolute + height:0.
+        /// </summary>
+        private void OnExtensionGeometryChanged()
+        {
+            if (extensionContainer == null) return;
+
+            if (!expanded)
+            {
+                // Node is collapsed by the built-in toggle
+                if (extensionContainer.resolvedStyle.display == DisplayStyle.None)
+                {
+                    extensionContainer.style.display = DisplayStyle.Flex;
+                    extensionContainer.style.position = Position.Absolute;
+                    extensionContainer.style.height = 0;
+                    extensionContainer.style.overflow = Overflow.Hidden;
+                    extensionContainer.style.left = 0;
+                    extensionContainer.style.right = 0;
+                    extensionContainer.style.top = 0;
+                    SchedulePortPositionUpdate();
+                }
+            }
+            else
+            {
+                // Node is expanded: ensure normal layout
+                extensionContainer.style.position = Position.Relative;
+                extensionContainer.style.height = new StyleLength(StyleKeyword.Auto);
+                extensionContainer.style.overflow = Overflow.Visible;
+                extensionContainer.style.top = StyleKeyword.Null;
+                SchedulePortPositionUpdate();
+            }
+        }
+
+        /// <summary>
+        /// Schedule a deferred port position update after layout.
+        /// </summary>
+        private void SchedulePortPositionUpdate()
+        {
+            schedule.Execute(() => UpdatePortPositions());
+        }
+
+        /// <summary>
+        /// Adjust port transforms so edges connect at the correct visual position.
+        /// - Section collapsed (header visible): ports moved to header Y
+        /// - Node fully collapsed: ports moved to node vertical center
+        /// - Expanded: transforms reset to zero
+        /// </summary>
+        private void UpdatePortPositions()
+        {
+            var allPorts = new List<Port>();
+            foreach (var kvp in TagConditionPorts) allPorts.Add(kvp.Value);
+            foreach (var kvp in NegativeTagPorts) allPorts.Add(kvp.Value);
+            foreach (var kvp in ConditionPorts) allPorts.Add(kvp.Value);
+            if (allPorts.Count == 0) return;
+
+            if (!expanded)
+            {
+                // Node fully collapsed: move all ports to node's vertical center
+                float nodeTop = worldBound.y;
+                float nodeH = resolvedStyle.height;
+                float targetY = nodeTop + nodeH * 0.5f;
+                foreach (var port in allPorts)
+                {
+                    float portY = port.worldBound.center.y;
+                    port.transform.position = new Vector3(0, targetY - portY, 0);
+                }
+                return;
+            }
+
+            // Node expanded: check each port's section collapse state
+            foreach (var port in allPorts)
+            {
+                // Navigate: port -> row -> body -> section, section[0] = header
+                var row = port.parent;
+                var body = row?.parent;
+                if (body == null) { port.transform.position = Vector3.zero; continue; }
+
+                float bodyHeight = body.resolvedStyle.height;
+                if (bodyHeight < 1f)
+                {
+                    // Section is collapsed: move port to header center Y
+                    var section = body.parent;
+                    var header = section?.ElementAt(0);
+                    if (header != null)
+                    {
+                        float headerCY = header.worldBound.center.y;
+                        float portCY = port.worldBound.center.y;
+                        port.transform.position = new Vector3(0, headerCY - portCY, 0);
+                    }
+                }
+                else
+                {
+                    // Section is expanded: reset transform
+                    port.transform.position = Vector3.zero;
+                }
+            }
         }
 
         /// <summary>
@@ -167,7 +274,9 @@ namespace AnoGame.AnoFlow.Editor
 
             // Count for badge
             int count = GetSectionCount(label);
-            string arrow = expanded ? "\u25BC" : "\u25B6";
+            string arrowDown = "\u25BE"; // small down triangle
+            string arrowRight = "\u25B8"; // small right triangle
+            string arrow = expanded ? arrowDown : arrowRight;
             var headerLabel = new Label($"{arrow} {label} ({count})");
             headerLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             headerLabel.style.fontSize = 12;
@@ -185,10 +294,11 @@ namespace AnoGame.AnoFlow.Editor
 
             section.Add(header);
 
-            // Body
+            // Body — use height:0 + overflow:hidden instead of display:none
+            // to keep ports in the layout tree for edge routing.
             var body = new VisualElement();
-            body.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
             body.style.paddingLeft = 4;
+            SetBodyCollapsed(body, !expanded);
             buildContent(body);
             section.Add(body);
 
@@ -200,15 +310,30 @@ namespace AnoGame.AnoFlow.Editor
             header.RegisterCallback<MouseDownEvent>(evt =>
             {
                 if (evt.button != 0) return;
-                bool isVisible = capturedBody.style.display == DisplayStyle.Flex;
-                capturedBody.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
-                string newArrow = isVisible ? "\u25B6" : "\u25BC";
+                bool isVisible = capturedBody.resolvedStyle.height > 0;
+                SetBodyCollapsed(capturedBody, isVisible);
+                string newArrow = isVisible ? arrowRight : arrowDown;
                 capturedLabel.text = $"{newArrow} {capturedArrowLabel} ({capturedCount})";
+                SchedulePortPositionUpdate();
                 evt.StopPropagation();
             });
 
             parent.Add(section);
             return section;
+        }
+
+        private static void SetBodyCollapsed(VisualElement body, bool collapsed)
+        {
+            if (collapsed)
+            {
+                body.style.height = 0;
+                body.style.overflow = Overflow.Hidden;
+            }
+            else
+            {
+                body.style.height = new StyleLength(StyleKeyword.Auto);
+                body.style.overflow = Overflow.Visible;
+            }
         }
 
         private int GetSectionCount(string label)
@@ -267,7 +392,9 @@ namespace AnoGame.AnoFlow.Editor
 
         private void AddTagConditionPortRow(string tag)
         {
-            bool satisfied = _allKnownTags.Contains(tag);
+            bool isNegative = tag.StartsWith("!");
+            string realTag = isNegative ? tag.Substring(1) : tag;
+            bool satisfied = _allKnownTags.Contains(realTag);
 
             var row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
@@ -281,10 +408,26 @@ namespace AnoGame.AnoFlow.Editor
             condPort.style.minWidth = 16;
             row.Add(condPort);
 
-            TagConditionPorts[tag] = condPort;
+            if (isNegative)
+            {
+                condPort.portColor = new Color(1f, 0.27f, 0.27f);
+                NegativeTagPorts[tag] = condPort;
+            }
+            else
+            {
+                TagConditionPorts[tag] = condPort;
+            }
 
-            var lbl = new Label($"{(satisfied ? "\u2713" : "\u2717")} {tag}");
-            lbl.style.color = satisfied ? new Color(0.5f, 0.85f, 1f) : new Color(1f, 0.5f, 0.5f);
+            string icon = isNegative ? "\u2717" : (satisfied ? "\u2713" : "\u2717");
+            var lbl = new Label($"{icon} {tag}");
+            if (isNegative)
+            {
+                lbl.style.color = new Color(1f, 0.4f, 0.4f);
+            }
+            else
+            {
+                lbl.style.color = satisfied ? new Color(0.5f, 0.85f, 1f) : new Color(1f, 0.5f, 0.5f);
+            }
             lbl.style.marginLeft = 4;
             lbl.style.flexGrow = 1;
             row.Add(lbl);
@@ -400,11 +543,37 @@ namespace AnoGame.AnoFlow.Editor
             else
                 foreach (var t in EventData.ConditionTags) currentTags.Add(t);
 
-            var available = existingTags.Where(t => !currentTags.Contains(t)).OrderBy(t => t).ToList();
+            var available = existingTags.Where(t => !currentTags.Contains(t) && !t.StartsWith("!")).OrderBy(t => t).ToList();
             foreach (var tag in available)
             {
                 var capturedTag = tag;
                 menu.AddItem(new GUIContent($"既存/{capturedTag}"), false, () => AddTag(fieldName, capturedTag, callback));
+            }
+
+            // conditionTags の場合のみ: resultTags から ! 付きネガティブ候補を生成
+            if (fieldName == "conditionTags")
+            {
+                var resultTags = new HashSet<string>();
+                foreach (var ed in _allEventDataList)
+                {
+                    foreach (var t in ed.ResultTags)
+                        if (!string.IsNullOrEmpty(t)) resultTags.Add(t);
+                }
+
+                var negCandidates = resultTags
+                    .Select(t => "!" + t)
+                    .Where(nt => !currentTags.Contains(nt))
+                    .OrderBy(t => t)
+                    .ToList();
+
+                if (negCandidates.Count > 0)
+                {
+                    foreach (var neg in negCandidates)
+                    {
+                        var capturedNeg = neg;
+                        menu.AddItem(new GUIContent($"否定/{capturedNeg}"), false, () => AddTag(fieldName, capturedNeg, callback));
+                    }
+                }
             }
 
             menu.AddSeparator("");
@@ -667,7 +836,13 @@ namespace AnoGame.AnoFlow.Editor
 
             if (reqEvents != null) foreach (var eid in reqEvents) { total++; if (_knownEventIds.Contains(eid)) satisfied++; }
             if (reqItems != null) foreach (var iid in reqItems) { total++; if (_knownItemIds.Contains(iid)) satisfied++; }
-            if (cTags != null) foreach (var t in cTags) { total++; if (_allKnownTags.Contains(t)) satisfied++; }
+            if (cTags != null) foreach (var t in cTags)
+                {
+                    // ネガティブタグは ! を除いた実タグ名で判定
+                    string realTag = t.StartsWith("!") ? t.Substring(1) : t;
+                    total++;
+                    if (_allKnownTags.Contains(realTag)) satisfied++;
+                }
 
             if (total > 0 && satisfied == total) { style.borderLeftColor = new Color(0.4f, 0.8f, 0.4f); style.borderLeftWidth = 3; }
             else if (satisfied > 0) { style.borderLeftColor = new Color(0.9f, 0.8f, 0.3f); style.borderLeftWidth = 3; }

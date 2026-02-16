@@ -19,6 +19,10 @@ namespace AnoGame.Domain.Event.Conditions
 
         public bool IsSatisfied()
         {
+            if (_tag.StartsWith("!"))
+            {
+                return !_eventService.HasTag(_tag.Substring(1));
+            }
             return _eventService.HasTag(_tag);
         }
     }

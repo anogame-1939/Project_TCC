@@ -124,6 +124,19 @@ namespace AnoGame.AnoFlow.Editor
             });
             toolbar.Add(editToggle);
 
+            // Negative lines toggle
+            var negativeToggle = new ToolbarToggle()
+            {
+                text = "Negative",
+                value = false
+            };
+            negativeToggle.tooltip = "ネガティブタグ(!付き)の\n抑制ラインを表示";
+            negativeToggle.RegisterValueChangedCallback(evt =>
+            {
+                _graphView?.SetShowNegativeEdges(evt.newValue);
+            });
+            toolbar.Add(negativeToggle);
+
             root.Add(toolbar);
 
             // Graph View
