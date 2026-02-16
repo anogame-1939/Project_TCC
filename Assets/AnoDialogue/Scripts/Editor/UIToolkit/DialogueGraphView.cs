@@ -314,15 +314,17 @@ namespace AnoGame.AnoDialogue.Editor
             // Get position in graph space
             var localMousePos = contentViewContainer.WorldToLocal(evt.mousePosition);
 
-            evt.menu.AppendAction("Add Node", action =>
-            {
-                CreateNode(localMousePos);
-            });
+            // ノードまたはノードの子要素を右クリックしたかを判定
+            var targetNode = evt.target as DialogueNodeView
+                ?? (evt.target as VisualElement)?.GetFirstAncestorOfType<DialogueNodeView>();
 
-            // If clicked on a node, add more options
-            var targetNode = evt.target as DialogueNodeView;
             if (targetNode != null)
             {
+                // ノード上で右クリック → 対象ノードの後ろに接続
+                evt.menu.AppendAction("Add Node", action =>
+                {
+                    CreateNodeAfter(targetNode.Unit, localMousePos);
+                });
                 evt.menu.AppendAction("Insert Node After", action =>
                 {
                     InsertNodeAfter(targetNode.Unit);
@@ -331,6 +333,14 @@ namespace AnoGame.AnoDialogue.Editor
                 evt.menu.AppendAction("Delete Node", action =>
                 {
                     DeleteNode(targetNode);
+                });
+            }
+            else
+            {
+                // 空白エリアで右クリック → 従来通り
+                evt.menu.AppendAction("Add Node", action =>
+                {
+                    CreateNode(localMousePos);
                 });
             }
         }
@@ -359,6 +369,29 @@ namespace AnoGame.AnoDialogue.Editor
             MarkDataDirty();
         }
 
+        private void CreateNodeAfter(ConversationUnit parent, Vector2 position)
+        {
+            string newID = GenerateNextID();
+
+            var newUnit = new ConversationUnit
+            {
+                ID = newID,
+                EpisodeID = parent.EpisodeID,
+                ChapterID = parent.ChapterID,
+                SectionID = parent.SectionID,
+                SpeakerName = parent.SpeakerName,  // スピーカー引き継ぎ
+                BodyText = "New Text",
+                Position = position,
+                NextID = parent.NextID  // 元の接続先を引き継ぐ
+            };
+
+            parent.NextID = newID;  // 親の接続先を新ノードに変更
+            Data.Conversations.Add(newUnit);
+
+            PopulateGraph();
+            MarkDataDirty();
+        }
+
         private void InsertNodeAfter(ConversationUnit parent)
         {
             string newID = GenerateNextID();
@@ -370,7 +403,7 @@ namespace AnoGame.AnoDialogue.Editor
                 EpisodeID = parent.EpisodeID,
                 ChapterID = parent.ChapterID,
                 SectionID = parent.SectionID,
-                SpeakerName = "New Speaker",
+                SpeakerName = parent.SpeakerName,  // スピーカー引き継ぎ
                 BodyText = "New Text",
                 Position = newPos,
                 NextID = parent.NextID
