@@ -10,3 +10,5 @@ trigger: always_on
   - プロフェッショナルさを維持し、業務ツールとしてふさわしい外観にすること。
 
 3.エディタツールに関する作業を行う際は、`Assets/AnoGame/Documents/EditorToolsList.md` を参照し、既存ツールの一覧・構成を把握すること。
+
+4.Unity標準コンポーネント（CanvasGroup, PlayableDirector等）のエディタ拡張は、`Assets/AnoUtility/` に配置すること。アセンブリは `AnoUtility.Editor`（名前空間: `AnoGame.Utility.Editor`）を使用する。

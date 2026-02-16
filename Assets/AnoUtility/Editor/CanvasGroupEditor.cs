@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace AnoGame.Editor
+namespace AnoGame.Utility.Editor
 {
     /// <summary>
     /// CanvasGroup のカスタムインスペクター。

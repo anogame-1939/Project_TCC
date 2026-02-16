@@ -31,7 +31,7 @@
 | 対象クラス | スクリプト | 配置 |
 |---|---|---|
 | GameManager | GameManagerEditor.cs | Editor/ |
-| PlayableDirector | PlayableDirectorEditor.cs | Editor/ |
+| PlayableDirector | PlayableDirectorEditor.cs | AnoUtility/Editor/ |
 | MonoBehaviour (ButtonAttribute) | ButtonAttributeEditor.cs | Editor/ |
 | EnemyBehaviorCoordinator | ComponentDescriptionEditor.cs | Editor/Attributes/ |
 | ItemData | ItemDataEditor.cs | Editor/ |
@@ -47,7 +47,7 @@
 | PlayerSpawnManager | PlayerSpawnManager.cs (内部クラス) | Application/Story/ |
 | ObjectMover | ObjectMover.cs (内部クラス) | Application/Common/Movement/ |
 | LoreSceneManager | LoreSceneManager.cs (内部クラス) | Application/Lore/ |
-| CanvasGroup | CanvasGroupEditor.cs | Editor/ |
+| CanvasGroup | CanvasGroupEditor.cs | AnoUtility/Editor/ |
 
 ---
 
