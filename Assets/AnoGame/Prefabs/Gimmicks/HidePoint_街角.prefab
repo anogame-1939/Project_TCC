@@ -1,115 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &51269535614876606
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9044958787728310892}
-  - component: {fileID: 8049410504976815159}
-  m_Layer: 26
-  m_Name: "\u4F1A\u8A71-\u540C\u3058\u3068\u3053\u308D\u306B\u96A0\u308C\u305F"
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9044958787728310892
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 51269535614876606}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5159853401283360565}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8049410504976815159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 51269535614876606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c593457cd8105e148906690e1707c592, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trigger: 32
-  condition:
-    luaConditions: []
-    questConditions: []
-    acceptedTags: []
-    acceptedGameObjects: []
-    luaWizardIndex: -1
-    lastEvaluationValue: 0
-  setQuestState: 1
-  questName: 
-  questState: 0
-  setQuestEntryState: 0
-  questEntryNumber: 1
-  questEntryState: 0
-  setAnotherQuestEntryState: 0
-  anotherQuestEntryNumber: 1
-  anotherQuestEntryState: 0
-  luaCode: 
-  sequence: 
-  sequenceSpeaker: {fileID: 0}
-  sequenceListener: {fileID: 0}
-  waitOneFrameOnStartOrEnable: 1
-  alertMessage: 
-  textTable: {fileID: 0}
-  alertDuration: 0
-  sendMessages: []
-  barkSource: 0
-  barkConversation: 
-  barkEntryID: -1
-  barkEntryTitle: 
-  barkText: 
-  barkTextSequence: 
-  barker: {fileID: 0}
-  barkTarget: {fileID: 0}
-  barkOrder: 0
-  allowBarksDuringConversations: 0
-  skipBarkIfNoValidEntries: 0
-  cacheBarkLines: 0
-  conversation: "\u3048\uFF1F"
-  conversationConversant: {fileID: 0}
-  conversationActor: {fileID: 0}
-  startConversationEntryID: -1
-  startConversationEntryTitle: 
-  overrideDialogueUI: {fileID: 0}
-  exclusive: 0
-  replace: 0
-  queue: 0
-  skipIfNoValidEntries: 0
-  preventRestartOnSameFrameEnded: 0
-  stopConversationOnTriggerExit: 0
-  marginToAllowTriggerExit: 0.2
-  stopConversationIfTooFar: 0
-  maxConversationDistance: 5
-  monitorConversationDistanceFrequency: 1
-  showCursorDuringConversation: 0
-  pauseGameDuringConversation: 0
-  setActiveActions: []
-  setEnabledActions: []
-  setAnimatorStateActions: []
-  onExecute:
-    m_PersistentCalls:
-      m_Calls: []
-  useConversationTitlePicker: 1
-  useBarkTitlePicker: 1
-  useQuestNamePicker: 1
-  selectedDatabase: {fileID: 11400000, guid: 98727bc873ff59a4caa1f95efb58c24f, type: 2}
 --- !u!1 &1381427303680215063
 GameObject:
   m_ObjectHideFlags: 0
@@ -145,7 +35,6 @@ Transform:
   - {fileID: 1846274546223140678}
   - {fileID: 6884587272267763949}
   - {fileID: 8809934198233056231}
-  - {fileID: 9044958787728310892}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &6482113794637398334
@@ -251,6 +140,8 @@ MonoBehaviour:
   hideColor: {r: 0.2, g: 1, b: 0.2, a: 1}
   exitColor: {r: 1, g: 0.9, b: 0.2, a: 1}
   invalidColor: {r: 1, g: 0.3, b: 0.3, a: 0.8}
+  playerHideColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  fadeDuration: 0.25
   forceDetectionRadius: 5
   OnSpotEnabled:
     m_PersistentCalls:
@@ -600,7 +491,7 @@ PlayableDirector:
   m_SceneBindings: []
   m_ExposedReferences:
     m_References:
-    - 783e7778db4a1a84da8ff3a6db7f98dd: {fileID: 8049410504976815159}
+    - 783e7778db4a1a84da8ff3a6db7f98dd: {fileID: 0}
 --- !u!114 &5276482608095532610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,6 +505,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playableDirector: {fileID: 7338428895587865915}
+  OnSkip:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8061706526239902773
 GameObject:
   m_ObjectHideFlags: 0
