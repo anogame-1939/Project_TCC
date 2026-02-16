@@ -27,6 +27,8 @@ namespace AnoGame.AnoFlow
         [SerializeField] private string prompt = "調べる";
         [SerializeField] private float maxDistance = 2.0f;
         [SerializeField] private int priority = 100;
+        [Tooltip("一度だけ実行する（falseなら条件を満たす限り何度でも実行可能）")]
+        [SerializeField] private bool once = true;
 
         [Header("Reference")]
         [SerializeField] private Transform uiAnchor;
@@ -108,8 +110,8 @@ namespace AnoGame.AnoFlow
 
         private bool CheckConditions()
         {
-            // 自分自身のイベントがクリア済みなら再実行不可
-            if (!string.IsNullOrEmpty(targetEventId) && _eventService.IsEventCleared(targetEventId))
+            // once が有効なら、クリア済みイベントの再実行を不可にする
+            if (once && !string.IsNullOrEmpty(targetEventId) && _eventService.IsEventCleared(targetEventId))
                 return false;
 
             if (eventData == null) return true;
@@ -135,14 +137,15 @@ namespace AnoGame.AnoFlow
                 }
             }
 
-            // ConditionTags チェック
+            // ConditionTags チェック（TagCondition経由でネガティブタグ対応）
             var tags = eventData.ConditionTags;
             if (tags != null)
             {
                 foreach (var tag in tags)
                 {
                     if (string.IsNullOrEmpty(tag)) continue;
-                    if (!_eventService.HasTag(tag)) return false;
+                    var condition = new TagCondition(_eventService, tag);
+                    if (!condition.IsSatisfied()) return false;
                 }
             }
 

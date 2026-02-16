@@ -4,6 +4,7 @@ using AnoGame.Domain.Event.Services;
 using AnoGame.Domain.Inventory.Services;
 using AnoGame.Application.Attributes;
 using AnoGame.Data;
+using AnoGame.Domain.Event.Conditions;
 using System.Collections;
 
 namespace AnoGame.AnoFlow
@@ -117,14 +118,15 @@ namespace AnoGame.AnoFlow
                 }
             }
 
-            // ConditionTags チェック
+            // ConditionTags チェック（TagCondition経由でネガティブタグ対応）
             var tags = eventData.ConditionTags;
             if (tags != null)
             {
                 foreach (var tag in tags)
                 {
                     if (string.IsNullOrEmpty(tag)) continue;
-                    if (!_eventService.HasTag(tag)) return false;
+                    var condition = new TagCondition(_eventService, tag);
+                    if (!condition.IsSatisfied()) return false;
                 }
             }
 
