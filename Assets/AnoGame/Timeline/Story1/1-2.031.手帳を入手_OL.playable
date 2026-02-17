@@ -103,102 +103,6 @@ MonoBehaviour:
     exposedName: 11b38e84d5c35cb478172af86c494cce
     defaultValue: {fileID: 0}
   lockDuringClip: 1
---- !u!114 &-4134226771969880218
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b22792c3b570444eb18cb78c2af3a74, type: 3}
-  m_Name: Audio Track
-  m_EditorClassIdentifier: 
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 1
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
-  m_Children: []
-  m_Clips:
-  - m_Version: 1
-    m_Start: 1.3912018140589573
-    m_ClipIn: 0
-    m_Asset: {fileID: 4682414295360296122}
-    m_Duration: 1.708798185941043
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: -4134226771969880218}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: -1
-    m_BlendOutDuration: -1
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: "\u9375\u3092\u958B\u3051\u308B"
-  m_Markers:
-    m_Objects: []
-  m_TrackProperties:
-    volume: 1
-    stereoPan: 0
-    spatialBlend: 0
 --- !u!114 &-3490104461896661420
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -229,8 +133,8 @@ MonoBehaviour:
     m_ParentTrack: {fileID: -3490104461896661420}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
-    m_BlendInDuration: -1
-    m_BlendOutDuration: -1
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
     m_MixInCurve:
       serializedVersion: 2
       m_Curve:
@@ -363,10 +267,9 @@ MonoBehaviour:
   m_Version: 0
   m_Tracks:
   - {fileID: -8877074514443128755}
-  - {fileID: -522117497010346519}
-  - {fileID: -4134226771969880218}
   - {fileID: 6602941771608377786}
   - {fileID: -3490104461896661420}
+  - {fileID: -522117497010346519}
   m_FixedDuration: 0
   m_EditorSettings:
     m_Framerate: 60
@@ -395,23 +298,6 @@ MonoBehaviour:
     exposedName: dc7dddb8c2cb03442aff82d08cc30b9b
     defaultValue: {fileID: 0}
   lockDuringClip: 1
---- !u!114 &4682414295360296122
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f10dd60657c6004587f237a7e90f8e4, type: 3}
-  m_Name: AudioPlayableAsset
-  m_EditorClassIdentifier: 
-  m_Clip: {fileID: 8300000, guid: 909f715d22682284cb792cc458e43893, type: 3}
-  m_Loop: 0
-  m_bufferingTime: 0.1
-  m_ClipProperties:
-    volume: 1
 --- !u!114 &5532071500544941842
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -629,7 +515,7 @@ MonoBehaviour:
   targetSection: -1
   conversationID: bec43d69-82ad-4630-827c-db0d26c446a2
   dialogueStyleName: "\u901A\u5E38"
-  styleDatabase: {fileID: 0}
+  styleDatabase: {fileID: 11400000, guid: f2be86183cd92044c884d519222012b3, type: 2}
   pauseTimeline: 1
   sceneImage: {fileID: 0}
 --- !u!114 &7519028460448919917

@@ -23,6 +23,7 @@
 | `AnoGame/Tools/Set Timeline Track Bindings` | TimelineBindingSetter.cs | MenuItem | タイムライントラックバインディング設定 |
 | `Assets/AnoGame/EventData/選択にGUIDを再割当` | EventDataEditor.cs | MenuItem | EventDataへのGUID再割当 |
 | `Assets/AnoGame/EventData/選択で空欄のみGUID自動生成` | EventDataEditor.cs | MenuItem | 空欄EventDataへのGUID自動生成 |
+| `Tools/Quick Component Adder` | QuickComponentAdderWindow.cs | EditorWindow | コンポーネントのクイック追加（最近使用＋ピン留め） |
 
 ---
 

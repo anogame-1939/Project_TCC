@@ -38,7 +38,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1226771445821150488}
-  - {fileID: 4280178499455391243}
   - {fileID: 5868558777045696873}
   - {fileID: 852082930714119076}
   - {fileID: 4252962010695339569}
@@ -162,8 +161,11 @@ MonoBehaviour:
   onEventFailed:
     m_PersistentCalls:
       m_Calls: []
-  conditionComponents: []
   supersededByEvents: []
+  conditionComponents: []
+  requiredItems: []
+  requiredEvents: []
+  checkConditionsOnDone: 0
   _onStart: 0
 --- !u!114 &807376814126595737
 MonoBehaviour:
@@ -178,6 +180,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playableDirector: {fileID: 6197756624100819944}
+  OnSkip:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!320 &6197756624100819944
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -214,11 +219,11 @@ PlayableDirector:
     - b255f589aac42fa4cb38c688f14b9b4d: {fileID: 5016246648226631651}
     - 3ceedd29c1350de45b9e6c0e02b15cd0: {fileID: 0}
     - b6e578ac5c8b01f41b8b8c8f8d961841: {fileID: 6103519738143389011}
-    - 5adb2b17f8d5fe343a6d179432f51b9d: {fileID: 8649194280664472256}
+    - 5adb2b17f8d5fe343a6d179432f51b9d: {fileID: 0}
     - 9a960fb98583673409f334b24776c486: {fileID: 0}
     - 8a8710166d8336446aa0e9bd69ce5fde: {fileID: 0}
     - 2cfc916eaaf0b054dab2acb3a0b22b3e: {fileID: 0}
-    - 9b541a20460f63144bc6c46497532495: {fileID: 8649194280664472256}
+    - 9b541a20460f63144bc6c46497532495: {fileID: 0}
 --- !u!82 &2245014349688498223
 AudioSource:
   m_ObjectHideFlags: 0
@@ -674,116 +679,6 @@ MonoBehaviour:
   m_MaximumFOV: 60
   m_MinimumOrthoSize: 1
   m_MaximumOrthoSize: 5000
---- !u!1 &5645723850889141723
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4280178499455391243}
-  - component: {fileID: 8649194280664472256}
-  m_Layer: 0
-  m_Name: "\u4F1A\u8A71"
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4280178499455391243
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5645723850889141723}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 1, z: 0.25}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2081986805372154829}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8649194280664472256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5645723850889141723}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c593457cd8105e148906690e1707c592, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trigger: 32
-  condition:
-    luaConditions: []
-    questConditions: []
-    acceptedTags: []
-    acceptedGameObjects: []
-    luaWizardIndex: -1
-    lastEvaluationValue: 0
-  setQuestState: 1
-  questName: 
-  questState: 0
-  setQuestEntryState: 0
-  questEntryNumber: 1
-  questEntryState: 0
-  setAnotherQuestEntryState: 0
-  anotherQuestEntryNumber: 1
-  anotherQuestEntryState: 0
-  luaCode: 
-  sequence: 
-  sequenceSpeaker: {fileID: 0}
-  sequenceListener: {fileID: 0}
-  waitOneFrameOnStartOrEnable: 1
-  alertMessage: 
-  textTable: {fileID: 0}
-  alertDuration: 0
-  sendMessages: []
-  barkSource: 0
-  barkConversation: 
-  barkEntryID: -1
-  barkEntryTitle: 
-  barkText: 
-  barkTextSequence: 
-  barker: {fileID: 0}
-  barkTarget: {fileID: 0}
-  barkOrder: 0
-  allowBarksDuringConversations: 0
-  skipBarkIfNoValidEntries: 0
-  cacheBarkLines: 0
-  conversation: "\u624B\u304C\u304B\u308A\u3092\u63A2\u305D\u3046"
-  conversationConversant: {fileID: 0}
-  conversationActor: {fileID: 4280178499455391243}
-  startConversationEntryID: -1
-  startConversationEntryTitle: 
-  overrideDialogueUI: {fileID: 0}
-  exclusive: 0
-  replace: 0
-  queue: 0
-  skipIfNoValidEntries: 0
-  preventRestartOnSameFrameEnded: 0
-  stopConversationOnTriggerExit: 0
-  marginToAllowTriggerExit: 0.2
-  stopConversationIfTooFar: 0
-  maxConversationDistance: 5
-  monitorConversationDistanceFrequency: 1
-  showCursorDuringConversation: 0
-  pauseGameDuringConversation: 0
-  setActiveActions: []
-  setEnabledActions: []
-  setAnimatorStateActions: []
-  onExecute:
-    m_PersistentCalls:
-      m_Calls: []
-  useConversationTitlePicker: 1
-  useBarkTitlePicker: 1
-  useQuestNamePicker: 1
-  selectedDatabase: {fileID: 11400000, guid: 98727bc873ff59a4caa1f95efb58c24f, type: 2}
 --- !u!1 &8131473492116748777
 GameObject:
   m_ObjectHideFlags: 0
