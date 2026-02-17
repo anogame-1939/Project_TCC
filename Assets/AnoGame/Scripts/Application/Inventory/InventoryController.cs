@@ -6,7 +6,6 @@ using AnoGame.Application.Input;
 using UnityEngine.EventSystems;
 using AnoGame.AnoFlow;
 using AnoGame.Domain.Inventory.Services;
-using PixelCrushers.DialogueSystem;
 using UnityEngine.Events;
 using Localizer;
 using Cysharp.Threading.Tasks;
@@ -258,10 +257,6 @@ namespace AnoGame.Application.Inventory
                 // 3. C#の標準機能で置換 ({0} の部分に displayName が入る)
                 // FormattedText.Parseを通すのは、太字(<b>)などのタグが含まれる場合に有効
                 titleText = string.Format(formatStr, displayName);
-
-                // もしフォーマット文字列自体に [em1] などのDialogue System用タグが含まれる場合は
-                // string.Formatした後に Parse します
-                titleText = FormattedText.Parse(titleText).text;
             }
             catch (System.Exception e)
             {
