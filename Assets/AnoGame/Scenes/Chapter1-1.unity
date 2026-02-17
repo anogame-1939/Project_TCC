@@ -3814,6 +3814,7 @@ GameObject:
   - component: {fileID: 496294228}
   - component: {fileID: 496294227}
   - component: {fileID: 496294226}
+  - component: {fileID: 496294231}
   m_Layer: 0
   m_Name: "\u30A4\u30D9\u30F3\u30C8\u30A8\u30EA\u30A2"
   m_TagString: Untagged
@@ -3984,22 +3985,9 @@ MonoBehaviour:
   onPlayerEnter:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1696939021}
-        m_TargetAssemblyTypeName: AnoGame.Application.Direction.DirectionHandler,
-          AnoGame.Application
-        m_MethodName: StatEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 496294227}
-        m_TargetAssemblyTypeName: UnityEngine.Playables.PlayableDirector, UnityEngine
-        m_MethodName: Play
+      - m_Target: {fileID: 496294231}
+        m_TargetAssemblyTypeName: AnoGame.AnoFlow.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4053,6 +4041,22 @@ Transform:
   - {fileID: 332735018}
   m_Father: {fileID: 1359481943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &496294231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496294225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d3a4c169d8c2449acfe5e9af1af2a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playableDirector: {fileID: 496294227}
+  OnSkip:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &512242492
 GameObject:
   m_ObjectHideFlags: 0
