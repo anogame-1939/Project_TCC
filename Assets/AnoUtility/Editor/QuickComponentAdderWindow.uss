@@ -1,0 +1,114 @@
+/* ========================================================
+   QuickComponentAdderWindow.uss
+   Quick Component Adder EditorWindow styles
+   ======================================================== */
+
+/* ── Root ── */
+.root {
+    padding: 4px;
+}
+
+/* ── Section ── */
+.section {
+    margin-bottom: 6px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    padding-bottom: 4px;
+}
+
+.section-header {
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 6px;
+    margin-bottom: 2px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 3px;
+    cursor: link;
+}
+
+.section-header:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.section-header-label {
+    -unity-font-style: bold;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.section-content {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+/* ── Component Row ── */
+.component-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 4px;
+    margin: 1px 0;
+    border-radius: 3px;
+}
+
+.component-row:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Add Button ── */
+.add-button {
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+    padding: 3px 8px;
+    margin: 0;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.03);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.add-button:hover {
+    background-color: rgba(80, 140, 220, 0.18);
+    border-color: rgba(80, 140, 220, 0.35);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.add-button:active {
+    background-color: rgba(80, 140, 220, 0.30);
+}
+
+/* ── Remove Button ── */
+.remove-button {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+    padding: 0;
+    border-width: 0;
+    border-radius: 3px;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 12px;
+    -unity-text-align: middle-center;
+}
+
+.remove-button:hover {
+    background-color: rgba(220, 80, 80, 0.25);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Empty / Info labels ── */
+.info-label {
+    padding: 8px;
+    -unity-text-align: middle-center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    -unity-font-style: italic;
+}
+
+.no-selection-label {
+    padding: 16px 8px;
+    -unity-text-align: middle-center;
+    font-size: 11px;
+    color: rgba(255, 200, 80, 0.6);
+}
