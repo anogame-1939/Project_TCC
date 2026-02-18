@@ -86800,7 +86800,7 @@ MonoBehaviour:
   viewAngle: 360
   losMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 3733978367
   uiAnchor: {fileID: 0}
   prompt: "\u8ABF\u3079\u308B\uFF08\u9577\u62BC\u3057\uFF09"
   priority: 500
@@ -99205,10 +99205,9 @@ MonoBehaviour:
   onPlayerEnter:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PixelCrushers.DialogueSystem.DialogueSystemTrigger,
-          Assembly-CSharp-firstpass
-        m_MethodName: OnUse
+      - m_Target: {fileID: 1842080252}
+        m_TargetAssemblyTypeName: AnoGame.AnoFlow.TimelineController, AnoGame.Application
+        m_MethodName: Enqueue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
