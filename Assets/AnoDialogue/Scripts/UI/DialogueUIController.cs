@@ -75,6 +75,7 @@ namespace AnoGame.AnoDialogue.UI
             base.Awake();
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
             if (portraitImage) portraitImage.enabled = false;
+            if (locationImage) locationImage.sprite = null;
             if (sceneImageCanvasGroup)
             {
                 sceneImageCanvasGroup.alpha = 0f;

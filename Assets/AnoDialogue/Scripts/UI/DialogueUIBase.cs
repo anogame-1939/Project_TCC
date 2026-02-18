@@ -11,7 +11,7 @@ namespace AnoGame.AnoDialogue.UI
         [SerializeField] protected DialogueStyle styleData;
 
         [Tooltip("The name of the style this UI handles (e.g. 'Standard', 'Narration')")]
-        [SerializeField] protected string styleName = "Standard";
+        [SerializeField] protected string styleName = "";
 
         public DialogueStyle StyleData => styleData;
         public string StyleName => styleName;

@@ -132,7 +132,7 @@ namespace AnoGame.AnoDialogue
 
         public void RegisterUI(UI.DialogueUIBase ui, string styleName)
         {
-            if (string.IsNullOrEmpty(styleName)) styleName = "Standard";
+            if (string.IsNullOrEmpty(styleName)) return;
 
             if (!registeredUIs.ContainsKey(styleName))
             {
@@ -143,8 +143,8 @@ namespace AnoGame.AnoDialogue
                 registeredUIs[styleName] = ui;
             }
 
-            // Set default active UI if none, or if this is the "Standard" one
-            if (activeUI == null || styleName == "Standard")
+            // 最初に登録されたUIをデフォルトのactiveUIとする
+            if (activeUI == null)
             {
                 activeUI = ui;
             }
@@ -228,24 +228,19 @@ namespace AnoGame.AnoDialogue
 
         private UI.DialogueUIBase ResolveUI(string styleName)
         {
-            if (string.IsNullOrEmpty(styleName)) styleName = "Standard";
-
-            // 1. Try specific style
-            if (registeredUIs.TryGetValue(styleName, out var ui))
+            // スタイル名が指定されている場合、辞書から検索
+            if (!string.IsNullOrEmpty(styleName))
             {
-                return ui;
+                if (registeredUIs.TryGetValue(styleName, out var ui))
+                {
+                    return ui;
+                }
+
+                UnityEngine.Debug.LogWarning($"[DialogueManager] Style '{styleName}' not found in registered UIs.");
             }
 
-            // 2. Fallback to any first registered UI
-            if (registeredUIs.Count > 0)
-            {
-                // Just grab the first one
-                var e = registeredUIs.GetEnumerator();
-                e.MoveNext();
-                return e.Current.Value;
-            }
-
-            return null;
+            // 未指定またはスタイル未登録の場合、activeUI を返す
+            return activeUI;
         }
 
         public void PreviewConversation(string id, string styleName = null)
