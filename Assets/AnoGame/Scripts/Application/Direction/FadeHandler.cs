@@ -12,6 +12,17 @@ namespace AnoGame.Application.Direction
         public void FadeOut() => FadeOut(_defaultDuration);
         public void FadeOutIn() => FadeOutIn(_defaultDuration);
 
+        /// <summary>
+        /// Timeline の ProcessFrame から直接 Range 値を設定する。
+        /// コルーチンを使わず、即座に反映される。
+        /// </summary>
+        /// <param name="range">0 = 透明（画面表示）/ 1 = 暗転（フェードアウト）</param>
+        public void SetFadeRange(float range, Color? color = null)
+        {
+            if (FadeManager.Instance == null) return;
+            FadeManager.Instance.SetRange(range, color);
+        }
+
         public void FadeIn(float duration, Color? color = null)
         {
             // ← ここをあなたの実装に合わせて差し替え

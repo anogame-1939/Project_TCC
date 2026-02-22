@@ -24,6 +24,20 @@ namespace AnoGame.Application.UI
         }
 
         /// <summary>
+        /// Timeline から直接呼ばれる。進行中のコルーチンを停止し、即座に Range を設定する。
+        /// </summary>
+        public void SetRange(float range, Color? color = null)
+        {
+            if (_fadeCoroutine != null)
+            {
+                StopCoroutine(_fadeCoroutine);
+                _fadeCoroutine = null;
+            }
+            if (color.HasValue) _fadeImage.SetColor(color.Value);
+            _fadeImage.Range = Mathf.Clamp01(range);
+        }
+
+        /// <summary>
         /// 指定した秒数かけてフェードインを行います
         /// </summary>
         /// <param name="duration">フェードにかかる時間(秒)</param>

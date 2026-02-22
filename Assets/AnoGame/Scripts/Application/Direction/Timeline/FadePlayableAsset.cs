@@ -12,16 +12,11 @@ namespace AnoGame.Application.Direction.Timeline
     {
         public FadeClipKind kind = FadeClipKind.In;
 
-        [Tooltip("true: クリップ長をフェード時間にする / false: 下のdurationを使う")]
-        public bool useClipDuration = true;
-
-        [Min(0f)] public new float duration = 0.5f;
         public Color color = Color.black;
 
         [Tooltip("クリップ終了時にフェード状態を維持するか")]
         public bool keepFadeState = true;
 
-        // 連続再生やブレンドは不要なのでミニマム
         public ClipCaps clipCaps => ClipCaps.None;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
@@ -29,8 +24,6 @@ namespace AnoGame.Application.Direction.Timeline
             var playable = ScriptPlayable<FadePlayableBehaviour>.Create(graph);
             var behaviour = playable.GetBehaviour();
             behaviour.kind = kind;
-            behaviour.useClipDuration = useClipDuration;
-            behaviour.durationOverride = duration;
             behaviour.color = color;
             behaviour.keepFadeState = keepFadeState;
             return playable;
