@@ -488,14 +488,31 @@ namespace AnoGame.AnoDialogue.Editor
             return matchEp && matchCh && matchSec && matchName;
         }
 
+        /// <summary>
+        /// Debounce handle for deferred save and sidebar rebuild.
+        /// Prevents heavy I/O and UI rebuild on every keystroke.
+        /// </summary>
+        private IVisualElementScheduledItem _debouncedSave;
+        private const long DEBOUNCE_MS = 500;
+
         private void MarkDataDirty()
         {
             if (Data != null)
             {
                 EditorUtility.SetDirty(Data);
-                AssetDatabase.SaveAssetIfDirty(Data);
             }
-            OnGraphDataChanged?.Invoke();
+
+            // デバウンス: 最後の変更から500ms後に保存・通知
+            _debouncedSave?.Pause();
+            _debouncedSave = schedule.Execute(() =>
+            {
+                if (Data != null)
+                {
+                    AssetDatabase.SaveAssetIfDirty(Data);
+                }
+                OnGraphDataChanged?.Invoke();
+            });
+            _debouncedSave.ExecuteLater(DEBOUNCE_MS);
         }
 
         /// <summary>
