@@ -34302,6 +34302,7 @@ Transform:
   - {fileID: 1240075653}
   - {fileID: 982771356}
   - {fileID: 623907635}
+  - {fileID: 699527001}
   - {fileID: 1766016249}
   - {fileID: 66325254}
   - {fileID: 352167988}
@@ -35500,7 +35501,7 @@ PlayableDirector:
   - key: {fileID: 3264712915023521575, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
     value: {fileID: 297600888}
   - key: {fileID: 449741529492234224, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
-    value: {fileID: 982771357}
+    value: {fileID: 699527000}
   - key: {fileID: -7178159759275161130, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
     value: {fileID: 83172803}
   - key: {fileID: 8653748433332878582, guid: a3dd385a66d11164e80c970204c2a204, type: 2}
@@ -37399,6 +37400,131 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.116, z: 0}
   m_TimeToStationary: 0.5
+--- !u!1 &699526999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 699527001}
+  - component: {fileID: 699527000}
+  m_Layer: 0
+  m_Name: SG_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &699527000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699526999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: 04c4fcb71aec90d45838aef305c4cb2c, type: 2}
+    - {fileID: 11400000, guid: ce46b255c18bdfb498ae73c023a442b7, type: 2}
+    - {fileID: 11400000, guid: ef2d015743edef74faab243476b64e2e, type: 2}
+    - {fileID: 11400000, guid: c896f1eadb933534a95bf4642393ef7b, type: 2}
+    - {fileID: 11400000, guid: 4e77bf9346370b141a7c37c2349a067d, type: 2}
+    - {fileID: 11400000, guid: 522a92ddb360bd740ad260c04d10f9ad, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 352167987}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.StoryController, AnoGame.Application
+          m_MethodName: LoadStory
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls: []
+    - m_PersistentCalls:
+        m_Calls: []
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 202650622}
+          m_TargetAssemblyTypeName: AnoGame.Application.Audio.AudioController, AnoGame.Application
+          m_MethodName: Play
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 202650622}
+          m_TargetAssemblyTypeName: AnoGame.Application.Audio.AudioController, AnoGame.Application
+          m_MethodName: Stop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 297600892}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: SetEnemyInputBlocked
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 297600892}
+          m_TargetAssemblyTypeName: AnoGame.Application.Story.EnemyMoveHandler, AnoGame.Application
+          m_MethodName: StopHeartbeat
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+--- !u!4 &699527001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699526999}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 569869563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &701892661
 GameObject:
   m_ObjectHideFlags: 0
@@ -75422,9 +75548,9 @@ MonoBehaviour:
     m_Events:
     - m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 352167987}
-          m_TargetAssemblyTypeName: AnoGame.Application.Story.StoryController, AnoGame.Application
-          m_MethodName: LoadStory
+        - m_Target: {fileID: 623907637}
+          m_TargetAssemblyTypeName: AnoGame.AnoFlow.TimelineController, AnoGame.Application
+          m_MethodName: Enqueue
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -75435,35 +75561,9 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
     - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1844276547}
-          m_TargetAssemblyTypeName: AnoGame.Application.UI.FlashbackUIController,
-            AnoGame.Application
-          m_MethodName: ShowFlashback
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 21300000, guid: 3f924b98c07bc4f5295ad23572b5d0e7, type: 3}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Sprite, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1844276547}
-          m_TargetAssemblyTypeName: AnoGame.Application.UI.FlashbackUIController,
-            AnoGame.Application
-          m_MethodName: HideFlashback
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 202650622}
@@ -99368,17 +99468,6 @@ PlayableDirector:
     value: {fileID: 297600889}
   m_ExposedReferences:
     m_References: []
---- !u!114 &1844276547 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7336159414962673463, guid: 94f59451a93668444be8afab5ed6246b, type: 3}
-  m_PrefabInstance: {fileID: 297600886}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e485a1148987fbe41ae8cf43379c6a82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1845765699
 GameObject:
   m_ObjectHideFlags: 0

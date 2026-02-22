@@ -322,6 +322,22 @@ MonoBehaviour:
     particleColor: {r: 1, g: 1, b: 1, a: 1}
     playThreshold: 0.083
     stopThreshold: 1
+--- !u!114 &-3312567546271844337
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
+  m_Name: Signal Emitter(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  m_Time: 27.53333333333333
+  m_Retroactive: 0
+  m_EmitOnce: 0
+  m_Asset: {fileID: 11400000, guid: 4e77bf9346370b141a7c37c2349a067d, type: 2}
 --- !u!114 &-3104032321964325513
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -506,8 +522,6 @@ MonoBehaviour:
   m_Name: FadePlayableAsset(Clone)(Clone)
   m_EditorClassIdentifier: 
   kind: 1
-  useClipDuration: 1
-  duration: 0.5
   color: {r: 1, g: 1, b: 1, a: 1}
   keepFadeState: 1
 --- !u!114 &11400000
@@ -655,6 +669,7 @@ MonoBehaviour:
   m_Markers:
     m_Objects:
     - {fileID: 5674089572325500570}
+    - {fileID: -3312567546271844337}
 --- !u!114 &503102219070874574
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -806,8 +821,6 @@ MonoBehaviour:
   m_Name: FadePlayableAsset
   m_EditorClassIdentifier: 
   kind: 0
-  useClipDuration: 1
-  duration: 0.5
   color: {r: 1, g: 1, b: 1, a: 1}
   keepFadeState: 1
 --- !u!114 &3264712915023521575
@@ -990,7 +1003,6 @@ MonoBehaviour:
   dialogueStyleName: "\u901A\u5E38"
   styleDatabase: {fileID: 11400000, guid: f2be86183cd92044c884d519222012b3, type: 2}
   pauseTimeline: 1
-  sceneImage: {fileID: 0}
 --- !u!114 &5505125096453514648
 MonoBehaviour:
   m_ObjectHideFlags: 1
