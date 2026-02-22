@@ -36,7 +36,13 @@ namespace AnoGame.AnoDialogue.Editor
             {
                 var list = _cachedStyleDb.styleNames.ToList();
                 int index = list.IndexOf(styleNameProp.stringValue);
-                if (index < 0) index = 0;
+                if (index < 0)
+                {
+                    index = 0;
+                    // 初期値が空または未登録の場合、最初のスタイルを自動設定
+                    styleNameProp.stringValue = list[0];
+                    serializedObject.ApplyModifiedProperties();
+                }
 
                 var dropdown = new DropdownField("Style Name", list, index);
                 dropdown.RegisterValueChangedCallback(evt =>
@@ -45,13 +51,6 @@ namespace AnoGame.AnoDialogue.Editor
                     serializedObject.ApplyModifiedProperties();
                 });
                 styleSection.Add(dropdown);
-
-                // 初期値が空なら最初のスタイルを設定
-                if (string.IsNullOrEmpty(styleNameProp.stringValue))
-                {
-                    styleNameProp.stringValue = list[0];
-                    serializedObject.ApplyModifiedProperties();
-                }
             }
             else
             {

@@ -40,9 +40,12 @@ namespace AnoGame.AnoDialogue.Timeline
         /// </summary>
         public void ShowSceneImage(string styleName, Sprite sprite)
         {
+            Debug.Log($"[DialogueTimelineReceiver] ShowSceneImage called: style={styleName}, sprite={(sprite != null ? sprite.name : "NULL")}, ManagerExists={DialogueManager.Instance != null}");
+
             if (DialogueManager.Instance != null)
             {
                 var display = DialogueManager.Instance.GetSceneImageDisplay(styleName);
+                Debug.Log($"[DialogueTimelineReceiver] GetSceneImageDisplay('{styleName}') => {(display != null ? display.gameObject.name : "NULL")}");
                 if (display != null)
                 {
                     display.Show(sprite);
@@ -51,6 +54,10 @@ namespace AnoGame.AnoDialogue.Timeline
                 {
                     Debug.LogWarning($"[DialogueTimelineReceiver] SceneImageDisplay not found for style: {styleName}");
                 }
+            }
+            else
+            {
+                Debug.LogWarning("[DialogueTimelineReceiver] DialogueManager.Instance is NULL!");
             }
         }
 

@@ -43,6 +43,11 @@ namespace AnoGame.AnoDialogue.UI
             if (DialogueManager.Instance != null)
             {
                 DialogueManager.Instance.RegisterSceneImageDisplay(this, styleName);
+                Debug.Log($"[SceneImageDisplay] Registered: styleName='{styleName}', go={gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"[SceneImageDisplay] Start: DialogueManager.Instance is NULL! Cannot register styleName='{styleName}'");
             }
         }
 
@@ -51,6 +56,8 @@ namespace AnoGame.AnoDialogue.UI
         /// </summary>
         public void Show(Sprite sprite)
         {
+            Debug.Log($"[SceneImageDisplay] Show: sprite={(sprite != null ? sprite.name : "NULL")}, targetImage={(targetImage != null ? "OK" : "NULL")}, go={gameObject.name}");
+
             if (targetImage != null)
             {
                 targetImage.sprite = sprite;
@@ -65,6 +72,7 @@ namespace AnoGame.AnoDialogue.UI
         /// </summary>
         public void Hide()
         {
+            Debug.Log($"[SceneImageDisplay] Hide: go={gameObject.name}");
             if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
             _fadeCoroutine = StartCoroutine(Fade(0f));
         }

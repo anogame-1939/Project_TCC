@@ -15,7 +15,11 @@ namespace AnoGame.AnoDialogue.Timeline
             base.ProcessFrame(playable, info, playerData);
 
             var receiver = playerData as DialogueTimelineReceiver;
-            if (receiver == null) return;
+            if (receiver == null)
+            {
+                Debug.LogWarning("[SceneImageMixer] ProcessFrame: playerData (receiver) is NULL! Track binding may be missing.");
+                return;
+            }
 
             int inputCount = playable.GetInputCount();
             for (int i = 0; i < inputCount; i++)
@@ -25,6 +29,10 @@ namespace AnoGame.AnoDialogue.Timeline
                 {
                     var inputPlayable = playable.GetInput(i);
                     var behaviour = ((ScriptPlayable<SceneImageBehaviour>)inputPlayable).GetBehaviour();
+                    if (behaviour.receiver == null)
+                    {
+                        Debug.Log($"[SceneImageMixer] Assigning receiver to behaviour[{i}]: sprite={(behaviour.sceneImage != null ? behaviour.sceneImage.name : "NULL")}");
+                    }
                     behaviour.receiver = receiver;
                 }
             }

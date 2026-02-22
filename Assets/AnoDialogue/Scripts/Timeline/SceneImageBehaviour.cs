@@ -17,11 +17,21 @@ namespace AnoGame.AnoDialogue.Timeline
 
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
+            Debug.Log($"[SceneImageBehaviour] OnBehaviourPlay: isShowing={_isShowing}, isPlaying={Application.isPlaying}, receiver={(receiver != null ? "OK" : "NULL")}, sprite={(sceneImage != null ? sceneImage.name : "NULL")}, style={dialogueStyleName}");
+
             if (_isShowing || !Application.isPlaying) return;
 
-            if (receiver == null) return;
+            if (receiver == null)
+            {
+                Debug.LogWarning("[SceneImageBehaviour] OnBehaviourPlay: receiver is NULL, skipping.");
+                return;
+            }
 
-            if (sceneImage == null) return;
+            if (sceneImage == null)
+            {
+                Debug.LogWarning("[SceneImageBehaviour] OnBehaviourPlay: sceneImage is NULL, skipping.");
+                return;
+            }
 
             _isShowing = true;
             receiver.ShowSceneImage(dialogueStyleName, sceneImage);
@@ -34,6 +44,7 @@ namespace AnoGame.AnoDialogue.Timeline
             {
                 if (sceneImage != null)
                 {
+                    Debug.Log($"[SceneImageBehaviour] ProcessFrame fallback: showing sprite={sceneImage.name}, style={dialogueStyleName}");
                     _isShowing = true;
                     receiver.ShowSceneImage(dialogueStyleName, sceneImage);
                 }

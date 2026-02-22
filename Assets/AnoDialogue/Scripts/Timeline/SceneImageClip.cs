@@ -25,6 +25,8 @@ namespace AnoGame.AnoDialogue.Timeline
             behaviour.sceneImage = sceneImage;
             behaviour.dialogueStyleName = dialogueStyleName;
 
+            Debug.Log($"[SceneImageClip] CreatePlayable: sprite={(sceneImage != null ? sceneImage.name : "NULL")}, style={dialogueStyleName}");
+
             return playable;
         }
     }

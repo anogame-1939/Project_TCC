@@ -89,7 +89,13 @@ namespace AnoGame.AnoDialogue.Editor
 
             var list = db.styleNames.ToList();
             int index = list.IndexOf(styleNameProp.stringValue);
-            if (index < 0) index = 0;
+            if (index < 0)
+            {
+                index = 0;
+                // 初期値が空または未登録の場合、最初のスタイルを自動設定
+                styleNameProp.stringValue = list[0];
+                serializedObject.ApplyModifiedProperties();
+            }
 
             var dropdown = new DropdownField("Target Style", list, index);
             dropdown.RegisterValueChangedCallback(evt =>
