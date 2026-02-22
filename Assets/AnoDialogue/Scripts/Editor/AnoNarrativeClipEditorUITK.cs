@@ -29,7 +29,6 @@ namespace AnoGame.AnoDialogue.Editor
         private HelpBox _selectionInfo;
         private TextField _convIDField;
         private Foldout _candidatesFoldout;
-        private VisualElement _sceneImageSection;
 
         private const string PrefsKeyEp = "AnoNarrative_Filter_Ep";
         private const string PrefsKeyCh = "AnoNarrative_Filter_Ch";
@@ -61,9 +60,6 @@ namespace AnoGame.AnoDialogue.Editor
 
             // ── Style Database ──
             BuildStyleSection(root);
-
-            // ── Scene Image ──
-            BuildSceneImageSection(root);
 
             // ── Separator ──
             root.Add(CreateSeparator());
@@ -157,47 +153,14 @@ namespace AnoGame.AnoDialogue.Editor
             {
                 styleNameProp.stringValue = evt.newValue;
                 serializedObject.ApplyModifiedProperties();
-                UpdateSceneImageSectionVisibility(evt.newValue);
             });
             container.Add(dropdown);
 
             // 初期表示時にも可視性を更新
-            container.schedule.Execute(() => UpdateSceneImageSectionVisibility(styleNameProp.stringValue));
+
         }
 
-        // ────────────────────────────────────────────────
-        // Scene Image Section
-        // ────────────────────────────────────────────────
-        private void BuildSceneImageSection(VisualElement root)
-        {
-            _sceneImageSection = new VisualElement();
 
-            var sceneImageProp = serializedObject.FindProperty("sceneImage");
-            if (sceneImageProp != null)
-            {
-                var imgField = new PropertyField(sceneImageProp, "Scene Image");
-                _sceneImageSection.Add(imgField);
-            }
-
-            root.Add(_sceneImageSection);
-        }
-
-        private void UpdateSceneImageSectionVisibility(string styleName)
-        {
-            if (_sceneImageSection == null) return;
-
-            // StyleDatabase から supportsSceneImage を取得
-            var styleDbProp = serializedObject.FindProperty("styleDatabase");
-            var db = styleDbProp?.objectReferenceValue as AnoGame.AnoDialogue.Data.DialogueStyle;
-
-            bool supports = true;
-            if (db != null)
-            {
-                supports = db.GetSupportsSceneImage(styleName);
-            }
-
-            _sceneImageSection.style.display = supports ? DisplayStyle.Flex : DisplayStyle.None;
-        }
 
         // ────────────────────────────────────────────────
         // Selection

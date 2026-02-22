@@ -4,8 +4,7 @@ namespace AnoGame.Application.UI
 {
     /// <summary>
     /// Flashback用の薄いラッパー。
-    /// AnoDialogue側のFlashbackUIControllerに背景画像制御が統合されたため、
-    /// 必要に応じてこのクラスから呼び出す。
+    /// SceneImageDisplay で背景画像を制御する。
     /// </summary>
     public class FlashbackUIController : MonoBehaviour
     {
@@ -13,10 +12,10 @@ namespace AnoGame.Application.UI
         {
             if (AnoGame.AnoDialogue.DialogueManager.Instance != null)
             {
-                var flashbackUI = AnoGame.AnoDialogue.DialogueManager.Instance.GetUI("Flashback");
-                if (flashbackUI != null)
+                var display = AnoGame.AnoDialogue.DialogueManager.Instance.GetSceneImageDisplay("Flashback");
+                if (display != null)
                 {
-                    flashbackUI.SetSceneImage(sprite);
+                    display.Show(sprite);
                 }
             }
         }
@@ -25,10 +24,10 @@ namespace AnoGame.Application.UI
         {
             if (AnoGame.AnoDialogue.DialogueManager.Instance != null)
             {
-                var flashbackUI = AnoGame.AnoDialogue.DialogueManager.Instance.GetUI("Flashback");
-                if (flashbackUI != null)
+                var display = AnoGame.AnoDialogue.DialogueManager.Instance.GetSceneImageDisplay("Flashback");
+                if (display != null)
                 {
-                    flashbackUI.ClearSceneImage();
+                    display.Hide();
                 }
             }
         }

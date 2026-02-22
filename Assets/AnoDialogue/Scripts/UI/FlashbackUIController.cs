@@ -13,9 +13,6 @@ namespace AnoGame.AnoDialogue.UI
         [SerializeField] private TextMeshProUGUI bodyText;
         [SerializeField] private Button continueButton;
 
-        [Header("Background")]
-        [SerializeField] private Image backgroundImage;
-
         [Header("Settings")]
         [SerializeField] private float typingSpeed = 0.08f;
 
@@ -32,31 +29,8 @@ namespace AnoGame.AnoDialogue.UI
         protected override void Awake()
         {
             base.Awake();
-            if (backgroundImage) backgroundImage.enabled = false;
         }
 
-        /// <summary>
-        /// シーン画像を設定する（回想スタイルでは背景として使用）。
-        /// </summary>
-        public override void SetSceneImage(Sprite sprite)
-        {
-            if (backgroundImage != null)
-            {
-                backgroundImage.sprite = sprite;
-            }
-        }
-
-        /// <summary>
-        /// シーン画像をクリアする。
-        /// </summary>
-        public override void ClearSceneImage()
-        {
-            if (backgroundImage != null)
-            {
-                backgroundImage.sprite = null;
-                backgroundImage.enabled = false;
-            }
-        }
 
         public override void ShowConversation(ConversationUnit unit)
         {
@@ -66,11 +40,6 @@ namespace AnoGame.AnoDialogue.UI
 
             if (speakerNameText) speakerNameText.text = unit.SpeakerName;
 
-            // 背景画像を表示
-            if (backgroundImage && backgroundImage.sprite != null)
-            {
-                backgroundImage.enabled = true;
-            }
 
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
@@ -89,10 +58,7 @@ namespace AnoGame.AnoDialogue.UI
                 bodyText.maxVisibleCharacters = 99999;
             }
 
-            if (backgroundImage && backgroundImage.sprite != null)
-            {
-                backgroundImage.enabled = true;
-            }
+
         }
 
         public override void Close()
@@ -100,12 +66,6 @@ namespace AnoGame.AnoDialogue.UI
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
             SetPanelActive(false);
-
-            // 背景画像を非表示
-            if (backgroundImage)
-            {
-                backgroundImage.enabled = false;
-            }
         }
 
         private IEnumerator TypeText(string content)

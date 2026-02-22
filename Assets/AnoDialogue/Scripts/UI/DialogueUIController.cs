@@ -15,11 +15,6 @@ namespace AnoGame.AnoDialogue.UI
         [SerializeField] private Image portraitImage;
         [SerializeField] private Button continueButton;
 
-        [Header("Scene Image")]
-        [SerializeField] private Image locationImage;
-        [Tooltip("マスク含む親のCanvasGroup。フェードの制御に使用")]
-        [SerializeField] private CanvasGroup sceneImageCanvasGroup;
-
         [Header("Choices")]
         [SerializeField] private Transform choiceContainer;
         [SerializeField] private Button choiceButtonPrefab;
@@ -38,7 +33,6 @@ namespace AnoGame.AnoDialogue.UI
         private ConversationUnit currentUnit;
         private Coroutine typingCoroutine;
         private Coroutine currentPortraitRoutine;
-        private Coroutine currentSceneImageRoutine;
         private Coroutine activeChoiceRoutine;
         private bool isTyping = false;
         private bool isSkipping = false;
@@ -75,34 +69,6 @@ namespace AnoGame.AnoDialogue.UI
             base.Awake();
             if (choiceButtonPrefab) choiceButtonPrefab.gameObject.SetActive(false);
             if (portraitImage) portraitImage.enabled = false;
-            if (locationImage) locationImage.sprite = null;
-            if (sceneImageCanvasGroup)
-            {
-                sceneImageCanvasGroup.alpha = 0f;
-            }
-        }
-
-        /// <summary>
-        /// シーン画像を設定する（通常スタイルではロケーション画像として使用）。
-        /// </summary>
-        public override void SetSceneImage(Sprite sprite)
-        {
-            if (locationImage != null)
-            {
-                locationImage.sprite = sprite;
-            }
-        }
-
-        /// <summary>
-        /// シーン画像をクリアする。フェードアウトして非表示にする。
-        /// </summary>
-        public override void ClearSceneImage()
-        {
-            if (locationImage != null)
-            {
-                if (currentSceneImageRoutine != null) StopCoroutine(currentSceneImageRoutine);
-                currentSceneImageRoutine = StartCoroutine(FadeSceneImage(null));
-            }
         }
 
         // Start/OnEnable handled by Base, but we can override if needed. 
@@ -122,12 +88,6 @@ namespace AnoGame.AnoDialogue.UI
                 UpdatePortrait(sprite);
             }
 
-            // ロケーション画像のフェード表示
-            if (locationImage && locationImage.sprite != null)
-            {
-                if (currentSceneImageRoutine != null) StopCoroutine(currentSceneImageRoutine);
-                currentSceneImageRoutine = StartCoroutine(FadeSceneImage(locationImage.sprite));
-            }
 
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(unit.BodyText));
@@ -315,12 +275,6 @@ namespace AnoGame.AnoDialogue.UI
                 portraitImage.color = c;
             }
 
-            // ロケーション画像をフェードアウト
-            if (sceneImageCanvasGroup && sceneImageCanvasGroup.alpha > 0f)
-            {
-                if (currentSceneImageRoutine != null) StopCoroutine(currentSceneImageRoutine);
-                currentSceneImageRoutine = StartCoroutine(FadeSceneImage(null));
-            }
         }
 
         private void Update()
@@ -398,62 +352,6 @@ namespace AnoGame.AnoDialogue.UI
             }
         }
 
-        /// <summary>
-        /// ロケーション画像のフェードイン/フェードアウト。
-        /// CanvasGroup.alphaで制御するため、マスク含む親要素全体がフェードする。
-        /// sprite != null でフェードイン、null でフェードアウト。
-        /// </summary>
-        private IEnumerator FadeSceneImage(Sprite newSprite)
-        {
-            if (sceneImageCanvasGroup == null) yield break;
-
-            if (newSprite != null)
-            {
-                // 既に同じスプライトで表示中ならスキップ
-                if (locationImage != null && sceneImageCanvasGroup.alpha > 0.9f
-                    && locationImage.sprite == newSprite)
-                {
-                    yield break;
-                }
-
-                if (locationImage != null)
-                {
-                    locationImage.sprite = newSprite;
-                }
-
-                float startAlpha = sceneImageCanvasGroup.alpha;
-                float t = 0f;
-
-                while (t < portraitFadeDuration)
-                {
-                    t += Time.deltaTime;
-                    sceneImageCanvasGroup.alpha = Mathf.Lerp(startAlpha, 1f, t / portraitFadeDuration);
-                    yield return null;
-                }
-                sceneImageCanvasGroup.alpha = 1f;
-            }
-            else
-            {
-                // フェードアウト
-                if (sceneImageCanvasGroup.alpha <= 0f) yield break;
-
-                float startAlpha = sceneImageCanvasGroup.alpha;
-                float t = 0f;
-
-                while (t < portraitFadeDuration)
-                {
-                    t += Time.deltaTime;
-                    sceneImageCanvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, t / portraitFadeDuration);
-                    yield return null;
-                }
-                sceneImageCanvasGroup.alpha = 0f;
-
-                if (locationImage != null)
-                {
-                    locationImage.sprite = null;
-                }
-            }
-        }
 
         private IEnumerator SelectFirstChoiceDelayed(GameObject target)
         {

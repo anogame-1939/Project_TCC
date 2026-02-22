@@ -55,15 +55,5 @@ namespace AnoGame.AnoDialogue.UI
         public abstract void Close();
         public abstract void OnClickNext();
 
-        /// <summary>
-        /// シーン画像を設定する。スタイルによって用途が異なる（ロケーション画像/背景等）。
-        /// 対応しないスタイルでは空実装。
-        /// </summary>
-        public virtual void SetSceneImage(Sprite sprite) { }
-
-        /// <summary>
-        /// シーン画像をクリアする。
-        /// </summary>
-        public virtual void ClearSceneImage() { }
     }
 }

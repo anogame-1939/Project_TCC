@@ -130,6 +130,33 @@ namespace AnoGame.AnoDialogue
         private Dictionary<string, UI.DialogueUIBase> registeredUIs = new Dictionary<string, UI.DialogueUIBase>();
         private UI.DialogueUIBase activeUI;
 
+        // SceneImageDisplay Reference
+        private Dictionary<string, UI.SceneImageDisplay> registeredSceneImageDisplays = new Dictionary<string, UI.SceneImageDisplay>();
+
+        public void RegisterSceneImageDisplay(UI.SceneImageDisplay display, string styleName)
+        {
+            if (string.IsNullOrEmpty(styleName)) return;
+
+            if (!registeredSceneImageDisplays.ContainsKey(styleName))
+            {
+                registeredSceneImageDisplays.Add(styleName, display);
+            }
+            else
+            {
+                registeredSceneImageDisplays[styleName] = display;
+            }
+        }
+
+        /// <summary>
+        /// スタイル名に対応する SceneImageDisplay を取得する。
+        /// </summary>
+        public UI.SceneImageDisplay GetSceneImageDisplay(string styleName)
+        {
+            if (string.IsNullOrEmpty(styleName)) return null;
+            registeredSceneImageDisplays.TryGetValue(styleName, out var display);
+            return display;
+        }
+
         public void RegisterUI(UI.DialogueUIBase ui, string styleName)
         {
             if (string.IsNullOrEmpty(styleName)) return;

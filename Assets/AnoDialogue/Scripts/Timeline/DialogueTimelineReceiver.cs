@@ -35,21 +35,38 @@ namespace AnoGame.AnoDialogue.Timeline
             }
         }
 
-        public void Play(string conversationID, string styleName, Sprite sceneImage)
+        /// <summary>
+        /// SceneImageTrack から呼ばれる。指定スタイルの SceneImageDisplay にシーン画像を表示する。
+        /// </summary>
+        public void ShowSceneImage(string styleName, Sprite sprite)
         {
             if (DialogueManager.Instance != null)
             {
-                // スタイルに応じたシーン画像設定（ロケーション画像/背景等）
-                if (sceneImage != null)
+                var display = DialogueManager.Instance.GetSceneImageDisplay(styleName);
+                if (display != null)
                 {
-                    var ui = DialogueManager.Instance.GetUI(styleName);
-                    if (ui != null)
-                    {
-                        ui.SetSceneImage(sceneImage);
-                    }
+                    display.Show(sprite);
+                }
+                else
+                {
+                    Debug.LogWarning($"[DialogueTimelineReceiver] SceneImageDisplay not found for style: {styleName}");
                 }
             }
-            Play(conversationID, styleName);
+        }
+
+        /// <summary>
+        /// SceneImageTrack から呼ばれる。指定スタイルの SceneImageDisplay のシーン画像を非表示にする。
+        /// </summary>
+        public void HideSceneImage(string styleName)
+        {
+            if (DialogueManager.Instance != null)
+            {
+                var display = DialogueManager.Instance.GetSceneImageDisplay(styleName);
+                if (display != null)
+                {
+                    display.Hide();
+                }
+            }
         }
 
         private void SimulatePlay(string conversationID)
