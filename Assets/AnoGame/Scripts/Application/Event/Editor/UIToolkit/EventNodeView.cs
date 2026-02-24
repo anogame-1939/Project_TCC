@@ -33,6 +33,8 @@ namespace AnoGame.AnoFlow.Editor
 
         public Action OnRequiredEventsChanged;
         public Action OnTagsChanged;
+        public Action OnNameEditCancelled;
+        public bool IsNewNode { get; set; }
 
         private VisualElement _conditionPortsContainer;
         private VisualElement _tagConditionPortsContainer;
@@ -88,12 +90,148 @@ namespace AnoGame.AnoFlow.Editor
         {
             if (evt.clickCount == 2 && evt.button == 0)
             {
+                // タイトル領域のダブルクリック → 名前編集
+                var titleElement = this.Q("title");
+                if (titleElement != null)
+                {
+                    var localPos = titleElement.WorldToLocal(evt.mousePosition);
+                    if (titleElement.ContainsPoint(localPos))
+                    {
+                        EnterEditNameMode();
+                        evt.StopPropagation();
+                        return;
+                    }
+                }
                 EventSceneBinder.SelectContainer(EventData.EventId);
                 evt.StopPropagation();
             }
             else if (evt.clickCount == 1 && evt.button == 0 && evt.modifiers == EventModifiers.None)
             {
                 schedule.Execute(() => EventSceneBinder.PingContainer(EventData.EventId)).ExecuteLater(200);
+            }
+        }
+
+        // ====== Name Edit Mode ======
+
+        /// <summary>
+        /// タイトルのLabelをTextFieldに置換し、イベント名の編集モードに入る
+        /// </summary>
+        public void EnterEditNameMode()
+        {
+            var titleLabel = this.Q<Label>("title-label");
+            if (titleLabel == null) return;
+
+            var titleContainer = titleLabel.parent;
+            if (titleContainer == null) return;
+
+            // 既存の EventName を取得（タイトルは "EventId\nEventName" 形式）
+            string currentName = EventData.EventName ?? "";
+
+            var textField = new TextField();
+            textField.name = "title-edit-field";
+            textField.value = currentName;
+            textField.style.flexGrow = 1;
+            textField.style.marginTop = 0;
+            textField.style.marginBottom = 0;
+            textField.style.fontSize = 13;
+
+            // Label を非表示にして TextField を挿入
+            titleLabel.style.display = DisplayStyle.None;
+            int labelIndex = titleContainer.IndexOf(titleLabel);
+            titleContainer.Insert(labelIndex + 1, textField);
+
+            // フォーカスを設定
+            schedule.Execute(() =>
+            {
+                textField.Focus();
+                textField.SelectAll();
+            }).ExecuteLater(50);
+
+            // Enter で確定
+            textField.RegisterCallback<KeyDownEvent>(e =>
+            {
+                if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
+                {
+                    CommitNameEdit(textField.value, titleLabel, textField);
+                    e.StopPropagation();
+                    e.PreventDefault();
+                }
+                else if (e.keyCode == KeyCode.Escape)
+                {
+                    CancelNameEdit(titleLabel, textField);
+                    e.StopPropagation();
+                    e.PreventDefault();
+                }
+            });
+
+            // フォーカスロスでも確定
+            textField.RegisterCallback<FocusOutEvent>(e =>
+            {
+                // TextField がまだ存在する場合のみ
+                if (textField.parent != null)
+                {
+                    if (IsNewNode && string.IsNullOrWhiteSpace(textField.value))
+                        CancelNameEdit(titleLabel, textField);
+                    else
+                        CommitNameEdit(textField.value, titleLabel, textField);
+                }
+            });
+        }
+
+        private void CommitNameEdit(string newName, Label titleLabel, TextField textField)
+        {
+            newName = newName?.Trim() ?? "";
+
+            // EventData の eventName を更新
+            var so = new SerializedObject(EventData);
+            so.Update();
+            so.FindProperty("eventName").stringValue = newName;
+
+            // eventId のサフィックスも更新 (EV_030_xxx → EV_030_newName)
+            string currentId = EventData.EventId;
+            if (!string.IsNullOrEmpty(newName) && currentId != null && currentId.Length >= 7)
+            {
+                string prefix = currentId.Substring(0, 7); // "EV_030_"
+                string newId = prefix + newName;
+                so.FindProperty("eventId").stringValue = newId;
+            }
+
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(EventData);
+            AssetDatabase.SaveAssetIfDirty(EventData);
+
+            // アセットファイル名もリネーム
+            string assetPath = AssetDatabase.GetAssetPath(EventData);
+            if (!string.IsNullOrEmpty(assetPath))
+            {
+                string newFileName = EventData.EventId;
+                AssetDatabase.RenameAsset(assetPath, newFileName);
+                AssetDatabase.SaveAssets();
+            }
+
+            // タイトルを更新
+            title = $"{EventData.EventId}\n{EventData.EventName}";
+            titleLabel.text = title;
+
+            // TextField を除去して Label を再表示
+            if (textField.parent != null)
+                textField.RemoveFromHierarchy();
+            titleLabel.style.display = DisplayStyle.Flex;
+
+            IsNewNode = false;
+        }
+
+        private void CancelNameEdit(Label titleLabel, TextField textField)
+        {
+            // TextField を除去して Label を再表示
+            if (textField.parent != null)
+                textField.RemoveFromHierarchy();
+            titleLabel.style.display = DisplayStyle.Flex;
+
+            if (IsNewNode)
+            {
+                // 新規作成中のキャンセル → ノード+アセットを削除
+                OnNameEditCancelled?.Invoke();
             }
         }
 
@@ -1026,6 +1164,8 @@ namespace AnoGame.AnoFlow.Editor
         private string _message = "";
         private string _result = null;
         private bool _confirmed = false;
+        private bool _focused = false;
+        private const string TEXT_FIELD_NAME = "TagInputField";
 
         public static string Show(string title, string message, string defaultValue, Vector2? screenPosition = null)
         {
@@ -1035,6 +1175,8 @@ namespace AnoGame.AnoFlow.Editor
             dialog._input = defaultValue ?? "";
             dialog.minSize = new Vector2(300, 100);
             dialog.maxSize = new Vector2(400, 120);
+            // IME入力中の不要な再描画を抑制
+            dialog.wantsMouseMove = false;
 
             if (screenPosition.HasValue)
             {
@@ -1048,8 +1190,40 @@ namespace AnoGame.AnoFlow.Editor
 
         private void OnGUI()
         {
+            // Enter/Escape キー処理（IME変換中でないときのみ）
+            var e = Event.current;
+            if (e.type == EventType.KeyDown)
+            {
+                if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
+                {
+                    _result = _input;
+                    _confirmed = true;
+                    e.Use();
+                    Close();
+                    return;
+                }
+                if (e.keyCode == KeyCode.Escape)
+                {
+                    e.Use();
+                    Close();
+                    return;
+                }
+            }
+
+            EditorGUILayout.Space(4);
             EditorGUILayout.LabelField(_message);
+
+            GUI.SetNextControlName(TEXT_FIELD_NAME);
             _input = EditorGUILayout.TextField(_input);
+
+            // 初回フォーカス設定
+            if (!_focused)
+            {
+                EditorGUI.FocusTextInControl(TEXT_FIELD_NAME);
+                _focused = true;
+            }
+
+            EditorGUILayout.Space(4);
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("OK"))
             {

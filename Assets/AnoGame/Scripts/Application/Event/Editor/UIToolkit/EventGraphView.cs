@@ -20,6 +20,9 @@ namespace AnoGame.AnoFlow.Editor
         private bool _editMode = false;
         private bool _showNegativeEdges = false;
 
+        // 遅延保存用
+        private IVisualElementScheduledItem _pendingSave;
+
         /// <summary>
         /// Shared section visibility state for all nodes.
         /// Toggled by toolbar buttons.
@@ -40,6 +43,132 @@ namespace AnoGame.AnoFlow.Editor
             var grid = new GridBackground();
             Insert(0, grid);
             grid.StretchToParentSize();
+
+            // ノード移動時に座標を自動保存
+            graphViewChanged = OnGraphViewChanged;
+        }
+
+        private GraphViewChange OnGraphViewChanged(GraphViewChange change)
+        {
+            if (change.movedElements != null && change.movedElements.Count > 0)
+            {
+                // 遅延保存: ドラッグ終了後500msで保存
+                if (_pendingSave != null)
+                    _pendingSave.Pause();
+                var item = schedule.Execute(SaveNodePositions);
+                item.ExecuteLater(500);
+                _pendingSave = item;
+            }
+            return change;
+        }
+
+        /// <summary>
+        /// 空白エリア右クリック時のコンテキストメニュー
+        /// </summary>
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            if (evt.target is GraphView)
+            {
+                var mousePos = evt.localMousePosition;
+                evt.menu.AppendAction("新規ノード作成", _ => CreateNewEventNode(mousePos));
+            }
+            base.BuildContextualMenu(evt);
+        }
+
+        /// <summary>
+        /// 新規 EventData アセットを作成し、グラフにノードを追加する
+        /// </summary>
+        public void CreateNewEventNode(Vector2 graphLocalPos)
+        {
+            if (_eventDataList == null) return;
+
+            // 次の連番を算出
+            int maxNum = 0;
+            foreach (var ed in _eventDataList)
+            {
+                var id = ed.EventId;
+                if (id != null && id.StartsWith("EV_") && id.Length >= 6)
+                {
+                    if (int.TryParse(id.Substring(3, 3), out int num))
+                    {
+                        if (num > maxNum) maxNum = num;
+                    }
+                }
+            }
+            int nextNum = maxNum + 1;
+            string tempEventId = $"EV_{nextNum:D3}_NewEvent";
+            string tempEventName = "";
+
+            // EventData アセットを作成
+            var newData = ScriptableObject.CreateInstance<EventData>();
+            var so = new SerializedObject(newData);
+            so.FindProperty("eventId").stringValue = tempEventId;
+            so.FindProperty("eventName").stringValue = tempEventName;
+            so.FindProperty("category").stringValue = "";
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            string dir = "Assets/AnoGame/Data/Events/Story2";
+            string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{dir}/{tempEventId}.asset");
+            AssetDatabase.CreateAsset(newData, assetPath);
+            AssetDatabase.SaveAssets();
+
+            // _eventDataList に追加して RebuildGraph
+            _eventDataList.Add(newData);
+
+            // ワールド座標→グラフ座標に変換
+            var worldPos = contentViewContainer.WorldToLocal(this.LocalToWorld(graphLocalPos));
+
+            RebuildGraph(null);
+
+            // 作成したノードを所定位置に配置
+            if (_nodeMap.TryGetValue(tempEventId, out var nodeView))
+            {
+                nodeView.SetPosition(new Rect(worldPos.x, worldPos.y, 0, 0));
+
+                // meta.json に即座に保存
+                var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+                var meta = EventGraphMeta.Load();
+                meta.SetNodePosition(assetGuid, tempEventId, worldPos);
+                meta.Save();
+
+                // 名前編集モードで開始
+                nodeView.IsNewNode = true;
+                nodeView.OnNameEditCancelled = () => DeleteEventNode(nodeView);
+                schedule.Execute(() => nodeView.EnterEditNameMode()).ExecuteLater(100);
+            }
+
+            OnGraphDataChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// ノードと対応する EventData アセットを削除する
+        /// </summary>
+        public void DeleteEventNode(EventNodeView nodeView)
+        {
+            if (nodeView == null || nodeView.EventData == null) return;
+
+            var data = nodeView.EventData;
+            var assetPath = AssetDatabase.GetAssetPath(data);
+            var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+
+            // グラフからノードを除去
+            _eventDataList.Remove(data);
+            _nodeMap.Remove(data.EventId);
+            RemoveElement(nodeView);
+
+            // meta.json からエントリを削除
+            var meta = EventGraphMeta.Load();
+            meta.RemoveNodePosition(assetGuid);
+            meta.Save();
+
+            // アセットを削除
+            if (!string.IsNullOrEmpty(assetPath))
+            {
+                AssetDatabase.DeleteAsset(assetPath);
+                AssetDatabase.SaveAssets();
+            }
+
+            OnGraphDataChanged?.Invoke();
         }
 
         public void PopulateGraph(List<EventData> eventDataList, HashSet<string> knownItemIds, Dictionary<string, string> itemNameMap = null)
@@ -193,7 +322,15 @@ namespace AnoGame.AnoFlow.Editor
                 int restoredCount = 0;
                 foreach (var kvp in _nodeMap)
                 {
-                    var pos = meta.GetNodePosition(kvp.Key);
+                    // アセットGUIDで座標を検索（フォールバック: eventId）
+                    var assetPath = AssetDatabase.GetAssetPath(kvp.Value.EventData);
+                    var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+                    var pos = meta.GetNodePosition(assetGuid);
+                    if (!pos.HasValue)
+                    {
+                        // 旧形式（eventIdキー）からのフォールバック
+                        pos = meta.GetNodePositionByEventId(kvp.Key);
+                    }
                     if (pos.HasValue)
                     {
                         kvp.Value.SetPosition(new Rect(pos.Value.x, pos.Value.y, 0, 0));
@@ -346,10 +483,11 @@ namespace AnoGame.AnoFlow.Editor
             foreach (var kvp in _nodeMap)
             {
                 var rect = kvp.Value.GetPosition();
-                meta.SetNodePosition(kvp.Key, new Vector2(rect.x, rect.y));
+                var assetPath = AssetDatabase.GetAssetPath(kvp.Value.EventData);
+                var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+                meta.SetNodePosition(assetGuid, kvp.Key, new Vector2(rect.x, rect.y));
             }
             meta.Save();
-            Debug.Log("Event Graph: Node positions saved.");
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)

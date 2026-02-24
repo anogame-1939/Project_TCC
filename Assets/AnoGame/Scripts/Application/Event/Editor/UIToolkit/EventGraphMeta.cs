@@ -63,27 +63,45 @@ namespace AnoGame.AnoFlow.Editor
 
         // --- Lookup helpers ---
 
-        public Vector2? GetNodePosition(string eventId)
+        public Vector2? GetNodePosition(string guid)
         {
             foreach (var entry in nodePositions)
             {
-                if (entry.eventId == eventId)
+                if (entry.guid == guid)
                     return new Vector2(entry.x, entry.y);
             }
             return null;
         }
 
-        public void SetNodePosition(string eventId, Vector2 pos)
+        public void SetNodePosition(string guid, string eventId, Vector2 pos)
         {
             for (int i = 0; i < nodePositions.Count; i++)
             {
-                if (nodePositions[i].eventId == eventId)
+                if (nodePositions[i].guid == guid)
                 {
-                    nodePositions[i] = new NodePositionEntry { eventId = eventId, x = pos.x, y = pos.y };
+                    nodePositions[i] = new NodePositionEntry { guid = guid, eventId = eventId, x = pos.x, y = pos.y };
                     return;
                 }
             }
-            nodePositions.Add(new NodePositionEntry { eventId = eventId, x = pos.x, y = pos.y });
+            nodePositions.Add(new NodePositionEntry { guid = guid, eventId = eventId, x = pos.x, y = pos.y });
+        }
+
+        /// <summary>
+        /// eventId で座標を検索（旧形式JSON互換のフォールバック用）
+        /// </summary>
+        public Vector2? GetNodePositionByEventId(string eventId)
+        {
+            foreach (var entry in nodePositions)
+            {
+                if (entry.eventId == eventId && string.IsNullOrEmpty(entry.guid))
+                    return new Vector2(entry.x, entry.y);
+            }
+            return null;
+        }
+
+        public void RemoveNodePosition(string guid)
+        {
+            nodePositions.RemoveAll(e => e.guid == guid);
         }
 
         public SceneBindingEntry GetSceneBinding(string eventId)
@@ -127,6 +145,7 @@ namespace AnoGame.AnoFlow.Editor
     [Serializable]
     public class NodePositionEntry
     {
+        public string guid;
         public string eventId;
         public float x;
         public float y;
