@@ -745,9 +745,11 @@ namespace AnoGame.AnoFlow.Editor
             }
 
             menu.AddSeparator("");
+            // メニュー表示前にマウスのスクリーン座標をキャプチャ
+            var mouseScreenPos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             menu.AddItem(new GUIContent("新規タグ..."), false, () =>
             {
-                var input = EditorInputDialog.Show("New Tag", "タグ名を入力:", "");
+                var input = EditorInputDialog.Show("New Tag", "タグ名を入力:", "", mouseScreenPos);
                 if (!string.IsNullOrEmpty(input))
                 {
                     AddTag(fieldName, input.Trim(), callback);
@@ -1025,7 +1027,7 @@ namespace AnoGame.AnoFlow.Editor
         private string _result = null;
         private bool _confirmed = false;
 
-        public static string Show(string title, string message, string defaultValue)
+        public static string Show(string title, string message, string defaultValue, Vector2? screenPosition = null)
         {
             var dialog = CreateInstance<EditorInputDialog>();
             dialog.titleContent = new GUIContent(title);
@@ -1033,6 +1035,13 @@ namespace AnoGame.AnoFlow.Editor
             dialog._input = defaultValue ?? "";
             dialog.minSize = new Vector2(300, 100);
             dialog.maxSize = new Vector2(400, 120);
+
+            if (screenPosition.HasValue)
+            {
+                var pos = screenPosition.Value;
+                dialog.position = new Rect(pos.x - 150, pos.y - 20, 300, 100);
+            }
+
             dialog.ShowModalUtility();
             return dialog._confirmed ? dialog._result : null;
         }
