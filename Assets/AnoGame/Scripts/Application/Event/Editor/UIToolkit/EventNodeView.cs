@@ -70,15 +70,46 @@ namespace AnoGame.AnoFlow.Editor
             AddToClassList("event-node");
             title = $"{EventData.EventId}\n{EventData.EventName}";
 
+            // ルート要素の背景を透明に（AnoDialogueと同じパターン）
+            style.backgroundColor = new StyleColor(Color.clear);
+            style.borderTopColor = new StyleColor(Color.clear);
+            style.borderBottomColor = new StyleColor(Color.clear);
+            style.borderLeftColor = new StyleColor(Color.clear);
+            style.borderRightColor = new StyleColor(Color.clear);
+
+            // #node-border を透明に
+            var nodeBorder = this.Q("node-border");
+            if (nodeBorder != null)
+            {
+                nodeBorder.style.backgroundColor = new StyleColor(new Color(0.18f, 0.18f, 0.18f, 1f));
+                nodeBorder.style.borderTopLeftRadius = 8;
+                nodeBorder.style.borderTopRightRadius = 8;
+                nodeBorder.style.borderBottomLeftRadius = 8;
+                nodeBorder.style.borderBottomRightRadius = 8;
+            }
+
+            // #title に背景色を設定
+            var titleElement = this.Q("title");
+            if (titleElement != null)
+            {
+                titleElement.style.backgroundColor = new StyleColor(new Color(0.24f, 0.24f, 0.24f, 1f));
+            }
+
             // Output Port
             var bottomContainer = new VisualElement();
             bottomContainer.AddToClassList("output-port-container");
             OutputPort = InstantiatePort(Orientation.Horizontal,
                 UnityEditor.Experimental.GraphView.Direction.Output,
                 Port.Capacity.Multi, typeof(bool));
-            OutputPort.portName = "Out";
+            OutputPort.portName = "";
             bottomContainer.Add(OutputPort);
-            Add(bottomContainer);
+
+            // #node-border 内に配置してノードサイズに収める
+            var nodeBorderForPort = this.Q("node-border");
+            if (nodeBorderForPort != null)
+                nodeBorderForPort.Add(bottomContainer);
+            else
+                Add(bottomContainer);
 
             CreateContent();
 

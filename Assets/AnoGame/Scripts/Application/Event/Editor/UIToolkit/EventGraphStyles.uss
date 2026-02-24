@@ -31,25 +31,34 @@
 /* --- Node Styles --- */
 .event-node {
     min-width: 250px;
-    background-color: #2d2d2d;
-    border-radius: 8px;
-    border-width: 1px;
-    border-color: #1a1a1a;
+    background-color: transparent;
+    border-radius: 0;
+    border-width: 0;
+    border-color: transparent;
+}
+
+.event-node #node-border {
+    background-color: transparent;
 }
 
 .event-node #title {
-    background-color: #3e3e3e;
     color: white;
     height: 30px;
     justify-content: center;
     padding-left: 8px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
 }
 
 .event-node #contents {
-    background-color: #2d2d2d;
+    background-color: transparent;
     padding: 8px;
+}
+
+.event-node #extension {
+    background-color: transparent;
+}
+
+.event-node #divider {
+    display: none;
 }
 
 .section-header {
@@ -84,14 +93,14 @@
     flex-direction: row;
     justify-content: flex-start;
     padding: 4px;
-    background-color: #2a2a2a;
+    background-color: transparent;
 }
 
 .output-port-container {
     flex-direction: row;
     justify-content: flex-end;
     padding: 4px;
-    background-color: #2a2a2a;
+    background-color: transparent;
 }
 
 /* Condition port rows (individual input ports per RequiredEvent) */
