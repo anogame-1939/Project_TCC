@@ -200,12 +200,25 @@ namespace AnoGame.AnoFlow.Editor
             // Load EventData assets from folder
             _eventDataList = new List<EventData>();
             var guids = AssetDatabase.FindAssets("t:EventData", new[] { EVENTDATA_DIR_PATH });
+            int skippedCount = 0;
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
-                if (asset != null && !asset.IsDeleted) _eventDataList.Add(asset);
+                if (asset != null)
+                {
+                    if (asset.IsDeleted)
+                    {
+                        Debug.Log($"[EventGraph] LoadData: isDeleted=true でスキップ: {asset.EventId}, path={path}");
+                        skippedCount++;
+                    }
+                    else
+                    {
+                        _eventDataList.Add(asset);
+                    }
+                }
             }
+            Debug.Log($"[EventGraph] LoadData: ディスク上{guids.Length}件, スキップ{skippedCount}件, 読み込み{_eventDataList.Count}件");
             _eventDataList.Sort((a, b) => string.Compare(a.EventId, b.EventId, StringComparison.Ordinal));
 
             // Load known item IDs from items_batch.json

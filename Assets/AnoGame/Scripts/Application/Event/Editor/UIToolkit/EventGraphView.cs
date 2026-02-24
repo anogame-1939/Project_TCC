@@ -46,6 +46,9 @@ namespace AnoGame.AnoFlow.Editor
 
             // ノード移動時に座標を自動保存
             graphViewChanged = OnGraphViewChanged;
+
+            // 削除操作をソフトデリートにフック
+            deleteSelection = OnDeleteSelection;
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange change)
@@ -61,6 +64,25 @@ namespace AnoGame.AnoFlow.Editor
             }
             return change;
         }
+        /// <summary>
+        /// GraphView の Delete キー/メニューから呼ばれる削除処理をソフトデリートに差し替え
+        /// </summary>
+        private void OnDeleteSelection(string operationName, AskUser askUser)
+        {
+            var nodesToDelete = new List<EventNodeView>();
+            foreach (var sel in selection)
+            {
+                if (sel is EventNodeView nodeView)
+                    nodesToDelete.Add(nodeView);
+            }
+
+            if (nodesToDelete.Count == 0) return;
+
+            foreach (var nodeView in nodesToDelete)
+            {
+                DeleteEventNode(nodeView);
+            }
+        }
 
         /// <summary>
         /// 空白エリア右クリック時のコンテキストメニュー
@@ -71,6 +93,10 @@ namespace AnoGame.AnoFlow.Editor
             {
                 var mousePos = evt.localMousePosition;
                 evt.menu.AppendAction("新規ノード作成", _ => CreateNewEventNode(mousePos));
+            }
+            else if (evt.target is EventNodeView targetNode)
+            {
+                evt.menu.AppendAction("ノード削除", _ => DeleteEventNode(targetNode));
             }
             base.BuildContextualMenu(evt);
         }
@@ -115,6 +141,7 @@ namespace AnoGame.AnoFlow.Editor
 
             // _eventDataList に追加して RebuildGraph
             _eventDataList.Add(newData);
+            Debug.Log($"[EventGraph] CreateNewEventNode: {tempEventId} 作成。_eventDataList件数={_eventDataList.Count}");
 
             // ワールド座標→グラフ座標に変換
             var worldPos = contentViewContainer.WorldToLocal(this.LocalToWorld(graphLocalPos));
@@ -149,11 +176,15 @@ namespace AnoGame.AnoFlow.Editor
             if (nodeView == null || nodeView.EventData == null) return;
 
             var data = nodeView.EventData;
+            var assetPath = AssetDatabase.GetAssetPath(data);
+            Debug.Log($"[EventGraph] DeleteEventNode: {data.EventId}, isDeleted前={data.IsDeleted}, path={assetPath}");
 
             // ソフトデリート（Undo 対応）
             Undo.RecordObject(data, "Delete Event Node");
             data.IsDeleted = true;
             EditorUtility.SetDirty(data);
+
+            Debug.Log($"[EventGraph] DeleteEventNode: {data.EventId}, isDeleted後={data.IsDeleted}");
 
             // グラフを再構築（isDeleted のノードが非表示になる）
             RebuildGraph(null);
@@ -173,7 +204,11 @@ namespace AnoGame.AnoFlow.Editor
 
             // null エントリとソフトデリート済みをフィルタ
             _eventDataList.RemoveAll(e => e == null);
+            var deletedIds = _eventDataList.Where(e => e.IsDeleted).Select(e => e.EventId).ToList();
+            if (deletedIds.Count > 0)
+                Debug.Log($"[EventGraph] PopulateGraph: isDeletedでスキップ: {string.Join(", ", deletedIds)}");
             var activeList = _eventDataList.Where(e => !e.IsDeleted).ToList();
+            Debug.Log($"[EventGraph] PopulateGraph: 全{_eventDataList.Count}件, アクティブ{activeList.Count}件");
 
             // Build known event ID set
             var knownEventIds = new HashSet<string>();
