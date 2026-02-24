@@ -18,6 +18,10 @@ namespace AnoGame.Data
         [SerializeField] private string description;
         [SerializeField] private bool isOneTime;
 
+        [HideInInspector]
+        [SerializeField] private bool _isDeleted;
+        public bool IsDeleted { get => _isDeleted; set => _isDeleted = value; }
+
         public string EventId => eventId;
         public string EventName => eventName;
         public string Category => category;

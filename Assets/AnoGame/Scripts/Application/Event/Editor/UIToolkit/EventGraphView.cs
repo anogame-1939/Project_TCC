@@ -96,7 +96,7 @@ namespace AnoGame.AnoFlow.Editor
                 }
             }
             int nextNum = maxNum + 1;
-            string tempEventId = $"EV_{nextNum:D3}_NewEvent";
+            string tempEventId = $"EV_{nextNum:D3}";
             string tempEventName = "";
 
             // EventData アセットを作成
@@ -111,6 +111,7 @@ namespace AnoGame.AnoFlow.Editor
             string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{dir}/{tempEventId}.asset");
             AssetDatabase.CreateAsset(newData, assetPath);
             AssetDatabase.SaveAssets();
+            Undo.RegisterCreatedObjectUndo(newData, "Create Event Node");
 
             // _eventDataList に追加して RebuildGraph
             _eventDataList.Add(newData);
@@ -148,27 +149,14 @@ namespace AnoGame.AnoFlow.Editor
             if (nodeView == null || nodeView.EventData == null) return;
 
             var data = nodeView.EventData;
-            var assetPath = AssetDatabase.GetAssetPath(data);
-            var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
 
-            // グラフからノードを除去
-            _eventDataList.Remove(data);
-            _nodeMap.Remove(data.EventId);
-            RemoveElement(nodeView);
+            // ソフトデリート（Undo 対応）
+            Undo.RecordObject(data, "Delete Event Node");
+            data.IsDeleted = true;
+            EditorUtility.SetDirty(data);
 
-            // meta.json からエントリを削除
-            var meta = EventGraphMeta.Load();
-            meta.RemoveNodePosition(assetGuid);
-            meta.Save();
-
-            // アセットを削除
-            if (!string.IsNullOrEmpty(assetPath))
-            {
-                AssetDatabase.DeleteAsset(assetPath);
-                AssetDatabase.SaveAssets();
-            }
-
-            OnGraphDataChanged?.Invoke();
+            // グラフを再構築（isDeleted のノードが非表示になる）
+            RebuildGraph(null);
         }
 
         public void PopulateGraph(List<EventData> eventDataList, HashSet<string> knownItemIds, Dictionary<string, string> itemNameMap = null)
@@ -183,16 +171,20 @@ namespace AnoGame.AnoFlow.Editor
 
             if (_eventDataList == null || _eventDataList.Count == 0) return;
 
+            // null エントリとソフトデリート済みをフィルタ
+            _eventDataList.RemoveAll(e => e == null);
+            var activeList = _eventDataList.Where(e => !e.IsDeleted).ToList();
+
             // Build known event ID set
             var knownEventIds = new HashSet<string>();
-            foreach (var ed in _eventDataList)
+            foreach (var ed in activeList)
             {
                 knownEventIds.Add(ed.EventId);
             }
 
             // Build tag→eventId lookup: which events produce each resultTag
             var tagProducers = new Dictionary<string, List<string>>();
-            foreach (var ed in _eventDataList)
+            foreach (var ed in activeList)
             {
                 var tags = ed.ResultTags;
                 if (tags == null) continue;
@@ -210,16 +202,16 @@ namespace AnoGame.AnoFlow.Editor
 
             // Build eventId→eventName lookup
             var eventNameMap = new Dictionary<string, string>();
-            foreach (var ed in _eventDataList)
+            foreach (var ed in activeList)
             {
                 eventNameMap[ed.EventId] = ed.EventName;
             }
 
             // 1. Create Nodes
-            foreach (var ed in _eventDataList)
+            foreach (var ed in activeList)
             {
                 var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(),
-                    _eventDataList, allKnownTags, eventNameMap, _itemNameMap, SectionVis);
+                    activeList, allKnownTags, eventNameMap, _itemNameMap, SectionVis);
                 node.OnRequiredEventsChanged = () => RebuildGraph(null);
                 node.OnTagsChanged = () => RebuildGraph(null);
                 AddElement(node);
@@ -227,7 +219,7 @@ namespace AnoGame.AnoFlow.Editor
             }
 
             // 2. Create Edges from RequiredEventIds (legacy direct references)
-            foreach (var ed in _eventDataList)
+            foreach (var ed in activeList)
             {
                 if (!_nodeMap.ContainsKey(ed.EventId)) continue;
                 var targetNode = _nodeMap[ed.EventId];
@@ -250,7 +242,7 @@ namespace AnoGame.AnoFlow.Editor
             }
 
             // 3. Create Edges from Tags (conditionTags ↔ resultTags)
-            foreach (var ed in _eventDataList)
+            foreach (var ed in activeList)
             {
                 if (!_nodeMap.ContainsKey(ed.EventId)) continue;
                 var targetNode = _nodeMap[ed.EventId];
@@ -283,7 +275,7 @@ namespace AnoGame.AnoFlow.Editor
             // 4. Create Negative Edges from conditionTags with "!" prefix
             if (_showNegativeEdges)
             {
-                foreach (var ed in _eventDataList)
+                foreach (var ed in activeList)
                 {
                     if (!_nodeMap.ContainsKey(ed.EventId)) continue;
                     var targetNode = _nodeMap[ed.EventId];

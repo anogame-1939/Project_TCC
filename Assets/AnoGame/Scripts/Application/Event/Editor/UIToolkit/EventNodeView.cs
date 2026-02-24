@@ -147,20 +147,18 @@ namespace AnoGame.AnoFlow.Editor
                 textField.SelectAll();
             }).ExecuteLater(50);
 
-            // Enter で確定
+            // Enter / Esc 処理
             textField.RegisterCallback<KeyDownEvent>(e =>
             {
                 if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
                 {
                     CommitNameEdit(textField.value, titleLabel, textField);
                     e.StopPropagation();
-                    e.PreventDefault();
                 }
                 else if (e.keyCode == KeyCode.Escape)
                 {
                     CancelNameEdit(titleLabel, textField);
                     e.StopPropagation();
-                    e.PreventDefault();
                 }
             });
 
@@ -182,32 +180,13 @@ namespace AnoGame.AnoFlow.Editor
         {
             newName = newName?.Trim() ?? "";
 
-            // EventData の eventName を更新
+            // EventData の eventName のみ更新（eventId は変更しない）
             var so = new SerializedObject(EventData);
             so.Update();
             so.FindProperty("eventName").stringValue = newName;
-
-            // eventId のサフィックスも更新 (EV_030_xxx → EV_030_newName)
-            string currentId = EventData.EventId;
-            if (!string.IsNullOrEmpty(newName) && currentId != null && currentId.Length >= 7)
-            {
-                string prefix = currentId.Substring(0, 7); // "EV_030_"
-                string newId = prefix + newName;
-                so.FindProperty("eventId").stringValue = newId;
-            }
-
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(EventData);
             AssetDatabase.SaveAssetIfDirty(EventData);
-
-            // アセットファイル名もリネーム
-            string assetPath = AssetDatabase.GetAssetPath(EventData);
-            if (!string.IsNullOrEmpty(assetPath))
-            {
-                string newFileName = EventData.EventId;
-                AssetDatabase.RenameAsset(assetPath, newFileName);
-                AssetDatabase.SaveAssets();
-            }
 
             // タイトルを更新
             title = $"{EventData.EventId}\n{EventData.EventName}";

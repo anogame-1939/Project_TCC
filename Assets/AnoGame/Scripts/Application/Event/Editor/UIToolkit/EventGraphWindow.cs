@@ -31,15 +31,58 @@ namespace AnoGame.AnoFlow.Editor
 
         private void OnEnable()
         {
+            CleanupSoftDeletedAssets();
             LoadData();
             BuildUI();
+            Undo.undoRedoPerformed += OnUndoRedo;
         }
 
         private void OnDisable()
         {
+            Undo.undoRedoPerformed -= OnUndoRedo;
             if (_graphView != null)
             {
                 _graphView.OnGraphDataChanged = null;
+            }
+            CleanupSoftDeletedAssets();
+        }
+
+        private void OnUndoRedo()
+        {
+            // Undo/Redo 後にグラフを再構築（isDeleted の変更が反映される）
+            if (_graphView != null && _eventDataList != null)
+            {
+                _graphView.PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
+            }
+        }
+
+        /// <summary>
+        /// isDeleted == true の EventData アセットを実際に削除する
+        /// </summary>
+        private void CleanupSoftDeletedAssets()
+        {
+            var guids = AssetDatabase.FindAssets("t:EventData", new[] { EVENTDATA_DIR_PATH });
+            int deletedCount = 0;
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
+                if (asset != null && asset.IsDeleted)
+                {
+                    // meta.json からも除去
+                    var meta = EventGraphMeta.Load();
+                    var assetGuid = AssetDatabase.AssetPathToGUID(path);
+                    meta.RemoveNodePosition(assetGuid);
+                    meta.Save();
+
+                    AssetDatabase.DeleteAsset(path);
+                    deletedCount++;
+                }
+            }
+            if (deletedCount > 0)
+            {
+                Debug.Log($"Event Graph: {deletedCount} 個のソフトデリート済みアセットをクリーンアップしました");
+                AssetDatabase.Refresh();
             }
         }
 
@@ -161,7 +204,7 @@ namespace AnoGame.AnoFlow.Editor
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var asset = AssetDatabase.LoadAssetAtPath<EventData>(path);
-                if (asset != null) _eventDataList.Add(asset);
+                if (asset != null && !asset.IsDeleted) _eventDataList.Add(asset);
             }
             _eventDataList.Sort((a, b) => string.Compare(a.EventId, b.EventId, StringComparison.Ordinal));
 
