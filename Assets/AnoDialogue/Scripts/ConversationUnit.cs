@@ -11,13 +11,13 @@ namespace AnoGame.AnoDialogue
         public string ID;
 
         [Tooltip("Episode Context (e.g. 1)")]
-        public int EpisodeID = -1;
+        public int EpisodeID = 0;
 
         [Tooltip("Story/Chapter Context (e.g. 1)")]
-        public int ChapterID = -1;
+        public int ChapterID = 0;
 
         [Tooltip("Section/Situation Context (e.g. 1)")]
-        public int SectionID = -1;
+        public int SectionID = 0;
 
         [Tooltip("Order of the node within the section")]
         public int NodeNumber = 0;

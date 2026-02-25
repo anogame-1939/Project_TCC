@@ -100,14 +100,14 @@ namespace AnoGame.AnoDialogue.Editor
             foreach (var epGroup in episodes)
             {
                 int epKey = epGroup.Key;
-                string epStr = epKey == -1 ? "Default" : epKey.ToString();
+                string epStr = epKey == 0 ? "Default" : epKey.ToString();
                 bool allowEp = string.IsNullOrEmpty(_searchFilter) || epStr.Contains(_searchFilter);
 
                 // Get saved foldout state (default: open)
                 if (!_foldoutStates.ContainsKey(epKey))
                     _foldoutStates[epKey] = true;
 
-                string foldoutLabel = epKey == -1 ? "Chapter: Default" : $"Episode: {epStr}";
+                string foldoutLabel = epKey == 0 ? "Chapter: Default" : $"Episode: {epStr}";
                 var epFoldout = new Foldout { text = foldoutLabel, value = _foldoutStates[epKey] };
                 epFoldout.AddToClassList("episode-foldout");
 
@@ -118,7 +118,7 @@ namespace AnoGame.AnoDialogue.Editor
                     _foldoutStates[capturedKey] = evt.newValue;
                 });
 
-                if (epKey != -1)
+                if (epKey != 0)
                 {
                     // + button for add chapter
                     var epHeader = epFoldout.Q<Toggle>();
@@ -151,7 +151,7 @@ namespace AnoGame.AnoDialogue.Editor
 
             foreach (var chapterGroup in chapters)
             {
-                string chStr = chapterGroup.Key == -1 ? "Default" : chapterGroup.Key.ToString();
+                string chStr = chapterGroup.Key == 0 ? "Default" : chapterGroup.Key.ToString();
                 bool allowChapter = allowEp || chStr.Contains(_searchFilter);
 
                 // Chapter row
@@ -176,7 +176,7 @@ namespace AnoGame.AnoDialogue.Editor
                 var sections = chapterGroup.GroupBy(u => new
                 {
                     ID = u.SectionID,
-                    NameKey = (u.SectionID == -1 ? u.SectionName : "")
+                    NameKey = (u.SectionID == 0 ? u.SectionName : "")
                 }).OrderBy(g => g.Key.ID).ThenBy(g => g.Key.NameKey).ToList();
 
                 foreach (var sectionGroup in sections)
@@ -184,12 +184,12 @@ namespace AnoGame.AnoDialogue.Editor
                     int secID = sectionGroup.Key.ID;
                     string secNameKey = sectionGroup.Key.NameKey;
 
-                    if (secID == -1 && (string.IsNullOrEmpty(secNameKey) || secNameKey == "Default")) continue;
+                    if (secID == 0 && (string.IsNullOrEmpty(secNameKey) || secNameKey == "Default")) continue;
 
                     if (!allowChapter && !sectionGroup.Any(u => u.ID != null && u.ID.ToLower().Contains(_searchFilter.ToLower()))) continue;
 
                     var first = sectionGroup.FirstOrDefault();
-                    string displayName = string.IsNullOrEmpty(first?.SectionName) ? (secID == -1 ? "Default" : secID.ToString()) : first.SectionName;
+                    string displayName = string.IsNullOrEmpty(first?.SectionName) ? (secID == 0 ? "Default" : secID.ToString()) : first.SectionName;
 
                     var secRow = new VisualElement();
                     secRow.AddToClassList("section-row");
@@ -323,7 +323,7 @@ namespace AnoGame.AnoDialogue.Editor
                 else if (_dragStarted)
                 {
                     // No drag occurred → treat as click (select section)
-                    string filterName = (sec == -1) ? nameKey : null;
+                    string filterName = (sec == 0) ? nameKey : null;
                     OnSelectSection?.Invoke(ep, ch, sec, filterName);
                     if (first != null)
                     {

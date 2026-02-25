@@ -168,6 +168,51 @@ namespace AnoGame.AnoDialogue
             Debug.Log($"Migrated {Conversations.Count} conversations to GUIDs.");
             UnityEditor.EditorUtility.SetDirty(this);
         }
+
+        /// <summary>
+        /// Default Episode (-1,-1,-1) を (0,0,0) に移行し、既存 EpisodeID を +1 シフトする。
+        /// ChapterID / SectionID は -1→0 のみ（シフト不要）。
+        /// </summary>
+        [ContextMenu("Migrate Default Episode: -1 to 0, shift others +1")]
+        public void MigrateDefaultEpisodeToZero()
+        {
+            int migratedDefault = 0;
+            int shiftedEpisode = 0;
+            int migratedChapter = 0;
+            int migratedSection = 0;
+
+            foreach (var unit in Conversations)
+            {
+                // EpisodeID: -1 → 0, >= 1 → +1
+                if (unit.EpisodeID == -1)
+                {
+                    unit.EpisodeID = 0;
+                    migratedDefault++;
+                }
+                else if (unit.EpisodeID >= 1)
+                {
+                    unit.EpisodeID += 1;
+                    shiftedEpisode++;
+                }
+
+                // ChapterID: -1 → 0 のみ
+                if (unit.ChapterID == -1)
+                {
+                    unit.ChapterID = 0;
+                    migratedChapter++;
+                }
+
+                // SectionID: -1 → 0 のみ
+                if (unit.SectionID == -1)
+                {
+                    unit.SectionID = 0;
+                    migratedSection++;
+                }
+            }
+
+            Debug.Log($"[MigrateDefaultEpisode] 完了: Default→0: {migratedDefault}, Episode+1: {shiftedEpisode}, Ch→0: {migratedChapter}, Sec→0: {migratedSection} / Total: {Conversations.Count}");
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
 #endif
     }
 }

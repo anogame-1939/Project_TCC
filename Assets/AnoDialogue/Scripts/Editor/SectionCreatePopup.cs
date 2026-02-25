@@ -45,9 +45,9 @@ namespace AnoGame.AnoDialogue.Editor
             _sectionID = EditorGUILayout.IntField("Section ID (Sec)", _sectionID);
 
             // Helpful note if -1
-            if (_episodeID == -1 || _chapterID == -1 || _sectionID == -1)
+            if (_episodeID == 0 || _chapterID == 0 || _sectionID == 0)
             {
-                EditorGUILayout.HelpBox("-1 will be treated as Default.", MessageType.Info);
+                EditorGUILayout.HelpBox("0 will be treated as Default.", MessageType.Info);
             }
 
             EditorGUILayout.Space(5);
