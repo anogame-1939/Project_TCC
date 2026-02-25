@@ -317,16 +317,23 @@ namespace AnoGame.AnoFlow.Editor
                 });
             });
 
-            // GeometryChanged detects expand/collapse state changes.
-            // Uses schedule.Execute to defer processing after RefreshExpandedState
-            // has finished updating extensionContainer styles internally.
-            this.RegisterCallback<GeometryChangedEvent>(_ =>
+            // #collapse-button のクリックで expand/collapse 状態変化を検出。
+            // GeometryChangedEvent はUSS変更でジオメトリが変わらない場合に発火しないため使用しない。
+            var collapseButton = this.Q("collapse-button");
+            if (collapseButton != null)
             {
-                if (expanded != _lastExpanded)
+                collapseButton.RegisterCallback<MouseUpEvent>(_ =>
                 {
-                    OnExpandCollapseChanged();
-                }
-            });
+                    // 1フレーム遅延: クリック後に expanded プロパティが更新されるのを待つ
+                    schedule.Execute(() =>
+                    {
+                        if (expanded != _lastExpanded)
+                        {
+                            OnExpandCollapseChanged();
+                        }
+                    });
+                });
+            }
         }
 
         /// <summary>
