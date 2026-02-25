@@ -152,6 +152,38 @@
     background-color: #553333;
 }
 
+/* --- Drag & Drop --- */
+.drag-ghost {
+    position: absolute;
+    background-color: rgba(58, 110, 165, 0.85);
+    border-radius: 4px;
+    padding: 2px 8px;
+    min-width: 80px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.drag-ghost-label {
+    color: #fff;
+    font-size: 11px;
+    -unity-text-align: middle-left;
+}
+
+.drop-indicator {
+    position: absolute;
+    height: 2px;
+    background-color: #4fc3f7;
+}
+
+.section-row--dragging {
+    opacity: 0.4;
+}
+
+.section-row--drag-over {
+    background-color: rgba(79, 195, 247, 0.15);
+    border-radius: 3px;
+}
+
 .sidebar-add-episode-btn {
     margin: 8px;
     height: 24px;

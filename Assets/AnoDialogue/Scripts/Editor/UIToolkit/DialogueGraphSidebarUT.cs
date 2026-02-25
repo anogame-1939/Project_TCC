@@ -25,6 +25,29 @@ namespace AnoGame.AnoDialogue.Editor
         private string _searchFilter = "";
         private Dictionary<int, bool> _foldoutStates = new Dictionary<int, bool>();
 
+        // --- Drag & Drop ---
+        private bool _isDragging;
+        private bool _dragStarted;
+        private Vector2 _dragStartPos;
+        private int _dragEp, _dragCh, _dragSec;
+        private string _dragSectionName;
+        private VisualElement _dragGhost;
+        private VisualElement _dropIndicator;
+        private const float DragThreshold = 5f;
+
+        /// <summary>
+        /// Information about a potential drop target in the sidebar.
+        /// </summary>
+        private struct DropTarget
+        {
+            public int EpisodeID;
+            public int ChapterID;
+            public int SectionID;  // -1 means "insert at end of chapter"
+            public bool InsertBefore;
+            public VisualElement Row;
+        }
+        private List<DropTarget> _dropTargets = new List<DropTarget>();
+
         public DialogueGraphSidebarUT(MasterDialogueData data)
         {
             Data = data;
@@ -64,6 +87,7 @@ namespace AnoGame.AnoDialogue.Editor
         public void RebuildTree()
         {
             _scrollView.Clear();
+            _dropTargets.Clear();
 
             if (Data == null || Data.Conversations == null || Data.Conversations.Count == 0)
             {
@@ -189,6 +213,10 @@ namespace AnoGame.AnoDialogue.Editor
 
                     var secBtn = new Button(() =>
                     {
+                        Debug.Log($"[Sidebar] Button Click: isDragging={_isDragging}, dragStarted={_dragStarted}");
+                        // Skip click action if drag just ended
+                        if (_isDragging || _dragStarted) return;
+
                         string filterName = (capturedSec == -1) ? capturedName : null;
                         OnSelectSection?.Invoke(capturedEp, capturedCh, capturedSec, filterName);
 
@@ -202,15 +230,17 @@ namespace AnoGame.AnoDialogue.Editor
                     };
                     secBtn.AddToClassList("section-btn");
 
-                    // Double-click to rename
-                    secBtn.RegisterCallback<MouseDownEvent>(evt =>
+                    // Double-click to rename (TrickleDown to intercept before Button's Clickable)
+                    secBtn.RegisterCallback<PointerDownEvent>(evt =>
                     {
+                        Debug.Log($"[Sidebar] secBtn PointerDown(TrickleDown): clickCount={evt.clickCount}, button={evt.button}, target={evt.target.GetType().Name}");
                         if (evt.clickCount == 2 && evt.button == 0)
                         {
+                            Debug.Log("[Sidebar] Double-click detected -> StartInlineRename");
                             evt.StopImmediatePropagation();
                             StartInlineRename(secBtn, capturedEp, capturedCh, capturedSec, displayName);
                         }
-                    });
+                    }, TrickleDown.TrickleDown);
 
                     // Right-click context menu
                     secBtn.RegisterCallback<ContextualMenuPopulateEvent>(evt =>
@@ -223,6 +253,19 @@ namespace AnoGame.AnoDialogue.Editor
                         {
                             DeleteSection(capturedEp, capturedCh, capturedSec);
                         });
+                    });
+
+                    // --- Drag & Drop registration ---
+                    RegisterDragEvents(secRow, capturedEp, capturedCh, capturedSec, capturedName, displayName);
+
+                    // Register as drop target
+                    _dropTargets.Add(new DropTarget
+                    {
+                        EpisodeID = capturedEp,
+                        ChapterID = capturedCh,
+                        SectionID = capturedSec,
+                        InsertBefore = false,
+                        Row = secRow
                     });
 
                     secRow.Add(secBtn);
@@ -238,6 +281,281 @@ namespace AnoGame.AnoDialogue.Editor
 
                     container.Add(secRow);
                 }
+            }
+        }
+
+        // --- Drag & Drop ---
+
+        private void RegisterDragEvents(VisualElement secRow, int ep, int ch, int sec, string nameKey, string displayName)
+        {
+            // TrickleDown: fires on parent BEFORE child elements (Button's Clickable)
+            secRow.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                Debug.Log($"[Sidebar] secRow PointerDown(TrickleDown): button={evt.button}, isDragging={_isDragging}, target={evt.target.GetType().Name}");
+                if (evt.button != 0 || _isDragging) return;
+                // Just record, do NOT capture yet (let Button click work normally)
+                _dragStarted = true;
+                _dragStartPos = evt.position;
+                _dragEp = ep;
+                _dragCh = ch;
+                _dragSec = sec;
+                _dragSectionName = displayName;
+            }, TrickleDown.TrickleDown);
+
+            // TrickleDown: detect drag threshold before Button consumes events
+            secRow.RegisterCallback<PointerMoveEvent>(evt =>
+            {
+                if (!_dragStarted && !_isDragging) return;
+
+                var delta = (Vector2)evt.position - _dragStartPos;
+
+                if (!_isDragging)
+                {
+                    if (delta.magnitude < DragThreshold) return;
+
+                    // Threshold exceeded: capture pointer and begin drag
+                    Debug.Log($"[Sidebar] Drag threshold exceeded: delta={delta.magnitude:F1}, capturing pointer");
+                    secRow.CapturePointer(evt.pointerId);
+                    _isDragging = true;
+                    BeginDrag(secRow);
+                    evt.StopImmediatePropagation();
+                }
+
+                if (_isDragging)
+                {
+                    UpdateDrag(evt.position);
+                    evt.StopImmediatePropagation();
+                }
+            }, TrickleDown.TrickleDown);
+
+            // TrickleDown: handle drop or cancel
+            secRow.RegisterCallback<PointerUpEvent>(evt =>
+            {
+                Debug.Log($"[Sidebar] secRow PointerUp(TrickleDown): isDragging={_isDragging}, dragStarted={_dragStarted}");
+                if (_isDragging)
+                {
+                    if (secRow.HasPointerCapture(evt.pointerId))
+                        secRow.ReleasePointer(evt.pointerId);
+                    EndDrag(evt.position);
+                    evt.StopImmediatePropagation();
+                }
+                _dragStarted = false;
+                _isDragging = false;
+            }, TrickleDown.TrickleDown);
+
+            secRow.RegisterCallback<PointerCaptureOutEvent>(evt =>
+            {
+                Debug.Log($"[Sidebar] secRow PointerCaptureOut: isDragging={_isDragging}, dragStarted={_dragStarted}");
+                if (_isDragging)
+                {
+                    CancelDrag();
+                }
+                _dragStarted = false;
+                _isDragging = false;
+            });
+
+            secRow.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Escape && _isDragging)
+                {
+                    CancelDrag();
+                    _dragStarted = false;
+                    _isDragging = false;
+                    evt.StopPropagation();
+                }
+            });
+        }
+
+        private void BeginDrag(VisualElement sourceRow)
+        {
+            // Create ghost
+            _dragGhost = new VisualElement();
+            _dragGhost.AddToClassList("drag-ghost");
+            var ghostLabel = new Label(_dragSectionName);
+            ghostLabel.AddToClassList("drag-ghost-label");
+            _dragGhost.Add(ghostLabel);
+
+            // Position ghost at initial place
+            var rootPanel = panel.visualTree;
+            rootPanel.Add(_dragGhost);
+
+            // Create drop indicator line
+            _dropIndicator = new VisualElement();
+            _dropIndicator.AddToClassList("drop-indicator");
+            _dropIndicator.style.display = DisplayStyle.None;
+            rootPanel.Add(_dropIndicator);
+
+            // Highlight source row
+            sourceRow.AddToClassList("section-row--dragging");
+        }
+
+        private void UpdateDrag(Vector2 pointerPos)
+        {
+            if (_dragGhost == null) return;
+
+            // Move ghost to follow pointer
+            _dragGhost.style.left = pointerPos.x + 10;
+            _dragGhost.style.top = pointerPos.y - 10;
+
+            // Find drop target
+            bool foundTarget = false;
+            foreach (var target in _dropTargets)
+            {
+                if (target.Row == null || target.Row.panel == null) continue;
+                // Skip self
+                if (target.EpisodeID == _dragEp && target.ChapterID == _dragCh && target.SectionID == _dragSec) continue;
+
+                var rowWorldBound = target.Row.worldBound;
+                if (rowWorldBound.Contains(pointerPos))
+                {
+                    foundTarget = true;
+
+                    // Determine insert position: top half = before, bottom half = after
+                    float midY = rowWorldBound.y + rowWorldBound.height * 0.5f;
+                    bool insertBefore = pointerPos.y < midY;
+                    float indicatorY = insertBefore ? rowWorldBound.yMin : rowWorldBound.yMax;
+
+                    _dropIndicator.style.display = DisplayStyle.Flex;
+                    _dropIndicator.style.left = rowWorldBound.x;
+                    _dropIndicator.style.top = indicatorY - 1;
+                    _dropIndicator.style.width = rowWorldBound.width;
+
+                    // Store intent in userData
+                    _dropIndicator.userData = new DropTarget
+                    {
+                        EpisodeID = target.EpisodeID,
+                        ChapterID = target.ChapterID,
+                        SectionID = target.SectionID,
+                        InsertBefore = insertBefore,
+                        Row = target.Row
+                    };
+
+                    // Highlight
+                    ClearDropHighlights();
+                    target.Row.AddToClassList("section-row--drag-over");
+                    break;
+                }
+            }
+
+            if (!foundTarget)
+            {
+                _dropIndicator.style.display = DisplayStyle.None;
+                ClearDropHighlights();
+            }
+        }
+
+        private void EndDrag(Vector2 pointerPos)
+        {
+            if (_dropIndicator != null && _dropIndicator.userData is DropTarget dropTarget && _dropIndicator.resolvedStyle.display == DisplayStyle.Flex)
+            {
+                PerformSectionMove(dropTarget);
+            }
+
+            CleanupDrag();
+        }
+
+        private void CancelDrag()
+        {
+            CleanupDrag();
+        }
+
+        private void CleanupDrag()
+        {
+            if (_dragGhost != null)
+            {
+                _dragGhost.RemoveFromHierarchy();
+                _dragGhost = null;
+            }
+            if (_dropIndicator != null)
+            {
+                _dropIndicator.RemoveFromHierarchy();
+                _dropIndicator = null;
+            }
+            ClearDropHighlights();
+            ClearDragSourceHighlight();
+        }
+
+        private void ClearDropHighlights()
+        {
+            _scrollView?.Query(className: "section-row--drag-over").ForEach(e => e.RemoveFromClassList("section-row--drag-over"));
+        }
+
+        private void ClearDragSourceHighlight()
+        {
+            _scrollView?.Query(className: "section-row--dragging").ForEach(e => e.RemoveFromClassList("section-row--dragging"));
+        }
+
+        private void PerformSectionMove(DropTarget target)
+        {
+            // Get all units belonging to the dragged section
+            var draggedUnits = Data.Conversations.Where(u =>
+                u.EpisodeID == _dragEp && u.ChapterID == _dragCh && u.SectionID == _dragSec).ToList();
+
+            if (draggedUnits.Count == 0) return;
+
+            // Determine new SectionID
+            int newSectionID;
+            if (target.InsertBefore)
+            {
+                newSectionID = target.SectionID;
+                // Shift existing sections at and after this position
+                var toShift = Data.Conversations.Where(u =>
+                    u.EpisodeID == target.EpisodeID &&
+                    u.ChapterID == target.ChapterID &&
+                    u.SectionID >= newSectionID &&
+                    !(u.EpisodeID == _dragEp && u.ChapterID == _dragCh && u.SectionID == _dragSec)
+                ).ToList();
+                foreach (var u in toShift)
+                    u.SectionID++;
+            }
+            else
+            {
+                newSectionID = target.SectionID + 1;
+                // Shift existing sections after target
+                var toShift = Data.Conversations.Where(u =>
+                    u.EpisodeID == target.EpisodeID &&
+                    u.ChapterID == target.ChapterID &&
+                    u.SectionID >= newSectionID &&
+                    !(u.EpisodeID == _dragEp && u.ChapterID == _dragCh && u.SectionID == _dragSec)
+                ).ToList();
+                foreach (var u in toShift)
+                    u.SectionID++;
+            }
+
+            // Move the dragged units
+            foreach (var u in draggedUnits)
+            {
+                u.EpisodeID = target.EpisodeID;
+                u.ChapterID = target.ChapterID;
+                u.SectionID = newSectionID;
+            }
+
+            // Compact section IDs in source chapter (if different from target)
+            if (_dragEp != target.EpisodeID || _dragCh != target.ChapterID)
+            {
+                CompactSectionIDs(_dragEp, _dragCh);
+            }
+            // Also compact target chapter
+            CompactSectionIDs(target.EpisodeID, target.ChapterID);
+
+            EditorUtility.SetDirty(Data);
+            RebuildTree();
+        }
+
+        private void CompactSectionIDs(int ep, int ch)
+        {
+            var sections = Data.Conversations
+                .Where(u => u.EpisodeID == ep && u.ChapterID == ch)
+                .GroupBy(u => u.SectionID)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            int newID = 1;
+            foreach (var group in sections)
+            {
+                foreach (var u in group)
+                    u.SectionID = newID;
+                newID++;
             }
         }
 
