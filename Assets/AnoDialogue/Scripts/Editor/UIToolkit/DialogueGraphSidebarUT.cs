@@ -408,51 +408,96 @@ namespace AnoGame.AnoDialogue.Editor
             _dragGhost.style.left = pointerPos.x + 10;
             _dragGhost.style.top = pointerPos.y - 10;
 
-            // Find drop target
-            bool foundTarget = false;
-            foreach (var target in _dropTargets)
+            // Collect all gaps (boundaries between section rows)
+            // Each gap is defined by (Y position in world coords, target info)
+            float bestDist = float.MaxValue;
+            float bestY = 0;
+            float bestX = 0;
+            float bestW = 0;
+            bool foundBest = false;
+            DropTarget bestTarget = default;
+
+            // Filter valid targets (exclude self)
+            var validTargets = new System.Collections.Generic.List<DropTarget>();
+            foreach (var t in _dropTargets)
             {
-                if (target.Row == null || target.Row.panel == null) continue;
-                // Skip self
-                if (target.EpisodeID == _dragEp && target.ChapterID == _dragCh && target.SectionID == _dragSec) continue;
+                if (t.Row == null || t.Row.panel == null) continue;
+                if (t.EpisodeID == _dragEp && t.ChapterID == _dragCh && t.SectionID == _dragSec) continue;
+                validTargets.Add(t);
+            }
 
-                var rowWorldBound = target.Row.worldBound;
-                if (rowWorldBound.Contains(pointerPos))
+            for (int i = 0; i < validTargets.Count; i++)
+            {
+                var target = validTargets[i];
+                var bound = target.Row.worldBound;
+
+                // Gap above this row (insert before)
+                float gapY = bound.yMin;
+                float dist = Mathf.Abs(pointerPos.y - gapY);
+                if (dist < bestDist)
                 {
-                    foundTarget = true;
-
-                    // Determine insert position: top half = before, bottom half = after
-                    float midY = rowWorldBound.y + rowWorldBound.height * 0.5f;
-                    bool insertBefore = pointerPos.y < midY;
-
-                    // Calculate position relative to scrollView contentContainer
-                    var contentBound = _scrollView.contentContainer.worldBound;
-                    float localY = (insertBefore ? rowWorldBound.yMin : rowWorldBound.yMax) - contentBound.yMin;
-                    float localX = rowWorldBound.xMin - contentBound.xMin;
-
-                    _dropIndicator.style.display = DisplayStyle.Flex;
-                    _dropIndicator.style.left = localX;
-                    _dropIndicator.style.top = localY - 1;
-                    _dropIndicator.style.width = rowWorldBound.width;
-
-                    // Store intent in userData
-                    _dropIndicator.userData = new DropTarget
+                    bestDist = dist;
+                    bestY = gapY;
+                    bestX = bound.xMin;
+                    bestW = bound.width;
+                    bestTarget = new DropTarget
                     {
                         EpisodeID = target.EpisodeID,
                         ChapterID = target.ChapterID,
                         SectionID = target.SectionID,
-                        InsertBefore = insertBefore,
+                        InsertBefore = true,
                         Row = target.Row
                     };
+                    foundBest = true;
+                }
 
-                    // Highlight
-                    ClearDropHighlights();
-                    target.Row.AddToClassList("section-row--drag-over");
-                    break;
+                // Gap below this row (insert after) — only for the last target in its chapter,
+                // or when the next target is in a different chapter/episode
+                bool isLastInGroup = (i == validTargets.Count - 1) ||
+                    validTargets[i + 1].EpisodeID != target.EpisodeID ||
+                    validTargets[i + 1].ChapterID != target.ChapterID;
+
+                if (isLastInGroup)
+                {
+                    float gapYBottom = bound.yMax;
+                    float distBottom = Mathf.Abs(pointerPos.y - gapYBottom);
+                    if (distBottom < bestDist)
+                    {
+                        bestDist = distBottom;
+                        bestY = gapYBottom;
+                        bestX = bound.xMin;
+                        bestW = bound.width;
+                        bestTarget = new DropTarget
+                        {
+                            EpisodeID = target.EpisodeID,
+                            ChapterID = target.ChapterID,
+                            SectionID = target.SectionID,
+                            InsertBefore = false,
+                            Row = target.Row
+                        };
+                        foundBest = true;
+                    }
                 }
             }
 
-            if (!foundTarget)
+            // Only show indicator if pointer is reasonably close to the sidebar
+            if (foundBest && bestDist < 80f)
+            {
+                var contentBound = _scrollView.contentContainer.worldBound;
+                float localY = bestY - contentBound.yMin;
+                float localX = bestX - contentBound.xMin;
+
+                _dropIndicator.style.display = DisplayStyle.Flex;
+                _dropIndicator.style.left = localX;
+                _dropIndicator.style.top = localY - 1;
+                _dropIndicator.style.width = bestW;
+
+                _dropIndicator.userData = bestTarget;
+
+                ClearDropHighlights();
+                bestTarget.Row.AddToClassList("section-row--drag-over");
+            }
+            else
             {
                 _dropIndicator.style.display = DisplayStyle.None;
                 ClearDropHighlights();
