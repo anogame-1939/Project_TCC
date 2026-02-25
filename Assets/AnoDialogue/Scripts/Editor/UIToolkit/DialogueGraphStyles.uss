@@ -273,10 +273,14 @@
 
 .top-port-container .top-port {
     align-self: center;
+    width: 12px;
 }
 
-.top-port-container .top-port .unity-port__connector {
+.top-port-container .top-port #connector {
     border-color: #aaa;
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
 }
 
 /* Bottom port container (Output / Next / Choices) */
@@ -293,10 +297,14 @@
 
 .bottom-port-container .bottom-port {
     align-self: center;
+    width: 12px;
 }
 
-.bottom-port-container .bottom-port .unity-port__connector {
+.bottom-port-container .bottom-port #connector {
     border-color: #aaa;
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
 }
 
 .dialogue-node #node-border {

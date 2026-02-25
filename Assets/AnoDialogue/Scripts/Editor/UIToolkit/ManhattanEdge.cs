@@ -5,9 +5,10 @@ using UnityEngine.UIElements;
 namespace AnoGame.AnoDialogue.Editor
 {
     /// <summary>
-    /// Step 1: Simple straight line from output port to input port.
-    /// from/to are in Edge's coordinate space, not EdgeControl's local space.
-    /// Must subtract EdgeControl.layout.position to convert.
+    /// Custom Edge with Manhattan (right-angle) routing.
+    /// Two patterns based on vertical relationship:
+    ///   - ChannelRoute: target is above → horizontal → vertical → horizontal (S-shape)
+    ///   - StepRoute:    target is below → horizontal → vertical (L-shape)
     /// </summary>
     public class ManhattanEdge : Edge
     {
@@ -48,16 +49,45 @@ namespace AnoGame.AnoDialogue.Editor
             painter.lineWidth = 2f;
             painter.lineCap = LineCap.Round;
 
-            // Intermediate points
-            float midX = (localFrom.x + localTo.x) * 0.5f;
-            Vector2 mid1 = new Vector2(midX, localFrom.y);
-            Vector2 mid2 = new Vector2(midX, localTo.y);
+            // to.y < from.y → target is above (Y increases downward)
+            if (localTo.y < localFrom.y)
+                DrawChannelRoute(painter, localFrom, localTo);
+            else
+                DrawStepRoute(painter, localFrom, localTo);
+        }
+
+        /// <summary>
+        /// Target is above source.
+        /// 4-point S-shape: from → (midX, from.y) → (midX, to.y) → to
+        /// Horizontal → Vertical → Horizontal
+        /// </summary>
+        private void DrawChannelRoute(Painter2D painter, Vector2 from, Vector2 to)
+        {
+            float midX = (from.x + to.x) * 0.5f;
+            Vector2 mid1 = new Vector2(midX, from.y);
+            Vector2 mid2 = new Vector2(midX, to.y);
 
             painter.BeginPath();
-            painter.MoveTo(localFrom);
+            painter.MoveTo(from);
             painter.LineTo(mid1);
             painter.LineTo(mid2);
-            painter.LineTo(localTo);
+            painter.LineTo(to);
+            painter.Stroke();
+        }
+
+        /// <summary>
+        /// Target is below source.
+        /// 3-point L-shape: from → (to.x, from.y) → to
+        /// Horizontal → Vertical
+        /// </summary>
+        private void DrawStepRoute(Painter2D painter, Vector2 from, Vector2 to)
+        {
+            Vector2 corner = new Vector2(to.x, from.y);
+
+            painter.BeginPath();
+            painter.MoveTo(from);
+            painter.LineTo(corner);
+            painter.LineTo(to);
             painter.Stroke();
         }
     }
