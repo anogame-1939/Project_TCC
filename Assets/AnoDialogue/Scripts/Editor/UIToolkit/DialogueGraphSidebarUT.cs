@@ -384,16 +384,14 @@ namespace AnoGame.AnoDialogue.Editor
             marker.style.position = Position.Absolute;
             marker.style.left = -4;
             marker.style.top = -3;
-            marker.style.width = 8;
-            marker.style.height = 8;
-            marker.style.borderTopLeftRadius = 4;
-            marker.style.borderTopRightRadius = 4;
-            marker.style.borderBottomLeftRadius = 4;
-            marker.style.borderBottomRightRadius = 4;
+            marker.style.width = 9;
+            marker.style.height = 9;
+            marker.style.borderTopLeftRadius = 5;
+            marker.style.borderTopRightRadius = 5;
+            marker.style.borderBottomLeftRadius = 5;
+            marker.style.borderBottomRightRadius = 5;
             marker.style.backgroundColor = new Color(0.31f, 0.76f, 0.97f); // #4fc3f7
             _dropIndicator.Add(marker);
-
-            rootPanel.Add(_dropIndicator);
 
             // Highlight source row
             sourceRow.AddToClassList("section-row--dragging");
@@ -419,17 +417,28 @@ namespace AnoGame.AnoDialogue.Editor
                 if (rowWorldBound.Contains(pointerPos))
                 {
                     foundTarget = true;
-                    Debug.Log($"[Sidebar] UpdateDrag: found target sec={target.SectionID} at worldBound={rowWorldBound}, pointerPos={pointerPos}");
 
                     // Determine insert position: top half = before, bottom half = after
                     float midY = rowWorldBound.y + rowWorldBound.height * 0.5f;
                     bool insertBefore = pointerPos.y < midY;
-                    float indicatorY = insertBefore ? rowWorldBound.yMin : rowWorldBound.yMax;
+
+                    // Remove previous indicator from hierarchy
+                    if (_dropIndicator.parent != null)
+                        _dropIndicator.RemoveFromHierarchy();
+
+                    // Insert indicator as sibling of the target row
+                    var parentContainer = target.Row.parent;
+                    if (parentContainer != null)
+                    {
+                        int rowIndex = parentContainer.IndexOf(target.Row);
+                        int insertIndex = insertBefore ? rowIndex : rowIndex + 1;
+                        if (insertIndex >= parentContainer.childCount)
+                            parentContainer.Add(_dropIndicator);
+                        else
+                            parentContainer.Insert(insertIndex, _dropIndicator);
+                    }
 
                     _dropIndicator.style.display = DisplayStyle.Flex;
-                    _dropIndicator.style.left = rowWorldBound.x;
-                    _dropIndicator.style.top = indicatorY - 1;
-                    _dropIndicator.style.width = rowWorldBound.width;
 
                     // Store intent in userData
                     _dropIndicator.userData = new DropTarget
@@ -450,6 +459,8 @@ namespace AnoGame.AnoDialogue.Editor
 
             if (!foundTarget)
             {
+                if (_dropIndicator.parent != null)
+                    _dropIndicator.RemoveFromHierarchy();
                 _dropIndicator.style.display = DisplayStyle.None;
                 ClearDropHighlights();
             }
