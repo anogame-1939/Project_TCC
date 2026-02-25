@@ -307,13 +307,12 @@ namespace AnoGame.AnoFlow.Editor
             extensionContainer.Add(container);
             RefreshExpandedState();
 
-            // Defer initial port position update after layout settles
+            // Defer initial sync after layout settles
             schedule.Execute(() =>
             {
                 schedule.Execute(() =>
                 {
                     SyncExtensionContainerState();
-                    ApplyPortPositions();
                 });
             });
 
@@ -371,38 +370,14 @@ namespace AnoGame.AnoFlow.Editor
             _lastExpanded = expanded;
             int gen = ++_portUpdateGen;
 
-            Debug.Log($"[PortDbg] OnExpandCollapseChanged '{EventData.EventId}' expanded={expanded} gen={gen} extDisplay={extensionContainer?.resolvedStyle.display} extH={extensionContainer?.resolvedStyle.height:F0}");
+            Debug.Log($"[PortDbg] OnExpandCollapseChanged '{EventData.EventId}' expanded={expanded} gen={gen}");
 
             // Defer 1 frame: RefreshExpandedState sets display:none on extensionContainer.
             // We need to wait for that to finish before overriding with our styles.
             schedule.Execute(() =>
             {
-                if (gen != _portUpdateGen)
-                {
-                    Debug.Log($"[PortDbg] SyncExt STALE '{EventData.EventId}' gen={gen} current={_portUpdateGen}");
-                    return;
-                }
-
-                Debug.Log($"[PortDbg] SyncExt PRE '{EventData.EventId}' gen={gen} extDisplay={extensionContainer?.resolvedStyle.display} extPos={extensionContainer?.resolvedStyle.position} extH={extensionContainer?.resolvedStyle.height:F0}");
+                if (gen != _portUpdateGen) return;
                 SyncExtensionContainerState();
-                Debug.Log($"[PortDbg] SyncExt POST '{EventData.EventId}' gen={gen} extDisplay={extensionContainer?.resolvedStyle.display} extPos={extensionContainer?.resolvedStyle.position} extH={extensionContainer?.resolvedStyle.height:F0}");
-
-                // Wait 1 more frame for layout to settle after style changes
-                schedule.Execute(() =>
-                {
-                    if (gen != _portUpdateGen)
-                    {
-                        Debug.Log($"[PortDbg] Apply STALE '{EventData.EventId}' gen={gen} current={_portUpdateGen}");
-                        return;
-                    }
-
-                    Debug.Log($"[PortDbg] Apply PRE '{EventData.EventId}' gen={gen} expanded={expanded} nodeH={resolvedStyle.height:F0} extH={extensionContainer?.resolvedStyle.height:F0}");
-                    for (int i = 0; i < _sectionBodies.Count; i++)
-                        Debug.Log($"[PortDbg]   body[{i}] h={_sectionBodies[i].resolvedStyle.height:F0}");
-
-                    ApplyPortPositions();
-                    LogAllPortPositions($"CollapseToggle AFTER gen={gen}");
-                });
             });
         }
 
@@ -450,10 +425,9 @@ namespace AnoGame.AnoFlow.Editor
             for (int i = 0; i < _sectionBodies.Count; i++)
             {
                 var body = _sectionBodies[i];
-                bool wasExpanded = body.resolvedStyle.height > 0;
+                bool wasExpanded = !IsSectionCollapsed(body);
                 _savedSectionStates.Add(wasExpanded);
-                Debug.Log($"[PortDbg]   SaveSection[{i}] wasExpanded={wasExpanded} h={body.resolvedStyle.height:F0}");
-                SetBodyCollapsed(body, true);
+                CollapseSectionBody(body);
             }
         }
 
@@ -464,43 +438,77 @@ namespace AnoGame.AnoFlow.Editor
         {
             for (int i = 0; i < _sectionBodies.Count && i < _savedSectionStates.Count; i++)
             {
-                bool wasExpanded = _savedSectionStates[i];
-                Debug.Log($"[PortDbg]   RestoreSection[{i}] wasExpanded={wasExpanded}");
-                SetBodyCollapsed(_sectionBodies[i], !wasExpanded);
+                if (_savedSectionStates[i])
+                    ExpandSectionBody(_sectionBodies[i]);
+                else
+                    CollapseSectionBody(_sectionBodies[i]);
             }
             _savedSectionStates.Clear();
         }
 
         /// <summary>
-        /// Schedule port position recalculation for section toggle.
-        /// Uses generation counter to debounce: only the latest call applies.
+        /// Check if a section body is currently in collapsed state.
         /// </summary>
-        private void SchedulePortPositionUpdate()
+        private static bool IsSectionCollapsed(VisualElement body)
         {
-            ResetPortTransforms();
-            int gen = ++_portUpdateGen;
-            Debug.Log($"[PortDbg] SchedulePortPositionUpdate '{EventData.EventId}' gen={gen}");
-            schedule.Execute(() =>
+            return body.resolvedStyle.height < 1f;
+        }
+
+        /// <summary>
+        /// Collapse a section body:
+        ///  - body: height:0 + overflow:visible (ポートははみ出して描画される)
+        ///  - ポート行内の非ポート要素(ラベル・ボタン): display:none
+        ///  - ポートのない子要素: display:none
+        /// ポートは body 内に留まり、GraphView 標準エッジルーティングがそのまま動作。
+        /// </summary>
+        private static void CollapseSectionBody(VisualElement body)
+        {
+            body.style.height = 0;
+            body.style.overflow = Overflow.Visible;
+
+            for (int i = 0; i < body.childCount; i++)
             {
-                if (gen != _portUpdateGen) return;
-                ApplyPortPositions();
-                LogAllPortPositions($"SectionToggle AFTER gen={gen}");
-            });
+                var child = body[i];
+                var port = child.Q<Port>();
+                if (port != null)
+                {
+                    // ポート行: ポート以外を非表示
+                    for (int j = 0; j < child.childCount; j++)
+                    {
+                        if (!(child[j] is Port))
+                            child[j].style.display = DisplayStyle.None;
+                    }
+                }
+                else
+                {
+                    // ポートのない行: 全体を非表示
+                    child.style.display = DisplayStyle.None;
+                }
+            }
         }
 
         /// <summary>
-        /// Reset all port transforms to zero.
+        /// Expand a section body:
+        ///  - body: height:auto + overflow:visible
+        ///  - 全子要素を display:flex に復元
         /// </summary>
-        private void ResetPortTransforms()
+        private static void ExpandSectionBody(VisualElement body)
         {
-            foreach (var kvp in TagConditionPorts) kvp.Value.transform.position = Vector3.zero;
-            foreach (var kvp in NegativeTagPorts) kvp.Value.transform.position = Vector3.zero;
-            foreach (var kvp in ConditionPorts) kvp.Value.transform.position = Vector3.zero;
+            body.style.height = new StyleLength(StyleKeyword.Auto);
+            body.style.overflow = Overflow.Visible;
+
+            for (int i = 0; i < body.childCount; i++)
+            {
+                var child = body[i];
+                child.style.display = DisplayStyle.Flex;
+                // ポート行内の非ポート要素も復元
+                for (int j = 0; j < child.childCount; j++)
+                    child[j].style.display = DisplayStyle.Flex;
+            }
         }
 
         /// <summary>
-        /// 全コネクタの現在座標・transform・親bodyの高さをログ出力する。
-        /// 操作の前後で呼び出して座標変化を追跡する。
+        /// 全コネクタの現在座標・親の情報をログ出力する。
         /// </summary>
         private void LogAllPortPositions(string context)
         {
@@ -508,12 +516,9 @@ namespace AnoGame.AnoFlow.Editor
 
             void LogPort(string dictName, Port port, string key)
             {
-                var row = port.parent;
-                var body = row?.parent;
-                float bodyH = body?.resolvedStyle.height ?? -1;
                 float portWorldY = port.worldBound.center.y;
-                float transformY = port.transform.position.y;
-                Debug.Log($"[PortDbg][Snap]   {dictName}['{key}'] worldCY={portWorldY:F1} transformY={transformY:F1} bodyH={bodyH:F0}");
+                string parentName = port.parent?.parent?.name ?? "?";
+                Debug.Log($"[PortDbg][Snap]   {dictName}['{key}'] worldCY={portWorldY:F1} parent={parentName}");
             }
 
             foreach (var kvp in TagConditionPorts) LogPort("TagCond", kvp.Value, kvp.Key);
@@ -521,122 +526,16 @@ namespace AnoGame.AnoFlow.Editor
             foreach (var kvp in ConditionPorts) LogPort("CondEvt", kvp.Value, kvp.Key);
         }
 
-        /// <summary>
-        /// Apply correct port positions based on the combined state:
-        ///   State A: Node collapsed -> all ports to node vertical center
-        ///   State B: Node expanded + section collapsed -> ports to section header Y
-        ///   State C: Node expanded + section expanded -> ports at normal position (zero)
-        /// </summary>
-        private void ApplyPortPositions()
-        {
-            var allPorts = new List<Port>();
-            foreach (var kvp in TagConditionPorts) allPorts.Add(kvp.Value);
-            foreach (var kvp in NegativeTagPorts) allPorts.Add(kvp.Value);
-            foreach (var kvp in ConditionPorts) allPorts.Add(kvp.Value);
-            if (allPorts.Count == 0) return;
 
-            bool currentExpanded = expanded;
-
-            // --- State A: Node collapsed ---
-            if (!currentExpanded)
-            {
-                float nodeH = resolvedStyle.height;
-                if (nodeH <= 0)
-                {
-                    Debug.Log($"[PortDbg] ApplyPortPositions '{EventData.EventId}' State A: nodeH={nodeH} NOT READY");
-                    return;
-                }
-                float targetY = worldBound.y + nodeH * 0.5f;
-
-                Debug.Log($"[PortDbg] ApplyPortPositions '{EventData.EventId}' State A: nodeH={nodeH:F0} targetY={targetY:F0} portCount={allPorts.Count}");
-                foreach (var port in allPorts)
-                {
-                    float portCY = port.worldBound.center.y;
-                    var newPos = new Vector3(0, targetY - portCY, 0);
-                    Debug.Log($"[PortDbg]   port portCY={portCY:F1} -> transform.y={newPos.y:F1}");
-                    port.transform.position = newPos;
-                }
-                // 5フレーム遅延実験: レイアウトパス完了後にエッジ再描画
-                ScheduleDelayedEdgeRepaint(5);
-                return;
-            }
-
-            // --- State B/C: Node expanded, check each section ---
-            Debug.Log($"[PortDbg] ApplyPortPositions '{EventData.EventId}' State B/C: portCount={allPorts.Count}");
-            foreach (var port in allPorts)
-            {
-                var row = port.parent;
-                var body = row?.parent;
-                if (body == null) continue;
-
-                float bodyHeight = body.resolvedStyle.height;
-                if (bodyHeight < 1f)
-                {
-                    // State B: Section collapsed -> move port to header center Y
-                    var section = body.parent;
-                    var header = section?.ElementAt(0);
-                    if (header != null)
-                    {
-                        float headerCY = header.worldBound.center.y;
-                        float portCY = port.worldBound.center.y;
-                        var newPos = new Vector3(0, headerCY - portCY, 0);
-                        Debug.Log($"[PortDbg]   B: port '{port.portName}' bodyH={bodyHeight:F0} headerCY={headerCY:F1} portCY={portCY:F1} -> transform.y={newPos.y:F1}");
-                        port.transform.position = newPos;
-                    }
-                }
-                else
-                {
-                    // State C: Section expanded -> reset transform
-                    var prevY = port.transform.position.y;
-                    port.transform.position = Vector3.zero;
-                    Debug.Log($"[PortDbg]   C: port '{port.portName}' bodyH={bodyHeight:F0} prevTransformY={prevY:F1} -> transform.y=0");
-                }
-            }
-            // 5フレーム遅延実験: レイアウトパス完了後にエッジ再描画
-            ScheduleDelayedEdgeRepaint(5);
-        }
-
-        /// <summary>
-        /// Nフレーム遅延後にForceEdgeRepaintを呼ぶ。
-        /// レイアウトパス完了後にエッジを再描画するための実験。
-        /// </summary>
-        private void ScheduleDelayedEdgeRepaint(int frames)
-        {
-            void Chain(int remaining)
-            {
-                if (remaining <= 0)
-                {
-                    Debug.Log($"[PortDbg] DelayedEdgeRepaint FIRE '{EventData.EventId}' (after {frames} frames)");
-                    ForceEdgeRepaint();
-                    return;
-                }
-                schedule.Execute(() => Chain(remaining - 1));
-            }
-            Chain(frames);
-        }
-
-        /// <summary>
-        /// Force edge/connector repaint after port transforms change.
-        /// </summary>
-        private void ForceEdgeRepaint()
-        {
-            var graphView = GetFirstAncestorOfType<GraphView>();
-            if (graphView != null)
-            {
-                foreach (var edge in graphView.edges.ToList())
-                {
-                    edge.MarkDirtyRepaint();
-                    edge.UpdateEdgeControl();
-                }
-            }
-        }
 
         /// <summary>
         /// Build an accordion section: clickable header + collapsible body.
         /// +ボタンはヘッダー行の右端に配置.
+        /// 折りたたみ時: body は height:0 + overflow:visible。
+        /// ポートは body 内に留まり、はみ出して描画される。
         /// </summary>
         private VisualElement BuildAccordionSection(VisualElement parent, string label,
-            bool expanded, Action<VisualElement> buildContent, Action onAddClicked)
+            bool sectionExpanded, Action<VisualElement> buildContent, Action onAddClicked)
         {
             var section = new VisualElement();
             section.style.marginTop = 4;
@@ -650,7 +549,7 @@ namespace AnoGame.AnoFlow.Editor
             string arrowDown = "\u25BE"; // small down triangle
             string arrowRight = "\u25B8"; // small right triangle
             // Hide arrow when count is 0
-            string arrow = count > 0 ? (expanded ? arrowDown : arrowRight) : "";
+            string arrow = count > 0 ? (sectionExpanded ? arrowDown : arrowRight) : "";
             string prefix = count > 0 ? $"{arrow} " : "  ";
             var headerLabel = new Label($"{prefix}{label} ({count})");
             headerLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -669,16 +568,19 @@ namespace AnoGame.AnoFlow.Editor
 
             section.Add(header);
 
-            // Body — use height:0 + overflow:hidden instead of display:none
-            // to keep ports in the layout tree for edge routing.
+            // Body
             var body = new VisualElement();
             body.style.paddingLeft = 4;
-            SetBodyCollapsed(body, !expanded);
             buildContent(body);
             section.Add(body);
 
             // Register body for node collapse/restore
+            int sectionIndex = _sectionBodies.Count;
             _sectionBodies.Add(body);
+
+            // Apply initial collapsed state
+            if (!sectionExpanded)
+                CollapseSectionBody(body);
 
             // Click header to toggle body
             var capturedLabel = headerLabel;
@@ -688,15 +590,21 @@ namespace AnoGame.AnoFlow.Editor
             header.RegisterCallback<MouseDownEvent>(evt =>
             {
                 if (evt.button != 0) return;
-                // Do nothing when section has no items
                 if (capturedCount == 0) { evt.StopPropagation(); return; }
-                bool isVisible = capturedBody.resolvedStyle.height > 0;
-                Debug.Log($"[PortDbg][USER] SectionToggle '{capturedArrowLabel}' in '{EventData.EventId}': wasVisible={isVisible} -> collapsed={isVisible} nodeExpanded={expanded}");
-                LogAllPortPositions($"SectionToggle '{capturedArrowLabel}' BEFORE");
-                SetBodyCollapsed(capturedBody, isVisible);
-                string newArrow = isVisible ? arrowRight : arrowDown;
-                capturedLabel.text = $"{newArrow} {capturedArrowLabel} ({capturedCount})";
-                SchedulePortPositionUpdate();
+
+                bool isCollapsed = IsSectionCollapsed(capturedBody);
+
+                if (isCollapsed)
+                {
+                    ExpandSectionBody(capturedBody);
+                    capturedLabel.text = $"{arrowDown} {capturedArrowLabel} ({capturedCount})";
+                }
+                else
+                {
+                    CollapseSectionBody(capturedBody);
+                    capturedLabel.text = $"{arrowRight} {capturedArrowLabel} ({capturedCount})";
+                }
+
                 evt.StopPropagation();
             });
 
@@ -704,19 +612,7 @@ namespace AnoGame.AnoFlow.Editor
             return section;
         }
 
-        private static void SetBodyCollapsed(VisualElement body, bool collapsed)
-        {
-            if (collapsed)
-            {
-                body.style.height = 0;
-                body.style.overflow = Overflow.Hidden;
-            }
-            else
-            {
-                body.style.height = new StyleLength(StyleKeyword.Auto);
-                body.style.overflow = Overflow.Visible;
-            }
-        }
+
 
         private int GetSectionCount(string label)
         {
