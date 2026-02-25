@@ -34,6 +34,7 @@ namespace AnoGame.AnoDialogue.Editor
         private VisualElement _dragGhost;
         private VisualElement _dropIndicator;
         private const float DragThreshold = 5f;
+        private IVisualElementScheduledItem _pendingClickSchedule;
 
         /// <summary>
         /// Information about a potential drop target in the sidebar.
@@ -269,6 +270,9 @@ namespace AnoGame.AnoDialogue.Editor
                     evt.StopImmediatePropagation();
                     _dragStarted = false;
                     _isDragging = false;
+                    // Cancel pending single-click action to prevent RebuildTree
+                    _pendingClickSchedule?.Pause();
+                    _pendingClickSchedule = null;
                     StartInlineRename(secNameLabel, ep, ch, sec, displayName);
                     return;
                 }
@@ -322,13 +326,25 @@ namespace AnoGame.AnoDialogue.Editor
                 }
                 else if (_dragStarted)
                 {
-                    // No drag occurred → treat as click (select section)
-                    string filterName = (sec == 0) ? nameKey : null;
-                    OnSelectSection?.Invoke(ep, ch, sec, filterName);
-                    if (first != null)
+                    // Delay click action to allow double-click PointerDown to arrive
+                    // before RebuildTree destroys the secRow instance
+                    int capturedEpLocal = ep;
+                    int capturedChLocal = ch;
+                    int capturedSecLocal = sec;
+                    string capturedNameKeyLocal = nameKey;
+                    var capturedFirst = first;
+                    var scheduled = schedule.Execute(() =>
                     {
-                        OnRequestPanTo?.Invoke(first.Position);
-                    }
+                        _pendingClickSchedule = null;
+                        string filterName = (capturedSecLocal == 0) ? capturedNameKeyLocal : null;
+                        OnSelectSection?.Invoke(capturedEpLocal, capturedChLocal, capturedSecLocal, filterName);
+                        if (capturedFirst != null)
+                        {
+                            OnRequestPanTo?.Invoke(capturedFirst.Position);
+                        }
+                    });
+                    scheduled.ExecuteLater(250);
+                    _pendingClickSchedule = scheduled;
                 }
 
                 _dragStarted = false;
@@ -652,8 +668,12 @@ namespace AnoGame.AnoDialogue.Editor
             parent.Insert(idx, textField);
             sourceNameLabel.style.display = DisplayStyle.None;
 
-            textField.Focus();
-            textField.SelectAll();
+            // Schedule Focus for next frame — Focus() doesn't work during PointerDown dispatch
+            textField.schedule.Execute(() =>
+            {
+                textField.Focus();
+                textField.SelectAll();
+            });
 
             Action commitRename = () =>
             {

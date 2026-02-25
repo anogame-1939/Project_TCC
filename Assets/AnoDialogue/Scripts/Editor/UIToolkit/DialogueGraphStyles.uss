@@ -25,6 +25,26 @@
 .dialogue-content {
     flex-grow: 1;
     flex-direction: row;
+    overflow: hidden;
+}
+
+/* Sidebar container — fixed width, does not grow */
+.dialogue-sidebar-container {
+    flex-shrink: 0;
+    flex-grow: 0;
+    overflow: hidden;
+}
+
+/* GraphView container — fills remaining space after sidebar */
+.dialogue-graph-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+}
+
+/* GraphView — positioned absolutely within container so layout.x = 0 */
+.dialogue-graph-view {
+    overflow: hidden;
 }
 
 /* --- Sidebar --- */

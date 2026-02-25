@@ -624,7 +624,8 @@ namespace AnoGame.AnoDialogue.Editor
             }
 
             PopulateGraph();
-            if (visibleNodes.Count > 0) FrameNode(visibleNodes[0].ID);
+            // Reset view to top-left origin
+            UpdateViewTransform(Vector3.zero, contentViewContainer.transform.scale);
             MarkDataDirty();
         }
 
@@ -658,7 +659,8 @@ namespace AnoGame.AnoDialogue.Editor
             }
 
             PopulateGraph();
-            if (visibleNodes.Count > 0) FrameNode(visibleNodes[0].ID);
+            // Reset view to top-left origin
+            UpdateViewTransform(Vector3.zero, contentViewContainer.transform.scale);
             MarkDataDirty();
         }
 

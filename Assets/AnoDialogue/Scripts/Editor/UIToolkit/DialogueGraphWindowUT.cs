@@ -99,6 +99,7 @@ namespace AnoGame.AnoDialogue.Editor
 
             // Sidebar
             _sidebarContainer = new VisualElement();
+            _sidebarContainer.AddToClassList("dialogue-sidebar-container");
             _sidebarContainer.style.display = _showSidebar ? DisplayStyle.Flex : DisplayStyle.None;
 
             _sidebar = new DialogueGraphSidebarUT(_data);
@@ -119,15 +120,22 @@ namespace AnoGame.AnoDialogue.Editor
             _sidebarContainer.Add(_sidebar);
             content.Add(_sidebarContainer);
 
-            // GraphView
+            // GraphView — wrapped in container so GraphView.layout.x stays at 0
+            // (direct flex placement gives layout.x = sidebar width, causing
+            //  RectangleSelector coordinate offset)
+            var graphContainer = new VisualElement();
+            graphContainer.AddToClassList("dialogue-graph-container");
+            content.Add(graphContainer);
+
             _graphView = new DialogueGraphView(_data);
             _graphView.AddToClassList("dialogue-graph-view");
+            _graphView.StretchToParentSize();
             _graphView.UseManhattanEdges = _useManhattanEdges;
             _graphView.OnGraphDataChanged = () =>
             {
                 _sidebar?.RebuildTree();
             };
-            content.Add(_graphView);
+            graphContainer.Add(_graphView);
 
             // Restore previous filter or set default
             if (_lastFilterEpisode != int.MinValue)
