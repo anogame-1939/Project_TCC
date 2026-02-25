@@ -324,6 +324,9 @@ namespace AnoGame.AnoFlow.Editor
             {
                 collapseButton.RegisterCallback<MouseUpEvent>(_ =>
                 {
+                    // クリック時のコネクタ座標を記録
+                    LogAllPortPositions($"CollapseBtn CLICK (before state change) expanded={expanded}");
+
                     // 1フレーム遅延: クリック後に expanded プロパティが更新されるのを待つ
                     schedule.Execute(() =>
                     {
@@ -398,6 +401,7 @@ namespace AnoGame.AnoFlow.Editor
                         Debug.Log($"[PortDbg]   body[{i}] h={_sectionBodies[i].resolvedStyle.height:F0}");
 
                     ApplyPortPositions();
+                    LogAllPortPositions($"CollapseToggle AFTER gen={gen}");
                 });
             });
         }
@@ -480,6 +484,7 @@ namespace AnoGame.AnoFlow.Editor
             {
                 if (gen != _portUpdateGen) return;
                 ApplyPortPositions();
+                LogAllPortPositions($"SectionToggle AFTER gen={gen}");
             });
         }
 
@@ -491,6 +496,29 @@ namespace AnoGame.AnoFlow.Editor
             foreach (var kvp in TagConditionPorts) kvp.Value.transform.position = Vector3.zero;
             foreach (var kvp in NegativeTagPorts) kvp.Value.transform.position = Vector3.zero;
             foreach (var kvp in ConditionPorts) kvp.Value.transform.position = Vector3.zero;
+        }
+
+        /// <summary>
+        /// 全コネクタの現在座標・transform・親bodyの高さをログ出力する。
+        /// 操作の前後で呼び出して座標変化を追跡する。
+        /// </summary>
+        private void LogAllPortPositions(string context)
+        {
+            Debug.Log($"[PortDbg][Snap] === {context} === node='{EventData.EventId}' expanded={expanded} nodeH={resolvedStyle.height:F0}");
+
+            void LogPort(string dictName, Port port, string key)
+            {
+                var row = port.parent;
+                var body = row?.parent;
+                float bodyH = body?.resolvedStyle.height ?? -1;
+                float portWorldY = port.worldBound.center.y;
+                float transformY = port.transform.position.y;
+                Debug.Log($"[PortDbg][Snap]   {dictName}['{key}'] worldCY={portWorldY:F1} transformY={transformY:F1} bodyH={bodyH:F0}");
+            }
+
+            foreach (var kvp in TagConditionPorts) LogPort("TagCond", kvp.Value, kvp.Key);
+            foreach (var kvp in NegativeTagPorts) LogPort("NegTag", kvp.Value, kvp.Key);
+            foreach (var kvp in ConditionPorts) LogPort("CondEvt", kvp.Value, kvp.Key);
         }
 
         /// <summary>
@@ -528,11 +556,13 @@ namespace AnoGame.AnoFlow.Editor
                     Debug.Log($"[PortDbg]   port portCY={portCY:F1} -> transform.y={newPos.y:F1}");
                     port.transform.position = newPos;
                 }
-                ForceEdgeRepaint();
+                // 5フレーム遅延実験: レイアウトパス完了後にエッジ再描画
+                ScheduleDelayedEdgeRepaint(5);
                 return;
             }
 
             // --- State B/C: Node expanded, check each section ---
+            Debug.Log($"[PortDbg] ApplyPortPositions '{EventData.EventId}' State B/C: portCount={allPorts.Count}");
             foreach (var port in allPorts)
             {
                 var row = port.parent;
@@ -549,12 +579,40 @@ namespace AnoGame.AnoFlow.Editor
                     {
                         float headerCY = header.worldBound.center.y;
                         float portCY = port.worldBound.center.y;
-                        port.transform.position = new Vector3(0, headerCY - portCY, 0);
+                        var newPos = new Vector3(0, headerCY - portCY, 0);
+                        Debug.Log($"[PortDbg]   B: port '{port.portName}' bodyH={bodyHeight:F0} headerCY={headerCY:F1} portCY={portCY:F1} -> transform.y={newPos.y:F1}");
+                        port.transform.position = newPos;
                     }
                 }
-                // State C: Section expanded -> transform already zero
+                else
+                {
+                    // State C: Section expanded -> reset transform
+                    var prevY = port.transform.position.y;
+                    port.transform.position = Vector3.zero;
+                    Debug.Log($"[PortDbg]   C: port '{port.portName}' bodyH={bodyHeight:F0} prevTransformY={prevY:F1} -> transform.y=0");
+                }
             }
-            ForceEdgeRepaint();
+            // 5フレーム遅延実験: レイアウトパス完了後にエッジ再描画
+            ScheduleDelayedEdgeRepaint(5);
+        }
+
+        /// <summary>
+        /// Nフレーム遅延後にForceEdgeRepaintを呼ぶ。
+        /// レイアウトパス完了後にエッジを再描画するための実験。
+        /// </summary>
+        private void ScheduleDelayedEdgeRepaint(int frames)
+        {
+            void Chain(int remaining)
+            {
+                if (remaining <= 0)
+                {
+                    Debug.Log($"[PortDbg] DelayedEdgeRepaint FIRE '{EventData.EventId}' (after {frames} frames)");
+                    ForceEdgeRepaint();
+                    return;
+                }
+                schedule.Execute(() => Chain(remaining - 1));
+            }
+            Chain(frames);
         }
 
         /// <summary>
@@ -634,6 +692,7 @@ namespace AnoGame.AnoFlow.Editor
                 if (capturedCount == 0) { evt.StopPropagation(); return; }
                 bool isVisible = capturedBody.resolvedStyle.height > 0;
                 Debug.Log($"[PortDbg][USER] SectionToggle '{capturedArrowLabel}' in '{EventData.EventId}': wasVisible={isVisible} -> collapsed={isVisible} nodeExpanded={expanded}");
+                LogAllPortPositions($"SectionToggle '{capturedArrowLabel}' BEFORE");
                 SetBodyCollapsed(capturedBody, isVisible);
                 string newArrow = isVisible ? arrowRight : arrowDown;
                 capturedLabel.text = $"{newArrow} {capturedArrowLabel} ({capturedCount})";

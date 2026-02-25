@@ -12,3 +12,5 @@ trigger: always_on
 3.エディタツールに関する作業を行う際は、`Assets/AnoGame/Documents/EditorToolsList.md` を参照し、既存ツールの一覧・構成を把握すること。
 
 4.Unity標準コンポーネント（CanvasGroup, PlayableDirector等）のエディタ拡張は、`Assets/AnoUtility/` に配置すること。アセンブリは `AnoUtility.Editor`（名前空間: `AnoGame.Utility.Editor`）を使用する。
+
+5.EventGraphの展開/折りたたみ・コネクタ位置に関する修正を行った際は、`Assets/AnoGame/Documents/EventGraph_CollapseExpand_Issues.md` に修正内容・原因・影響範囲のサマリを追記すること。
