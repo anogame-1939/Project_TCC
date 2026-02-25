@@ -395,6 +395,9 @@ namespace AnoGame.AnoDialogue.Editor
 
             // Highlight source row
             sourceRow.AddToClassList("section-row--dragging");
+
+            // Add drop indicator to scrollView contentContainer (absolute overlay, no layout shift)
+            _scrollView.contentContainer.Add(_dropIndicator);
         }
 
         private void UpdateDrag(Vector2 pointerPos)
@@ -422,23 +425,15 @@ namespace AnoGame.AnoDialogue.Editor
                     float midY = rowWorldBound.y + rowWorldBound.height * 0.5f;
                     bool insertBefore = pointerPos.y < midY;
 
-                    // Remove previous indicator from hierarchy
-                    if (_dropIndicator.parent != null)
-                        _dropIndicator.RemoveFromHierarchy();
-
-                    // Insert indicator as sibling of the target row
-                    var parentContainer = target.Row.parent;
-                    if (parentContainer != null)
-                    {
-                        int rowIndex = parentContainer.IndexOf(target.Row);
-                        int insertIndex = insertBefore ? rowIndex : rowIndex + 1;
-                        if (insertIndex >= parentContainer.childCount)
-                            parentContainer.Add(_dropIndicator);
-                        else
-                            parentContainer.Insert(insertIndex, _dropIndicator);
-                    }
+                    // Calculate position relative to scrollView contentContainer
+                    var contentBound = _scrollView.contentContainer.worldBound;
+                    float localY = (insertBefore ? rowWorldBound.yMin : rowWorldBound.yMax) - contentBound.yMin;
+                    float localX = rowWorldBound.xMin - contentBound.xMin;
 
                     _dropIndicator.style.display = DisplayStyle.Flex;
+                    _dropIndicator.style.left = localX;
+                    _dropIndicator.style.top = localY - 1;
+                    _dropIndicator.style.width = rowWorldBound.width;
 
                     // Store intent in userData
                     _dropIndicator.userData = new DropTarget
@@ -459,8 +454,6 @@ namespace AnoGame.AnoDialogue.Editor
 
             if (!foundTarget)
             {
-                if (_dropIndicator.parent != null)
-                    _dropIndicator.RemoveFromHierarchy();
                 _dropIndicator.style.display = DisplayStyle.None;
                 ClearDropHighlights();
             }
