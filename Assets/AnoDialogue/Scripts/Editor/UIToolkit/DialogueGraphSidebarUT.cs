@@ -125,17 +125,10 @@ namespace AnoGame.AnoDialogue.Editor
                     if (epHeader != null)
                     {
                         var addChBtn = new Button(() => CreateChapter(epKey)) { text = "+" };
-                        addChBtn.style.width = 20;
-                        addChBtn.style.height = 18;
-                        addChBtn.style.fontSize = 11;
-                        addChBtn.style.unityTextAlign = TextAnchor.MiddleCenter;
-                        addChBtn.style.paddingTop = 0;
-                        addChBtn.style.paddingBottom = 0;
-                        addChBtn.style.paddingLeft = 0;
-                        addChBtn.style.paddingRight = 0;
+                        addChBtn.AddToClassList("chapter-btn");
                         addChBtn.style.position = Position.Absolute;
-                        addChBtn.style.right = 4;
-                        addChBtn.style.top = 2;
+                        addChBtn.style.right = 6;
+                        addChBtn.style.top = 0;
                         epHeader.Add(addChBtn);
                     }
                 }
