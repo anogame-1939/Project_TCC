@@ -201,62 +201,37 @@ namespace AnoGame.AnoDialogue.Editor
                     var secRow = new VisualElement();
                     secRow.AddToClassList("section-row");
 
-                    var handle = new Label("≡");
-                    handle.AddToClassList("section-handle");
-                    secRow.Add(handle);
-
                     // Capture for closure
                     int capturedEp = epGroup.Key;
                     int capturedCh = chapterGroup.Key;
                     int capturedSec = secID;
                     string capturedName = secNameKey;
 
-                    var secBtn = new Button(() =>
-                    {
-                        Debug.Log($"[Sidebar] Button Click: isDragging={_isDragging}, dragStarted={_dragStarted}");
-                        // Skip click action if drag just ended
-                        if (_isDragging || _dragStarted) return;
+                    // Section name label (left, ellipsis overflow)
+                    var secNameLabel = new Label(displayName);
+                    secNameLabel.AddToClassList("section-name");
+                    secNameLabel.pickingMode = PickingMode.Ignore;
 
-                        string filterName = (capturedSec == -1) ? capturedName : null;
-                        OnSelectSection?.Invoke(capturedEp, capturedCh, capturedSec, filterName);
+                    // Section count label (right-aligned)
+                    var secCountLabel = new Label(sectionGroup.Count().ToString());
+                    secCountLabel.AddToClassList("section-count");
+                    secCountLabel.pickingMode = PickingMode.Ignore;
 
-                        if (first != null)
-                        {
-                            OnRequestPanTo?.Invoke(first.Position);
-                        }
-                    })
-                    {
-                        text = $"{displayName} ({sectionGroup.Count()})"
-                    };
-                    secBtn.AddToClassList("section-btn");
+                    // --- All interactions (click, double-click, DD, context menu) handled via SecRow ---
+                    RegisterDragEvents(secRow, secNameLabel, secCountLabel, capturedEp, capturedCh, capturedSec, capturedName, displayName, first);
 
-                    // Double-click to rename (TrickleDown to intercept before Button's Clickable)
-                    secBtn.RegisterCallback<PointerDownEvent>(evt =>
-                    {
-                        Debug.Log($"[Sidebar] secBtn PointerDown(TrickleDown): clickCount={evt.clickCount}, button={evt.button}, target={evt.target.GetType().Name}");
-                        if (evt.clickCount == 2 && evt.button == 0)
-                        {
-                            Debug.Log("[Sidebar] Double-click detected -> StartInlineRename");
-                            evt.StopImmediatePropagation();
-                            StartInlineRename(secBtn, capturedEp, capturedCh, capturedSec, displayName);
-                        }
-                    }, TrickleDown.TrickleDown);
-
-                    // Right-click context menu
-                    secBtn.RegisterCallback<ContextualMenuPopulateEvent>(evt =>
+                    // Right-click context menu on secRow
+                    secRow.RegisterCallback<ContextualMenuPopulateEvent>(evt =>
                     {
                         evt.menu.AppendAction("Rename", action =>
                         {
-                            StartInlineRename(secBtn, capturedEp, capturedCh, capturedSec, displayName);
+                            StartInlineRename(secNameLabel, capturedEp, capturedCh, capturedSec, displayName);
                         });
                         evt.menu.AppendAction("Delete Section", action =>
                         {
                             DeleteSection(capturedEp, capturedCh, capturedSec);
                         });
                     });
-
-                    // --- Drag & Drop registration ---
-                    RegisterDragEvents(secRow, capturedEp, capturedCh, capturedSec, capturedName, displayName);
 
                     // Register as drop target
                     _dropTargets.Add(new DropTarget
@@ -268,7 +243,8 @@ namespace AnoGame.AnoDialogue.Editor
                         Row = secRow
                     });
 
-                    secRow.Add(secBtn);
+                    secRow.Add(secNameLabel);
+                    secRow.Add(secCountLabel);
 
                     // Delete button for section
                     var secDelBtn = new Button(() =>
@@ -286,23 +262,39 @@ namespace AnoGame.AnoDialogue.Editor
 
         // --- Drag & Drop ---
 
-        private void RegisterDragEvents(VisualElement secRow, int ep, int ch, int sec, string nameKey, string displayName)
+        private void RegisterDragEvents(VisualElement secRow, Label secNameLabel, Label secCountLabel, int ep, int ch, int sec, string nameKey, string displayName, ConversationUnit first)
         {
-            // TrickleDown: fires on parent BEFORE child elements (Button's Clickable)
+            // PointerDown: record drag start + detect double-click
             secRow.RegisterCallback<PointerDownEvent>(evt =>
             {
-                Debug.Log($"[Sidebar] secRow PointerDown(TrickleDown): button={evt.button}, isDragging={_isDragging}, target={evt.target.GetType().Name}");
-                if (evt.button != 0 || _isDragging) return;
-                // Just record, do NOT capture yet (let Button click work normally)
+                if (evt.button != 0) return;
+
+                // Double-click → rename
+                if (evt.clickCount == 2)
+                {
+                    Debug.Log("[Sidebar] Double-click detected -> StartInlineRename");
+                    evt.StopImmediatePropagation();
+                    _dragStarted = false;
+                    _isDragging = false;
+                    StartInlineRename(secNameLabel, ep, ch, sec, displayName);
+                    return;
+                }
+
+                if (_isDragging) return;
+
+                // Record for potential drag
                 _dragStarted = true;
                 _dragStartPos = evt.position;
                 _dragEp = ep;
                 _dragCh = ch;
                 _dragSec = sec;
                 _dragSectionName = displayName;
+
+                // Capture immediately so we get all PointerMove/PointerUp
+                secRow.CapturePointer(evt.pointerId);
             }, TrickleDown.TrickleDown);
 
-            // TrickleDown: detect drag threshold before Button consumes events
+            // PointerMove: detect drag threshold
             secRow.RegisterCallback<PointerMoveEvent>(evt =>
             {
                 if (!_dragStarted && !_isDragging) return;
@@ -313,39 +305,46 @@ namespace AnoGame.AnoDialogue.Editor
                 {
                     if (delta.magnitude < DragThreshold) return;
 
-                    // Threshold exceeded: capture pointer and begin drag
-                    Debug.Log($"[Sidebar] Drag threshold exceeded: delta={delta.magnitude:F1}, capturing pointer");
-                    secRow.CapturePointer(evt.pointerId);
+                    // Threshold exceeded: begin drag
+                    Debug.Log($"[Sidebar] Drag threshold exceeded: delta={delta.magnitude:F1}");
                     _isDragging = true;
                     BeginDrag(secRow);
-                    evt.StopImmediatePropagation();
                 }
 
                 if (_isDragging)
                 {
                     UpdateDrag(evt.position);
-                    evt.StopImmediatePropagation();
                 }
             }, TrickleDown.TrickleDown);
 
-            // TrickleDown: handle drop or cancel
+            // PointerUp: handle drop or click
             secRow.RegisterCallback<PointerUpEvent>(evt =>
             {
-                Debug.Log($"[Sidebar] secRow PointerUp(TrickleDown): isDragging={_isDragging}, dragStarted={_dragStarted}");
+                if (secRow.HasPointerCapture(evt.pointerId))
+                    secRow.ReleasePointer(evt.pointerId);
+
                 if (_isDragging)
                 {
-                    if (secRow.HasPointerCapture(evt.pointerId))
-                        secRow.ReleasePointer(evt.pointerId);
                     EndDrag(evt.position);
-                    evt.StopImmediatePropagation();
                 }
+                else if (_dragStarted)
+                {
+                    // No drag occurred → treat as click (select section)
+                    string filterName = (sec == -1) ? nameKey : null;
+                    OnSelectSection?.Invoke(ep, ch, sec, filterName);
+                    if (first != null)
+                    {
+                        OnRequestPanTo?.Invoke(first.Position);
+                    }
+                }
+
                 _dragStarted = false;
                 _isDragging = false;
             }, TrickleDown.TrickleDown);
 
             secRow.RegisterCallback<PointerCaptureOutEvent>(evt =>
             {
-                Debug.Log($"[Sidebar] secRow PointerCaptureOut: isDragging={_isDragging}, dragStarted={_dragStarted}");
+                if (evt.target != secRow) return;
                 if (_isDragging)
                 {
                     CancelDrag();
@@ -368,6 +367,8 @@ namespace AnoGame.AnoDialogue.Editor
 
         private void BeginDrag(VisualElement sourceRow)
         {
+            Debug.Log($"[Sidebar] BeginDrag: section='{_dragSectionName}' ({_dragEp}/{_dragCh}/{_dragSec}), dropTargets={_dropTargets.Count}");
+
             // Create ghost
             _dragGhost = new VisualElement();
             _dragGhost.AddToClassList("drag-ghost");
@@ -378,6 +379,7 @@ namespace AnoGame.AnoDialogue.Editor
             // Position ghost at initial place
             var rootPanel = panel.visualTree;
             rootPanel.Add(_dragGhost);
+            Debug.Log($"[Sidebar] Ghost added to panel. rootPanel children={rootPanel.childCount}");
 
             // Create drop indicator line
             _dropIndicator = new VisualElement();
@@ -409,6 +411,7 @@ namespace AnoGame.AnoDialogue.Editor
                 if (rowWorldBound.Contains(pointerPos))
                 {
                     foundTarget = true;
+                    Debug.Log($"[Sidebar] UpdateDrag: found target sec={target.SectionID} at worldBound={rowWorldBound}, pointerPos={pointerPos}");
 
                     // Determine insert position: top half = before, bottom half = after
                     float midY = rowWorldBound.y + rowWorldBound.height * 0.5f;
@@ -446,9 +449,19 @@ namespace AnoGame.AnoDialogue.Editor
 
         private void EndDrag(Vector2 pointerPos)
         {
-            if (_dropIndicator != null && _dropIndicator.userData is DropTarget dropTarget && _dropIndicator.resolvedStyle.display == DisplayStyle.Flex)
+            bool hasIndicator = _dropIndicator != null;
+            bool isDropTarget = hasIndicator && _dropIndicator.userData is DropTarget;
+            bool isVisible = hasIndicator && _dropIndicator.resolvedStyle.display == DisplayStyle.Flex;
+            Debug.Log($"[Sidebar] EndDrag: hasIndicator={hasIndicator}, isDropTarget={isDropTarget}, isVisible={isVisible}");
+
+            if (hasIndicator && _dropIndicator.userData is DropTarget dropTarget && isVisible)
             {
+                Debug.Log($"[Sidebar] PerformSectionMove: from ({_dragEp}/{_dragCh}/{_dragSec}) to ({dropTarget.EpisodeID}/{dropTarget.ChapterID}/{dropTarget.SectionID}), insertBefore={dropTarget.InsertBefore}");
                 PerformSectionMove(dropTarget);
+            }
+            else
+            {
+                Debug.Log("[Sidebar] EndDrag: no valid drop target, canceling");
             }
 
             CleanupDrag();
@@ -560,18 +573,18 @@ namespace AnoGame.AnoDialogue.Editor
         }
 
         // --- Inline Rename ---
-        private void StartInlineRename(Button sourceBtn, int ep, int ch, int sec, string currentName)
+        private void StartInlineRename(Label sourceNameLabel, int ep, int ch, int sec, string currentName)
         {
-            var parent = sourceBtn.parent;
-            var idx = parent.IndexOf(sourceBtn);
+            var parent = sourceNameLabel.parent;
+            var idx = parent.IndexOf(sourceNameLabel);
 
             var textField = new TextField();
             textField.value = currentName;
-            textField.AddToClassList("section-btn");
+            textField.AddToClassList("section-name");
             textField.style.flexGrow = 1;
 
             parent.Insert(idx, textField);
-            sourceBtn.style.display = DisplayStyle.None;
+            sourceNameLabel.style.display = DisplayStyle.None;
 
             textField.Focus();
             textField.SelectAll();
@@ -587,14 +600,14 @@ namespace AnoGame.AnoDialogue.Editor
                 EditorUtility.SetDirty(Data);
 
                 parent.Remove(textField);
-                sourceBtn.text = $"{newName} ({units.Count})";
-                sourceBtn.style.display = DisplayStyle.Flex;
+                sourceNameLabel.text = newName;
+                sourceNameLabel.style.display = DisplayStyle.Flex;
             };
 
             Action cancelRename = () =>
             {
                 parent.Remove(textField);
-                sourceBtn.style.display = DisplayStyle.Flex;
+                sourceNameLabel.style.display = DisplayStyle.Flex;
             };
 
             textField.RegisterCallback<KeyDownEvent>(evt =>

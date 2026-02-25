@@ -104,36 +104,42 @@
 .section-row {
     flex-direction: row;
     align-items: center;
-    padding: 1px 8px 1px 24px;
+    padding: 1px 4px 1px 24px;
+    border-radius: 3px;
+    background-color: #444;
+    margin: 1px 8px 1px 24px;
+    cursor: arrow;
 }
 
-.section-handle {
-    width: 16px;
-    font-size: 10px;
-    color: #888;
-    -unity-text-align: middle-center;
-    cursor: move-arrow;
+.section-row:hover {
+    background-color: #555;
 }
 
-.section-btn {
+.section-row:active {
+    background-color: #3a6ea5;
+}
+
+.section-name {
     flex-grow: 1;
+    flex-shrink: 1;
     height: 20px;
     font-size: 11px;
     -unity-text-align: middle-left;
     padding-left: 4px;
-    background-color: #444;
-    border-radius: 3px;
-    border-width: 0;
     color: #ddd;
-    margin-left: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.section-btn:hover {
-    background-color: #555;
-}
-
-.section-btn:active {
-    background-color: #3a6ea5;
+.section-count {
+    flex-shrink: 0;
+    height: 20px;
+    min-width: 20px;
+    font-size: 10px;
+    -unity-text-align: middle-right;
+    padding-right: 2px;
+    color: #999;
 }
 
 .section-delete-btn {
