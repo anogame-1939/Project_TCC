@@ -14,3 +14,5 @@ trigger: always_on
 4.Unity標準コンポーネント（CanvasGroup, PlayableDirector等）のエディタ拡張は、`Assets/AnoUtility/` に配置すること。アセンブリは `AnoUtility.Editor`（名前空間: `AnoGame.Utility.Editor`）を使用する。
 
 5.EventGraphの展開/折りたたみ・コネクタ位置に関する修正を行った際は、`Assets/AnoGame/Documents/EventGraph_CollapseExpand_Issues.md` に修正内容・原因・影響範囲のサマリを追記すること。
+
+6.エディタツール作成・編集時に `MarkDirtyRepaint()` / `EditorUtility.SetDirty()` 等のDirty/Repaint系メソッドを安易に使用しないこと。UIToolkitのレイアウト問題はスタイル変更や構造変更で根本的に解決し、Dirty系はデータ永続化目的のみに限定すること。

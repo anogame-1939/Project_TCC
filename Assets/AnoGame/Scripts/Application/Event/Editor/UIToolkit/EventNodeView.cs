@@ -39,6 +39,19 @@ namespace AnoGame.AnoFlow.Editor
         private VisualElement _conditionPortsContainer;
         private VisualElement _tagConditionPortsContainer;
 
+        /// <summary>
+        /// mainContainer に直接追加するコンテンツコンテナ。
+        /// extensionContainer ではなく mainContainer に置くことで、
+        /// GraphView の collapse (display:none) の影響を受けない。
+        /// </summary>
+        private VisualElement _contentContainer;
+
+        /// <summary>
+        /// content(left) + outputPort(right) を横並びにする Row ラッパー。
+        /// #node-border の子として配置。
+        /// </summary>
+        private VisualElement _nodeBody;
+
         // Accordion sections
         private VisualElement _resultTagsSection;
         private VisualElement _conditionTagsSection;
@@ -95,21 +108,30 @@ namespace AnoGame.AnoFlow.Editor
                 titleElement.style.backgroundColor = new StyleColor(new Color(0.24f, 0.24f, 0.24f, 1f));
             }
 
-            // Output Port
-            var bottomContainer = new VisualElement();
-            bottomContainer.AddToClassList("output-port-container");
+            // --- Node body: Row wrapper for content (left) + output port (right) ---
+            _nodeBody = new VisualElement();
+            _nodeBody.style.flexDirection = FlexDirection.Row;
+            _nodeBody.style.alignItems = Align.Stretch;
+
+            // Output Port (right side)
+            var outputPortWrapper = new VisualElement();
+            outputPortWrapper.AddToClassList("output-port-container");
+            outputPortWrapper.style.justifyContent = Justify.Center;
+            outputPortWrapper.style.alignItems = Align.Center;
+            outputPortWrapper.style.flexShrink = 0;
             OutputPort = InstantiatePort(Orientation.Horizontal,
                 UnityEditor.Experimental.GraphView.Direction.Output,
                 Port.Capacity.Multi, typeof(bool));
             OutputPort.portName = "";
-            bottomContainer.Add(OutputPort);
+            outputPortWrapper.Add(OutputPort);
+            _nodeBody.Add(outputPortWrapper);
 
             // #node-border 内に配置してノードサイズに収める
             var nodeBorderForPort = this.Q("node-border");
             if (nodeBorderForPort != null)
-                nodeBorderForPort.Add(bottomContainer);
+                nodeBorderForPort.Add(_nodeBody);
             else
-                Add(bottomContainer);
+                Add(_nodeBody);
 
             CreateContent();
 
@@ -304,7 +326,10 @@ namespace AnoGame.AnoFlow.Editor
 
             UpdateConditionBorder();
 
-            extensionContainer.Add(container);
+            // _nodeBody の先頭に挿入（OutputPort の左側）
+            _contentContainer = container;
+            _contentContainer.style.flexGrow = 1;
+            _nodeBody.Insert(0, container);
             RefreshExpandedState();
 
             // Defer initial sync after layout settles
@@ -323,9 +348,6 @@ namespace AnoGame.AnoFlow.Editor
             {
                 collapseButton.RegisterCallback<MouseUpEvent>(_ =>
                 {
-                    // クリック時のコネクタ座標を記録
-                    LogAllPortPositions($"CollapseBtn CLICK (before state change) expanded={expanded}");
-
                     // 1フレーム遅延: クリック後に expanded プロパティが更新されるのを待つ
                     schedule.Execute(() =>
                     {
@@ -370,10 +392,6 @@ namespace AnoGame.AnoFlow.Editor
             _lastExpanded = expanded;
             int gen = ++_portUpdateGen;
 
-            Debug.Log($"[PortDbg] OnExpandCollapseChanged '{EventData.EventId}' expanded={expanded} gen={gen}");
-
-            // Defer 1 frame: RefreshExpandedState sets display:none on extensionContainer.
-            // We need to wait for that to finish before overriding with our styles.
             schedule.Execute(() =>
             {
                 if (gen != _portUpdateGen) return;
@@ -382,37 +400,84 @@ namespace AnoGame.AnoFlow.Editor
         }
 
         /// <summary>
-        /// Synchronize extensionContainer style with the current expanded state.
-        /// When collapsed, also collapse all accordion sections so ports compact.
-        /// When expanded, restore section states and extensionContainer styles.
+        /// Synchronize content container with the current expanded state.
+        /// Content is in mainContainer (not extensionContainer), so GraphView's
+        /// collapse (display:none on extensionContainer) doesn't affect it.
+        /// We control visibility ourselves:
+        ///   Collapse: height:0 + overflow:visible (ports remain for edge routing)
+        ///   Expand:   height:auto + restore sections
         /// </summary>
         private void SyncExtensionContainerState()
         {
-            if (extensionContainer == null) return;
+            if (_contentContainer == null) return;
 
             if (!expanded)
             {
                 // Save each section's expanded state, then collapse all
                 SaveAndCollapseSections();
 
-                // Override RefreshExpandedState's display:none
-                extensionContainer.style.display = DisplayStyle.Flex;
-                extensionContainer.style.position = Position.Absolute;
-                extensionContainer.style.height = 0;
-                extensionContainer.style.overflow = Overflow.Hidden;
-                extensionContainer.style.left = 0;
-                extensionContainer.style.right = 0;
-                extensionContainer.style.top = 0;
+                // _contentContainer 直下の非ポート要素（カテゴリラベル等）を非表示
+                HideNonPortChildren(_contentContainer);
+
+                // Collapse the content container itself
+                // height:0 + overflow:visible → ポートのみはみ出して描画され、
+                // エッジルーティングに参加する。
+                _contentContainer.style.height = 0;
+                _contentContainer.style.overflow = Overflow.Visible;
             }
             else
             {
-                extensionContainer.style.position = Position.Relative;
-                extensionContainer.style.height = new StyleLength(StyleKeyword.Auto);
-                extensionContainer.style.overflow = Overflow.Visible;
-                extensionContainer.style.top = StyleKeyword.Null;
+                // Expand the content container
+                _contentContainer.style.height = new StyleLength(StyleKeyword.Auto);
+                _contentContainer.style.overflow = Overflow.Visible;
+
+                // 非表示にした要素を復元
+                ShowAllChildren(_contentContainer);
 
                 // Restore section states saved before collapse
                 RestoreSectionStates();
+            }
+        }
+
+        /// <summary>
+        /// コンテナ直下の要素のうち、Port を含まないものを display:none にする。
+        /// セクション全体（header+body）も対象: 内部に Port がなければ丸ごと非表示。
+        /// Port を含むセクションはヘッダーのみ非表示にし、body は CollapseSectionBody で処理済み。
+        /// </summary>
+        private static void HideNonPortChildren(VisualElement container)
+        {
+            for (int i = 0; i < container.childCount; i++)
+            {
+                var child = container[i];
+                if (child.Q<Port>() == null)
+                {
+                    // ポートを含まない要素 → 完全に非表示
+                    child.style.display = DisplayStyle.None;
+                }
+                else
+                {
+                    // ポートを含むセクション → ヘッダー部分のみ非表示
+                    for (int j = 0; j < child.childCount; j++)
+                    {
+                        var grandChild = child[j];
+                        if (grandChild.Q<Port>() == null)
+                            grandChild.style.display = DisplayStyle.None;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// HideNonPortChildren で非表示にした要素を全て display:flex に復元する。
+        /// </summary>
+        private static void ShowAllChildren(VisualElement container)
+        {
+            for (int i = 0; i < container.childCount; i++)
+            {
+                var child = container[i];
+                child.style.display = DisplayStyle.Flex;
+                for (int j = 0; j < child.childCount; j++)
+                    child[j].style.display = DisplayStyle.Flex;
             }
         }
 
@@ -507,24 +572,7 @@ namespace AnoGame.AnoFlow.Editor
             }
         }
 
-        /// <summary>
-        /// 全コネクタの現在座標・親の情報をログ出力する。
-        /// </summary>
-        private void LogAllPortPositions(string context)
-        {
-            Debug.Log($"[PortDbg][Snap] === {context} === node='{EventData.EventId}' expanded={expanded} nodeH={resolvedStyle.height:F0}");
 
-            void LogPort(string dictName, Port port, string key)
-            {
-                float portWorldY = port.worldBound.center.y;
-                string parentName = port.parent?.parent?.name ?? "?";
-                Debug.Log($"[PortDbg][Snap]   {dictName}['{key}'] worldCY={portWorldY:F1} parent={parentName}");
-            }
-
-            foreach (var kvp in TagConditionPorts) LogPort("TagCond", kvp.Value, kvp.Key);
-            foreach (var kvp in NegativeTagPorts) LogPort("NegTag", kvp.Value, kvp.Key);
-            foreach (var kvp in ConditionPorts) LogPort("CondEvt", kvp.Value, kvp.Key);
-        }
 
 
 
