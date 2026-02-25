@@ -378,6 +378,21 @@ namespace AnoGame.AnoDialogue.Editor
             _dropIndicator = new VisualElement();
             _dropIndicator.AddToClassList("drop-indicator");
             _dropIndicator.style.display = DisplayStyle.None;
+
+            // Left marker (circle)
+            var marker = new VisualElement();
+            marker.style.position = Position.Absolute;
+            marker.style.left = -4;
+            marker.style.top = -3;
+            marker.style.width = 8;
+            marker.style.height = 8;
+            marker.style.borderTopLeftRadius = 4;
+            marker.style.borderTopRightRadius = 4;
+            marker.style.borderBottomLeftRadius = 4;
+            marker.style.borderBottomRightRadius = 4;
+            marker.style.backgroundColor = new Color(0.31f, 0.76f, 0.97f); // #4fc3f7
+            _dropIndicator.Add(marker);
+
             rootPanel.Add(_dropIndicator);
 
             // Highlight source row
