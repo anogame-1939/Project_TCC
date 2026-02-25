@@ -491,11 +491,20 @@ namespace AnoGame.AnoDialogue.Editor
             _scrollView?.Query(className: "section-row--dragging").ForEach(e => e.RemoveFromClassList("section-row--dragging"));
         }
 
+        private bool IsDraggedUnit(AnoGame.AnoDialogue.ConversationUnit u)
+        {
+            if (u.EpisodeID != _dragEp || u.ChapterID != _dragCh || u.SectionID != _dragSec)
+                return false;
+            // SectionID==0 の場合は SectionName でも絞り込む
+            if (_dragSec == 0 && !string.IsNullOrEmpty(_dragSectionName))
+                return u.SectionName == _dragSectionName;
+            return true;
+        }
+
         private void PerformSectionMove(DropTarget target)
         {
             // Get all units belonging to the dragged section
-            var draggedUnits = Data.Conversations.Where(u =>
-                u.EpisodeID == _dragEp && u.ChapterID == _dragCh && u.SectionID == _dragSec).ToList();
+            var draggedUnits = Data.Conversations.Where(u => IsDraggedUnit(u)).ToList();
 
             if (draggedUnits.Count == 0) return;
 
@@ -509,7 +518,7 @@ namespace AnoGame.AnoDialogue.Editor
                     u.EpisodeID == target.EpisodeID &&
                     u.ChapterID == target.ChapterID &&
                     u.SectionID >= newSectionID &&
-                    !(u.EpisodeID == _dragEp && u.ChapterID == _dragCh && u.SectionID == _dragSec)
+                    !IsDraggedUnit(u)
                 ).ToList();
                 foreach (var u in toShift)
                     u.SectionID++;
@@ -522,7 +531,7 @@ namespace AnoGame.AnoDialogue.Editor
                     u.EpisodeID == target.EpisodeID &&
                     u.ChapterID == target.ChapterID &&
                     u.SectionID >= newSectionID &&
-                    !(u.EpisodeID == _dragEp && u.ChapterID == _dragCh && u.SectionID == _dragSec)
+                    !IsDraggedUnit(u)
                 ).ToList();
                 foreach (var u in toShift)
                     u.SectionID++;
@@ -551,7 +560,7 @@ namespace AnoGame.AnoDialogue.Editor
         private void CompactSectionIDs(int ep, int ch)
         {
             var sections = Data.Conversations
-                .Where(u => u.EpisodeID == ep && u.ChapterID == ch)
+                .Where(u => u.EpisodeID == ep && u.ChapterID == ch && u.SectionID != 0)
                 .GroupBy(u => u.SectionID)
                 .OrderBy(g => g.Key)
                 .ToList();
