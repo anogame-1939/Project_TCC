@@ -36,8 +36,15 @@ namespace AnoGame.AnoFlow.Editor
         public Action OnNameEditCancelled;
         public bool IsNewNode { get; set; }
 
+        private bool _nodeEditMode = false;
         private VisualElement _conditionPortsContainer;
         private VisualElement _tagConditionPortsContainer;
+
+        /// <summary>
+        /// セクションヘッダーの Label 参照。BuildAccordionSection で登録。
+        /// 順序: ResultTags(0), ConditionTags(1), RequiredEvents(2), RequiredItems(3)
+        /// </summary>
+        private readonly List<Label> _sectionHeaderLabels = new List<Label>();
 
         /// <summary>
         /// mainContainer に直接追加するコンテンツコンテナ。
@@ -477,7 +484,11 @@ namespace AnoGame.AnoFlow.Editor
                 var child = container[i];
                 child.style.display = DisplayStyle.Flex;
                 for (int j = 0; j < child.childCount; j++)
+                {
+                    // Port の内部構造は変更しない（レイアウト破壊を防止）
+                    if (child[j] is Port) continue;
                     child[j].style.display = DisplayStyle.Flex;
+                }
             }
         }
 
@@ -509,6 +520,76 @@ namespace AnoGame.AnoFlow.Editor
                     CollapseSectionBody(_sectionBodies[i]);
             }
             _savedSectionStates.Clear();
+        }
+
+        /// <summary>
+        /// EditMode の表示状態をこのノード内の edit-btn 要素に適用する。
+        /// </summary>
+        public void ApplyEditMode(bool enabled)
+        {
+            _nodeEditMode = enabled;
+            var display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+            this.Query(className: "edit-btn").ForEach(el => el.style.display = display);
+        }
+
+        /// <summary>
+        /// 各セクションの展開/折りたたみ状態を取得する。
+        /// 順序: ResultTags, ConditionTags, RequiredEvents, RequiredItems
+        /// </summary>
+        public bool[] GetCurrentSectionStates()
+        {
+            var states = new bool[_sectionBodies.Count];
+            for (int i = 0; i < _sectionBodies.Count; i++)
+                states[i] = !IsSectionCollapsed(_sectionBodies[i]);
+            return states;
+        }
+
+        /// <summary>
+        /// 保存したセクション状態を復元する。
+        /// ヘッダーの矢印も更新する。
+        /// </summary>
+        public void ApplySectionStates(bool[] states)
+        {
+            string arrowDown = "\u25BE";
+            string arrowRight = "\u25B8";
+
+            for (int i = 0; i < _sectionBodies.Count && i < states.Length; i++)
+            {
+                var body = _sectionBodies[i];
+                bool shouldExpand = states[i];
+                bool isCollapsed = IsSectionCollapsed(body);
+
+                if (shouldExpand && isCollapsed)
+                {
+                    ExpandSectionBody(body);
+                    UpdateSectionArrow(body, arrowDown);
+                }
+                else if (!shouldExpand && !isCollapsed)
+                {
+                    CollapseSectionBody(body);
+                    UpdateSectionArrow(body, arrowRight);
+                }
+            }
+
+            // edit-btn の表示状態を再適用
+            ApplyEditMode(_nodeEditMode);
+        }
+
+        /// <summary>
+        /// セクションヘッダーの矢印を更新する。
+        /// </summary>
+        private static void UpdateSectionArrow(VisualElement body, string arrow)
+        {
+            var section = body.parent;
+            if (section == null || section.childCount == 0) return;
+            var header = section[0];
+            if (header == null || header.childCount == 0) return;
+            var label = header[0] as Label;
+            if (label == null) return;
+
+            var text = label.text;
+            if (text.StartsWith("\u25BE") || text.StartsWith("\u25B8"))
+                label.text = arrow + text.Substring(1);
         }
 
         /// <summary>
@@ -556,6 +637,7 @@ namespace AnoGame.AnoFlow.Editor
         /// Expand a section body:
         ///  - body: height:auto + overflow:visible
         ///  - 全子要素を display:flex に復元
+        ///  - Port 内部構造と edit-btn の display は変更しない
         /// </summary>
         private static void ExpandSectionBody(VisualElement body)
         {
@@ -566,9 +648,13 @@ namespace AnoGame.AnoFlow.Editor
             {
                 var child = body[i];
                 child.style.display = DisplayStyle.Flex;
-                // ポート行内の非ポート要素も復元
                 for (int j = 0; j < child.childCount; j++)
+                {
+                    if (child[j] is Port) continue;
+                    // edit-btn の表示状態は SetEditMode が管理するため変更しない
+                    if (child[j].ClassListContains("edit-btn")) continue;
                     child[j].style.display = DisplayStyle.Flex;
+                }
             }
         }
 
@@ -625,6 +711,7 @@ namespace AnoGame.AnoFlow.Editor
             // Register body for node collapse/restore
             int sectionIndex = _sectionBodies.Count;
             _sectionBodies.Add(body);
+            _sectionHeaderLabels.Add(headerLabel);
 
             // Apply initial collapsed state
             if (!sectionExpanded)
@@ -646,6 +733,8 @@ namespace AnoGame.AnoFlow.Editor
                 {
                     ExpandSectionBody(capturedBody);
                     capturedLabel.text = $"{arrowDown} {capturedArrowLabel} ({capturedCount})";
+                    // edit-btn の適用状態を再適用
+                    ApplyEditMode(_nodeEditMode);
                 }
                 else
                 {
@@ -1015,6 +1104,14 @@ namespace AnoGame.AnoFlow.Editor
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(EventData);
             AssetDatabase.SaveAssetIfDirty(EventData);
+
+            // --- ローカルUI更新: 行を追加 ---
+            AddConditionPortRow(eventId);
+            RefreshSectionHeader(2); // RequiredEvents = index 2
+            ApplyEditMode(_nodeEditMode);
+            UpdateConditionBorder();
+
+            // エッジ接続のためコールバック（GraphView がエッジを張る）
             OnRequiredEventsChanged?.Invoke();
         }
 
@@ -1026,6 +1123,7 @@ namespace AnoGame.AnoFlow.Editor
             var prop = so.FindProperty("requiredEventIds");
             if (prop == null) return;
 
+            bool deleted = false;
             for (int i = 0; i < prop.arraySize; i++)
             {
                 var eidProp = prop.GetArrayElementAtIndex(i).FindPropertyRelative("eventId");
@@ -1035,10 +1133,55 @@ namespace AnoGame.AnoFlow.Editor
                     so.ApplyModifiedProperties();
                     EditorUtility.SetDirty(EventData);
                     AssetDatabase.SaveAssetIfDirty(EventData);
-                    OnRequiredEventsChanged?.Invoke();
-                    return;
+                    deleted = true;
+                    break;
                 }
             }
+
+            if (!deleted) return;
+
+            // --- ローカルUI更新: エッジ切断→行削除→ヘッダー更新 ---
+            if (ConditionPorts.TryGetValue(eventId, out var port))
+            {
+                // 接続中のエッジを切断・削除
+                foreach (var edge in port.connections.ToList())
+                {
+                    edge.output?.Disconnect(edge);
+                    edge.input?.Disconnect(edge);
+                    edge.RemoveFromHierarchy();
+                }
+                ConditionPorts.Remove(eventId);
+
+                // 行ごと削除
+                port.parent?.RemoveFromHierarchy();
+            }
+
+            RefreshSectionHeader(2); // RequiredEvents = index 2
+            UpdateConditionBorder();
+        }
+
+        /// <summary>
+        /// セクションヘッダーのカウント表示と矢印を現在のデータに基づいて更新する。
+        /// </summary>
+        private void RefreshSectionHeader(int sectionIndex)
+        {
+            if (sectionIndex < 0 || sectionIndex >= _sectionHeaderLabels.Count) return;
+            var label = _sectionHeaderLabels[sectionIndex];
+            if (label == null) return;
+
+            string[] sectionNames = { "Result Tags", "Condition Tags", "Req Events", "Req Items" };
+            if (sectionIndex >= sectionNames.Length) return;
+
+            string name = sectionNames[sectionIndex];
+            int count = GetSectionCount(name);
+
+            bool isExpanded = sectionIndex < _sectionBodies.Count && !IsSectionCollapsed(_sectionBodies[sectionIndex]);
+            string arrowDown = "\u25BE";
+            string arrowRight = "\u25B8";
+            string arrow = count > 0 ? (isExpanded ? arrowDown : arrowRight) : "";
+            string prefix = count > 0 ? $"{arrow} " : "  ";
+            label.text = $"{prefix}{name} ({count})";
+            label.style.color = count > 0 ? Color.white : new Color(0.5f, 0.5f, 0.5f);
         }
 
         // ====== Helpers ======

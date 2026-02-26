@@ -247,7 +247,7 @@ namespace AnoGame.AnoFlow.Editor
             {
                 var node = new EventNodeView(ed, knownEventIds, knownItemIds ?? new HashSet<string>(),
                     activeList, allKnownTags, eventNameMap, _itemNameMap, SectionVis);
-                node.OnRequiredEventsChanged = () => RebuildGraph(null);
+                node.OnRequiredEventsChanged = () => ConnectEdgesForNode(node);
                 node.OnTagsChanged = () => RebuildGraph(null);
                 AddElement(node);
                 _nodeMap[ed.EventId] = node;
@@ -418,6 +418,13 @@ namespace AnoGame.AnoFlow.Editor
                 positions[kvp.Key] = new Vector2(rect.x, rect.y);
             }
 
+            // Save per-node section states before rebuild
+            var sectionStates = new Dictionary<string, bool[]>();
+            foreach (var kvp in _nodeMap)
+            {
+                sectionStates[kvp.Key] = kvp.Value.GetCurrentSectionStates();
+            }
+
             // Rebuild
             PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
 
@@ -427,6 +434,15 @@ namespace AnoGame.AnoFlow.Editor
                 if (_nodeMap.TryGetValue(kvp.Key, out var node))
                 {
                     node.SetPosition(new Rect(kvp.Value.x, kvp.Value.y, 0, 0));
+                }
+            }
+
+            // Restore per-node section states
+            foreach (var kvp in sectionStates)
+            {
+                if (_nodeMap.TryGetValue(kvp.Key, out var node))
+                {
+                    node.ApplySectionStates(kvp.Value);
                 }
             }
 
@@ -482,13 +498,9 @@ namespace AnoGame.AnoFlow.Editor
         public void SetEditMode(bool enabled)
         {
             _editMode = enabled;
-            var display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
             foreach (var node in _nodeMap.Values)
             {
-                node.Query(className: "edit-btn").ForEach(el =>
-                {
-                    el.style.display = display;
-                });
+                node.ApplyEditMode(enabled);
             }
         }
 
@@ -515,6 +527,34 @@ namespace AnoGame.AnoFlow.Editor
                 meta.SetNodePosition(assetGuid, kvp.Key, new Vector2(rect.x, rect.y));
             }
             meta.Save();
+        }
+
+        /// <summary>
+        /// 指定ノードの RequiredEvent ポートのうち未接続のものにエッジを張る。
+        /// AddRequiredEvent 後のローカル更新用。
+        /// </summary>
+        private void ConnectEdgesForNode(EventNodeView targetNode)
+        {
+            if (targetNode == null) return;
+
+            foreach (var kvp in targetNode.ConditionPorts)
+            {
+                var reqId = kvp.Key;
+                var condPort = kvp.Value;
+
+                // 既に接続済みならスキップ
+                if (condPort.connected) continue;
+
+                // ソースノードを探してエッジ接続
+                if (_nodeMap.TryGetValue(reqId, out var sourceNode))
+                {
+                    var edge = sourceNode.OutputPort.ConnectTo(condPort);
+                    AddElement(edge);
+                }
+            }
+
+            // エッジレイヤーを前面に
+            schedule.Execute(BringEdgesToFront);
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
