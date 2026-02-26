@@ -124,9 +124,11 @@
     display: flex;
 }
 
-/* Tag/Event name labels: fixed width with ellipsis */
+/* Tag/Event name labels: flex fill with ellipsis, buttons align right */
 .section-item-label {
-    max-width: 120px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     -unity-text-overflow-position: end;

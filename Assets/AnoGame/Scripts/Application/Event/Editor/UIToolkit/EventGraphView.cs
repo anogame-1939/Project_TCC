@@ -510,6 +510,15 @@ namespace AnoGame.AnoFlow.Editor
         }
 
         /// <summary>
+        /// Window 側から SectionVis 変更後に呼ぶリビルド。
+        /// per-node section states は復元しない（SectionVis の値をそのまま使う）。
+        /// </summary>
+        public void RebuildForSectionChange()
+        {
+            RebuildGraph(null, false);
+        }
+
+        /// <summary>
         /// Show or hide all edit buttons (+, ▲, ▼, ×) across all nodes.
         /// </summary>
         public void SetEditMode(bool enabled)
