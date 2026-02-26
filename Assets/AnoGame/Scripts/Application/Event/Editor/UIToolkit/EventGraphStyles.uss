@@ -114,3 +114,12 @@
     margin-top: 2px;
     padding-left: 0;
 }
+
+/* Edit buttons: hidden by default, shown only in edit-mode */
+.edit-btn {
+    display: none;
+}
+
+.edit-mode .edit-btn {
+    display: flex;
+}

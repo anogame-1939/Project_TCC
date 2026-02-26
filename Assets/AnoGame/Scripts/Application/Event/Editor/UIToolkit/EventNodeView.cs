@@ -523,13 +523,16 @@ namespace AnoGame.AnoFlow.Editor
         }
 
         /// <summary>
-        /// EditMode の表示状態をこのノード内の edit-btn 要素に適用する。
+        /// EditMode の表示状態をこのノードに適用する。
+        /// USS の .edit-mode クラスで制御するため、インラインスタイルは不要。
         /// </summary>
         public void ApplyEditMode(bool enabled)
         {
             _nodeEditMode = enabled;
-            var display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
-            this.Query(className: "edit-btn").ForEach(el => el.style.display = display);
+            if (enabled)
+                AddToClassList("edit-mode");
+            else
+                RemoveFromClassList("edit-mode");
         }
 
         /// <summary>
@@ -556,23 +559,18 @@ namespace AnoGame.AnoFlow.Editor
             for (int i = 0; i < _sectionBodies.Count && i < states.Length; i++)
             {
                 var body = _sectionBodies[i];
-                bool shouldExpand = states[i];
-                bool isCollapsed = IsSectionCollapsed(body);
-
-                if (shouldExpand && isCollapsed)
+                // resolvedStyle はレイアウト前に無効なため、無条件で適用する
+                if (states[i])
                 {
                     ExpandSectionBody(body);
                     UpdateSectionArrow(body, arrowDown);
                 }
-                else if (!shouldExpand && !isCollapsed)
+                else
                 {
                     CollapseSectionBody(body);
                     UpdateSectionArrow(body, arrowRight);
                 }
             }
-
-            // edit-btn の表示状態を再適用
-            ApplyEditMode(_nodeEditMode);
         }
 
         /// <summary>
@@ -733,8 +731,6 @@ namespace AnoGame.AnoFlow.Editor
                 {
                     ExpandSectionBody(capturedBody);
                     capturedLabel.text = $"{arrowDown} {capturedArrowLabel} ({capturedCount})";
-                    // edit-btn の適用状態を再適用
-                    ApplyEditMode(_nodeEditMode);
                 }
                 else
                 {
@@ -775,7 +771,8 @@ namespace AnoGame.AnoFlow.Editor
                     row.style.flexDirection = FlexDirection.Row;
                     row.style.alignItems = Align.Center;
 
-                    var tagLbl = new Label($"\u25cf {tag}");
+                    var tagLbl = new Label($"\u25cf {TruncateDisplayText(tag)}");
+                    tagLbl.tooltip = tag;
                     tagLbl.style.color = new Color(0.4f, 0.9f, 0.4f);
                     tagLbl.style.flexGrow = 1;
                     row.Add(tagLbl);
@@ -834,7 +831,8 @@ namespace AnoGame.AnoFlow.Editor
             }
 
             string icon = isNegative ? "\u2717" : (satisfied ? "\u2713" : "\u2717");
-            var lbl = new Label($"{icon} {tag}");
+            var lbl = new Label($"{icon} {TruncateDisplayText(tag)}");
+            lbl.tooltip = tag;
             if (isNegative)
             {
                 lbl.style.color = new Color(1f, 0.4f, 0.4f);
@@ -898,8 +896,8 @@ namespace AnoGame.AnoFlow.Editor
             ConditionPorts[eid] = condPort;
 
             var displayName = _eventNameMap.TryGetValue(eid, out var eName) ? eName : eid;
-            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {displayName}");
-            lbl.tooltip = eid;
+            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {TruncateDisplayText(displayName)}");
+            lbl.tooltip = $"{displayName} ({eid})";
             lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
             lbl.style.marginLeft = 4;
             lbl.style.flexGrow = 1;
@@ -1108,7 +1106,6 @@ namespace AnoGame.AnoFlow.Editor
             // --- ローカルUI更新: 行を追加 ---
             AddConditionPortRow(eventId);
             RefreshSectionHeader(2); // RequiredEvents = index 2
-            ApplyEditMode(_nodeEditMode);
             UpdateConditionBorder();
 
             // エッジ接続のためコールバック（GraphView がエッジを張る）
@@ -1182,6 +1179,15 @@ namespace AnoGame.AnoFlow.Editor
             string prefix = count > 0 ? $"{arrow} " : "  ";
             label.text = $"{prefix}{name} ({count})";
             label.style.color = count > 0 ? Color.white : new Color(0.5f, 0.5f, 0.5f);
+        }
+
+        /// <summary>
+        /// 表示テキストを最大文字数で省略する。超過分は "..." に置換。
+        /// </summary>
+        private static string TruncateDisplayText(string text, int maxChars = 8)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= maxChars) return text;
+            return text.Substring(0, maxChars) + "...";
         }
 
         // ====== Helpers ======
