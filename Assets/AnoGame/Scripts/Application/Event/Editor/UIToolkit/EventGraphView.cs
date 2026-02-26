@@ -527,6 +527,12 @@ namespace AnoGame.AnoFlow.Editor
             foreach (var node in _nodeMap.Values)
             {
                 node.ApplyEditMode(enabled);
+                if (enabled)
+                    node.ForceExpandAllSections();
+                else
+                    node.ApplySectionVisibility(
+                        SectionVis.ResultTags, SectionVis.ConditionTags,
+                        SectionVis.RequiredEvents, SectionVis.RequiredItems);
             }
         }
 

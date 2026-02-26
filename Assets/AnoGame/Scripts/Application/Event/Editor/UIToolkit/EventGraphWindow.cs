@@ -58,9 +58,7 @@ namespace AnoGame.AnoFlow.Editor
         private void OnUndoRedo()
         {
             if (_graphView != null && _eventDataList != null)
-            {
                 _graphView.PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
-            }
         }
 
         private void CleanupSoftDeletedAssets()
@@ -101,7 +99,7 @@ namespace AnoGame.AnoFlow.Editor
             root.AddToClassList("event-graph-root");
             rootVisualElement.Add(root);
 
-            // === Toolbar (left: Reload, Auto Layout, Save Positions) ===
+            // === Toolbar ===
             var toolbar = new Toolbar();
             toolbar.AddToClassList("event-toolbar");
 
@@ -127,9 +125,8 @@ namespace AnoGame.AnoFlow.Editor
             _graphView.AddToClassList("event-graph-view");
             graphContainer.Add(_graphView);
 
-            // === Floating Panel ===
-            var panel = BuildFloatingPanel();
-            graphContainer.Add(panel);
+            // === Floating Panel (vertical layout) ===
+            graphContainer.Add(BuildFloatingPanel());
 
             root.Add(graphContainer);
 
@@ -139,7 +136,6 @@ namespace AnoGame.AnoFlow.Editor
                 _graphView.SetEditMode(_isEditMode);
             }
 
-            // ノードのヘッダークリック折りたたみ → ALLハイライト解除
             _graphView.OnExpandAllStateChanged = allExpanded =>
             {
                 if (!allExpanded)
@@ -160,10 +156,10 @@ namespace AnoGame.AnoFlow.Editor
             panel.style.borderTopRightRadius = 6;
             panel.style.borderBottomLeftRadius = 6;
             panel.style.borderBottomRightRadius = 6;
-            panel.style.paddingLeft = 6;
-            panel.style.paddingRight = 6;
-            panel.style.paddingTop = 4;
-            panel.style.paddingBottom = 4;
+            panel.style.paddingLeft = 8;
+            panel.style.paddingRight = 8;
+            panel.style.paddingTop = 6;
+            panel.style.paddingBottom = 6;
             panel.style.borderTopWidth = 1;
             panel.style.borderBottomWidth = 1;
             panel.style.borderLeftWidth = 1;
@@ -173,79 +169,89 @@ namespace AnoGame.AnoFlow.Editor
             panel.style.borderBottomColor = borderColor;
             panel.style.borderLeftColor = borderColor;
             panel.style.borderRightColor = borderColor;
+            panel.style.minWidth = 140;
 
-            // --- Row 1: ALL + Section toggles ---
-            var row1 = new VisualElement();
-            row1.style.flexDirection = FlexDirection.Row;
-            row1.style.alignItems = Align.Center;
-            row1.style.marginBottom = 4;
-
+            // --- ALL button ---
             _allBtn = new Button() { text = "ALL" };
             _allBtn.tooltip = "\u5168\u30bb\u30af\u30b7\u30e7\u30f3\u306e\u5c55\u958b/\u6298\u7573\u3092\u30c8\u30b0\u30eb";
+            _allBtn.style.height = 22;
+            _allBtn.style.marginBottom = 4;
             _allBtn.clicked += OnAllClicked;
-            StyleFloatingButton(_allBtn);
-            row1.Add(_allBtn);
+            panel.Add(_allBtn);
 
-            AddSpacer(row1, 8);
+            // --- Separator ---
+            var sep1 = new VisualElement();
+            sep1.style.height = 1;
+            sep1.style.backgroundColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            sep1.style.marginTop = 2;
+            sep1.style.marginBottom = 4;
+            panel.Add(sep1);
 
-            _resultToggle = CreateSectionToggle("Result", "\u5168\u30ce\u30fc\u30c9\u306e Result Tags \u8868\u793a\u5207\u66ff");
-            row1.Add(_resultToggle);
+            // --- Section toggles (vertical) ---
+            _resultToggle = CreatePanelToggle("Result", "\u5168\u30ce\u30fc\u30c9\u306e Result Tags \u8868\u793a\u5207\u66ff");
+            _resultToggle.RegisterValueChangedCallback(_ => OnSectionToggleChanged());
+            panel.Add(_resultToggle);
 
-            _conditionToggle = CreateSectionToggle("Condition", "\u5168\u30ce\u30fc\u30c9\u306e Condition Tags \u8868\u793a\u5207\u66ff");
-            row1.Add(_conditionToggle);
+            _conditionToggle = CreatePanelToggle("Condition", "\u5168\u30ce\u30fc\u30c9\u306e Condition Tags \u8868\u793a\u5207\u66ff");
+            _conditionToggle.RegisterValueChangedCallback(_ => OnSectionToggleChanged());
+            panel.Add(_conditionToggle);
 
-            _eventsToggle = CreateSectionToggle("Events", "\u5168\u30ce\u30fc\u30c9\u306e Req Events \u8868\u793a\u5207\u66ff");
-            row1.Add(_eventsToggle);
+            _eventsToggle = CreatePanelToggle("Events", "\u5168\u30ce\u30fc\u30c9\u306e Req Events \u8868\u793a\u5207\u66ff");
+            _eventsToggle.RegisterValueChangedCallback(_ => OnSectionToggleChanged());
+            panel.Add(_eventsToggle);
 
-            _itemsToggle = CreateSectionToggle("Items", "\u5168\u30ce\u30fc\u30c9\u306e Req Items \u8868\u793a\u5207\u66ff");
-            row1.Add(_itemsToggle);
+            _itemsToggle = CreatePanelToggle("Items", "\u5168\u30ce\u30fc\u30c9\u306e Req Items \u8868\u793a\u5207\u66ff");
+            _itemsToggle.RegisterValueChangedCallback(_ => OnSectionToggleChanged());
+            panel.Add(_itemsToggle);
 
-            panel.Add(row1);
+            // --- Separator ---
+            var sep2 = new VisualElement();
+            sep2.style.height = 1;
+            sep2.style.backgroundColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            sep2.style.marginTop = 4;
+            sep2.style.marginBottom = 4;
+            panel.Add(sep2);
 
-            // --- Row 2: Negative (left) ... Edit (right) ---
-            var row2 = new VisualElement();
-            row2.style.flexDirection = FlexDirection.Row;
-            row2.style.alignItems = Align.Center;
-
-            var negativeToggle = new Toggle() { text = "Negative", value = false };
-            negativeToggle.tooltip = "\u30cd\u30ac\u30c6\u30a3\u30d6\u30bf\u30b0(!)\u306e\n\u6291\u5236\u30e9\u30a4\u30f3\u3092\u8868\u793a";
+            // --- Negative toggle ---
+            var negativeToggle = CreatePanelToggle("Negative", "\u30cd\u30ac\u30c6\u30a3\u30d6\u30bf\u30b0(!)\u306e\n\u6291\u5236\u30e9\u30a4\u30f3\u3092\u8868\u793a");
             negativeToggle.RegisterValueChangedCallback(evt =>
             {
                 _graphView?.SetShowNegativeEdges(evt.newValue);
             });
-            row2.Add(negativeToggle);
+            panel.Add(negativeToggle);
 
-            // Spacer to push Edit to right
-            var editSpacer = new VisualElement();
-            editSpacer.style.flexGrow = 1;
-            row2.Add(editSpacer);
+            // --- Edit toggle (right-aligned row) ---
+            var editRow = new VisualElement();
+            editRow.style.flexDirection = FlexDirection.Row;
+            editRow.style.justifyContent = Justify.FlexEnd;
 
-            var editToggle = new Toggle() { text = "Edit", value = _isEditMode };
-            editToggle.tooltip = "\u7de8\u96c6\u30e2\u30fc\u30c9\u306eON/OFF";
+            var editToggle = CreatePanelToggle("Edit", "\u7de8\u96c6\u30e2\u30fc\u30c9\u306eON/OFF");
+            editToggle.value = _isEditMode;
             editToggle.RegisterValueChangedCallback(evt =>
             {
                 _isEditMode = evt.newValue;
                 _graphView?.SetEditMode(_isEditMode);
             });
-            row2.Add(editToggle);
-
-            panel.Add(row2);
+            editRow.Add(editToggle);
+            panel.Add(editRow);
 
             return panel;
         }
 
-        private Toggle CreateSectionToggle(string label, string tooltip)
+        /// <summary>
+        /// \u30d1\u30cd\u30eb\u7528\u30c8\u30b0\u30eb\u3002\u30c6\u30ad\u30b9\u30c8\u5de6\u3001\u30c1\u30a7\u30c3\u30af\u30dc\u30c3\u30af\u30b9\u53f3\u63c3\u3048\u3002
+        /// </summary>
+        private static Toggle CreatePanelToggle(string label, string tooltip)
         {
-            var toggle = new Toggle() { text = label, value = false };
+            var toggle = new Toggle(label);
             toggle.tooltip = tooltip;
-            toggle.style.marginLeft = 4;
-            toggle.RegisterValueChangedCallback(evt => OnSectionToggleChanged());
+            toggle.style.flexDirection = FlexDirection.RowReverse;
+            toggle.style.justifyContent = Justify.SpaceBetween;
+            toggle.style.marginTop = 1;
+            toggle.style.marginBottom = 1;
             return toggle;
         }
 
-        /// <summary>
-        /// ALL ボタンクリック: 全トグルを一括ON/OFF。
-        /// </summary>
         private void OnAllClicked()
         {
             if (_graphView == null) return;
@@ -254,13 +260,11 @@ namespace AnoGame.AnoFlow.Editor
                       && _eventsToggle.value && _itemsToggle.value;
             bool expand = !allOn;
 
-            // トグルUI更新（コールバック発火を防ぐ）
             _resultToggle.SetValueWithoutNotify(expand);
             _conditionToggle.SetValueWithoutNotify(expand);
             _eventsToggle.SetValueWithoutNotify(expand);
             _itemsToggle.SetValueWithoutNotify(expand);
 
-            // SectionVis 更新
             _graphView.SectionVis.ResultTags = expand;
             _graphView.SectionVis.ConditionTags = expand;
             _graphView.SectionVis.RequiredEvents = expand;
@@ -270,9 +274,6 @@ namespace AnoGame.AnoFlow.Editor
             UpdateAllHighlight();
         }
 
-        /// <summary>
-        /// 個別セクショントグル変更時: SectionVis 更新 + リビルド + ALLハイライト更新。
-        /// </summary>
         private void OnSectionToggleChanged()
         {
             if (_graphView == null) return;
@@ -286,9 +287,6 @@ namespace AnoGame.AnoFlow.Editor
             UpdateAllHighlight();
         }
 
-        /// <summary>
-        /// SectionVis の現在値をトグルUIに反映する（Reload後など）。
-        /// </summary>
         private void SyncTogglesFromSectionVis()
         {
             if (_graphView == null) return;
@@ -299,9 +297,6 @@ namespace AnoGame.AnoFlow.Editor
             UpdateAllHighlight();
         }
 
-        /// <summary>
-        /// ALLハイライト: 全トグルONならハイライト。
-        /// </summary>
         private void UpdateAllHighlight()
         {
             if (_allBtn == null) return;
@@ -313,23 +308,6 @@ namespace AnoGame.AnoFlow.Editor
                 _allBtn.AddToClassList("expand-all-active");
             else
                 _allBtn.RemoveFromClassList("expand-all-active");
-        }
-
-        private static void StyleFloatingButton(Button btn)
-        {
-            btn.style.height = 20;
-            btn.style.fontSize = 11;
-            btn.style.marginLeft = 2;
-            btn.style.marginRight = 2;
-            btn.style.paddingLeft = 6;
-            btn.style.paddingRight = 6;
-        }
-
-        private static void AddSpacer(VisualElement parent, float width)
-        {
-            var spacer = new VisualElement();
-            spacer.style.width = width;
-            parent.Add(spacer);
         }
 
         private void LoadData()

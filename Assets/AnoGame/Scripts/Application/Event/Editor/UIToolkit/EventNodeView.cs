@@ -536,6 +536,26 @@ namespace AnoGame.AnoFlow.Editor
         }
 
         /// <summary>
+        /// EditモードON時: データがある全セクションを強制展開する。
+        /// </summary>
+        public void ForceExpandAllSections()
+        {
+            var allTrue = new bool[_sectionBodies.Count];
+            for (int i = 0; i < allTrue.Length; i++)
+                allTrue[i] = true;
+            ApplySectionStates(allTrue);
+        }
+
+        /// <summary>
+        /// EditモードOFF時: SectionVisに基づいてセクション状態を復帰する。
+        /// </summary>
+        public void ApplySectionVisibility(bool resultTags, bool conditionTags, bool reqEvents, bool reqItems)
+        {
+            var states = new bool[] { resultTags, conditionTags, reqEvents, reqItems };
+            ApplySectionStates(states);
+        }
+
+        /// <summary>
         /// 各セクションの展開/折りたたみ状態を取得する。
         /// 順序: ResultTags, ConditionTags, RequiredEvents, RequiredItems
         /// </summary>
@@ -619,8 +639,9 @@ namespace AnoGame.AnoFlow.Editor
                     // ポート行: ポート以外を非表示
                     for (int j = 0; j < child.childCount; j++)
                     {
-                        if (!(child[j] is Port))
-                            child[j].style.display = DisplayStyle.None;
+                        if (child[j] is Port) continue;
+                        if (child[j].ClassListContains("edit-btn")) continue;
+                        child[j].style.display = DisplayStyle.None;
                     }
                 }
                 else
@@ -724,6 +745,8 @@ namespace AnoGame.AnoFlow.Editor
             {
                 if (evt.button != 0) return;
                 if (capturedCount == 0) { evt.StopPropagation(); return; }
+                // Editモード中は折りたたみブロック（編集操作に必要なセクションを保護）
+                if (_nodeEditMode) { evt.StopPropagation(); return; }
 
                 bool isCollapsed = IsSectionCollapsed(capturedBody);
 
@@ -736,7 +759,6 @@ namespace AnoGame.AnoFlow.Editor
                 {
                     CollapseSectionBody(capturedBody);
                     capturedLabel.text = $"{arrowRight} {capturedArrowLabel} ({capturedCount})";
-                    // 全展開状態ではなくなったことをGraphViewに通知
                     var graphView = GetFirstAncestorOfType<EventGraphView>();
                     graphView?.NotifySectionCollapsed();
                 }
