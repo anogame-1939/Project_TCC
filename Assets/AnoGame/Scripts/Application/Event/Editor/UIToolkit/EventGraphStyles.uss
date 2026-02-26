@@ -123,3 +123,17 @@
 .edit-mode .edit-btn {
     display: flex;
 }
+
+/* Tag/Event name labels: fixed width with ellipsis */
+.section-item-label {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -unity-text-overflow-position: end;
+    white-space: nowrap;
+}
+
+/* Expand-all toolbar button highlight */
+.expand-all-active {
+    background-color: #4a6a8a;
+}

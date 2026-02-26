@@ -13,6 +13,7 @@ namespace AnoGame.AnoFlow.Editor
     public class EventGraphView : GraphView
     {
         public Action OnGraphDataChanged;
+        public Action<bool> OnExpandAllStateChanged;
         private List<EventData> _eventDataList;
         private HashSet<string> _knownItemIds;
         private Dictionary<string, string> _itemNameMap;
@@ -408,7 +409,7 @@ namespace AnoGame.AnoFlow.Editor
         /// Rebuild the graph preserving existing node positions.
         /// Optionally focus camera on a specific node.
         /// </summary>
-        private void RebuildGraph(string focusNodeId)
+        private void RebuildGraph(string focusNodeId, bool preserveSectionStates = true)
         {
             // Save current positions before rebuild
             var positions = new Dictionary<string, Vector2>();
@@ -418,35 +419,36 @@ namespace AnoGame.AnoFlow.Editor
                 positions[kvp.Key] = new Vector2(rect.x, rect.y);
             }
 
-            // Save per-node section states before rebuild
-            var sectionStates = new Dictionary<string, bool[]>();
-            foreach (var kvp in _nodeMap)
+            // Save per-node section states before rebuild (only when preserving)
+            Dictionary<string, bool[]> sectionStates = null;
+            if (preserveSectionStates)
             {
-                sectionStates[kvp.Key] = kvp.Value.GetCurrentSectionStates();
+                sectionStates = new Dictionary<string, bool[]>();
+                foreach (var kvp in _nodeMap)
+                    sectionStates[kvp.Key] = kvp.Value.GetCurrentSectionStates();
             }
 
             // Rebuild
             PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
 
-            // Restore all saved positions (existing nodes don't move)
+            // Restore all saved positions
             foreach (var kvp in positions)
             {
                 if (_nodeMap.TryGetValue(kvp.Key, out var node))
-                {
                     node.SetPosition(new Rect(kvp.Value.x, kvp.Value.y, 0, 0));
-                }
             }
 
-            // Restore per-node section states
-            foreach (var kvp in sectionStates)
+            // Restore per-node section states (only when preserving)
+            if (sectionStates != null)
             {
-                if (_nodeMap.TryGetValue(kvp.Key, out var node))
+                foreach (var kvp in sectionStates)
                 {
-                    node.ApplySectionStates(kvp.Value);
+                    if (_nodeMap.TryGetValue(kvp.Key, out var node))
+                        node.ApplySectionStates(kvp.Value);
                 }
             }
 
-            // Focus camera on a specific node if requested
+            // Focus camera on a specific node
             if (!string.IsNullOrEmpty(focusNodeId) && _nodeMap.TryGetValue(focusNodeId, out var focusNode))
             {
                 schedule.Execute(() =>
@@ -476,20 +478,35 @@ namespace AnoGame.AnoFlow.Editor
                 case "RequiredEvents": SectionVis.RequiredEvents = !SectionVis.RequiredEvents; break;
                 case "RequiredItems": SectionVis.RequiredItems = !SectionVis.RequiredItems; break;
             }
-            RebuildGraph(null);
+            RebuildGraph(null, false); // Toolbar toggle: don't preserve per-node states
         }
 
         /// <summary>
         /// Toggle all sections on or off.
         /// </summary>
-        public void ToggleAllSections(bool expand)
+        public void ToggleAllSections()
         {
-            UnityEngine.Debug.Log($"[PortDbg][USER] Toolbar ToggleAllSections expand={expand}");
+            // 現在全展開なら全折畳、そうでなければ全展開
+            bool allExpanded = SectionVis.ResultTags && SectionVis.ConditionTags
+                            && SectionVis.RequiredEvents && SectionVis.RequiredItems;
+            bool expand = !allExpanded;
+
             SectionVis.ResultTags = expand;
             SectionVis.ConditionTags = expand;
             SectionVis.RequiredEvents = expand;
             SectionVis.RequiredItems = expand;
-            RebuildGraph(null);
+            RebuildGraph(null, false); // Toolbar toggle: don't preserve per-node states
+
+            OnExpandAllStateChanged?.Invoke(expand);
+        }
+
+        /// <summary>
+        /// ノードのヘッダークリックでセクションが折りたたまれた時に呼ばれる。
+        /// 全展開状態が崩れたらハイライトを解除する。
+        /// </summary>
+        public void NotifySectionCollapsed()
+        {
+            OnExpandAllStateChanged?.Invoke(false);
         }
 
         /// <summary>

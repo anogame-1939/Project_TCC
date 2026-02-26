@@ -736,6 +736,9 @@ namespace AnoGame.AnoFlow.Editor
                 {
                     CollapseSectionBody(capturedBody);
                     capturedLabel.text = $"{arrowRight} {capturedArrowLabel} ({capturedCount})";
+                    // 全展開状態ではなくなったことをGraphViewに通知
+                    var graphView = GetFirstAncestorOfType<EventGraphView>();
+                    graphView?.NotifySectionCollapsed();
                 }
 
                 evt.StopPropagation();
@@ -771,7 +774,8 @@ namespace AnoGame.AnoFlow.Editor
                     row.style.flexDirection = FlexDirection.Row;
                     row.style.alignItems = Align.Center;
 
-                    var tagLbl = new Label($"\u25cf {TruncateDisplayText(tag)}");
+                    var tagLbl = new Label($"\u25cf {tag}");
+                    tagLbl.AddToClassList("section-item-label");
                     tagLbl.tooltip = tag;
                     tagLbl.style.color = new Color(0.4f, 0.9f, 0.4f);
                     tagLbl.style.flexGrow = 1;
@@ -831,7 +835,8 @@ namespace AnoGame.AnoFlow.Editor
             }
 
             string icon = isNegative ? "\u2717" : (satisfied ? "\u2713" : "\u2717");
-            var lbl = new Label($"{icon} {TruncateDisplayText(tag)}");
+            var lbl = new Label($"{icon} {tag}");
+            lbl.AddToClassList("section-item-label");
             lbl.tooltip = tag;
             if (isNegative)
             {
@@ -896,7 +901,8 @@ namespace AnoGame.AnoFlow.Editor
             ConditionPorts[eid] = condPort;
 
             var displayName = _eventNameMap.TryGetValue(eid, out var eName) ? eName : eid;
-            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {TruncateDisplayText(displayName)}");
+            var lbl = new Label($"{(exists ? "\u2713" : "\u2717")} {displayName}");
+            lbl.AddToClassList("section-item-label");
             lbl.tooltip = $"{displayName} ({eid})";
             lbl.style.color = exists ? new Color(0.6f, 1f, 0.6f) : new Color(1f, 0.5f, 0.5f);
             lbl.style.marginLeft = 4;

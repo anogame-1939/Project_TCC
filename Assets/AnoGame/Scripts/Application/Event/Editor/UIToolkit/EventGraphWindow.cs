@@ -102,7 +102,7 @@ namespace AnoGame.AnoFlow.Editor
             root.AddToClassList("event-graph-root");
             rootVisualElement.Add(root);
 
-            // Toolbar
+            // Toolbar (left side only: Reload, Auto Layout, Save Positions)
             var toolbar = new Toolbar();
             toolbar.AddToClassList("event-toolbar");
 
@@ -120,79 +120,135 @@ namespace AnoGame.AnoFlow.Editor
             var savePositionsBtn = new ToolbarButton(() => _graphView?.SaveNodePositions()) { text = "Save Positions" };
             toolbar.Add(savePositionsBtn);
 
-            // Spacer
-            var spacer = new VisualElement();
-            spacer.style.flexGrow = 1;
-            toolbar.Add(spacer);
+            root.Add(toolbar);
 
-            // Section toggle buttons
-            var expandAllBtn = new ToolbarButton(() => _graphView?.ToggleAllSections(true)) { text = "\u25BC 全展開" };
-            toolbar.Add(expandAllBtn);
+            // Graph View container (relative positioning for floating panel)
+            var graphContainer = new VisualElement();
+            graphContainer.style.flexGrow = 1;
+            graphContainer.style.position = Position.Relative;
 
-            var collapseAllBtn = new ToolbarButton(() => _graphView?.ToggleAllSections(false)) { text = "\u25B6 全折畳" };
-            toolbar.Add(collapseAllBtn);
+            _graphView = new EventGraphView();
+            _graphView.AddToClassList("event-graph-view");
+            graphContainer.Add(_graphView);
 
-            toolbar.Add(new ToolbarSpacer());
+            // ===== Floating Panel (right-top overlay) =====
+            var floatingPanel = new VisualElement();
+            floatingPanel.AddToClassList("floating-panel");
+            floatingPanel.style.position = Position.Absolute;
+            floatingPanel.style.top = 8;
+            floatingPanel.style.right = 8;
+            floatingPanel.style.backgroundColor = new StyleColor(new Color(0.22f, 0.22f, 0.22f, 0.92f));
+            floatingPanel.style.borderTopLeftRadius = 6;
+            floatingPanel.style.borderTopRightRadius = 6;
+            floatingPanel.style.borderBottomLeftRadius = 6;
+            floatingPanel.style.borderBottomRightRadius = 6;
+            floatingPanel.style.paddingLeft = 6;
+            floatingPanel.style.paddingRight = 6;
+            floatingPanel.style.paddingTop = 4;
+            floatingPanel.style.paddingBottom = 4;
+            floatingPanel.style.borderTopWidth = 1;
+            floatingPanel.style.borderBottomWidth = 1;
+            floatingPanel.style.borderLeftWidth = 1;
+            floatingPanel.style.borderRightWidth = 1;
+            floatingPanel.style.borderTopColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            floatingPanel.style.borderBottomColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            floatingPanel.style.borderLeftColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            floatingPanel.style.borderRightColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
 
-            var toggleResult = new ToolbarButton(() => _graphView?.ToggleSection("ResultTags")) { text = "Result" };
-            toggleResult.tooltip = "Result Tags 表示切替";
-            toolbar.Add(toggleResult);
+            // Row 1: Section toggles
+            var sectionRow = new VisualElement();
+            sectionRow.style.flexDirection = FlexDirection.Row;
+            sectionRow.style.marginBottom = 4;
 
-            var toggleCondition = new ToolbarButton(() => _graphView?.ToggleSection("ConditionTags")) { text = "Condition" };
-            toggleCondition.tooltip = "Condition Tags 表示切替";
-            toolbar.Add(toggleCondition);
+            var expandToggleBtn = new Button() { text = "\u25BC \u5168\u5c55\u958b" };
+            expandToggleBtn.tooltip = "\u5168\u30bb\u30af\u30b7\u30e7\u30f3\u306e\u5c55\u958b/\u6298\u7573\u3092\u30c8\u30b0\u30eb";
+            expandToggleBtn.clicked += () => _graphView?.ToggleAllSections();
+            StyleFloatingButton(expandToggleBtn);
+            sectionRow.Add(expandToggleBtn);
 
-            var toggleReqEvents = new ToolbarButton(() => _graphView?.ToggleSection("RequiredEvents")) { text = "Events" };
-            toggleReqEvents.tooltip = "Required Events 表示切替";
-            toolbar.Add(toggleReqEvents);
-
-            var toggleReqItems = new ToolbarButton(() => _graphView?.ToggleSection("RequiredItems")) { text = "Items" };
-            toggleReqItems.tooltip = "Required Items 表示切替";
-            toolbar.Add(toggleReqItems);
-
-            toolbar.Add(new ToolbarSpacer());
-
-            // Edit mode toggle
-            ToolbarToggle editToggle = null;
-            editToggle = new ToolbarToggle()
+            Action<bool> onExpandAllChanged = allExpanded =>
             {
-                text = "Edit",
-                value = _isEditMode
+                if (allExpanded)
+                    expandToggleBtn.AddToClassList("expand-all-active");
+                else
+                    expandToggleBtn.RemoveFromClassList("expand-all-active");
             };
-            editToggle.tooltip = "編集モードのON/OFF\n+▲▼×ボタンの表示切替";
+
+            AddFloatingSpacer(sectionRow);
+
+            var toggleResult = new Button(() => _graphView?.ToggleSection("ResultTags")) { text = "Result" };
+            toggleResult.tooltip = "Result Tags \u8868\u793a\u5207\u66ff";
+            StyleFloatingButton(toggleResult);
+            sectionRow.Add(toggleResult);
+
+            var toggleCondition = new Button(() => _graphView?.ToggleSection("ConditionTags")) { text = "Condition" };
+            toggleCondition.tooltip = "Condition Tags \u8868\u793a\u5207\u66ff";
+            StyleFloatingButton(toggleCondition);
+            sectionRow.Add(toggleCondition);
+
+            var toggleReqEvents = new Button(() => _graphView?.ToggleSection("RequiredEvents")) { text = "Events" };
+            toggleReqEvents.tooltip = "Required Events \u8868\u793a\u5207\u66ff";
+            StyleFloatingButton(toggleReqEvents);
+            sectionRow.Add(toggleReqEvents);
+
+            var toggleReqItems = new Button(() => _graphView?.ToggleSection("RequiredItems")) { text = "Items" };
+            toggleReqItems.tooltip = "Required Items \u8868\u793a\u5207\u66ff";
+            StyleFloatingButton(toggleReqItems);
+            sectionRow.Add(toggleReqItems);
+
+            floatingPanel.Add(sectionRow);
+
+            // Row 2: Edit / Negative toggles
+            var modeRow = new VisualElement();
+            modeRow.style.flexDirection = FlexDirection.Row;
+
+            var editToggle = new Toggle() { text = "Edit", value = _isEditMode };
+            editToggle.tooltip = "\u7de8\u96c6\u30e2\u30fc\u30c9\u306eON/OFF";
             editToggle.RegisterValueChangedCallback(evt =>
             {
                 _isEditMode = evt.newValue;
                 _graphView?.SetEditMode(_isEditMode);
             });
-            toolbar.Add(editToggle);
+            editToggle.style.marginRight = 8;
+            modeRow.Add(editToggle);
 
-            // Negative lines toggle
-            var negativeToggle = new ToolbarToggle()
-            {
-                text = "Negative",
-                value = false
-            };
-            negativeToggle.tooltip = "ネガティブタグ(!付き)の\n抑制ラインを表示";
+            var negativeToggle = new Toggle() { text = "Negative", value = false };
+            negativeToggle.tooltip = "\u30cd\u30ac\u30c6\u30a3\u30d6\u30bf\u30b0(!)\u306e\n\u6291\u5236\u30e9\u30a4\u30f3\u3092\u8868\u793a";
             negativeToggle.RegisterValueChangedCallback(evt =>
             {
                 _graphView?.SetShowNegativeEdges(evt.newValue);
             });
-            toolbar.Add(negativeToggle);
+            modeRow.Add(negativeToggle);
 
-            root.Add(toolbar);
+            floatingPanel.Add(modeRow);
 
-            // Graph View
-            _graphView = new EventGraphView();
-            _graphView.AddToClassList("event-graph-view");
-
-            root.Add(_graphView);
+            graphContainer.Add(floatingPanel);
+            root.Add(graphContainer);
 
             if (_eventDataList != null && _eventDataList.Count > 0)
             {
                 _graphView.PopulateGraph(_eventDataList, _knownItemIds, _itemNameMap);
                 _graphView.SetEditMode(_isEditMode);
             }
+
+            _graphView.OnExpandAllStateChanged = onExpandAllChanged;
+        }
+
+        private static void StyleFloatingButton(Button btn)
+        {
+            btn.style.height = 20;
+            btn.style.fontSize = 11;
+            btn.style.marginLeft = 2;
+            btn.style.marginRight = 2;
+            btn.style.paddingLeft = 6;
+            btn.style.paddingRight = 6;
+        }
+
+        private static void AddFloatingSpacer(VisualElement parent)
+        {
+            var spacer = new VisualElement();
+            spacer.style.width = 8;
+            parent.Add(spacer);
         }
 
         private void LoadData()
