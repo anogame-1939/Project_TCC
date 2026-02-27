@@ -240,23 +240,6 @@ namespace AnoGame.Editor.Tools
             receptorBtn.style.marginBottom = 15;
             _detailView.Add(receptorBtn);
 
-            // Target Inspection
-            if (root.Trigger != null)
-            {
-                var inspLabel = new Label("Trigger Inspector Preview");
-                inspLabel.style.fontSize = 12;
-                inspLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-                inspLabel.style.marginTop = 10;
-                inspLabel.style.marginBottom = 5;
-                _detailView.Add(inspLabel);
-
-                var editor = UnityEditor.Editor.CreateEditor(root.Trigger);
-                var inspectorElement = new InspectorElement(editor);
-                inspectorElement.style.borderTopWidth = 1;
-                inspectorElement.style.borderTopColor = Color.gray;
-                inspectorElement.style.paddingTop = 5;
-                _detailView.Add(inspectorElement);
-            }
         }
     }
 }

@@ -183,7 +183,7 @@ namespace AnoGame.AnoDialogue.Editor
         }
 
         /// <summary>
-        /// Center view on a specific node.
+        /// Position view so that the specified node appears near the top-left corner.
         /// </summary>
         public void FrameNode(string nodeID)
         {
@@ -193,11 +193,12 @@ namespace AnoGame.AnoDialogue.Editor
                 schedule.Execute(() =>
                 {
                     var nodeRect = nodeView.GetPosition();
-                    var graphRect = contentRect;
 
+                    // Place the node at the top-left with a small margin
+                    const float margin = 50f;
                     var targetPos = new Vector3(
-                        -(nodeRect.x - graphRect.width / 2 + nodeRect.width / 2),
-                        -(nodeRect.y - graphRect.height / 2 + nodeRect.height / 2),
+                        -(nodeRect.x - margin),
+                        -(nodeRect.y - margin),
                         0
                     );
 
