@@ -435,38 +435,141 @@ namespace AnoGame.AnoDialogue.Editor
 
         private void DrawListCandidates(List<string> orderedIDs, string selectedID, SerializedProperty convIDProp)
         {
+            // 選択中を先頭に表示
+            if (!string.IsNullOrEmpty(selectedID) && orderedIDs.Contains(selectedID))
+            {
+                string displayName = ResolveDisplayName(selectedID);
+                var selectedBtn = new Button(() =>
+                {
+                    SelectConversation(convIDProp, selectedID);
+                });
+                selectedBtn.text = displayName;
+                selectedBtn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                selectedBtn.style.marginBottom = 1;
+                selectedBtn.style.marginTop = 1;
+                selectedBtn.style.backgroundColor = new Color(0.2f, 0.6f, 0.2f, 0.8f);
+                selectedBtn.style.color = Color.white;
+                _candidateContainer.Add(selectedBtn);
+            }
+
+            int prevEp = -999;
+            int prevCh = -999;
+
             foreach (var id in orderedIDs)
             {
+                var unit = _masterData?.GetConversationByID(id);
+                int curEp = unit?.EpisodeID ?? 0;
+                int curCh = unit?.ChapterID ?? 0;
+
+                // Episode区切り
+                if (curEp != prevEp)
+                {
+                    _candidateContainer.Add(CreateEpisodeSeparator(curEp));
+                    prevCh = -999;
+                }
+                // Chapter区切り
+                if (curCh != prevCh)
+                {
+                    _candidateContainer.Add(CreateChapterSeparator(curCh));
+                }
+
+                prevEp = curEp;
+                prevCh = curCh;
+
                 string displayName = ResolveDisplayName(id);
                 bool isSelected = id == selectedID;
 
-                var btn = new Button(() =>
-                {
-                    SelectConversation(convIDProp, id);
-                });
-                btn.text = displayName;
-                btn.style.unityTextAlign = TextAnchor.MiddleLeft;
-                btn.style.marginBottom = 1;
-                btn.style.marginTop = 1;
-
                 if (isSelected)
                 {
-                    btn.style.backgroundColor = new Color(0.2f, 0.6f, 0.2f, 0.8f);
-                    btn.style.color = Color.white;
+                    // ゴーストボタン（元の位置）
+                    _candidateContainer.Add(CreateGhostButton(displayName, id));
                 }
-
-                _candidateContainer.Add(btn);
+                else
+                {
+                    var btn = new Button(() =>
+                    {
+                        SelectConversation(convIDProp, id);
+                    });
+                    btn.text = displayName;
+                    btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                    btn.style.marginBottom = 1;
+                    btn.style.marginTop = 1;
+                    _candidateContainer.Add(btn);
+                }
             }
         }
 
         private void DrawGridCandidates(List<string> orderedIDs, string selectedID, SerializedProperty convIDProp)
         {
+            int maxCols = 3;
+
+            // 選択中を先頭に表示
+            if (!string.IsNullOrEmpty(selectedID) && orderedIDs.Contains(selectedID))
+            {
+                string selDisplayName = ResolveDisplayName(selectedID);
+                string selTruncated = selDisplayName.Length > 12 ? selDisplayName.Substring(0, 12) + ".." : selDisplayName;
+                string selTooltip = selectedID;
+                if (_masterData != null)
+                {
+                    var selUnit = _masterData.GetConversationByID(selectedID);
+                    if (selUnit != null)
+                    {
+                        selTooltip = $"{selUnit.SectionName}\n{selUnit.SpeakerName}\n{selUnit.BodyText}";
+                    }
+                }
+
+                var selRow = new VisualElement();
+                selRow.style.flexDirection = FlexDirection.Row;
+                selRow.style.marginBottom = 2;
+
+                var selBtn = new Button(() =>
+                {
+                    SelectConversation(convIDProp, selectedID);
+                });
+                selBtn.text = selTruncated;
+                selBtn.tooltip = selTooltip;
+                selBtn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                selBtn.style.flexGrow = 1;
+                selBtn.style.flexBasis = 0;
+                selBtn.style.marginRight = 2;
+                selBtn.style.backgroundColor = new Color(0.2f, 0.6f, 0.2f, 0.8f);
+                selBtn.style.color = Color.white;
+                selRow.Add(selBtn);
+
+                _candidateContainer.Add(selRow);
+            }
+
             VisualElement row = null;
             int colIndex = 0;
-            int maxCols = 3;
+            int prevEp = -999;
+            int prevCh = -999;
 
             foreach (var id in orderedIDs)
             {
+                var unit = _masterData?.GetConversationByID(id);
+                int curEp = unit?.EpisodeID ?? 0;
+                int curCh = unit?.ChapterID ?? 0;
+
+                // Episode区切り
+                if (curEp != prevEp)
+                {
+                    // 行を一旦リセット
+                    row = null;
+                    colIndex = 0;
+                    _candidateContainer.Add(CreateEpisodeSeparator(curEp));
+                    prevCh = -999;
+                }
+                // Chapter区切り
+                if (curCh != prevCh)
+                {
+                    row = null;
+                    colIndex = 0;
+                    _candidateContainer.Add(CreateChapterSeparator(curCh));
+                }
+
+                prevEp = curEp;
+                prevCh = curCh;
+
                 if (colIndex % maxCols == 0)
                 {
                     row = new VisualElement();
@@ -482,31 +585,36 @@ namespace AnoGame.AnoDialogue.Editor
                 string tooltipText = id;
                 if (_masterData != null)
                 {
-                    var unit = _masterData.GetConversationByID(id);
                     if (unit != null)
                     {
                         tooltipText = $"{unit.SectionName}\n{unit.SpeakerName}\n{unit.BodyText}";
                     }
                 }
 
-                var btn = new Button(() =>
-                {
-                    SelectConversation(convIDProp, id);
-                });
-                btn.text = truncated;
-                btn.tooltip = tooltipText;
-                btn.style.unityTextAlign = TextAnchor.MiddleLeft;
-                btn.style.flexGrow = 1;
-                btn.style.flexBasis = 0;
-                btn.style.marginRight = 2;
-
                 if (isSelected)
                 {
-                    btn.style.backgroundColor = new Color(0.2f, 0.6f, 0.2f, 0.8f);
-                    btn.style.color = Color.white;
+                    // ゴーストボタン（元の位置）
+                    var ghost = CreateGhostButton(truncated, tooltipText);
+                    ghost.style.flexGrow = 1;
+                    ghost.style.flexBasis = 0;
+                    ghost.style.marginRight = 2;
+                    row.Add(ghost);
+                }
+                else
+                {
+                    var btn = new Button(() =>
+                    {
+                        SelectConversation(convIDProp, id);
+                    });
+                    btn.text = truncated;
+                    btn.tooltip = tooltipText;
+                    btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                    btn.style.flexGrow = 1;
+                    btn.style.flexBasis = 0;
+                    btn.style.marginRight = 2;
+                    row.Add(btn);
                 }
 
-                row.Add(btn);
                 colIndex++;
             }
         }
@@ -544,18 +652,31 @@ namespace AnoGame.AnoDialogue.Editor
             return id;
         }
 
+        /// <summary>
+        /// Episode/Chapterでソートされたリストを返す（選択IDの先頭移動は描画側で処理）
+        /// </summary>
         private List<string> GetOrderedIDs(string selectedID)
         {
-            if (string.IsNullOrEmpty(selectedID) || !_filteredIDs.Contains(selectedID))
-                return _filteredIDs;
+            if (_masterData == null) return _filteredIDs;
 
-            var ordered = new List<string>(_filteredIDs.Count);
-            ordered.Add(selectedID);
-            foreach (var id in _filteredIDs)
+            var sorted = new List<string>(_filteredIDs);
+            sorted.Sort((a, b) =>
             {
-                if (id != selectedID) ordered.Add(id);
-            }
-            return ordered;
+                var unitA = _masterData.GetConversationByID(a);
+                var unitB = _masterData.GetConversationByID(b);
+                int epA = unitA?.EpisodeID ?? 0;
+                int epB = unitB?.EpisodeID ?? 0;
+                if (epA != epB) return epA.CompareTo(epB);
+
+                int chA = unitA?.ChapterID ?? 0;
+                int chB = unitB?.ChapterID ?? 0;
+                if (chA != chB) return chA.CompareTo(chB);
+
+                int secA = unitA?.SectionID ?? 0;
+                int secB = unitB?.SectionID ?? 0;
+                return secA.CompareTo(secB);
+            });
+            return sorted;
         }
 
         private void UpdateFilteredList()
@@ -643,6 +764,89 @@ namespace AnoGame.AnoDialogue.Editor
             sep.style.marginTop = 8;
             sep.style.marginBottom = 8;
             return sep;
+        }
+
+        /// <summary>
+        /// Episode区切り：太いセパレータ + ラベル
+        /// </summary>
+        private VisualElement CreateEpisodeSeparator(int episodeID)
+        {
+            var container = new VisualElement();
+            container.style.marginTop = 6;
+            container.style.marginBottom = 2;
+
+            // 太いライン
+            var line = new VisualElement();
+            line.style.height = 3;
+            line.style.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+            line.style.marginBottom = 2;
+            container.Add(line);
+
+            // ラベル
+            string epText = episodeID == 0 ? "Default" : $"Episode {episodeID}";
+            var label = new Label(epText);
+            label.style.fontSize = 10;
+            label.style.unityFontStyleAndWeight = FontStyle.Bold;
+            label.style.color = new Color(0.8f, 0.8f, 0.8f, 1f);
+            label.style.marginBottom = 2;
+            container.Add(label);
+
+            return container;
+        }
+
+        /// <summary>
+        /// Chapter区切り：細いライン + ラベル
+        /// </summary>
+        private VisualElement CreateChapterSeparator(int chapterID)
+        {
+            var container = new VisualElement();
+            container.style.flexDirection = FlexDirection.Row;
+            container.style.alignItems = Align.Center;
+            container.style.marginTop = 3;
+            container.style.marginBottom = 1;
+
+            // ラベル
+            var label = new Label($"ch{chapterID}");
+            label.style.fontSize = 9;
+            label.style.color = new Color(0.55f, 0.55f, 0.55f, 0.8f);
+            label.style.marginRight = 4;
+            label.style.minWidth = 20;
+            container.Add(label);
+
+            // 細いライン
+            var line = new VisualElement();
+            line.style.height = 1;
+            line.style.flexGrow = 1;
+            line.style.backgroundColor = new Color(0.4f, 0.4f, 0.4f, 0.6f);
+            container.Add(line);
+
+            return container;
+        }
+
+        /// <summary>
+        /// ゴーストボタン：半透明・クリック不可
+        /// </summary>
+        private VisualElement CreateGhostButton(string text, string tooltip)
+        {
+            var ghost = new Button();
+            ghost.text = text;
+            ghost.tooltip = tooltip;
+            ghost.style.unityTextAlign = TextAnchor.MiddleLeft;
+            ghost.style.marginBottom = 1;
+            ghost.style.marginTop = 1;
+            ghost.style.opacity = 0.35f;
+            ghost.style.backgroundColor = new Color(0.2f, 0.6f, 0.2f, 0.3f);
+            ghost.style.color = new Color(1f, 1f, 1f, 0.5f);
+            ghost.style.borderTopWidth = 1;
+            ghost.style.borderBottomWidth = 1;
+            ghost.style.borderLeftWidth = 1;
+            ghost.style.borderRightWidth = 1;
+            ghost.style.borderTopColor = new Color(0.2f, 0.6f, 0.2f, 0.3f);
+            ghost.style.borderBottomColor = new Color(0.2f, 0.6f, 0.2f, 0.3f);
+            ghost.style.borderLeftColor = new Color(0.2f, 0.6f, 0.2f, 0.3f);
+            ghost.style.borderRightColor = new Color(0.2f, 0.6f, 0.2f, 0.3f);
+            ghost.SetEnabled(false);
+            return ghost;
         }
     }
 }
