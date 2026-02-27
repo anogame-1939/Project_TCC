@@ -13,6 +13,8 @@ namespace AnoGame.Editor.Tools
     {
         private ListView _eventListView;
         private ScrollView _detailView;
+        private ToolbarSearchField _searchField;
+        private List<AnoEventRoot> _allEventRoots = new List<AnoEventRoot>();
         private List<AnoEventRoot> _eventRoots = new List<AnoEventRoot>();
 
         [MenuItem("AnoGame/Tools/Event Dashboard")]
@@ -31,6 +33,7 @@ namespace AnoGame.Editor.Tools
             // Left Pane: List View
             var leftPane = new VisualElement();
             leftPane.style.flexGrow = 1;
+            leftPane.style.overflow = Overflow.Hidden;
             splitView.Add(leftPane);
 
             var header = new Label("Scene Events");
@@ -41,20 +44,50 @@ namespace AnoGame.Editor.Tools
             header.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f, 1f);
             leftPane.Add(header);
 
-            var refreshBtn = new Button(RefreshList) { text = "↻ Refresh (Scan Scene)" };
-            leftPane.Add(refreshBtn);
+            // Toolbar: Refresh + Search
+            var toolbar = new VisualElement();
+            toolbar.style.flexDirection = FlexDirection.Row;
+            toolbar.style.alignItems = Align.Center;
+            toolbar.style.paddingLeft = 4;
+            toolbar.style.paddingRight = 4;
+            toolbar.style.paddingTop = 2;
+            toolbar.style.paddingBottom = 2;
+            leftPane.Add(toolbar);
+
+            var refreshBtn = new Button(RefreshList) { text = "↻" };
+            refreshBtn.style.width = 24;
+            refreshBtn.style.height = 24;
+            refreshBtn.style.fontSize = 14;
+            refreshBtn.style.unityTextAlign = TextAnchor.MiddleCenter;
+            refreshBtn.style.paddingLeft = 0;
+            refreshBtn.style.paddingRight = 0;
+            refreshBtn.style.paddingTop = 0;
+            refreshBtn.style.paddingBottom = 0;
+            refreshBtn.style.marginRight = 4;
+            toolbar.Add(refreshBtn);
+
+            _searchField = new ToolbarSearchField();
+            _searchField.style.flexGrow = 1;
+            _searchField.style.flexShrink = 1;
+            _searchField.style.minWidth = 0;
+            _searchField.RegisterValueChangedCallback(evt => ApplyFilter());
+            toolbar.Add(_searchField);
 
             _eventListView = new ListView();
             _eventListView.style.flexGrow = 1;
-            _eventListView.makeItem = () => new Label();
+            _eventListView.makeItem = () =>
+            {
+                var lbl = new Label();
+                lbl.style.paddingLeft = 8;
+                return lbl;
+            };
             _eventListView.bindItem = (element, i) =>
             {
                 var label = (Label)element;
                 var root = _eventRoots[i];
                 if (root != null)
                 {
-                    string eventId = root.EventData != null ? root.EventData.EventId : "???";
-                    label.text = $"[{eventId}] {root.gameObject.name}";
+                    label.text = FormatEventDisplayName(root);
                 }
                 else
                 {
@@ -70,6 +103,8 @@ namespace AnoGame.Editor.Tools
             _detailView.style.paddingLeft = 10;
             _detailView.style.paddingRight = 10;
             _detailView.style.paddingTop = 10;
+            _detailView.style.borderLeftWidth = 1;
+            _detailView.style.borderLeftColor = new Color(0.1f, 0.1f, 0.1f, 1f);
             splitView.Add(_detailView);
 
             RefreshList();
@@ -92,24 +127,46 @@ namespace AnoGame.Editor.Tools
 
         private void RefreshList()
         {
-            _eventRoots.Clear();
-            _eventRoots.AddRange(Object.FindObjectsByType<AnoEventRoot>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+            _allEventRoots.Clear();
+            _allEventRoots.AddRange(Object.FindObjectsByType<AnoEventRoot>(FindObjectsInactive.Include, FindObjectsSortMode.None));
 
             // Sort by EventID if possible, otherwise by name
-            _eventRoots = _eventRoots.OrderBy(r => 
+            _allEventRoots = _allEventRoots.OrderBy(r => 
             {
                 if (r != null && r.EventData != null) return r.EventData.EventId;
                 if (r != null) return r.gameObject.name;
                 return "";
             }).ToList();
 
+            ApplyFilter();
+            ShowDefaultDetail();
+        }
+
+        private void ApplyFilter()
+        {
+            string filter = _searchField != null ? _searchField.value : "";
+
+            if (string.IsNullOrEmpty(filter))
+            {
+                _eventRoots = new List<AnoEventRoot>(_allEventRoots);
+            }
+            else
+            {
+                filter = filter.ToLowerInvariant();
+                _eventRoots = _allEventRoots.Where(r =>
+                {
+                    if (r == null) return false;
+                    string displayName = FormatEventDisplayName(r).ToLowerInvariant();
+                    string fullName = r.gameObject.name.ToLowerInvariant();
+                    return displayName.Contains(filter) || fullName.Contains(filter);
+                }).ToList();
+            }
+
             if (_eventListView != null)
             {
                 _eventListView.itemsSource = _eventRoots;
                 _eventListView.RefreshItems();
             }
-
-            ShowDefaultDetail();
         }
 
         private void OnSelectionChanged(IEnumerable<object> selection)
@@ -248,6 +305,32 @@ namespace AnoGame.Editor.Tools
             receptorBtn.style.marginBottom = 15;
             _detailView.Add(receptorBtn);
 
+        }
+
+        /// <summary>
+        /// イベント表示名のフォーマット: [EventId]_日本語ラベル
+        /// 日本語が見つからない場合はオブジェクト名をそのまま使用
+        /// </summary>
+        private static string FormatEventDisplayName(AnoEventRoot root)
+        {
+            string eventId = root.EventData != null ? root.EventData.EventId : "???";
+            string jaLabel = ExtractJapaneseLabel(root.gameObject.name);
+            if (!string.IsNullOrEmpty(jaLabel))
+                return $"{jaLabel} [{eventId}]";
+            return $"[{eventId}] {root.gameObject.name}";
+        }
+
+        /// <summary>
+        /// 名前の最後の_区切りセグメントを取得する
+        /// 例: "Get_KeyControlPanel_制御盤の鍵入手" → "制御盤の鍵入手"
+        /// </summary>
+        private static string ExtractJapaneseLabel(string name)
+        {
+            int lastUnderscore = name.LastIndexOf('_');
+            if (lastUnderscore < 0 || lastUnderscore >= name.Length - 1)
+                return name;
+
+            return name.Substring(lastUnderscore + 1);
         }
     }
 }

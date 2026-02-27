@@ -208,7 +208,7 @@ namespace AnoGame.Editor.Tools
             {
                 if (kvp.Key == mainContainer) continue;
                 var windows = kvp.Value;
-                if (windows.Count < 2) continue;
+                if (windows.Count < 1) continue;
 
                 string key = string.Join("|",
                     windows.Select(w => w.GetType().FullName).OrderBy(n => n));

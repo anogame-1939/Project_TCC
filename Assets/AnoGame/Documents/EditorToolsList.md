@@ -27,6 +27,7 @@
 | `AnoGame/Tools/Event Dashboard` | AnoEventDashboardWindow.cs | EditorWindow | シーン内のイベントダッシュボード |
 | `AnoGame/Tools/Event Dashboard/Migrate Scene Events to AnoEventRoot` | EventDashboardMigration.cs | MenuItem | 既存イベントルートへのAnoEventRootアタッチ |
 | `AnoGame/Tools/Workspace Switcher` | WorkspaceSwitcher.cs | EditorWindow | ワークスペース（タブ構成）の保存・切り替え |
+| `Tools/Scene Pin Placement` | ScenePinPlacementTool.cs | MenuItem (Toggle) | シーン上にピンを立てオブジェクトを移動する配置ツール |
 
 ---
 
