@@ -124,6 +124,14 @@ namespace AnoGame.Editor.Tools
             }
 
             BuildDetailView(selectedRoot);
+
+            // リスト選択時にタイムラインを自動表示
+            if (selectedRoot.Trigger != null)
+            {
+                Selection.activeGameObject = selectedRoot.Trigger;
+                EditorGUIUtility.PingObject(selectedRoot.Trigger);
+                EditorApplication.ExecuteMenuItem("Window/Sequencing/Timeline");
+            }
         }
 
         private void ShowDefaultDetail()
