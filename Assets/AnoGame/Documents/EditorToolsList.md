@@ -26,6 +26,7 @@
 | `Tools/Quick Component Adder` | QuickComponentAdderWindow.cs | EditorWindow | コンポーネントのクイック追加（最近使用＋ピン留め） |
 | `AnoGame/Tools/Event Dashboard` | AnoEventDashboardWindow.cs | EditorWindow | シーン内のイベントダッシュボード |
 | `AnoGame/Tools/Event Dashboard/Migrate Scene Events to AnoEventRoot` | EventDashboardMigration.cs | MenuItem | 既存イベントルートへのAnoEventRootアタッチ |
+| `AnoGame/Tools/Workspace Switcher` | WorkspaceSwitcher.cs | EditorWindow | ワークスペース（タブ構成）の保存・切り替え |
 
 ---
 
