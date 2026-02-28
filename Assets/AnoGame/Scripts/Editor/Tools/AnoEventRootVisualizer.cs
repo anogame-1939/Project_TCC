@@ -18,6 +18,9 @@ namespace AnoGame.Editor.Tools
         internal static bool IsActive;
         internal static event System.Action OnActiveChanged;
 
+        // ── タグフィルタ（非表示タグセット） ──
+        internal static readonly HashSet<Application.Event.EventColorTag> HiddenTags = new HashSet<Application.Event.EventColorTag>();
+
         // ── ランタイム座標記録 ──
         private static readonly Dictionary<int, RuntimeMoveRecord> _runtimeMoves = new Dictionary<int, RuntimeMoveRecord>();
         private static bool _isPlayMode;
@@ -183,6 +186,7 @@ namespace AnoGame.Editor.Tools
             foreach (var root in eventRoots)
             {
                 if (root == null) continue;
+                if (HiddenTags.Contains(root.ColorTag)) continue;
                 Vector3 pos = root.transform.position;
                 float camSize = HandleUtility.GetHandleSize(pos) * 0.8f;
                 float hSize = Mathf.Max(SphereRadius, camSize);
@@ -206,6 +210,7 @@ namespace AnoGame.Editor.Tools
             foreach (var root in eventRoots)
             {
                 if (root == null) continue;
+                if (HiddenTags.Contains(root.ColorTag)) continue;
                 DrawEventRootGizmo(root, root == hoveredRoot);
             }
         }
