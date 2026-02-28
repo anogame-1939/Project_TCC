@@ -194,6 +194,15 @@ namespace AnoGame.Editor.Tools
                 }
             }
 
+            // ── ホバー中のオブジェクトをクリックしたらSelectionに設定 ──
+            if (hoveredRoot != null
+                && Event.current.type == EventType.MouseDown
+                && Event.current.button == 0)
+            {
+                Selection.activeGameObject = hoveredRoot.gameObject;
+                EditorGUIUtility.PingObject(hoveredRoot.gameObject);
+            }
+
             foreach (var root in eventRoots)
             {
                 if (root == null) continue;
