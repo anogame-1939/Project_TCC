@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
+using UnityEditor.Overlays;
+using UnityEditor.Toolbars;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace AnoGame.Editor.Tools
 {
@@ -10,13 +15,13 @@ namespace AnoGame.Editor.Tools
     public static class ScenePinPlacementTool
     {
         // ── 状態 ──
-        private static bool _isActive;
+        internal static bool IsActive;
         private static Vector3? _pinPosition;
 
         // ── 描画設定 ──
-        private static readonly Color PinBaseColor = new Color(1f, 0.85f, 0f, 0.6f);   // 半透明イエロー
-        private static readonly Color PinShaftColor = new Color(0.9f, 0.2f, 0.2f, 1f);  // 赤
-        private static readonly Color PinHeadColor = new Color(0.9f, 0.15f, 0.15f, 1f); // 赤
+        private static readonly Color PinBaseColor = new Color(1f, 0.85f, 0f, 0.6f);
+        private static readonly Color PinShaftColor = new Color(0.9f, 0.2f, 0.2f, 1f);
+        private static readonly Color PinHeadColor = new Color(0.9f, 0.15f, 0.15f, 1f);
         private static readonly Color CloseButtonColor = new Color(0.8f, 0.1f, 0.1f, 0.9f);
         private static readonly Color HierarchyButtonColor = new Color(0.2f, 0.7f, 0.3f, 1f);
 
@@ -30,6 +35,9 @@ namespace AnoGame.Editor.Tools
         // ── メニュー ──
         private const string MenuPath = "Tools/Scene Pin Placement";
 
+        // ── Overlay 更新用 ──
+        internal static event System.Action OnActiveChanged;
+
         static ScenePinPlacementTool()
         {
             SceneView.duringSceneGui -= OnSceneGUI;
@@ -41,20 +49,26 @@ namespace AnoGame.Editor.Tools
         [MenuItem(MenuPath, false, 200)]
         private static void ToggleMode()
         {
-            _isActive = !_isActive;
-            if (!_isActive)
-            {
-                _pinPosition = null;
-            }
-            SceneView.RepaintAll();
-            EditorApplication.RepaintHierarchyWindow();
+            SetActive(!IsActive);
         }
 
         [MenuItem(MenuPath, true)]
         private static bool ToggleModeValidate()
         {
-            Menu.SetChecked(MenuPath, _isActive);
+            Menu.SetChecked(MenuPath, IsActive);
             return true;
+        }
+
+        internal static void SetActive(bool active)
+        {
+            IsActive = active;
+            if (!IsActive)
+            {
+                _pinPosition = null;
+            }
+            OnActiveChanged?.Invoke();
+            SceneView.RepaintAll();
+            EditorApplication.RepaintHierarchyWindow();
         }
 
         // ====================================================================
@@ -62,7 +76,7 @@ namespace AnoGame.Editor.Tools
         // ====================================================================
         private static void OnSceneGUI(SceneView sceneView)
         {
-            if (!_isActive) return;
+            if (!IsActive) return;
 
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
 
@@ -72,32 +86,17 @@ namespace AnoGame.Editor.Tools
             {
                 Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
 
-                // Raycast でシーン上の位置を取得
-                Vector3 hitPoint;
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                // 常に Y=0 平面との交差のみ使用（コライダー無視）
+                Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+                if (groundPlane.Raycast(ray, out float distance))
                 {
-                    hitPoint = hit.point;
-                }
-                else
-                {
-                    // コライダーが無い場合は XZ 平面 (Y=0) との交差
-                    Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-                    if (groundPlane.Raycast(ray, out float distance))
-                    {
-                        hitPoint = ray.GetPoint(distance);
-                    }
-                    else
-                    {
-                        return; // 交差なし
-                    }
-                }
+                    Vector3 hitPoint = ray.GetPoint(distance);
+                    _pinPosition = new Vector3(hitPoint.x, 0f, hitPoint.z);
 
-                // Y=0 固定
-                _pinPosition = new Vector3(hitPoint.x, 0f, hitPoint.z);
-
-                e.Use();
-                SceneView.RepaintAll();
-                EditorApplication.RepaintHierarchyWindow();
+                    e.Use();
+                    SceneView.RepaintAll();
+                    EditorApplication.RepaintHierarchyWindow();
+                }
             }
 
             // ── ピン描画 ──
@@ -164,9 +163,7 @@ namespace AnoGame.Editor.Tools
                     Handles.SphereHandleCap))
             {
                 _pinPosition = null;
-                _isActive = false;
-                SceneView.RepaintAll();
-                EditorApplication.RepaintHierarchyWindow();
+                SetActive(false);
             }
 
             // × テキスト
@@ -184,10 +181,15 @@ namespace AnoGame.Editor.Tools
         // ====================================================================
         private static void OnHierarchyGUI(int instanceID, Rect selectionRect)
         {
-            if (!_isActive || !_pinPosition.HasValue) return;
+            if (!IsActive || !_pinPosition.HasValue) return;
 
             GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
             if (go == null) return;
+
+            // 選択中のオブジェクトのみボタンを表示
+            var selectedObjects = Selection.gameObjects;
+            if (selectedObjects == null || selectedObjects.Length == 0) return;
+            if (!selectedObjects.Contains(go)) return;
 
             float buttonWidth = 22f;
             float padding = 2f;
@@ -204,12 +206,104 @@ namespace AnoGame.Editor.Tools
 
             if (GUI.Button(buttonRect, "\u25b6"))
             {
-                Undo.RecordObject(go.transform, "Pin Placement Move");
-                go.transform.position = _pinPosition.Value;
-                EditorUtility.SetDirty(go.transform);
+                MoveSelectedObjectsToPin(selectedObjects, _pinPosition.Value);
             }
 
             GUI.backgroundColor = prevBg;
         }
+
+        /// <summary>
+        /// 選択中のオブジェクトをピン位置に移動する。
+        /// 親子が同時に選択されている場合、子はフィルタして親のみ移動（子のローカル座標を維持）。
+        /// </summary>
+        private static void MoveSelectedObjectsToPin(GameObject[] selectedObjects, Vector3 pinPos)
+        {
+            // 親子重複フィルタ: 祖先が選択に含まれるオブジェクトを除外
+            var selectedSet = new HashSet<GameObject>(selectedObjects);
+            var rootTargets = new List<GameObject>();
+
+            foreach (var obj in selectedObjects)
+            {
+                bool hasSelectedAncestor = false;
+                Transform parent = obj.transform.parent;
+                while (parent != null)
+                {
+                    if (selectedSet.Contains(parent.gameObject))
+                    {
+                        hasSelectedAncestor = true;
+                        break;
+                    }
+                    parent = parent.parent;
+                }
+                if (!hasSelectedAncestor)
+                {
+                    rootTargets.Add(obj);
+                }
+            }
+
+            if (rootTargets.Count == 0) return;
+
+            Undo.SetCurrentGroupName("Pin Placement Move");
+            int undoGroup = Undo.GetCurrentGroup();
+
+            foreach (var obj in rootTargets)
+            {
+                Undo.RecordObject(obj.transform, "Pin Placement Move");
+                obj.transform.position = pinPos;
+                EditorUtility.SetDirty(obj.transform);
+            }
+
+            Undo.CollapseUndoOperations(undoGroup);
+
+            // インスペクターに表示 + ヒエラルキーでハイライト
+            EditorGUIUtility.PingObject(rootTargets[0]);
+        }
+    }
+
+    // ========================================================================
+    // SceneView Overlay — PMode フローティングパネル
+    // ========================================================================
+    [Overlay(typeof(SceneView), "pin-placement-overlay", "PMode")]
+    public class ScenePinPlacementOverlay : Overlay
+    {
+        private Toggle _toggle;
+
+        public override VisualElement CreatePanelContent()
+        {
+            var root = new VisualElement();
+            root.style.flexDirection = FlexDirection.Row;
+            root.style.alignItems = Align.Center;
+            root.style.paddingLeft = 4;
+            root.style.paddingRight = 4;
+            root.style.paddingTop = 2;
+            root.style.paddingBottom = 2;
+            root.style.width = 120;
+
+            _toggle = new Toggle();
+            _toggle.SetValueWithoutNotify(ScenePinPlacementTool.IsActive);
+            _toggle.RegisterValueChangedCallback(evt =>
+            {
+                ScenePinPlacementTool.SetActive(evt.newValue);
+            });
+            _toggle.style.marginRight = 6;
+            root.Add(_toggle);
+
+            var label = new Label(ScenePinPlacementTool.IsActive
+                ? "Active"
+                : "Inactive");
+            label.style.unityFontStyleAndWeight = FontStyle.Normal;
+            root.Add(label);
+
+            ScenePinPlacementTool.OnActiveChanged += () =>
+            {
+                _toggle?.SetValueWithoutNotify(ScenePinPlacementTool.IsActive);
+                label.text = ScenePinPlacementTool.IsActive
+                    ? "Active"
+                    : "Inactive";
+            };
+
+            return root;
+        }
     }
 }
+
