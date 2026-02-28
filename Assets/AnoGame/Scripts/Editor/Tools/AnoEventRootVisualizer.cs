@@ -17,9 +17,13 @@ namespace AnoGame.Editor.Tools
         // ── 状態 ──
         internal static bool IsActive;
         internal static event System.Action OnActiveChanged;
+        internal static event System.Action OnSceneSelectionChanged;
 
         // ── タグフィルタ（非表示タグセット） ──
         internal static readonly HashSet<Application.Event.EventColorTag> HiddenTags = new HashSet<Application.Event.EventColorTag>();
+
+        // ── 複数選択対象（Dashboardから設定） ──
+        internal static readonly HashSet<Application.Event.AnoEventRoot> SelectedRoots = new HashSet<Application.Event.AnoEventRoot>();
 
         // ── ランタイム座標記録 ──
         private static readonly Dictionary<int, RuntimeMoveRecord> _runtimeMoves = new Dictionary<int, RuntimeMoveRecord>();
@@ -203,8 +207,31 @@ namespace AnoGame.Editor.Tools
                 && Event.current.type == EventType.MouseDown
                 && Event.current.button == 0)
             {
+                bool alreadySelected = SelectedRoots.Contains(hoveredRoot);
+
+                if (Event.current.control)
+                {
+                    // Ctrl+クリック: トグル追加/解除
+                    if (alreadySelected)
+                        SelectedRoots.Remove(hoveredRoot);
+                    else
+                        SelectedRoots.Add(hoveredRoot);
+                }
+                else if (!alreadySelected)
+                {
+                    // 未選択オブジェクトを通常クリック: 単独選択に切替
+                    SelectedRoots.Clear();
+                    SelectedRoots.Add(hoveredRoot);
+                }
+                // else: 選択済みオブジェクトをCtrlなしクリック → 選択維持（ドラッグ用）
+
                 Selection.activeGameObject = hoveredRoot.gameObject;
                 EditorGUIUtility.PingObject(hoveredRoot.gameObject);
+
+                Debug.Log($"[Visualizer] Scene click: ctrl={Event.current.control}, hovered={hoveredRoot.gameObject.name}, alreadySelected={alreadySelected}, SelectedRoots.Count={SelectedRoots.Count}");
+
+                // Dashboardのリストと同期
+                OnSceneSelectionChanged?.Invoke();
             }
 
             foreach (var root in eventRoots)
@@ -265,41 +292,78 @@ namespace AnoGame.Editor.Tools
             Handles.DrawWireDisc(pos, Vector3.forward, drawRadius, wireThickness);
             Handles.DrawWireDisc(pos, Vector3.right, drawRadius, wireThickness);
 
-            // ── FreeMoveHandle ──
-            Handles.color = handleColor;
-
-            EditorGUI.BeginChangeCheck();
-            Vector3 newPos = Handles.FreeMoveHandle(
-                pos,
-                handleSize,
-                Vector3.one * 0.5f,
-                Handles.SphereHandleCap);
-
-            if (EditorGUI.EndChangeCheck())
+            // ── FreeMoveHandle（Ctrl押下中はスキップ＝選択モード専用） ──
+            if (!Event.current.control)
             {
-                // Y=0 固定
-                newPos.y = 0f;
+                Handles.color = handleColor;
 
-                // PlayMode中なら座標を記録
-                if (_isPlayMode)
+                EditorGUI.BeginChangeCheck();
+                Vector3 newPos = Handles.FreeMoveHandle(
+                    pos,
+                    handleSize,
+                    Vector3.one * 0.5f,
+                    Handles.SphereHandleCap);
+
+                if (EditorGUI.EndChangeCheck())
                 {
-                    RecordRuntimeMove(eventRoot, pos, newPos);
-                }
-                else
-                {
-                    Undo.RecordObject(t, "Move AnoEventRoot");
-                }
+                    Vector3 delta = newPos - pos;
+                    delta.y = 0f; // Y=0 固定
 
-                t.position = newPos;
+                    Debug.Log($"[Visualizer] Drag: {eventRoot.gameObject.name}, SelectedRoots.Count={SelectedRoots.Count}, contains={SelectedRoots.Contains(eventRoot)}, delta={delta}");
 
-                if (!_isPlayMode)
-                {
-                    EditorUtility.SetDirty(t);
+                    // 複数選択時は全対象を一括移動
+                    if (SelectedRoots.Count > 1 && SelectedRoots.Contains(eventRoot))
+                    {
+                        foreach (var root in SelectedRoots)
+                        {
+                            if (root == null) continue;
+                            var rt = root.transform;
+                            Vector3 target = rt.position + delta;
+                            target.y = 0f;
+
+                            if (_isPlayMode)
+                            {
+                                RecordRuntimeMove(root, rt.position, target);
+                            }
+                            else
+                            {
+                                Undo.RecordObject(rt, "Move AnoEventRoot (Bulk)");
+                            }
+
+                            rt.position = target;
+
+                            if (!_isPlayMode)
+                            {
+                                EditorUtility.SetDirty(rt);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // 単体移動
+                        newPos.y = 0f;
+
+                        if (_isPlayMode)
+                        {
+                            RecordRuntimeMove(eventRoot, pos, newPos);
+                        }
+                        else
+                        {
+                            Undo.RecordObject(t, "Move AnoEventRoot");
+                        }
+
+                        t.position = newPos;
+
+                        if (!_isPlayMode)
+                        {
+                            EditorUtility.SetDirty(t);
+                        }
+                    }
+
+                    // インスペクターに表示 + ヒエラルキーでハイライト
+                    Selection.activeGameObject = eventRoot.gameObject;
+                    EditorGUIUtility.PingObject(eventRoot.gameObject);
                 }
-
-                // インスペクターに表示 + ヒエラルキーでハイライト
-                Selection.activeGameObject = eventRoot.gameObject;
-                EditorGUIUtility.PingObject(eventRoot.gameObject);
             }
 
             // ── ラベル表示 ──

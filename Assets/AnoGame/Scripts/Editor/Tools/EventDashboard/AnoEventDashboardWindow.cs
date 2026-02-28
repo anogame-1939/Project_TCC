@@ -19,6 +19,7 @@ namespace AnoGame.Editor.Tools
         private bool _timelineMode = true;
         private readonly HashSet<Application.Event.EventColorTag> _activeTagFilters = new HashSet<Application.Event.EventColorTag>();
         private bool _allTagsActive = true;
+        private bool _suppressUnitySelectionSync;
 
         [MenuItem("AnoGame/Tools/Event Dashboard")]
         public static void ShowWindow()
@@ -215,12 +216,34 @@ namespace AnoGame.Editor.Tools
         {
             UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += OnSceneOpened;
             Selection.selectionChanged += OnUnitySelectionChanged;
+            AnoEventRootVisualizer.OnSceneSelectionChanged += SyncListFromSceneSelection;
         }
 
         private void OnDisable()
         {
             UnityEditor.SceneManagement.EditorSceneManager.sceneOpened -= OnSceneOpened;
             Selection.selectionChanged -= OnUnitySelectionChanged;
+            AnoEventRootVisualizer.OnSceneSelectionChanged -= SyncListFromSceneSelection;
+        }
+
+        /// <summary>
+        /// シーン上の複数選択をDashboardのListViewに同期する。
+        /// </summary>
+        private void SyncListFromSceneSelection()
+        {
+            if (_eventListView == null) return;
+
+            _suppressUnitySelectionSync = true;
+
+            var indices = new List<int>();
+            for (int i = 0; i < _eventRoots.Count; i++)
+            {
+                if (AnoEventRootVisualizer.SelectedRoots.Contains(_eventRoots[i]))
+                    indices.Add(i);
+            }
+            _eventListView.SetSelection(indices);
+
+            EditorApplication.delayCall += () => _suppressUnitySelectionSync = false;
         }
 
         private void OnSceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
@@ -234,6 +257,7 @@ namespace AnoGame.Editor.Tools
         /// </summary>
         private void OnUnitySelectionChanged()
         {
+            if (_suppressUnitySelectionSync) return;
             if (_eventListView == null || _eventRoots == null) return;
 
             var activeGo = Selection.activeGameObject;
@@ -320,6 +344,20 @@ namespace AnoGame.Editor.Tools
             _detailView.Clear();
 
             var selectedRoots = selection.OfType<AnoEventRoot>().ToList();
+
+            // VisualizerのSelectedRootsを同期
+            // シーンからの同期トリガー時はSelectedRootsを上書きしない
+            // (SyncListFromSceneSelection → SetSelection → OnSelectionChanged の連鎖で
+            //  シーン側で既に設定済みのSelectedRootsがクリアされるのを防ぐ)
+            if (!_suppressUnitySelectionSync)
+            {
+                AnoEventRootVisualizer.SelectedRoots.Clear();
+                foreach (var root in selectedRoots)
+                    AnoEventRootVisualizer.SelectedRoots.Add(root);
+            }
+            SceneView.RepaintAll();
+
+            Debug.Log($"[Dashboard] OnSelectionChanged: {selectedRoots.Count} items selected, SelectedRoots={AnoEventRootVisualizer.SelectedRoots.Count}");
 
             if (selectedRoots.Count == 0)
             {
