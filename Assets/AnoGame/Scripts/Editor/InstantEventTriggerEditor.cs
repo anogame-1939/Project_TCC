@@ -1,10 +1,8 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
-using System.Linq;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 using AnoGame.AnoFlow;
-using AnoGame.Application.Attributes;
-using AnoGame.Data;
 
 namespace AnoGame.Editor
 {
@@ -12,180 +10,90 @@ namespace AnoGame.Editor
     [CanEditMultipleObjects]
     public class InstantEventTriggerEditor : UnityEditor.Editor
     {
-        private SerializedProperty scriptProp;
-        private SerializedProperty targetEventIdProp;
-        private SerializedProperty onStartProp;
-
-        // EventTriggerBase propertes
-        private SerializedProperty onPrepareEventProp;
-        private SerializedProperty onEventStartProp;
-        private SerializedProperty onEventFinishProp;
-        private SerializedProperty onEventDoneProp;
-        private SerializedProperty onEventFailedProp;
-
-        private SerializedProperty supersededByEventsProp;
-        private SerializedProperty conditionComponentsProp;
-        private SerializedProperty requiredItemsProp;
-        private SerializedProperty requiredEventsProp;
-        private SerializedProperty checkConditionsOnDoneProp;
-
-        private void OnEnable()
+        public override VisualElement CreateInspectorGUI()
         {
-            scriptProp = serializedObject.FindProperty("m_Script");
-            targetEventIdProp = serializedObject.FindProperty("targetEventId");
-            onStartProp = serializedObject.FindProperty("_onStart");
+            var root = new VisualElement();
 
-            onPrepareEventProp = serializedObject.FindProperty("onPrepareEvent");
-            onEventStartProp = serializedObject.FindProperty("onEventStart");
-            onEventFinishProp = serializedObject.FindProperty("onEventFinish");
-            onEventDoneProp = serializedObject.FindProperty("onEventDone");
-            onEventFailedProp = serializedObject.FindProperty("onEventFailed");
+            // Script
+            var scriptProp = serializedObject.FindProperty("m_Script");
+            if (scriptProp != null)
+            {
+                var f = new PropertyField(scriptProp);
+                f.SetEnabled(false);
+                root.Add(f);
+            }
 
-            supersededByEventsProp = serializedObject.FindProperty("supersededByEvents");
-            conditionComponentsProp = serializedObject.FindProperty("conditionComponents");
-            requiredItemsProp = serializedObject.FindProperty("requiredItems");
-            requiredEventsProp = serializedObject.FindProperty("requiredEvents");
-            checkConditionsOnDoneProp = serializedObject.FindProperty("checkConditionsOnDone");
+            // Override
+            var overrideLabel = new Label("Override");
+            overrideLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            overrideLabel.style.marginTop = 6;
+            overrideLabel.style.marginBottom = 4;
+            root.Add(overrideLabel);
+
+            root.Add(new PropertyField(serializedObject.FindProperty("targetEventId"), "Target Event ID"));
+            root.Add(new PropertyField(serializedObject.FindProperty("_onStart"), "On Start"));
+            root.Add(CreateSeparator());
+
+            // EventTriggerBase fields
+            AddEventTriggerBaseFields(root);
+
+            return root;
         }
 
-        public override void OnInspectorGUI()
+        private void AddEventTriggerBaseFields(VisualElement root)
         {
-            serializedObject.Update();
+            // EventData
+            root.Add(new PropertyField(serializedObject.FindProperty("eventData"), "Event Data"));
+            root.Add(CreateSeparator());
 
-            // Script field (read-only usually)
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.PropertyField(scriptProp);
-            }
+            // Conditions
+            var condLabel = new Label("Conditions");
+            condLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            condLabel.style.marginTop = 6;
+            condLabel.style.marginBottom = 4;
+            root.Add(condLabel);
 
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Instant Event Logic (Fixed)", EditorStyles.boldLabel);
+            root.Add(new PropertyField(serializedObject.FindProperty("requiredItems"), "Required Items"));
+            root.Add(new PropertyField(serializedObject.FindProperty("requiredEvents"), "Required Events"));
 
-            // Check & Draw Target Event ID
-            if (targetEventIdProp != null)
-            {
-                EditorGUILayout.PropertyField(targetEventIdProp, new GUIContent("Target Event ID"));
-                // Fallback warning if ID is missing
-                if (string.IsNullOrEmpty(targetEventIdProp.stringValue))
-                {
-                    EditorGUILayout.HelpBox("Select an Event ID from the list.", MessageType.Info);
-                }
-            }
-            else
-            {
-                EditorGUILayout.HelpBox("Error: 'targetEventId' property not found!", MessageType.Error);
-            }
+            var ckProp = serializedObject.FindProperty("checkConditionsOnDone");
+            if (ckProp != null) root.Add(new PropertyField(ckProp, "Check Conditions On Done"));
+            root.Add(CreateSeparator());
 
-            if (onStartProp != null) EditorGUILayout.PropertyField(onStartProp);
+            // Legacy
+            var legacyLabel = new Label("Legacy");
+            legacyLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            legacyLabel.style.marginTop = 6;
+            legacyLabel.style.marginBottom = 4;
+            legacyLabel.style.color = new Color(0.6f, 0.6f, 0.6f);
+            root.Add(legacyLabel);
 
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Condition Settings", EditorStyles.boldLabel);
+            root.Add(new PropertyField(serializedObject.FindProperty("supersededByEvents"), "Superseded By Events"));
+            root.Add(new PropertyField(serializedObject.FindProperty("conditionComponents"), "Condition Components"));
+            root.Add(CreateSeparator());
 
-            // Item Conditions
-            DrawConditionList<ItemData>("Item Conditions", requiredItemsProp, "t:ItemData", "Add Item Condition", (item) => item.ItemName);
+            // Events
+            var evtLabel = new Label("Events");
+            evtLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            evtLabel.style.marginTop = 6;
+            evtLabel.style.marginBottom = 4;
+            root.Add(evtLabel);
 
-            // Event Conditions
-            DrawConditionList<EventData>("Event Conditions", requiredEventsProp, "t:EventData", "Add Event Condition", (evt) => evt.EventName);
-
-            EditorGUILayout.Space();
-
-            // Legacy Foldout
-            bool legacyExpanded = EditorGUILayout.BeginFoldoutHeaderGroup(false, "Legacy Conditions");
-            if (legacyExpanded)
-            {
-                // Keep foldout logic consistent
-            }
-            EditorGUILayout.EndFoldoutHeaderGroup();
-
-            // Draw Legacy properties nicely
-            EditorGUILayout.PropertyField(supersededByEventsProp);
-            EditorGUILayout.PropertyField(conditionComponentsProp);
-            if (checkConditionsOnDoneProp != null) EditorGUILayout.PropertyField(checkConditionsOnDoneProp);
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Events", EditorStyles.boldLabel);
-            DrawProp(onPrepareEventProp);
-            DrawProp(onEventStartProp);
-            DrawProp(onEventFinishProp);
-            DrawProp(onEventDoneProp);
-            DrawProp(onEventFailedProp);
-
-            serializedObject.ApplyModifiedProperties();
+            root.Add(new PropertyField(serializedObject.FindProperty("onPrepareEvent"), "On Prepare"));
+            root.Add(new PropertyField(serializedObject.FindProperty("onEventStart"), "On Event Start"));
+            root.Add(new PropertyField(serializedObject.FindProperty("onEventFinish"), "On Event Finish"));
+            root.Add(new PropertyField(serializedObject.FindProperty("onEventDone"), "On Event Done"));
+            root.Add(new PropertyField(serializedObject.FindProperty("onEventFailed"), "On Event Failed"));
         }
 
-        private void DrawProp(SerializedProperty prop)
+        private VisualElement CreateSeparator()
         {
-            if (prop != null) EditorGUILayout.PropertyField(prop);
-        }
-
-        private void DrawConditionList<T>(string label, SerializedProperty listProp, string filter, string addButtonText, System.Func<T, string> nameSelector) where T : ScriptableObject
-        {
-            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
-
-            if (listProp == null) return;
-
-            EditorGUI.indentLevel++;
-            int count = listProp.arraySize;
-            for (int i = 0; i < count; i++)
-            {
-                EditorGUILayout.BeginHorizontal();
-                SerializedProperty elementProp = listProp.GetArrayElementAtIndex(i);
-
-                // Get referenced object
-                T asset = elementProp.objectReferenceValue as T;
-                string displayName = "None";
-                if (asset != null)
-                {
-                    displayName = nameSelector(asset);
-                    if (string.IsNullOrEmpty(displayName)) displayName = asset.name;
-                }
-
-                // Draw Read-only Label (or disabled text field)
-                using (new EditorGUI.DisabledScope(true))
-                {
-                    EditorGUILayout.TextField(displayName);
-                }
-
-                // Allow removing
-                if (GUILayout.Button("X", GUILayout.Width(20)))
-                {
-                    // If reference exists, clear it first so DeleteArrayElementAtIndex actually removes the element
-                    if (elementProp.objectReferenceValue != null)
-                    {
-                        elementProp.objectReferenceValue = null;
-                    }
-                    listProp.DeleteArrayElementAtIndex(i);
-                    break;
-                }
-                EditorGUILayout.EndHorizontal();
-            }
-            EditorGUI.indentLevel--;
-
-            if (GUILayout.Button(addButtonText))
-            {
-                // Show dropdown
-                var menu = new GenericMenu();
-                string[] guids = AssetDatabase.FindAssets(filter);
-
-                foreach (var guid in guids)
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(guid);
-                    T asset = AssetDatabase.LoadAssetAtPath<T>(path);
-                    if (asset != null)
-                    {
-                        string name = nameSelector(asset);
-                        if (string.IsNullOrEmpty(name)) name = asset.name;
-
-                        menu.AddItem(new GUIContent(name), false, () =>
-                        {
-                            listProp.InsertArrayElementAtIndex(listProp.arraySize);
-                            listProp.GetArrayElementAtIndex(listProp.arraySize - 1).objectReferenceValue = asset;
-                            serializedObject.ApplyModifiedProperties();
-                        });
-                    }
-                }
-                menu.ShowAsContext();
-            }
+            var sep = new VisualElement();
+            sep.style.height = 1;
+            sep.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+            sep.style.marginTop = 8;
+            sep.style.marginBottom = 8;
+            return sep;
         }
     }
 }
