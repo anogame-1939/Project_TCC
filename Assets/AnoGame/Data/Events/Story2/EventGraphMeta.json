@@ -208,7 +208,7 @@
             "guid": "d0e0400ed86e446cc92bee472d7aefbd",
             "eventId": "EV_003_Door1_Default",
             "x": 350.0,
-            "y": -215.0
+            "y": -214.0
         },
         {
             "guid": "818846ab6df544b1db8c59e1a77a8f7e",
@@ -393,8 +393,20 @@
         {
             "guid": "15039f69e025a5141a456d830d5c4f73",
             "eventId": "EV_032",
-            "x": 50.0,
-            "y": -205.0
+            "x": -49.0,
+            "y": -574.0
+        },
+        {
+            "guid": "8f6d266d4d0fd15409731c383a4b3103",
+            "eventId": "EV_033",
+            "x": -49.0,
+            "y": -399.0
+        },
+        {
+            "guid": "f28e46902c2ac704e8ba2f734af55170",
+            "eventId": "EV_034",
+            "x": 249.0,
+            "y": -479.0
         }
     ],
     "sceneBindings": [
@@ -404,6 +416,20 @@
             "containerPath": "GeneratedEventsV2/EV_032_Inspect",
             "receptorName": "EV_032_Receptor_Inspect",
             "triggerName": "EV_032_Trigger"
+        },
+        {
+            "eventId": "EV_033",
+            "sceneName": "_Startup_Test",
+            "containerPath": "GeneratedEventsV2/EV_033_Item",
+            "receptorName": "EV_033_Receptor_Item",
+            "triggerName": "EV_033_Trigger"
+        },
+        {
+            "eventId": "EV_034",
+            "sceneName": "_Startup_Test",
+            "containerPath": "GeneratedEventsV2/EV_034_Contact",
+            "receptorName": "EV_034_Receptor_Contact",
+            "triggerName": "EV_034_Trigger"
         }
     ]
 }

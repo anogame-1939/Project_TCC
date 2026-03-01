@@ -16,3 +16,5 @@ trigger: always_on
 5.EventGraphの展開/折りたたみ・コネクタ位置に関する修正を行った際は、`Assets/AnoGame/Documents/EventGraph_CollapseExpand_Issues.md` に修正内容・原因・影響範囲のサマリを追記すること。
 
 6.エディタツール作成・編集時に `MarkDirtyRepaint()` / `EditorUtility.SetDirty()` 等のDirty/Repaint系メソッドを安易に使用しないこと。UIToolkitのレイアウト問題はスタイル変更や構造変更で根本的に解決し、Dirty系はデータ永続化目的のみに限定すること。
+
+7.エディタツール作成時、IMGUI（OnGUI, GenericMenu, EditorGUILayout等）は極力使用せず、UIToolkit（VisualElement, Button, Toggle等）を使用すること。特にOverlayやEditorWindow内ではUIToolkitに統一すること。

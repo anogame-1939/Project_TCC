@@ -678,6 +678,7 @@ namespace AnoGame.Editor.Tools
         private Toggle _toggle;
         private Button _placementBtn;
         private Label _statusLabel;
+        private VisualElement _receptorPanel;
 
         public override VisualElement CreatePanelContent()
         {
@@ -719,7 +720,45 @@ namespace AnoGame.Editor.Tools
             _placementBtn.SetEnabled(AnoEventRootVisualizer.IsActive);
             root.Add(_placementBtn);
 
-            // ── Row 3: Status Label ──
+            // ── Row 3: Receptor Type Selection Panel (initially hidden) ──
+            _receptorPanel = new VisualElement();
+            _receptorPanel.style.display = DisplayStyle.None;
+            _receptorPanel.style.marginTop = 2;
+            _receptorPanel.style.paddingTop = 2;
+            _receptorPanel.style.paddingBottom = 2;
+            _receptorPanel.style.borderTopWidth = 1;
+            _receptorPanel.style.borderTopColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+
+            var contactBtn = new Button(() => StartPlacement(ReceptorType.Contact))
+            { text = "Contact" };
+            contactBtn.tooltip = "距離トリガー";
+            contactBtn.style.height = 20;
+            contactBtn.style.fontSize = 11;
+            contactBtn.style.marginTop = 1;
+            contactBtn.style.marginBottom = 1;
+            _receptorPanel.Add(contactBtn);
+
+            var inspectBtn = new Button(() => StartPlacement(ReceptorType.Inspect))
+            { text = "Inspect" };
+            inspectBtn.tooltip = "調べる";
+            inspectBtn.style.height = 20;
+            inspectBtn.style.fontSize = 11;
+            inspectBtn.style.marginTop = 1;
+            inspectBtn.style.marginBottom = 1;
+            _receptorPanel.Add(inspectBtn);
+
+            var itemBtn = new Button(() => StartPlacement(ReceptorType.Item))
+            { text = "Item" };
+            itemBtn.tooltip = "アイテム使用";
+            itemBtn.style.height = 20;
+            itemBtn.style.fontSize = 11;
+            itemBtn.style.marginTop = 1;
+            itemBtn.style.marginBottom = 1;
+            _receptorPanel.Add(itemBtn);
+
+            root.Add(_receptorPanel);
+
+            // ── Row 4: Status Label ──
             _statusLabel = new Label("");
             _statusLabel.style.fontSize = 10;
             _statusLabel.style.color = new StyleColor(new Color(1f, 0.85f, 0.3f));
@@ -754,15 +793,21 @@ namespace AnoGame.Editor.Tools
                 return;
             }
 
-            // Receptor 種別選択メニュー
-            var menu = new GenericMenu();
-            menu.AddItem(new GUIContent("Contact (距離トリガー)"), false,
-                () => AnoEventRootVisualizer.SetPlacementMode(true, ReceptorType.Contact));
-            menu.AddItem(new GUIContent("Inspect (調べる)"), false,
-                () => AnoEventRootVisualizer.SetPlacementMode(true, ReceptorType.Inspect));
-            menu.AddItem(new GUIContent("Item (アイテム使用)"), false,
-                () => AnoEventRootVisualizer.SetPlacementMode(true, ReceptorType.Item));
-            menu.ShowAsContext();
+            // 種別選択パネルの表示/非表示をトグル
+            if (_receptorPanel != null)
+            {
+                bool visible = _receptorPanel.style.display == DisplayStyle.Flex;
+                _receptorPanel.style.display = visible ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+        }
+
+        private void StartPlacement(ReceptorType type)
+        {
+            // 種別パネルを閉じる
+            if (_receptorPanel != null)
+                _receptorPanel.style.display = DisplayStyle.None;
+
+            AnoEventRootVisualizer.SetPlacementMode(true, type);
         }
 
         private void UpdatePlacementUI()
