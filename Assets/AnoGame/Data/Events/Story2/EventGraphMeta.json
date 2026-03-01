@@ -2,7 +2,9 @@
     "version": 1,
     "storyId": "Story2",
     "eventDataFolder": "Assets/AnoGame/Data/Events/Story2",
-    "targetScenes": [],
+    "targetScenes": [
+        "_Startup_Test"
+    ],
     "nodePositions": [
         {
             "guid": "",
@@ -387,7 +389,21 @@
             "eventId": "EV_031",
             "x": 1884.0,
             "y": 1135.0
+        },
+        {
+            "guid": "15039f69e025a5141a456d830d5c4f73",
+            "eventId": "EV_032",
+            "x": 50.0,
+            "y": -205.0
         }
     ],
-    "sceneBindings": []
+    "sceneBindings": [
+        {
+            "eventId": "EV_032",
+            "sceneName": "_Startup_Test",
+            "containerPath": "GeneratedEventsV2/EV_032_Inspect",
+            "receptorName": "EV_032_Receptor_Inspect",
+            "triggerName": "EV_032_Trigger"
+        }
+    ]
 }

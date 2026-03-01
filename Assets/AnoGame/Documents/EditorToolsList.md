@@ -28,7 +28,7 @@
 | `AnoGame/Tools/Event Dashboard/Migrate Scene Events to AnoEventRoot` | EventDashboardMigration.cs | MenuItem | 既存イベントルートへのAnoEventRootアタッチ |
 | `AnoGame/Tools/Workspace Switcher` | WorkspaceSwitcher.cs | EditorWindow | ワークスペース（タブ構成）の保存・切り替え |
 | `Tools/Scene Pin Placement` | ScenePinPlacementTool.cs | MenuItem (Toggle) | シーン上にピンを立てオブジェクトを移動する配置ツール |
-| `Tools/AnoEventRoot Visualizer` | AnoEventRootVisualizer.cs | MenuItem (Toggle) + Overlay | AnoEventRootの球体ギズモ可視化・移動ツール |
+| `Tools/AnoEventRoot Visualizer` | AnoEventRootVisualizer.cs | MenuItem (Toggle) + Overlay | AnoEventRootの球体ギズモ可視化・移動ツール + イベント配置モード |
 
 ---
 

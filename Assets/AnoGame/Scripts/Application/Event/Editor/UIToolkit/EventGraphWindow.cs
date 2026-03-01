@@ -33,6 +33,7 @@ namespace AnoGame.AnoFlow.Editor
 
         // Folder selector references
         private VisualElement _folderListContainer;
+        private Label _folderToggleLabel;
 
         /// <summary>
         /// 現在のルートパス
@@ -209,7 +210,10 @@ namespace AnoGame.AnoFlow.Editor
             _graphView.AddToClassList("event-graph-view");
             graphContainer.Add(_graphView);
 
-            // === Floating Panel (vertical layout) ===
+            // === Folder Selector Panel (top-left, collapsible) ===
+            graphContainer.Add(BuildFolderPanel());
+
+            // === Floating Panel (vertical layout, top-right) ===
             graphContainer.Add(BuildFloatingPanel());
 
             root.Add(graphContainer);
@@ -227,6 +231,92 @@ namespace AnoGame.AnoFlow.Editor
             };
 
             SyncTogglesFromSectionVis();
+        }
+
+        /// <summary>
+        /// 左上の折りたたみ可能なフォルダ選択パネルを構築
+        /// </summary>
+        private VisualElement BuildFolderPanel()
+        {
+            var panel = new VisualElement();
+            panel.style.position = Position.Absolute;
+            panel.style.top = 8;
+            panel.style.left = 8;
+            panel.style.backgroundColor = new StyleColor(new Color(0.22f, 0.22f, 0.22f, 0.92f));
+            panel.style.borderTopLeftRadius = 6;
+            panel.style.borderTopRightRadius = 6;
+            panel.style.borderBottomLeftRadius = 6;
+            panel.style.borderBottomRightRadius = 6;
+            panel.style.paddingLeft = 8;
+            panel.style.paddingRight = 8;
+            panel.style.paddingTop = 6;
+            panel.style.paddingBottom = 6;
+            panel.style.borderTopWidth = 1;
+            panel.style.borderBottomWidth = 1;
+            panel.style.borderLeftWidth = 1;
+            panel.style.borderRightWidth = 1;
+            var borderColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            panel.style.borderTopColor = borderColor;
+            panel.style.borderBottomColor = borderColor;
+            panel.style.borderLeftColor = borderColor;
+            panel.style.borderRightColor = borderColor;
+            panel.style.minWidth = 100;
+
+            // ヘッダー行（トグル + ラベル + 設定ボタン）
+            var header = new VisualElement();
+            header.style.flexDirection = FlexDirection.Row;
+            header.style.alignItems = Align.Center;
+            header.style.cursor = StyleKeyword.Initial;
+
+            var toggleLabel = new Label($"\u25BA {SelectedFolder}");
+            toggleLabel.style.fontSize = 11;
+            toggleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            toggleLabel.style.flexGrow = 1;
+            toggleLabel.style.cursor = StyleKeyword.Initial;
+            header.Add(toggleLabel);
+
+            panel.Add(header);
+
+            // 折りたたみコンテンツ
+            var content = new VisualElement();
+            content.style.display = DisplayStyle.None; // デフォルトは折りたたみ
+            content.style.marginTop = 4;
+
+            bool isExpanded = false;
+
+            // ヘッダークリックで展開/折りたたみ
+            header.RegisterCallback<ClickEvent>(evt =>
+            {
+                isExpanded = !isExpanded;
+                content.style.display = isExpanded ? DisplayStyle.Flex : DisplayStyle.None;
+                toggleLabel.text = isExpanded ? "\u25BC Folder" : $"\u25BA {SelectedFolder}";
+            });
+
+            // フォルダ一覧
+            _folderListContainer = new VisualElement();
+            RebuildFolderList();
+            content.Add(_folderListContainer);
+
+            // セパレータ + 設定ボタン
+            var sep = new VisualElement();
+            sep.style.height = 1;
+            sep.style.backgroundColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
+            sep.style.marginTop = 4;
+            sep.style.marginBottom = 4;
+            content.Add(sep);
+
+            var settingsBtn = new Button(() => ShowRootPathPopup()) { text = "Root Path ..." };
+            settingsBtn.tooltip = "ルートパスの変更";
+            settingsBtn.style.height = 20;
+            settingsBtn.style.fontSize = 10;
+            content.Add(settingsBtn);
+
+            panel.Add(content);
+
+            // toggleLabel を更新用に保持
+            _folderToggleLabel = toggleLabel;
+
+            return panel;
         }
 
         private VisualElement BuildFloatingPanel()
@@ -254,45 +344,6 @@ namespace AnoGame.AnoFlow.Editor
             panel.style.borderLeftColor = borderColor;
             panel.style.borderRightColor = borderColor;
             panel.style.minWidth = 140;
-
-            // === Folder Selector Section ===
-            var folderHeader = new VisualElement();
-            folderHeader.style.flexDirection = FlexDirection.Row;
-            folderHeader.style.justifyContent = Justify.SpaceBetween;
-            folderHeader.style.alignItems = Align.Center;
-            folderHeader.style.marginBottom = 4;
-
-            var folderLabel = new Label("Folder");
-            folderLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            folderLabel.style.fontSize = 11;
-            folderHeader.Add(folderLabel);
-
-            // 設定ボタン
-            var settingsBtn = new Button(() => ShowRootPathPopup()) { text = "..." };
-            settingsBtn.tooltip = "ルートパスの変更";
-            settingsBtn.style.width = 24;
-            settingsBtn.style.height = 18;
-            settingsBtn.style.fontSize = 10;
-            settingsBtn.style.paddingLeft = 0;
-            settingsBtn.style.paddingRight = 0;
-            settingsBtn.style.paddingTop = 0;
-            settingsBtn.style.paddingBottom = 0;
-            folderHeader.Add(settingsBtn);
-
-            panel.Add(folderHeader);
-
-            // フォルダ一覧コンテナ
-            _folderListContainer = new VisualElement();
-            RebuildFolderList();
-            panel.Add(_folderListContainer);
-
-            // --- Separator (folder → toggles) ---
-            var sep0 = new VisualElement();
-            sep0.style.height = 1;
-            sep0.style.backgroundColor = new StyleColor(new Color(0.4f, 0.4f, 0.4f));
-            sep0.style.marginTop = 4;
-            sep0.style.marginBottom = 4;
-            panel.Add(sep0);
 
             // --- ALL button ---
             _allBtn = new Button() { text = "ALL" };
@@ -424,6 +475,10 @@ namespace AnoGame.AnoFlow.Editor
 
             // フォルダ一覧のハイライト更新
             RebuildFolderList();
+
+            // 折りたたみ時のラベル更新
+            if (_folderToggleLabel != null && !_folderToggleLabel.text.StartsWith("\u25BC"))
+                _folderToggleLabel.text = $"\u25BA {folderName}";
         }
 
         /// <summary>

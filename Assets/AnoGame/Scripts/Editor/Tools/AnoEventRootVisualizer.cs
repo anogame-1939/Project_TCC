@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.UIElements;
+using AnoGame.Editor.EventPlacement;
 
 namespace AnoGame.Editor.Tools
 {
@@ -18,6 +19,11 @@ namespace AnoGame.Editor.Tools
         internal static bool IsActive;
         internal static event System.Action OnActiveChanged;
         internal static event System.Action OnSceneSelectionChanged;
+
+        // ── 配置モード ──
+        internal static bool IsPlacementMode;
+        internal static ReceptorType PlacementReceptorType;
+        internal static event System.Action OnPlacementModeChanged;
 
         // ── タグフィルタ（非表示タグセット） ──
         internal static readonly HashSet<Application.Event.EventColorTag> HiddenTags = new HashSet<Application.Event.EventColorTag>();
@@ -143,7 +149,16 @@ namespace AnoGame.Editor.Tools
         internal static void SetActive(bool active)
         {
             IsActive = active;
+            if (!active) SetPlacementMode(false, ReceptorType.Inspect);
             OnActiveChanged?.Invoke();
+            SceneView.RepaintAll();
+        }
+
+        internal static void SetPlacementMode(bool active, ReceptorType type)
+        {
+            IsPlacementMode = active;
+            PlacementReceptorType = type;
+            OnPlacementModeChanged?.Invoke();
             SceneView.RepaintAll();
         }
 
@@ -179,6 +194,15 @@ namespace AnoGame.Editor.Tools
             if (Event.current.type == EventType.MouseMove)
             {
                 sceneView.Repaint();
+            }
+
+            // ── 配置モード処理 ──
+            if (IsPlacementMode)
+            {
+                HandlePlacementMode(sceneView);
+                // 配置モード中も既存ギズモを描画（参考用）
+                DrawAllEventRoots(null);
+                return;
             }
 
             var eventRoots = Object.FindObjectsByType<Application.Event.AnoEventRoot>(
@@ -234,6 +258,106 @@ namespace AnoGame.Editor.Tools
                 OnSceneSelectionChanged?.Invoke();
             }
 
+            foreach (var root in eventRoots)
+            {
+                if (root == null) continue;
+                if (HiddenTags.Contains(root.ColorTag)) continue;
+                DrawEventRootGizmo(root, root == hoveredRoot);
+            }
+        }
+
+        // ====================================================================
+        // 配置モード
+        // ====================================================================
+
+        private static void HandlePlacementMode(SceneView sceneView)
+        {
+            // Escape or 右クリック → 配置モード解除
+            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape)
+            {
+                SetPlacementMode(false, PlacementReceptorType);
+                Event.current.Use();
+                return;
+            }
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 1)
+            {
+                SetPlacementMode(false, PlacementReceptorType);
+                Event.current.Use();
+                return;
+            }
+
+            // マウス位置をワールド座標に変換（レイキャスト）
+            Vector3 worldPos = Vector3.zero;
+            bool hasHit = false;
+
+            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
+            {
+                worldPos = hit.point;
+                worldPos.y = 0f;
+                hasHit = true;
+            }
+            else
+            {
+                // コライダーがない場合は Y=0 平面との交点を使用
+                Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+                if (groundPlane.Raycast(ray, out float distance))
+                {
+                    worldPos = ray.GetPoint(distance);
+                    worldPos.y = 0f;
+                    hasHit = true;
+                }
+            }
+
+            // プレビュー描画
+            if (hasHit)
+            {
+                // 薄い球体プレビュー
+                Color previewColor = new Color(1f, 0.8f, 0.2f, 0.3f);
+                Handles.color = previewColor;
+                Handles.SphereHandleCap(0, worldPos, Quaternion.identity, SphereRadius * 2f, EventType.Repaint);
+
+                // ワイヤフレーム
+                Handles.color = new Color(1f, 0.8f, 0.2f, 0.8f);
+                Handles.DrawWireDisc(worldPos, Vector3.up, SphereRadius, 2f);
+
+                // 配置先フォルダとID情報をラベル表示
+                string folderPath = EventPlacementService.GetActiveFolderPath();
+                string nextId = EventPlacementService.GenerateNextEventId(folderPath);
+                string previewLabel = $"{nextId} [{PlacementReceptorType}]";
+                DrawLabel(worldPos + Vector3.up * LabelOffsetY, previewLabel, new Color(0.8f, 0.6f, 0f, 0.85f));
+            }
+
+            // 左クリック → 配置実行
+            if (hasHit && Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            {
+                EventPlacementService.PlaceEvent(worldPos, PlacementReceptorType);
+                Event.current.Use();
+                // 連続配置: モードは維持
+            }
+
+            // SceneView の既定の選択動作を抑制
+            if (Event.current.type == EventType.Layout)
+            {
+                HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+            }
+
+            // ステータスバーにガイド表示
+            Handles.BeginGUI();
+            var statusRect = new Rect(10, sceneView.position.height - 60, 400, 24);
+            EditorGUI.DrawRect(statusRect, new Color(0, 0, 0, 0.7f));
+            GUI.Label(statusRect, $"  [配置モード] {PlacementReceptorType} -- 左クリック: 配置 / Esc,右クリック: 解除",
+                new GUIStyle(EditorStyles.boldLabel) { normal = { textColor = new Color(1f, 0.9f, 0.3f) }, alignment = TextAnchor.MiddleLeft });
+            Handles.EndGUI();
+        }
+
+        /// <summary>
+        /// 全 AnoEventRoot のギズモを描画する（配置モード中のバックグラウンド描画用）
+        /// </summary>
+        private static void DrawAllEventRoots(Application.Event.AnoEventRoot hoveredRoot)
+        {
+            var eventRoots = Object.FindObjectsByType<Application.Event.AnoEventRoot>(
+                FindObjectsSortMode.None);
             foreach (var root in eventRoots)
             {
                 if (root == null) continue;
@@ -308,8 +432,6 @@ namespace AnoGame.Editor.Tools
                 {
                     Vector3 delta = newPos - pos;
                     delta.y = 0f; // Y=0 固定
-
-                    Debug.Log($"[Visualizer] Drag: {eventRoot.gameObject.name}, SelectedRoots.Count={SelectedRoots.Count}, contains={SelectedRoots.Contains(eventRoot)}, delta={delta}");
 
                     // 複数選択時は全対象を一括移動
                     if (SelectedRoots.Count > 1 && SelectedRoots.Contains(eventRoot))
@@ -554,17 +676,22 @@ namespace AnoGame.Editor.Tools
     public class AnoEventRootVisualizerOverlay : Overlay
     {
         private Toggle _toggle;
+        private Button _placementBtn;
+        private Label _statusLabel;
 
         public override VisualElement CreatePanelContent()
         {
             var root = new VisualElement();
-            root.style.flexDirection = FlexDirection.Row;
-            root.style.alignItems = Align.Center;
             root.style.paddingLeft = 4;
             root.style.paddingRight = 4;
             root.style.paddingTop = 2;
             root.style.paddingBottom = 2;
-            root.style.width = 120;
+            root.style.minWidth = 140;
+
+            // ── Row 1: Active Toggle ──
+            var row1 = new VisualElement();
+            row1.style.flexDirection = FlexDirection.Row;
+            row1.style.alignItems = Align.Center;
 
             _toggle = new Toggle();
             _toggle.SetValueWithoutNotify(AnoEventRootVisualizer.IsActive);
@@ -573,23 +700,88 @@ namespace AnoGame.Editor.Tools
                 AnoEventRootVisualizer.SetActive(evt.newValue);
             });
             _toggle.style.marginRight = 6;
-            root.Add(_toggle);
+            row1.Add(_toggle);
 
             var label = new Label(AnoEventRootVisualizer.IsActive
                 ? "Active"
                 : "Inactive");
             label.style.unityFontStyleAndWeight = FontStyle.Normal;
-            root.Add(label);
+            row1.Add(label);
 
+            root.Add(row1);
+
+            // ── Row 2: Placement Button ──
+            _placementBtn = new Button() { text = "+ Event" };
+            _placementBtn.tooltip = "クリックして Receptor 種別を選択し、シーン上をクリックしてイベントを配置";
+            _placementBtn.style.height = 22;
+            _placementBtn.style.marginTop = 4;
+            _placementBtn.clicked += OnPlacementButtonClicked;
+            _placementBtn.SetEnabled(AnoEventRootVisualizer.IsActive);
+            root.Add(_placementBtn);
+
+            // ── Row 3: Status Label ──
+            _statusLabel = new Label("");
+            _statusLabel.style.fontSize = 10;
+            _statusLabel.style.color = new StyleColor(new Color(1f, 0.85f, 0.3f));
+            _statusLabel.style.marginTop = 2;
+            _statusLabel.style.display = DisplayStyle.None;
+            root.Add(_statusLabel);
+
+            // ── イベント購読 ──
             AnoEventRootVisualizer.OnActiveChanged += () =>
             {
                 _toggle?.SetValueWithoutNotify(AnoEventRootVisualizer.IsActive);
                 label.text = AnoEventRootVisualizer.IsActive
                     ? "Active"
                     : "Inactive";
+                _placementBtn?.SetEnabled(AnoEventRootVisualizer.IsActive);
+            };
+
+            AnoEventRootVisualizer.OnPlacementModeChanged += () =>
+            {
+                UpdatePlacementUI();
             };
 
             return root;
+        }
+
+        private void OnPlacementButtonClicked()
+        {
+            if (AnoEventRootVisualizer.IsPlacementMode)
+            {
+                // 配置モード解除
+                AnoEventRootVisualizer.SetPlacementMode(false, ReceptorType.Inspect);
+                return;
+            }
+
+            // Receptor 種別選択メニュー
+            var menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Contact (距離トリガー)"), false,
+                () => AnoEventRootVisualizer.SetPlacementMode(true, ReceptorType.Contact));
+            menu.AddItem(new GUIContent("Inspect (調べる)"), false,
+                () => AnoEventRootVisualizer.SetPlacementMode(true, ReceptorType.Inspect));
+            menu.AddItem(new GUIContent("Item (アイテム使用)"), false,
+                () => AnoEventRootVisualizer.SetPlacementMode(true, ReceptorType.Item));
+            menu.ShowAsContext();
+        }
+
+        private void UpdatePlacementUI()
+        {
+            if (_placementBtn == null || _statusLabel == null) return;
+
+            if (AnoEventRootVisualizer.IsPlacementMode)
+            {
+                _placementBtn.text = "x Stop";
+                _placementBtn.style.backgroundColor = new StyleColor(new Color(0.7f, 0.3f, 0.2f, 0.8f));
+                _statusLabel.text = $"[{AnoEventRootVisualizer.PlacementReceptorType}]";
+                _statusLabel.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _placementBtn.text = "+ Event";
+                _placementBtn.style.backgroundColor = StyleKeyword.Null;
+                _statusLabel.style.display = DisplayStyle.None;
+            }
         }
     }
 }
