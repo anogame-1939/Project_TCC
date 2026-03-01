@@ -21,6 +21,11 @@ namespace AnoGame.AnoFlow.Editor
         private bool _editMode = false;
         private bool _showNegativeEdges = false;
 
+        /// <summary>
+        /// 現在アクティブなイベントデータフォルダパス
+        /// </summary>
+        public string ActiveFolderPath { get; set; } = "Assets/AnoGame/Data/Events";
+
         // 遅延保存用
         private IVisualElementScheduledItem _pendingSave;
 
@@ -134,7 +139,7 @@ namespace AnoGame.AnoFlow.Editor
             so.FindProperty("category").stringValue = "";
             so.ApplyModifiedPropertiesWithoutUndo();
 
-            string dir = "Assets/AnoGame/Data/Events/Story2";
+            string dir = ActiveFolderPath;
             string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{dir}/{tempEventId}.asset");
             AssetDatabase.CreateAsset(newData, assetPath);
             AssetDatabase.SaveAssets();
@@ -156,9 +161,9 @@ namespace AnoGame.AnoFlow.Editor
 
                 // meta.json に即座に保存
                 var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
-                var meta = EventGraphMeta.Load();
+                var meta = EventGraphMeta.Load(ActiveFolderPath);
                 meta.SetNodePosition(assetGuid, tempEventId, worldPos);
-                meta.Save();
+                meta.Save(ActiveFolderPath);
 
                 // 名前編集モードで開始
                 nodeView.IsNewNode = true;
@@ -341,7 +346,7 @@ namespace AnoGame.AnoFlow.Editor
             }
 
             // Restore positions from meta or auto layout
-            var meta = EventGraphMeta.Load();
+            var meta = EventGraphMeta.Load(ActiveFolderPath);
             bool hasPositions = meta.nodePositions != null && meta.nodePositions.Count > 0;
             bool restored = false;
 
@@ -550,7 +555,7 @@ namespace AnoGame.AnoFlow.Editor
         /// </summary>
         public void SaveNodePositions()
         {
-            var meta = EventGraphMeta.Load();
+            var meta = EventGraphMeta.Load(ActiveFolderPath);
             foreach (var kvp in _nodeMap)
             {
                 var rect = kvp.Value.GetPosition();
@@ -558,7 +563,7 @@ namespace AnoGame.AnoFlow.Editor
                 var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
                 meta.SetNodePosition(assetGuid, kvp.Key, new Vector2(rect.x, rect.y));
             }
-            meta.Save();
+            meta.Save(ActiveFolderPath);
         }
 
         /// <summary>

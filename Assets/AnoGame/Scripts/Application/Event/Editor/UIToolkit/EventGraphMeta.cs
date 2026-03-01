@@ -9,51 +9,77 @@ namespace AnoGame.AnoFlow.Editor
     [Serializable]
     public class EventGraphMeta
     {
+        private const string META_FILENAME = "EventGraphMeta.json";
+
         public int version = 1;
-        public string storyId = "Story2";
-        public string eventDataFolder = "Assets/AnoGame/Data/Events/Story2";
+        public string storyId = "";
+        public string eventDataFolder = "";
         public List<string> targetScenes = new List<string>();
         public List<NodePositionEntry> nodePositions = new List<NodePositionEntry>();
         public List<SceneBindingEntry> sceneBindings = new List<SceneBindingEntry>();
 
         // --- Serialization helpers ---
 
-        private const string META_PATH = "Assets/AnoGame/Data/Events/Story2/EventGraphMeta.json";
-
-        public static string GetMetaPath() => META_PATH;
-
-        public static EventGraphMeta Load()
+        /// <summary>
+        /// 指定フォルダのメタファイルパスを返す
+        /// </summary>
+        public static string GetMetaPath(string folderPath)
         {
-            if (!File.Exists(META_PATH))
+            return $"{folderPath}/{META_FILENAME}";
+        }
+
+        /// <summary>
+        /// 指定フォルダからメタデータを読み込む
+        /// </summary>
+        public static EventGraphMeta Load(string folderPath)
+        {
+            string metaPath = GetMetaPath(folderPath);
+            if (!File.Exists(metaPath))
             {
-                return new EventGraphMeta();
+                var newMeta = new EventGraphMeta();
+                newMeta.eventDataFolder = folderPath;
+                newMeta.storyId = Path.GetFileName(folderPath);
+                return newMeta;
             }
 
             try
             {
-                string json = File.ReadAllText(META_PATH);
+                string json = File.ReadAllText(metaPath);
                 var meta = JsonUtility.FromJson<EventGraphMeta>(json);
-                return meta ?? new EventGraphMeta();
+                if (meta == null)
+                {
+                    meta = new EventGraphMeta();
+                    meta.eventDataFolder = folderPath;
+                    meta.storyId = Path.GetFileName(folderPath);
+                }
+                return meta;
             }
             catch (Exception ex)
             {
                 Debug.LogWarning($"Failed to load EventGraphMeta: {ex.Message}");
-                return new EventGraphMeta();
+                var fallback = new EventGraphMeta();
+                fallback.eventDataFolder = folderPath;
+                fallback.storyId = Path.GetFileName(folderPath);
+                return fallback;
             }
         }
 
-        public void Save()
+        /// <summary>
+        /// 指定フォルダにメタデータを保存する
+        /// </summary>
+        public void Save(string folderPath)
         {
             try
             {
-                string dir = Path.GetDirectoryName(META_PATH);
+                string metaPath = GetMetaPath(folderPath);
+                string dir = Path.GetDirectoryName(metaPath);
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
                 }
 
                 string json = JsonUtility.ToJson(this, true);
-                File.WriteAllText(META_PATH, json);
+                File.WriteAllText(metaPath, json);
             }
             catch (Exception ex)
             {

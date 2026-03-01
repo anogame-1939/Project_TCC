@@ -124,7 +124,7 @@ public class BatchEventCreatorV2
 
         // 3. Update EventGraphMeta with scene bindings
         var sceneName = EditorSceneManager.GetActiveScene().name;
-        var meta = EventGraphMeta.Load();
+        var meta = EventGraphMeta.Load(EVENTDATA_DIR_PATH);
         if (!meta.targetScenes.Contains(sceneName))
         {
             meta.targetScenes.Add(sceneName);
@@ -163,7 +163,7 @@ public class BatchEventCreatorV2
                 triggerName ?? ""
             );
         }
-        meta.Save();
+        meta.Save(EVENTDATA_DIR_PATH);
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         AssetDatabase.SaveAssets();
