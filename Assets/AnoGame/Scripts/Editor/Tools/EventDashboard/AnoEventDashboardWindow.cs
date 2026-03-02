@@ -743,6 +743,73 @@ namespace AnoGame.Editor.Tools
             if (root.EventData != null)
             {
                 infoBox.Add(new Label($"Event ID: {root.EventData.EventId}"));
+
+                // ── EventName 編集 ──
+                var nameRow = new VisualElement();
+                nameRow.style.flexDirection = FlexDirection.Row;
+                nameRow.style.alignItems = Align.Center;
+                nameRow.style.marginTop = 4;
+                nameRow.style.marginBottom = 4;
+
+                var nameLabel = new Label("Event Name:");
+                nameLabel.style.width = 85;
+                nameLabel.style.flexShrink = 0;
+                nameRow.Add(nameLabel);
+
+                var nameField = new TextField();
+                nameField.value = root.EventData.EventName ?? "";
+                nameField.style.flexGrow = 1;
+
+                // Enter / フォーカスロスト時のみ確定
+                System.Action commitNameChange = () =>
+                {
+                    string newName = nameField.value?.Trim() ?? "";
+
+                    // EventData.eventName を更新
+                    var so = new SerializedObject(root.EventData);
+                    so.Update();
+                    so.FindProperty("eventName").stringValue = newName;
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(root.EventData);
+                    AssetDatabase.SaveAssetIfDirty(root.EventData);
+
+                    // GameObject 名に反映
+                    string eventId = root.EventData.EventId ?? "";
+                    string newObjName = string.IsNullOrEmpty(newName)
+                        ? eventId
+                        : $"{eventId}_{newName}";
+                    Undo.RecordObject(root.gameObject, "Rename Event Object");
+                    root.gameObject.name = newObjName;
+                    EditorUtility.SetDirty(root.gameObject);
+
+                    // タイトルラベルを更新
+                    titleLabel.text = root.gameObject.name;
+
+                    // リスト表示を更新
+                    _eventListView.RefreshItems();
+
+                    // シーンをダーティに
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                        root.gameObject.scene);
+                };
+
+                nameField.RegisterCallback<KeyDownEvent>(evt =>
+                {
+                    if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
+                    {
+                        commitNameChange();
+                        evt.StopPropagation();
+                    }
+                });
+
+                nameField.RegisterCallback<FocusOutEvent>(evt =>
+                {
+                    commitNameChange();
+                });
+
+                nameRow.Add(nameField);
+                infoBox.Add(nameRow);
+
                 infoBox.Add(new Label($"Category: {root.EventData.Category}"));
                 
                 var descLabel = new Label($"Description:\n{root.EventData.Description}");

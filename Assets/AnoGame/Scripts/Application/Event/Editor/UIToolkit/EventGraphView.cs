@@ -69,10 +69,7 @@ namespace AnoGame.AnoFlow.Editor
                     }
                     else if (evt.keyCode == KeyCode.V)
                     {
-                        // ペースト位置：ビューの中央
-                        var center = contentViewContainer.WorldToLocal(
-                            this.LocalToWorld(new Vector2(layout.width / 2, layout.height / 2)));
-                        PasteNodes(center);
+                        PasteNodes(Vector2.zero);
                         evt.StopPropagation();
                     }
                 }
@@ -122,11 +119,7 @@ namespace AnoGame.AnoFlow.Editor
                 var mousePos = evt.localMousePosition;
                 evt.menu.AppendAction("新規ノード作成", _ => CreateNewEventNode(mousePos));
                 evt.menu.AppendAction("ノードを貼り付け",
-                    _ =>
-                    {
-                        var worldPos = contentViewContainer.WorldToLocal(this.LocalToWorld(mousePos));
-                        PasteNodes(worldPos);
-                    },
+                    _ => PasteNodes(Vector2.zero),
                     _ => _clipboard.Count > 0 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
             }
             else if (evt.target is EventNodeView targetNode)
@@ -250,8 +243,6 @@ namespace AnoGame.AnoFlow.Editor
         {
             if (_clipboard.Count == 0 || _eventDataList == null) return;
 
-            float offsetX = 0;
-            float offsetY = 0;
             var meta = EventGraphMeta.Load(ActiveFolderPath);
             var newNodeIds = new List<string>();
 
@@ -273,10 +264,24 @@ namespace AnoGame.AnoFlow.Editor
                 }
             }
 
+            // コピー元ノードの位置を取得してオフセット配置に使う
+            int clipIndex = 0;
             foreach (var source in _clipboard)
             {
                 maxNum++;
                 string newEventId = $"EV_{maxNum:D3}";
+
+                // コピー元の位置を取得（見つかればそこから右下にオフセット、なければ basePos を使用）
+                Vector2 pastePos;
+                if (_nodeMap.TryGetValue(source.EventId, out var sourceNode))
+                {
+                    var srcRect = sourceNode.GetPosition();
+                    pastePos = new Vector2(srcRect.x + 200, srcRect.y + 50);
+                }
+                else
+                {
+                    pastePos = new Vector2(basePos.x + clipIndex * 50, basePos.y + clipIndex * 50);
+                }
 
                 // 1. まずアセットを作成
                 string dir = ActiveFolderPath;
@@ -319,18 +324,16 @@ namespace AnoGame.AnoFlow.Editor
 
                 // meta にポジションを保存
                 var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
-                var pos = new Vector2(basePos.x + offsetX, basePos.y + offsetY);
-                meta.SetNodePosition(assetGuid, newEventId, pos);
+                meta.SetNodePosition(assetGuid, newEventId, pastePos);
 
-                offsetX += 50;
-                offsetY += 50;
+                clipIndex++;
             }
 
             AssetDatabase.SaveAssets();
             meta.Save(ActiveFolderPath);
 
-            // グラフ再構築
-            RebuildGraph(newNodeIds.Count > 0 ? newNodeIds[0] : null);
+            // グラフ再構築（カメラ移動なし）
+            RebuildGraph(null);
 
             Debug.Log($"[EventGraph] {newNodeIds.Count} 件のノードを貼り付けました");
             OnGraphDataChanged?.Invoke();
