@@ -107,10 +107,15 @@ namespace AnoGame.Editor.PropertyDrawers
             root.Add(filterRow);
 
             // ── Candidates Section ──
+            string foldoutKey = "EventSelectorDrawer_Foldout_" + propertyPath;
             var candidatesFoldout = new Foldout();
             candidatesFoldout.text = "Candidates (0)";
-            candidatesFoldout.value = false;
+            candidatesFoldout.value = SessionState.GetBool(foldoutKey, true);
             candidatesFoldout.style.marginTop = 4;
+            candidatesFoldout.RegisterValueChangedCallback(evt =>
+            {
+                SessionState.SetBool(foldoutKey, evt.newValue);
+            });
             root.Add(candidatesFoldout);
 
             var infoRow = new VisualElement();
@@ -213,6 +218,16 @@ namespace AnoGame.Editor.PropertyDrawers
                     DrawListCandidates(candidateContainer, filtered, selectedID,
                         cachedIds, cachedDisplayNames, cachedAssets, selectEvent);
                 }
+
+                // 選択中イベントのゴーストボタンまでスクロール
+                scrollView.schedule.Execute(() =>
+                {
+                    var ghost = candidateContainer.Q("ghost-selected");
+                    if (ghost != null)
+                    {
+                        scrollView.ScrollTo(ghost);
+                    }
+                });
             };
 
             // ── Register callbacks ──
@@ -504,6 +519,7 @@ namespace AnoGame.Editor.PropertyDrawers
         private static VisualElement CreateGhostButton(string text, string tooltip)
         {
             var ghost = new Button();
+            ghost.name = "ghost-selected";
             ghost.text = text;
             ghost.tooltip = tooltip;
             ghost.style.unityTextAlign = TextAnchor.MiddleLeft;

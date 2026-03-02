@@ -20,6 +20,7 @@ namespace AnoGame.AnoFlow.Editor
         private Dictionary<string, EventNodeView> _nodeMap = new Dictionary<string, EventNodeView>();
         private bool _editMode = false;
         private bool _showNegativeEdges = false;
+        private List<EventData> _clipboard = new List<EventData>();
 
         /// <summary>
         /// 現在アクティブなイベントデータフォルダパス
@@ -55,6 +56,27 @@ namespace AnoGame.AnoFlow.Editor
 
             // 削除操作をソフトデリートにフック
             deleteSelection = OnDeleteSelection;
+
+            // Ctrl+C / Ctrl+V キーバインド
+            RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.ctrlKey || evt.commandKey)
+                {
+                    if (evt.keyCode == KeyCode.C)
+                    {
+                        CopySelectedNodes();
+                        evt.StopPropagation();
+                    }
+                    else if (evt.keyCode == KeyCode.V)
+                    {
+                        // ペースト位置：ビューの中央
+                        var center = contentViewContainer.WorldToLocal(
+                            this.LocalToWorld(new Vector2(layout.width / 2, layout.height / 2)));
+                        PasteNodes(center);
+                        evt.StopPropagation();
+                    }
+                }
+            });
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange change)
@@ -99,9 +121,17 @@ namespace AnoGame.AnoFlow.Editor
             {
                 var mousePos = evt.localMousePosition;
                 evt.menu.AppendAction("新規ノード作成", _ => CreateNewEventNode(mousePos));
+                evt.menu.AppendAction("ノードを貼り付け",
+                    _ =>
+                    {
+                        var worldPos = contentViewContainer.WorldToLocal(this.LocalToWorld(mousePos));
+                        PasteNodes(worldPos);
+                    },
+                    _ => _clipboard.Count > 0 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
             }
             else if (evt.target is EventNodeView targetNode)
             {
+                evt.menu.AppendAction("ノードをコピー", _ => CopySelectedNodes());
                 evt.menu.AppendAction("ノード削除", _ => DeleteEventNode(targetNode));
             }
             base.BuildContextualMenu(evt);
@@ -194,6 +224,116 @@ namespace AnoGame.AnoFlow.Editor
 
             // グラフを再構築（isDeleted のノードが非表示になる）
             RebuildGraph(null);
+        }
+
+        /// <summary>
+        /// 選択中のノードをクリップボードにコピーする
+        /// </summary>
+        public void CopySelectedNodes()
+        {
+            _clipboard.Clear();
+            foreach (var sel in selection)
+            {
+                if (sel is EventNodeView nodeView && nodeView.EventData != null)
+                {
+                    _clipboard.Add(nodeView.EventData);
+                }
+            }
+            if (_clipboard.Count > 0)
+                Debug.Log($"[EventGraph] {_clipboard.Count} 件のノードをコピーしました");
+        }
+
+        /// <summary>
+        /// クリップボードのノードを貼り付ける（ディープコピー）
+        /// </summary>
+        public void PasteNodes(Vector2 basePos)
+        {
+            if (_clipboard.Count == 0 || _eventDataList == null) return;
+
+            float offsetX = 0;
+            float offsetY = 0;
+            var meta = EventGraphMeta.Load(ActiveFolderPath);
+            var newNodeIds = new List<string>();
+
+            // 連番をループ外で1回だけ算出（ループ内で手動インクリメント）
+            int maxNum = 0;
+            foreach (var ed in _eventDataList)
+            {
+                var id = ed.EventId;
+                if (!string.IsNullOrEmpty(id) && id.StartsWith("EV_"))
+                {
+                    string numPart = id.Substring(3);
+                    int underscoreIdx = numPart.IndexOf('_');
+                    if (underscoreIdx >= 0)
+                        numPart = numPart.Substring(0, underscoreIdx);
+                    if (int.TryParse(numPart, out int num))
+                    {
+                        if (num > maxNum) maxNum = num;
+                    }
+                }
+            }
+
+            foreach (var source in _clipboard)
+            {
+                maxNum++;
+                string newEventId = $"EV_{maxNum:D3}";
+
+                // 1. まずアセットを作成
+                string dir = ActiveFolderPath;
+                string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{dir}/{newEventId}.asset");
+                var newData = ScriptableObject.CreateInstance<EventData>();
+                AssetDatabase.CreateAsset(newData, assetPath);
+
+                // 2. アセット作成後に SerializedObject でプロパティを設定
+                var so = new SerializedObject(newData);
+                so.Update();
+                so.FindProperty("eventId").stringValue = newEventId;
+                so.FindProperty("eventName").stringValue = source.EventName ?? "";
+                so.FindProperty("category").stringValue = source.Category ?? "";
+                so.FindProperty("description").stringValue = source.Description ?? "";
+                so.FindProperty("isOneTime").boolValue = source.IsOneTime;
+
+                // タグをコピー
+                var conditionTags = so.FindProperty("conditionTags");
+                conditionTags.ClearArray();
+                foreach (var tag in source.ConditionTags)
+                {
+                    conditionTags.InsertArrayElementAtIndex(conditionTags.arraySize);
+                    conditionTags.GetArrayElementAtIndex(conditionTags.arraySize - 1).stringValue = tag;
+                }
+
+                var resultTags = so.FindProperty("resultTags");
+                resultTags.ClearArray();
+                foreach (var tag in source.ResultTags)
+                {
+                    resultTags.InsertArrayElementAtIndex(resultTags.arraySize);
+                    resultTags.GetArrayElementAtIndex(resultTags.arraySize - 1).stringValue = tag;
+                }
+
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+                Undo.RegisterCreatedObjectUndo(newData, "Paste Event Node");
+
+                _eventDataList.Add(newData);
+                newNodeIds.Add(newEventId);
+
+                // meta にポジションを保存
+                var assetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+                var pos = new Vector2(basePos.x + offsetX, basePos.y + offsetY);
+                meta.SetNodePosition(assetGuid, newEventId, pos);
+
+                offsetX += 50;
+                offsetY += 50;
+            }
+
+            AssetDatabase.SaveAssets();
+            meta.Save(ActiveFolderPath);
+
+            // グラフ再構築
+            RebuildGraph(newNodeIds.Count > 0 ? newNodeIds[0] : null);
+
+            Debug.Log($"[EventGraph] {newNodeIds.Count} 件のノードを貼り付けました");
+            OnGraphDataChanged?.Invoke();
         }
 
         public void PopulateGraph(List<EventData> eventDataList, HashSet<string> knownItemIds, Dictionary<string, string> itemNameMap = null)

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using AnoGame.AnoFlow;
+using AnoGame.AnoFlow.Editor;
 
 namespace AnoGame.Editor
 {
@@ -24,7 +25,10 @@ namespace AnoGame.Editor
             }
 
             // Event
-            root.Add(new PropertyField(serializedObject.FindProperty("targetEventId"), "Target Event ID"));
+            var eventField = new PropertyField(serializedObject.FindProperty("targetEventId"), "Target Event ID");
+            ReceptorEditorUtility.SetupDuplicateCheck(
+                eventField, serializedObject, "targetEventId", (Component)target);
+            root.Add(eventField);
             root.Add(CreateSeparator());
 
             // Settings

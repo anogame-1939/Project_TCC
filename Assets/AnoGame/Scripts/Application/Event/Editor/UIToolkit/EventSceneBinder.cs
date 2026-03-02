@@ -1,51 +1,76 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using AnoGame.Application.Event;
+using System.Collections.Generic;
 
 namespace AnoGame.AnoFlow.Editor
 {
     /// <summary>
     /// Utility to find and ping scene GameObjects linked to an EventData by eventId.
-    /// Uses hybrid approach: name-convention search + meta file fallback.
+    /// Uses AnoEventRoot component references for reliable scene binding.
     /// </summary>
     public static class EventSceneBinder
     {
-        private static readonly string[] ROOT_NAMES = { "GeneratedEvents", "GeneratedEventsV2" };
-
         /// <summary>
         /// Find the container GameObject for the given eventId in loaded scenes.
+        /// Uses AnoEventRoot.EventData reference for GUID-based lookup.
         /// </summary>
         public static GameObject FindContainer(string eventId)
         {
-            foreach (var rootName in ROOT_NAMES)
-            {
-                var root = GameObject.Find(rootName);
-                if (root == null) continue;
+            if (string.IsNullOrEmpty(eventId)) return null;
 
-                foreach (Transform child in root.transform)
+            var roots = Object.FindObjectsByType<AnoEventRoot>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var root in roots)
+            {
+                if (root.EventData != null && root.EventData.EventId == eventId)
                 {
-                    if (child.name.StartsWith(eventId))
-                    {
-                        return child.gameObject;
-                    }
+                    return root.gameObject;
                 }
             }
             return null;
         }
 
         /// <summary>
+        /// Find ALL container GameObjects for the given eventId in loaded scenes.
+        /// Used for duplicate detection.
+        /// </summary>
+        public static List<GameObject> FindAllContainers(string eventId)
+        {
+            var result = new List<GameObject>();
+            if (string.IsNullOrEmpty(eventId)) return result;
+
+            var roots = Object.FindObjectsByType<AnoEventRoot>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var root in roots)
+            {
+                if (root.EventData != null && root.EventData.EventId == eventId)
+                {
+                    result.Add(root.gameObject);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Find the Receptor child under the event container.
+        /// Uses AnoEventRoot.Receptor reference.
         /// </summary>
         public static GameObject FindReceptor(string eventId)
         {
-            var container = FindContainer(eventId);
-            if (container == null) return null;
+            if (string.IsNullOrEmpty(eventId)) return null;
 
-            foreach (Transform child in container.transform)
+            var roots = Object.FindObjectsByType<AnoEventRoot>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var root in roots)
             {
-                if (child.name.Contains("Receptor"))
+                if (root.EventData != null && root.EventData.EventId == eventId)
                 {
-                    return child.gameObject;
+                    return root.Receptor;
                 }
             }
             return null;
@@ -53,17 +78,20 @@ namespace AnoGame.AnoFlow.Editor
 
         /// <summary>
         /// Find the Trigger child under the event container.
+        /// Uses AnoEventRoot.Trigger reference.
         /// </summary>
         public static GameObject FindTrigger(string eventId)
         {
-            var container = FindContainer(eventId);
-            if (container == null) return null;
+            if (string.IsNullOrEmpty(eventId)) return null;
 
-            foreach (Transform child in container.transform)
+            var roots = Object.FindObjectsByType<AnoEventRoot>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var root in roots)
             {
-                if (child.name.Contains("Trigger"))
+                if (root.EventData != null && root.EventData.EventId == eventId)
                 {
-                    return child.gameObject;
+                    return root.Trigger;
                 }
             }
             return null;
