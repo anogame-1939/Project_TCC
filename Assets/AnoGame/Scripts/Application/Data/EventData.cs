@@ -1,5 +1,7 @@
 using UnityEngine;
 using AnoGame.Domain.Event.Types;
+using AnoGame.Domain.Event.Services;
+using AnoGame.Domain.Inventory.Services;
 using System.Collections.Generic;
 using AnoGame.Application.Attributes;
 
@@ -47,6 +49,61 @@ namespace AnoGame.Data
         public bool HasConditions => (requiredItemIds != null && requiredItemIds.Count > 0)
             || (requiredEventIds != null && requiredEventIds.Count > 0)
             || (conditionTags != null && conditionTags.Count > 0);
+
+        /// <summary>
+        /// このイベントが実行可能かどうかを判定する。
+        /// 条件判定を EventData に一元化し、Receptor/Trigger から呼び出す。
+        /// </summary>
+        public bool CanExecute(IEventService eventService, IInventoryService inventoryService)
+        {
+            // 1. OneTime かつクリア済みなら実行不可
+            if (isOneTime && eventService.IsEventCleared(eventId))
+                return false;
+
+            // 2. 必要アイテムの所持チェック
+            if (requiredItemIds != null)
+            {
+                foreach (var item in requiredItemIds)
+                {
+                    if (!string.IsNullOrEmpty(item.itemId) && !inventoryService.HasItem(item.itemId))
+                        return false;
+                }
+            }
+
+            // 3. 必要イベントのクリアチェック
+            if (requiredEventIds != null)
+            {
+                foreach (var evt in requiredEventIds)
+                {
+                    if (!string.IsNullOrEmpty(evt.eventId) && !eventService.IsEventCleared(evt.eventId))
+                        return false;
+                }
+            }
+
+            // 4. タグ条件チェック（ネガティブタグ "!" prefix 対応）
+            if (conditionTags != null)
+            {
+                foreach (var tag in conditionTags)
+                {
+                    if (string.IsNullOrEmpty(tag)) continue;
+
+                    if (tag.StartsWith("!"))
+                    {
+                        // ネガティブ: タグが付いていなければOK
+                        if (eventService.HasTag(tag.Substring(1)))
+                            return false;
+                    }
+                    else
+                    {
+                        // ポジティブ: タグが付いていればOK
+                        if (!eventService.HasTag(tag))
+                            return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()
