@@ -23,7 +23,7 @@ public sealed class EventEditorWindow : EditorWindow
         public void Dispose() => EditorGUIUtility.labelWidth = _old;
     }
     // ───────── 設定 ─────────
-    private const string DEFAULT_SAVE_PATH = "Assets/AnoGame/Data/Items";
+    private const string DEFAULT_SAVE_PATH = "Assets/_Project/Data/Items";
     private const string EDITORPREFS_PATH_KEY = "AnoGame.EventEditor.SavePath";
     private static readonly Regex NameRegex =
         new Regex(@"^(\d+)-(\d+)\.(\d{3})\.(.+)$", RegexOptions.Compiled);

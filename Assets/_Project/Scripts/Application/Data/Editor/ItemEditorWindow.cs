@@ -12,7 +12,7 @@ using AnoGame.Data;
 public sealed class ItemEditorWindow : EditorWindow
 {
     // ───────────── 設定（要件：デフォルトパスは const） ─────────────
-    private const string DEFAULT_SAVE_PATH = "Assets/AnoGame/Data/Items";
+    private const string DEFAULT_SAVE_PATH = "Assets/_Project/Data/Items";
     private const string EDITORPREFS_PATH_KEY = "AnoGame.ItemEditor.SavePath";
 
     // 命名規則：Item Data.{chapter}-{section}.{branch:000}.{itemName}.asset

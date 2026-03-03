@@ -32,15 +32,15 @@ namespace AnoGame.Editor.EventPlacement
     public static class EventPlacementService
     {
         // ── 定数 ──
-        private const string PREFAB_DIR = "Assets/AnoGame/Prefabs/EventZone";
-        private const string TIMELINE_DIR = "Assets/AnoGame/Data/ItemsResources/Timelines";
-        private const string TEMPLATE_TIMELINE = "Assets/AnoGame/Data/ItemsResources/Timelines/Tpl_Timeline.playable";
+        private const string PREFAB_DIR = "Assets/_Project/Prefabs/EventZone";
+        private const string TIMELINE_DIR = "Assets/_Project/Data/ItemsResources/Timelines";
+        private const string TEMPLATE_TIMELINE = "Assets/_Project/Data/ItemsResources/Timelines/Tpl_Timeline.playable";
         private const string SCENE_ROOT_NAME = "GeneratedEventsV2";
 
         // EventGraphWindow と共通の EditorPrefs キー
         private const string PREF_ROOT_PATH = "AnoFlow.EventGraph.RootPath";
         private const string PREF_SELECTED_FOLDER = "AnoFlow.EventGraph.SelectedFolder";
-        private const string DEFAULT_ROOT_PATH = "Assets/AnoGame/Data/Events";
+        private const string DEFAULT_ROOT_PATH = "Assets/_Project/Data/Events";
 
         /// <summary>
         /// 現在 EventGraph で選択中のフォルダパスを取得する

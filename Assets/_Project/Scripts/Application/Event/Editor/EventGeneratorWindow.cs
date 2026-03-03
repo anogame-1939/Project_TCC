@@ -122,7 +122,7 @@ namespace AnoGame.AnoFlow.Editor
 
         void CreateTimelineAsset(GameObject obj, string assetName)
         {
-            string folderPath = "Assets/AnoGame/Resources/Timelines";
+            string folderPath = "Assets/_Project/Resources/Timelines";
             // フォルダがない場合は作成
             if (!Directory.Exists(folderPath))
             {

@@ -10,9 +10,9 @@ using AnoGame.Data.Editor; // ItemGeneratorWindowのデータ構造を利用
 public class BatchItemCreator
 {
     // JSONファイルのパス
-    private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/items_batch.json";
+    private const string JSON_PATH = "Assets/_Project/Data/ItemsResources/items_batch.json";
     // 保存先
-    private const string SAVE_PATH = "Assets/AnoGame/Data/ItemsResources";
+    private const string SAVE_PATH = "Assets/_Project/Data/ItemsResources";
     // データベースのパス (プロジェクトに合わせて調整が必要。ここでは検索して取得)
     private const string DB_NAME = "ItemDatabase"; 
 

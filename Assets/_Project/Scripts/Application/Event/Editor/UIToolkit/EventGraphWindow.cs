@@ -15,8 +15,8 @@ namespace AnoGame.AnoFlow.Editor
     {
         private const string PREF_ROOT_PATH = "AnoFlow.EventGraph.RootPath";
         private const string PREF_SELECTED_FOLDER = "AnoFlow.EventGraph.SelectedFolder";
-        private const string DEFAULT_ROOT_PATH = "Assets/AnoGame/Data/Events";
-        private const string ITEMS_JSON_PATH = "Assets/AnoGame/Data/ItemsResources/items_batch.json";
+        private const string DEFAULT_ROOT_PATH = "Assets/_Project/Data/Events";
+        private const string ITEMS_JSON_PATH = "Assets/_Project/Data/ItemsResources/items_batch.json";
 
         private EventGraphView _graphView;
         private List<EventData> _eventDataList;
@@ -175,7 +175,7 @@ namespace AnoGame.AnoFlow.Editor
             rootVisualElement.Clear();
 
             var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
-                "Assets/AnoGame/Scripts/Application/Event/Editor/UIToolkit/EventGraphStyles.uss");
+                "Assets/_Project/Scripts/Application/Event/Editor/UIToolkit/EventGraphStyles.uss");
             if (styleSheet != null)
                 rootVisualElement.styleSheets.Add(styleSheet);
 

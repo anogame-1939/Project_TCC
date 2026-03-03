@@ -25,7 +25,7 @@ public class DocumentTemplateSettings : ScriptableObject
 public class ItemDataEditor : Editor
 {
     private const string DOCUMENT_PREFIX = "誰かの手記のようだ。言葉は古いがかろうじて読める。";
-    private const string TEMPLATE_ASSET_PATH = "Assets/AnoGame/Editor/DocumentTemplates.asset";
+    private const string TEMPLATE_ASSET_PATH = "Assets/_Project/Editor/DocumentTemplates.asset";
     private bool _showTemplates = false;
     private DocumentTemplateSettings _templateSettings;
 

@@ -9,7 +9,7 @@ namespace AnoGame.Data.Editor
     [CustomEditor(typeof(EventTagRegistry))]
     public class EventTagRegistryEditor : UnityEditor.Editor
     {
-        private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/Events";
+        private const string EVENTDATA_DIR_PATH = "Assets/_Project/Data/Events";
 
         // 参照元キャッシュ
         private Dictionary<string, List<ReferenceInfo>> _referenceCache;

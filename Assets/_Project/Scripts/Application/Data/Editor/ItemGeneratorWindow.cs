@@ -33,7 +33,7 @@ namespace AnoGame.Data.Editor
         ItemDatabase targetDatabase;
 
         // 保存先フォルダ
-        string savePath = "Assets/AnoGame/Data/ItemsResources";
+        string savePath = "Assets/_Project/Data/ItemsResources";
 
         [MenuItem("Tools/SLFB Item Generator")]
         public static void ShowWindow()

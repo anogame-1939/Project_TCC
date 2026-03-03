@@ -126,10 +126,10 @@ namespace AnoGame.Data.Editor
         // Assets メニューから一括実行（選択中の EventData 対象）
         // ─────────────────────────────────────────────────────────────
 
-        [MenuItem("Assets/AnoGame/EventData/選択にGUIDを再割当", true)]
+        [MenuItem("Assets/_Project/EventData/選択にGUIDを再割当", true)]
         static bool ValidateReassignGuids() => Selection.objects.Any(o => o is EventData);
 
-        [MenuItem("Assets/AnoGame/EventData/選択にGUIDを再割当")]
+        [MenuItem("Assets/_Project/EventData/選択にGUIDを再割当")]
         static void ReassignGuidsToSelection()
         {
             var targets = Selection.objects.OfType<EventData>().ToArray();
@@ -148,10 +148,10 @@ namespace AnoGame.Data.Editor
             EditorUtility.DisplayDialog("EventData", $"GUIDを {targets.Length} 件に再割り当てしました。", "OK");
         }
 
-        [MenuItem("Assets/AnoGame/EventData/選択で空欄のみGUID自動生成", true)]
+        [MenuItem("Assets/_Project/EventData/選択で空欄のみGUID自動生成", true)]
         static bool ValidateFillEmptyGuids() => Selection.objects.Any(o => o is EventData);
 
-        [MenuItem("Assets/AnoGame/EventData/選択で空欄のみGUID自動生成")]
+        [MenuItem("Assets/_Project/EventData/選択で空欄のみGUID自動生成")]
         static void FillEmptyGuidsInSelection()
         {
             var targets = Selection.objects.OfType<EventData>().ToArray();

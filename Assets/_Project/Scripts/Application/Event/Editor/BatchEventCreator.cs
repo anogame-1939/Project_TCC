@@ -12,10 +12,10 @@ using System.Reflection;
 
 public class BatchEventCreator
 {
-    private const string JSON_PATH = "Assets/AnoGame/Data/ItemsResources/events_batch.json";
-    private const string PREFAB_DIR_PATH = "Assets/AnoGame/Prefabs/EventZone";
-    private const string TIMELINE_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Timelines";
-    private const string EVENTDATA_DIR_PATH = "Assets/AnoGame/Data/ItemsResources/Events";
+    private const string JSON_PATH = "Assets/_Project/Data/ItemsResources/events_batch.json";
+    private const string PREFAB_DIR_PATH = "Assets/_Project/Prefabs/EventZone";
+    private const string TIMELINE_DIR_PATH = "Assets/_Project/Data/ItemsResources/Timelines";
+    private const string EVENTDATA_DIR_PATH = "Assets/_Project/Data/ItemsResources/Events";
     private readonly static Vector3 PLACEMENT_OFFSET = new Vector3(0, 0, 5f);
 
     [MenuItem("Tools/Run Batch Event Creation")]

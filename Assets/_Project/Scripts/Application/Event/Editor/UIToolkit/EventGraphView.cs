@@ -25,7 +25,7 @@ namespace AnoGame.AnoFlow.Editor
         /// <summary>
         /// 現在アクティブなイベントデータフォルダパス
         /// </summary>
-        public string ActiveFolderPath { get; set; } = "Assets/AnoGame/Data/Events";
+        public string ActiveFolderPath { get; set; } = "Assets/_Project/Data/Events";
 
         // 遅延保存用
         private IVisualElementScheduledItem _pendingSave;
