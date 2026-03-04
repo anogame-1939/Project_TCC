@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -16,14 +17,15 @@ namespace AnoGame.Editor.Tools
     public static class AnoEventRootVisualizer
     {
         // ── 状態 ──
+        private const string PrefKeyIsActive = "AnoEventRootVisualizer_IsActive";
         internal static bool IsActive;
-        internal static event System.Action OnActiveChanged;
-        internal static event System.Action OnSceneSelectionChanged;
+        internal static event Action OnActiveChanged;
+        internal static event Action OnSceneSelectionChanged;
 
         // ── 配置モード ──
         internal static bool IsPlacementMode;
         internal static ReceptorType PlacementReceptorType;
-        internal static event System.Action OnPlacementModeChanged;
+        internal static event Action OnPlacementModeChanged;
 
         // ── タグフィルタ（非表示タグセット） ──
         internal static readonly HashSet<Application.Event.EventColorTag> HiddenTags = new HashSet<Application.Event.EventColorTag>();
@@ -32,6 +34,7 @@ namespace AnoGame.Editor.Tools
         internal static readonly HashSet<Application.Event.AnoEventRoot> SelectedRoots = new HashSet<Application.Event.AnoEventRoot>();
 
         // ── ランタイム座標記録 ──
+        private const string SessionKeyRuntimeMoves = "AnoEventRootVisualizer_RuntimeMoves";
         private static readonly Dictionary<int, RuntimeMoveRecord> _runtimeMoves = new Dictionary<int, RuntimeMoveRecord>();
         private static bool _isPlayMode;
 
@@ -67,6 +70,8 @@ namespace AnoGame.Editor.Tools
 
         static AnoEventRootVisualizer()
         {
+            IsActive = EditorPrefs.GetBool(PrefKeyIsActive, false);
+            RestoreRuntimeMoves();
             SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
@@ -75,21 +80,24 @@ namespace AnoGame.Editor.Tools
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            if (!IsActive) return;
-
             switch (state)
             {
                 case PlayModeStateChange.EnteredPlayMode:
                     _isPlayMode = true;
                     _runtimeMoves.Clear();
+                    SaveRuntimeMoves();
                     // 再プレイ時にポップアップを閉じる
                     var existing = EditorWindow.GetWindow<RuntimeMoveReviewWindow>(false, "", false);
                     if (existing != null) existing.Close();
                     break;
                 case PlayModeStateChange.ExitingPlayMode:
                     _isPlayMode = false;
+                    // ドメインリロード前に記録を永続化
+                    SaveRuntimeMoves();
                     break;
                 case PlayModeStateChange.EnteredEditMode:
+                    // ドメインリロード後に復元された記録も含めて表示
+                    RestoreRuntimeMoves();
                     if (_runtimeMoves.Count > 0)
                     {
                         RuntimeMoveReviewWindow.Show(_runtimeMoves);
@@ -120,6 +128,7 @@ namespace AnoGame.Editor.Tools
                 record.NewPosition = newPos;
                 _runtimeMoves[id] = record;
             }
+            SaveRuntimeMoves();
         }
 
         private static string GetGameObjectPath(Transform t)
@@ -131,6 +140,67 @@ namespace AnoGame.Editor.Tools
                 path = t.name + "/" + path;
             }
             return path;
+        }
+
+        // ── SessionState 永続化 ──
+
+        [Serializable]
+        private class RuntimeMoveRecordSerializable
+        {
+            public int Key;
+            public string Name;
+            public string ScenePath;
+            public float OrigX, OrigY, OrigZ;
+            public float NewX, NewY, NewZ;
+        }
+
+        [Serializable]
+        private class RuntimeMoveRecordList
+        {
+            public List<RuntimeMoveRecordSerializable> Items = new List<RuntimeMoveRecordSerializable>();
+        }
+
+        private static void SaveRuntimeMoves()
+        {
+            var list = new RuntimeMoveRecordList();
+            foreach (var kvp in _runtimeMoves)
+            {
+                list.Items.Add(new RuntimeMoveRecordSerializable
+                {
+                    Key = kvp.Key,
+                    Name = kvp.Value.Name,
+                    ScenePath = kvp.Value.ScenePath,
+                    OrigX = kvp.Value.OriginalPosition.x,
+                    OrigY = kvp.Value.OriginalPosition.y,
+                    OrigZ = kvp.Value.OriginalPosition.z,
+                    NewX = kvp.Value.NewPosition.x,
+                    NewY = kvp.Value.NewPosition.y,
+                    NewZ = kvp.Value.NewPosition.z
+                });
+            }
+            string json = JsonUtility.ToJson(list);
+            SessionState.SetString(SessionKeyRuntimeMoves, json);
+        }
+
+        private static void RestoreRuntimeMoves()
+        {
+            string json = SessionState.GetString(SessionKeyRuntimeMoves, "");
+            if (string.IsNullOrEmpty(json)) return;
+
+            var list = JsonUtility.FromJson<RuntimeMoveRecordList>(json);
+            if (list == null || list.Items == null) return;
+
+            _runtimeMoves.Clear();
+            foreach (var item in list.Items)
+            {
+                _runtimeMoves[item.Key] = new RuntimeMoveRecord
+                {
+                    Name = item.Name,
+                    ScenePath = item.ScenePath,
+                    OriginalPosition = new Vector3(item.OrigX, item.OrigY, item.OrigZ),
+                    NewPosition = new Vector3(item.NewX, item.NewY, item.NewZ)
+                };
+            }
         }
 
         [MenuItem(MenuPath, false, 201)]
@@ -149,6 +219,7 @@ namespace AnoGame.Editor.Tools
         internal static void SetActive(bool active)
         {
             IsActive = active;
+            EditorPrefs.SetBool(PrefKeyIsActive, active);
             if (!active) SetPlacementMode(false, ReceptorType.Inspect);
             OnActiveChanged?.Invoke();
             SceneView.RepaintAll();
@@ -205,7 +276,7 @@ namespace AnoGame.Editor.Tools
                 return;
             }
 
-            var eventRoots = Object.FindObjectsByType<Application.Event.AnoEventRoot>(
+            var eventRoots = UnityEngine.Object.FindObjectsByType<Application.Event.AnoEventRoot>(
                 FindObjectsSortMode.None);
 
             // ── 最もカーソルに近い1つだけをホバー対象にする ──
@@ -356,7 +427,7 @@ namespace AnoGame.Editor.Tools
         /// </summary>
         private static void DrawAllEventRoots(Application.Event.AnoEventRoot hoveredRoot)
         {
-            var eventRoots = Object.FindObjectsByType<Application.Event.AnoEventRoot>(
+            var eventRoots = UnityEngine.Object.FindObjectsByType<Application.Event.AnoEventRoot>(
                 FindObjectsSortMode.None);
             foreach (var root in eventRoots)
             {
@@ -644,7 +715,7 @@ namespace AnoGame.Editor.Tools
             if (go == null)
             {
                 // パスで見つからない場合、名前で検索
-                var allRoots = Object.FindObjectsByType<Application.Event.AnoEventRoot>(FindObjectsSortMode.None);
+                var allRoots = UnityEngine.Object.FindObjectsByType<Application.Event.AnoEventRoot>(FindObjectsSortMode.None);
                 foreach (var root in allRoots)
                 {
                     if (root.gameObject.name == record.Name)
