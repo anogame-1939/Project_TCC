@@ -1,0 +1,141 @@
+/* ================================================
+   EventGraphWindow UIToolkit - Style Sheet
+   ================================================ */
+
+/* --- Main Window --- */
+.event-graph-root {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+/* --- Toolbar --- */
+.event-toolbar {
+    flex-direction: row;
+    height: 24px;
+    background-color: #383838;
+    border-bottom-width: 1px;
+    border-bottom-color: #1a1a1a;
+}
+
+/* --- Content Area --- */
+.event-content {
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+/* --- GraphView --- */
+.event-graph-view {
+    flex-grow: 1;
+}
+
+/* --- Node Styles --- */
+.event-node {
+    width: 250px;
+    background-color: transparent;
+    border-radius: 0;
+    border-width: 0;
+    border-color: transparent;
+}
+
+.event-node #node-border {
+    background-color: transparent;
+}
+
+.event-node #title {
+    color: white;
+    height: 30px;
+    justify-content: center;
+    padding-left: 8px;
+}
+
+.event-node #contents {
+    background-color: transparent;
+    padding: 0;
+    padding-top: 4px;
+}
+
+.event-node #extension {
+    background-color: transparent;
+}
+
+.event-node #divider {
+    display: none;
+}
+
+.section-header {
+    -unity-font-style: bold;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    color: #ccc;
+    font-size: 11px;
+}
+
+.node-field {
+    margin-bottom: 4px;
+}
+
+.node-text-area {
+    min-height: 40px;
+    white-space: normal;
+}
+
+/* Port containers */
+.port-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top-width: 1px;
+    border-top-color: #444;
+}
+
+.input-port-container {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 4px;
+    background-color: transparent;
+}
+
+.output-port-container {
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 4px;
+    background-color: transparent;
+}
+
+/* Condition port rows (individual input ports per RequiredEvent) */
+.condition-ports-container {
+    padding-left: 0;
+    padding-top: 4px;
+}
+
+.condition-ports-container > VisualElement {
+    margin-top: 2px;
+    padding-left: 0;
+}
+
+/* Edit buttons: hidden by default, shown only in edit-mode */
+.edit-btn {
+    display: none;
+}
+
+.edit-mode .edit-btn {
+    display: flex;
+}
+
+/* Tag/Event name labels: flex fill with ellipsis, buttons align right */
+.section-item-label {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -unity-text-overflow-position: end;
+    white-space: nowrap;
+}
+
+/* Expand-all toolbar button highlight */
+.expand-all-active {
+    background-color: #4a6a8a;
+}
