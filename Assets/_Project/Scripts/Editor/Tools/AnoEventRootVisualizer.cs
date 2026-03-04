@@ -53,8 +53,7 @@ namespace AnoGame.Editor.Tools
         private static readonly Color LabelTextColor = new Color(0.9f, 1f, 0.9f, 1f);
         private static readonly Color HandleColor = new Color(0.3f, 0.9f, 0.5f, 0.6f);
 
-        private const float SphereRadius = 1.5f;
-        private const float HandleSize = 1.8f;
+        private const float SphereRadius = 1.3f;
         private const float LabelOffsetY = 2.5f;
 
         // ── 名前整形用正規表現 ──
@@ -287,7 +286,7 @@ namespace AnoGame.Editor.Tools
                 if (root == null) continue;
                 if (HiddenTags.Contains(root.ColorTag)) continue;
                 Vector3 pos = root.transform.position;
-                float camSize = HandleUtility.GetHandleSize(pos) * 0.8f;
+                float camSize = HandleUtility.GetHandleSize(pos) * 0.65f;
                 float hSize = Mathf.Max(SphereRadius, camSize);
                 float dist = HandleUtility.DistanceToCircle(pos, hSize);
                 if (dist <= 0f && dist < closestDist)
@@ -298,35 +297,42 @@ namespace AnoGame.Editor.Tools
             }
 
             // ── ホバー中のオブジェクトをクリックしたらSelectionに設定 ──
+            bool isModifierClick = Event.current.control || Event.current.shift;
             if (hoveredRoot != null
                 && Event.current.type == EventType.MouseDown
-                && Event.current.button == 0)
+                && Event.current.button == 0
+                && isModifierClick)
             {
+                // Ctrl/Shift+クリック: トグル追加/解除
                 bool alreadySelected = SelectedRoots.Contains(hoveredRoot);
-
-                if (Event.current.control)
-                {
-                    // Ctrl+クリック: トグル追加/解除
-                    if (alreadySelected)
-                        SelectedRoots.Remove(hoveredRoot);
-                    else
-                        SelectedRoots.Add(hoveredRoot);
-                }
-                else if (!alreadySelected)
-                {
-                    // 未選択オブジェクトを通常クリック: 単独選択に切替
-                    SelectedRoots.Clear();
+                if (alreadySelected)
+                    SelectedRoots.Remove(hoveredRoot);
+                else
                     SelectedRoots.Add(hoveredRoot);
-                }
-                // else: 選択済みオブジェクトをCtrlなしクリック → 選択維持（ドラッグ用）
 
                 Selection.activeGameObject = hoveredRoot.gameObject;
-                EditorGUIUtility.PingObject(hoveredRoot.gameObject);
-
-                Debug.Log($"[Visualizer] Scene click: ctrl={Event.current.control}, hovered={hoveredRoot.gameObject.name}, alreadySelected={alreadySelected}, SelectedRoots.Count={SelectedRoots.Count}");
-
-                // Dashboardのリストと同期
                 OnSceneSelectionChanged?.Invoke();
+
+                // FreeMoveHandleへの伝撬を防止
+                Event.current.Use();
+                return;
+            }
+
+            // 通常クリック（修飾キーなし）: FreeMoveHandleに任せるが、
+            // ホバー先が未選択なら単独選択に切替
+            if (hoveredRoot != null
+                && Event.current.type == EventType.MouseDown
+                && Event.current.button == 0
+                && !isModifierClick)
+            {
+                if (!SelectedRoots.Contains(hoveredRoot))
+                {
+                    SelectedRoots.Clear();
+                    SelectedRoots.Add(hoveredRoot);
+                    OnSceneSelectionChanged?.Invoke();
+                }
+
+                Selection.activeGameObject = hoveredRoot.gameObject;
             }
 
             foreach (var root in eventRoots)
@@ -446,7 +452,7 @@ namespace AnoGame.Editor.Tools
             Color tagColor = Application.Event.AnoEventRoot.GetTagColor(eventRoot.ColorTag);
 
             // ── ハンドルサイズ算出（ホバー判定とFreeMoveHandleで共通） ──
-            float cameraBasedSize = HandleUtility.GetHandleSize(pos) * 0.8f;
+            float cameraBasedSize = HandleUtility.GetHandleSize(pos) * 0.65f;
             float handleSize = Mathf.Max(SphereRadius, cameraBasedSize);
 
             // ホバー時は黄色っぽいハイライト
@@ -464,14 +470,15 @@ namespace AnoGame.Editor.Tools
             }
             Color handleColor = new Color(tagColor.r, tagColor.g, tagColor.b, 0.6f);
 
-            // ── 選択ハイライト ──
-            bool isSelected = Selection.activeGameObject == eventRoot.gameObject;
+            // ── 選択ハイライト（複数選択対応） ──
+            bool isSelected = SelectedRoots.Contains(eventRoot)
+                || Selection.activeGameObject == eventRoot.gameObject;
             if (isSelected)
             {
                 Handles.color = Color.white;
-                Handles.DrawWireDisc(pos, Vector3.up, SphereRadius + 0.2f, 3f);
-                Handles.DrawWireDisc(pos, Vector3.forward, SphereRadius + 0.2f, 3f);
-                Handles.DrawWireDisc(pos, Vector3.right, SphereRadius + 0.2f, 3f);
+                Handles.DrawWireDisc(pos, Vector3.up, SphereRadius, 3f);
+                Handles.DrawWireDisc(pos, Vector3.forward, SphereRadius, 3f);
+                Handles.DrawWireDisc(pos, Vector3.right, SphereRadius, 3f);
             }
 
             // ── 球体 ──
@@ -553,9 +560,11 @@ namespace AnoGame.Editor.Tools
                         }
                     }
 
-                    // インスペクターに表示 + ヒエラルキーでハイライト
-                    Selection.activeGameObject = eventRoot.gameObject;
-                    EditorGUIUtility.PingObject(eventRoot.gameObject);
+                    // 単体移動時のみインスペクターに表示
+                    if (SelectedRoots.Count <= 1)
+                    {
+                        Selection.activeGameObject = eventRoot.gameObject;
+                    }
                 }
             }
 
