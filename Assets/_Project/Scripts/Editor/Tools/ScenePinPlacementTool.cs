@@ -263,10 +263,21 @@ namespace AnoGame.Editor.Tools
     // ========================================================================
     // SceneView Overlay — PMode フローティングパネル
     // ========================================================================
-    [Overlay(typeof(SceneView), "pin-placement-overlay", "PMode")]
+    [Overlay(typeof(SceneView), "pin-placement-overlay", "PMode", defaultDisplay = true)]
     public class ScenePinPlacementOverlay : Overlay
     {
         private Toggle _toggle;
+        private const string PrefKey = "PMode_Overlay_Init_v2";
+
+        public override void OnCreated()
+        {
+            base.OnCreated();
+            if (!EditorPrefs.GetBool(PrefKey, false))
+            {
+                displayed = true;
+                EditorPrefs.SetBool(PrefKey, true);
+            }
+        }
 
         public override VisualElement CreatePanelContent()
         {
