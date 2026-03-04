@@ -672,13 +672,24 @@ namespace AnoGame.Editor.Tools
     // ========================================================================
     // SceneView Overlay — EventRoot Visualizer フローティングパネル
     // ========================================================================
-    [Overlay(typeof(SceneView), "event-root-visualizer-overlay", "EventRoot")]
+    [Overlay(typeof(SceneView), "event-root-visualizer-overlay", "EventRoot", defaultDisplay = true)]
     public class AnoEventRootVisualizerOverlay : Overlay
     {
         private Toggle _toggle;
         private Button _placementBtn;
         private Label _statusLabel;
         private VisualElement _receptorPanel;
+        private const string PrefKey = "EventRoot_Overlay_Init_v2";
+
+        public override void OnCreated()
+        {
+            base.OnCreated();
+            if (!EditorPrefs.GetBool(PrefKey, false))
+            {
+                displayed = true;
+                EditorPrefs.SetBool(PrefKey, true);
+            }
+        }
 
         public override VisualElement CreatePanelContent()
         {
