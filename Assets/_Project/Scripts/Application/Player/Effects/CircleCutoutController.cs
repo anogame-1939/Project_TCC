@@ -5,6 +5,7 @@ namespace AnoGame.Application.Player.Effects
     /// <summary>
     /// プレイヤー位置を基準とした丸窓切り抜きエフェクトのコントローラ。
     /// Shader.SetGlobal* でポストプロセスシェーダーにプレイヤー座標を送信する。
+    /// マテリアル側の _UseGlobalParams トグルが ON の場合に使用される。
     /// </summary>
     public class CircleCutoutController : MonoBehaviour
     {
@@ -22,9 +23,10 @@ namespace AnoGame.Application.Player.Effects
         [Header("有効/無効")]
         [SerializeField] private bool _enabled = true;
 
-        private static readonly int PlayerWorldPosId = Shader.PropertyToID("_PlayerWorldPos");
-        private static readonly int CutoutRadiusId = Shader.PropertyToID("_CutoutRadius");
-        private static readonly int CutoutFadeWidthId = Shader.PropertyToID("_CutoutFadeWidth");
+        // _Global_ プレフィックス付きのプロパティ名（マテリアルプロパティとの名前衝突回避）
+        private static readonly int PlayerWorldPosId = Shader.PropertyToID("_Global_PlayerWorldPos");
+        private static readonly int CutoutRadiusId = Shader.PropertyToID("_Global_CutoutRadius");
+        private static readonly int CutoutFadeWidthId = Shader.PropertyToID("_Global_CutoutFadeWidth");
 
         /// <summary>切り抜き半径</summary>
         public float Radius
