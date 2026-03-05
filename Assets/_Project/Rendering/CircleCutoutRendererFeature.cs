@@ -5,19 +5,30 @@ using UnityEngine.Rendering.Universal;
 namespace AnoGame.Application.Rendering
 {
     /// <summary>
-    /// MainCamera タグのカメラでのみフルスクリーンパスを実行する RendererFeature。
-    /// FullScreenPassRendererFeature の代替として使用する。
+    /// 丸窓切り抜き用 RendererFeature（2パス方式）。
+    /// Pass1: 対象レイヤーを除外した状態のカラーバッファを背景RTにコピー
+    /// Pass2: フルスクリーンパスで切り抜きエリア内を背景RTに差し替え
+    /// MainCamera タグのカメラでのみ実行。
     /// </summary>
     public class CircleCutoutRendererFeature : ScriptableRendererFeature
     {
+        [Header("マテリアル")]
         [SerializeField] private Material _passMaterial;
-        [SerializeField] private ScriptableRenderPassInput _requirements = ScriptableRenderPassInput.Color | ScriptableRenderPassInput.Depth;
 
-        private CircleCutoutRenderPass _renderPass;
+        [Header("切り抜き対象レイヤー")]
+        [Tooltip("このレイヤーのオブジェクトが丸窓内で透過される")]
+        [SerializeField] private LayerMask _cuttableLayerMask;
+
+        private CopyBackgroundPass _copyPass;
+        private CircleCutoutRenderPass _cutoutPass;
 
         public override void Create()
         {
-            _renderPass = new CircleCutoutRenderPass
+            _copyPass = new CopyBackgroundPass
+            {
+                renderPassEvent = RenderPassEvent.AfterRenderingOpaques
+            };
+            _cutoutPass = new CircleCutoutRenderPass
             {
                 renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing
             };
@@ -26,46 +37,96 @@ namespace AnoGame.Application.Rendering
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
             if (_passMaterial == null) return;
-
-            // MainCamera タグのカメラでのみ実行
             if (!renderingData.cameraData.camera.CompareTag("MainCamera")) return;
 
-            _renderPass.Setup(_passMaterial, _requirements);
-            renderer.EnqueuePass(_renderPass);
+            _copyPass.Setup();
+            renderer.EnqueuePass(_copyPass);
+
+            _cutoutPass.Setup(_passMaterial, _copyPass.BackgroundTexture);
+            renderer.EnqueuePass(_cutoutPass);
         }
 
         protected override void Dispose(bool disposing)
         {
-            _renderPass?.Dispose();
+            _copyPass?.Dispose();
+            _cutoutPass?.Dispose();
         }
 
-        private class CircleCutoutRenderPass : ScriptableRenderPass
+        /// <summary>
+        /// 対象レイヤー除外状態のカラーバッファを背景としてコピーするパス。
+        /// 現時点のカラーバッファ（Opaque描画後）を一時RTにコピーする。
+        /// </summary>
+        private class CopyBackgroundPass : ScriptableRenderPass
         {
-            private Material _material;
-            private RTHandle _copiedColor;
+            private RTHandle _backgroundRT;
+            public RTHandle BackgroundTexture => _backgroundRT;
 
-            public void Setup(Material material, ScriptableRenderPassInput requirements)
+            private static readonly int BackgroundTexId = Shader.PropertyToID("_CircleCutoutBackground");
+
+            public void Setup()
             {
-                _material = material;
-                ConfigureInput(requirements);
+                ConfigureInput(ScriptableRenderPassInput.Color);
             }
 
             public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
             {
                 var desc = renderingData.cameraData.cameraTargetDescriptor;
                 desc.depthBufferBits = 0;
-                RenderingUtils.ReAllocateIfNeeded(ref _copiedColor, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: "_CircleCutoutCopiedColor");
+                RenderingUtils.ReAllocateIfNeeded(ref _backgroundRT, desc, FilterMode.Bilinear,
+                    TextureWrapMode.Clamp, name: "_CircleCutoutBackground");
+            }
+
+            public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+            {
+                var cmd = CommandBufferPool.Get("CircleCutout_CopyBackground");
+                var source = renderingData.cameraData.renderer.cameraColorTargetHandle;
+
+                Blitter.BlitCameraTexture(cmd, source, _backgroundRT);
+                cmd.SetGlobalTexture(BackgroundTexId, _backgroundRT);
+
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
+
+            public void Dispose()
+            {
+                _backgroundRT?.Release();
+            }
+        }
+
+        /// <summary>
+        /// フルスクリーン切り抜きパス。
+        /// 切り抜きエリア内のピクセルを背景RT（対象レイヤーなし）に差し替える。
+        /// </summary>
+        private class CircleCutoutRenderPass : ScriptableRenderPass
+        {
+            private Material _material;
+            private RTHandle _copiedColor;
+            private RTHandle _backgroundRT;
+
+            public void Setup(Material material, RTHandle backgroundRT)
+            {
+                _material = material;
+                _backgroundRT = backgroundRT;
+                ConfigureInput(ScriptableRenderPassInput.Color | ScriptableRenderPassInput.Depth);
+            }
+
+            public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+            {
+                var desc = renderingData.cameraData.cameraTargetDescriptor;
+                desc.depthBufferBits = 0;
+                RenderingUtils.ReAllocateIfNeeded(ref _copiedColor, desc, FilterMode.Bilinear,
+                    TextureWrapMode.Clamp, name: "_CircleCutoutCopiedColor");
             }
 
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
                 if (_material == null) return;
 
-                var cmd = CommandBufferPool.Get("CircleCutout");
-
+                var cmd = CommandBufferPool.Get("CircleCutout_Composite");
                 var source = renderingData.cameraData.renderer.cameraColorTargetHandle;
 
-                // カラーバッファを一時テクスチャにコピー
+                // カラーバッファをコピー
                 Blitter.BlitCameraTexture(cmd, source, _copiedColor);
                 _material.SetTexture("_BlitTexture", _copiedColor);
 

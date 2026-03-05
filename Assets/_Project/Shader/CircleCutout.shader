@@ -12,7 +12,7 @@ Shader "Custom/PostProcess/CircleCutout"
         [Toggle] _UseGlobalParams ("Use Global Params", Float) = 1
 
         [Header(Debug)]
-        [KeywordEnum(OFF, DEPTH_RAW, DEPTH_LINEAR, WORLD_Y)] _Debug ("Debug View", Float) = 0
+        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, WORLD_Y)] _Debug ("Debug View", Float) = 0
     }
 
     SubShader
@@ -33,7 +33,10 @@ Shader "Custom/PostProcess/CircleCutout"
             TEXTURE2D_X(_BlitTexture);
             SAMPLER(sampler_LinearClamp);
 
-            // Depth texture - declared manually instead of DeclareDepthTexture.hlsl
+            // Background texture (scene WITHOUT cuttable objects)
+            TEXTURE2D_X(_CircleCutoutBackground);
+
+            // Depth
             TEXTURE2D_X_FLOAT(_CameraDepthTexture);
             SAMPLER(sampler_CameraDepthTexture);
 
@@ -68,32 +71,32 @@ Shader "Custom/PostProcess/CircleCutout"
             {
                 float2 uv = i.uv;
                 half4 color = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv);
+                half4 background = SAMPLE_TEXTURE2D_X(_CircleCutoutBackground, sampler_LinearClamp, uv);
 
                 // Select params
                 float4 playerPos = _UseGlobalParams > 0.5 ? _Global_PlayerWorldPos : _PlayerWorldPos;
                 float  radius    = _UseGlobalParams > 0.5 ? _Global_CutoutRadius : _CutoutRadius;
                 float  fadeWidth = _UseGlobalParams > 0.5 ? _Global_CutoutFadeWidth : _CutoutFadeWidth;
 
-                // Sample depth (manual)
-                float rawDepth = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
-
-                // Debug: raw depth (no inversion, just the value from the buffer)
+                // Debug views
                 if (_Debug > 0.5 && _Debug < 1.5)
                 {
-                    return half4(rawDepth, rawDepth, rawDepth, 1.0);
+                    // DEPTH_RAW
+                    float d = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
+                    return half4(d, d, d, 1.0);
                 }
-
-                // Debug: linear depth (scaled for visibility)
                 if (_Debug > 1.5 && _Debug < 2.5)
                 {
-                    float linearZ = LinearEyeDepth(rawDepth, _ZBufferParams);
-                    float vis = saturate(linearZ / 200.0); // 0-200 range
-                    return half4(vis, vis, vis, 1.0);
+                    // BACKGROUND: show the background texture
+                    return background;
                 }
 
                 // Passthrough when disabled
                 if (radius + fadeWidth <= 0.0)
                     return color;
+
+                // Sample depth
+                float rawDepth = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
 
                 // Skip skybox
                 #if UNITY_REVERSED_Z
@@ -121,18 +124,19 @@ Shader "Custom/PostProcess/CircleCutout"
                     return half4(yNorm, 0, 1.0 - yNorm, 1.0);
                 }
 
-                // Height filter
+                // Height filter: keep ground (at or below player height + offset)
                 if (worldPos.y <= playerPos.y + _HeightOffset)
                     return color;
 
-                // XZ distance
+                // XZ distance to player
                 float dist = length(worldPos.xz - playerPos.xz);
 
-                // Cutout fade
+                // Cutout: blend between full scene and background (without cuttable objects)
                 float alpha = saturate((dist - radius) / max(fadeWidth, 0.001));
-                color.rgb *= alpha;
 
-                return color;
+                // alpha=0 inside cutout -> show background (ground visible)
+                // alpha=1 outside cutout -> show normal scene
+                return lerp(background, color, alpha);
             }
             ENDHLSL
         }
