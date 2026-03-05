@@ -3,15 +3,15 @@ Shader "Custom/PostProcess/CircleCutout"
     Properties
     {
         [Header(Circle Cutout)]
-        _CutoutRadius ("Cutout Radius", Range(0, 50)) = 3
-        _CutoutFadeWidth ("Fade Width", Range(0, 20)) = 1
-        _PlayerWorldPos ("Player World Pos", Vector) = (0, 0, 0, 0)
+        _CutoutRadius ("Cutout Radius", Range(0, 1)) = 0.15
+        _CutoutFadeWidth ("Fade Width", Range(0, 0.5)) = 0.05
+        _PlayerScreenPos ("Player Screen Pos (viewport 0-1)", Vector) = (0.5, 0.5, 0, 0)
 
         [Header(Source Select)]
         [Toggle] _UseGlobalParams ("Use Global Params", Float) = 1
 
         [Header(Debug)]
-        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, WORLD_POS)] _Debug ("Debug View", Float) = 0
+        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, DISTANCE)] _Debug ("Debug View", Float) = 0
     }
 
     SubShader
@@ -37,13 +37,13 @@ Shader "Custom/PostProcess/CircleCutout"
             TEXTURE2D_X_FLOAT(_CameraDepthTexture);
             SAMPLER(sampler_CameraDepthTexture);
 
-            float4 _PlayerWorldPos;
+            float4 _PlayerScreenPos;
             float  _CutoutRadius;
             float  _CutoutFadeWidth;
             float  _UseGlobalParams;
             float  _Debug;
 
-            float4 _Global_PlayerWorldPos;
+            float4 _Global_PlayerScreenPos;
             float  _Global_CutoutRadius;
             float  _Global_CutoutFadeWidth;
 
@@ -68,7 +68,7 @@ Shader "Custom/PostProcess/CircleCutout"
                 half4 background = SAMPLE_TEXTURE2D_X(_CircleCutoutBackground, sampler_LinearClamp, uv);
 
                 // Select params
-                float4 playerPos = _UseGlobalParams > 0.5 ? _Global_PlayerWorldPos : _PlayerWorldPos;
+                float2 playerUV  = _UseGlobalParams > 0.5 ? _Global_PlayerScreenPos.xy : _PlayerScreenPos.xy;
                 float  radius    = _UseGlobalParams > 0.5 ? _Global_CutoutRadius : _CutoutRadius;
                 float  fadeWidth = _UseGlobalParams > 0.5 ? _Global_CutoutFadeWidth : _CutoutFadeWidth;
 
@@ -87,37 +87,19 @@ Shader "Custom/PostProcess/CircleCutout"
                 if (radius + fadeWidth <= 0.0)
                     return color;
 
-                // Sample depth
-                float rawDepth = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
+                // Screen-space distance (aspect ratio corrected)
+                float aspect = _ScreenParams.x / _ScreenParams.y;
+                float2 diff = uv - playerUV;
+                diff.x *= aspect; // correct for non-square screens
+                float dist = length(diff);
 
-                // Skip skybox - keep full scene
-                #if UNITY_REVERSED_Z
-                    if (rawDepth < 0.0001) return color;
-                #else
-                    if (rawDepth > 0.9999) return color;
-                #endif
-
-                // Reconstruct world position
-                #if UNITY_REVERSED_Z
-                    float depthNDC = rawDepth;
-                #else
-                    float depthNDC = rawDepth * 2.0 - 1.0;
-                #endif
-
-                float2 posCS = uv * 2.0 - 1.0;
-                float4 clipPos = float4(posCS, depthNDC, 1.0);
-                float4 worldPos4 = mul(UNITY_MATRIX_I_VP, clipPos);
-                float3 worldPos = worldPos4.xyz / worldPos4.w;
-
-                // Debug: world pos (R=X, G=Y, B=Z normalized)
+                // Debug: distance visualization
                 if (_Debug > 2.5)
                 {
-                    float3 relPos = (worldPos - playerPos.xyz) / 20.0 + 0.5;
-                    return half4(saturate(relPos), 1.0);
+                    float vis = saturate(dist / 0.5);
+                    float edge = 1.0 - smoothstep(radius - 0.002, radius + 0.002, dist);
+                    return half4(vis, vis * 0.5, edge, 1.0);
                 }
-
-                // XZ distance to player
-                float dist = length(worldPos.xz - playerPos.xz);
 
                 // Cutout blend
                 // t=0 (inside radius) -> background (Wall hidden)
