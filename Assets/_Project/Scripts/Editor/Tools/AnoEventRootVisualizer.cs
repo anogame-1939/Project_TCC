@@ -260,6 +260,9 @@ namespace AnoGame.Editor.Tools
         {
             if (!IsActive) return;
 
+            // 破棄済みオブジェクトを除去
+            SelectedRoots.RemoveWhere(r => r == null);
+
             // マウス移動でホバー判定を更新するため再描画を要求
             if (Event.current.type == EventType.MouseMove)
             {
@@ -330,9 +333,10 @@ namespace AnoGame.Editor.Tools
                     SelectedRoots.Clear();
                     SelectedRoots.Add(hoveredRoot);
                     OnSceneSelectionChanged?.Invoke();
+                    Selection.activeGameObject = hoveredRoot.gameObject;
                 }
-
-                Selection.activeGameObject = hoveredRoot.gameObject;
+                // 選択済みオブジェクトの場合は Selection を変更しない
+                // （変更すると OnUnitySelectionChanged 経由で SelectedRoots がリセットされるため）
             }
 
             foreach (var root in eventRoots)
