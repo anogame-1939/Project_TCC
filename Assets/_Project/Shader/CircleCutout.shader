@@ -12,7 +12,7 @@ Shader "Custom/PostProcess/CircleCutout"
         [Toggle] _UseGlobalParams ("Use Global Params", Float) = 1
 
         [Header(Debug)]
-        [KeywordEnum(OFF, RAW_DEPTH, WORLD_Y)] _Debug ("Debug View", Float) = 0
+        [KeywordEnum(OFF, DEPTH_RAW, DEPTH_LINEAR, WORLD_Y)] _Debug ("Debug View", Float) = 0
     }
 
     SubShader
@@ -29,10 +29,13 @@ Shader "Custom/PostProcess/CircleCutout"
             #pragma fragment Frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
             TEXTURE2D_X(_BlitTexture);
             SAMPLER(sampler_LinearClamp);
+
+            // Depth texture - declared manually instead of DeclareDepthTexture.hlsl
+            TEXTURE2D_X_FLOAT(_CameraDepthTexture);
+            SAMPLER(sampler_CameraDepthTexture);
 
             // Material properties
             float4 _PlayerWorldPos;
@@ -71,17 +74,20 @@ Shader "Custom/PostProcess/CircleCutout"
                 float  radius    = _UseGlobalParams > 0.5 ? _Global_CutoutRadius : _CutoutRadius;
                 float  fadeWidth = _UseGlobalParams > 0.5 ? _Global_CutoutFadeWidth : _CutoutFadeWidth;
 
-                // Sample depth
-                float rawDepth = SampleSceneDepth(uv);
+                // Sample depth (manual)
+                float rawDepth = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
 
-                // Debug: raw depth
+                // Debug: raw depth (no inversion, just the value from the buffer)
                 if (_Debug > 0.5 && _Debug < 1.5)
                 {
-                    #if UNITY_REVERSED_Z
-                        float vis = 1.0 - rawDepth;
-                    #else
-                        float vis = rawDepth;
-                    #endif
+                    return half4(rawDepth, rawDepth, rawDepth, 1.0);
+                }
+
+                // Debug: linear depth (scaled for visibility)
+                if (_Debug > 1.5 && _Debug < 2.5)
+                {
+                    float linearZ = LinearEyeDepth(rawDepth, _ZBufferParams);
+                    float vis = saturate(linearZ / 200.0); // 0-200 range
                     return half4(vis, vis, vis, 1.0);
                 }
 
@@ -109,13 +115,13 @@ Shader "Custom/PostProcess/CircleCutout"
                 float3 worldPos = worldPos4.xyz / worldPos4.w;
 
                 // Debug: world Y
-                if (_Debug > 1.5)
+                if (_Debug > 2.5)
                 {
                     float yNorm = saturate((worldPos.y - playerPos.y) / 10.0);
                     return half4(yNorm, 0, 1.0 - yNorm, 1.0);
                 }
 
-                // Height filter: keep ground (at or below player Y + offset)
+                // Height filter
                 if (worldPos.y <= playerPos.y + _HeightOffset)
                     return color;
 

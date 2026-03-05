@@ -27,7 +27,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
   m_Name: FullScreenPassRendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   passMaterial: {fileID: 2100000, guid: c6951b5c1d6ff184485d48b98ff5f85f, type: 2}
   injectionPoint: 550
   requirements: 5
@@ -63,7 +63,8 @@ MonoBehaviour:
   - {fileID: 2363312481698673774}
   - {fileID: -5178808664125688883}
   - {fileID: -3023661478224450718}
-  m_RendererFeatureMap: 12c39aa2e3898e718343020fc249cd3cba6a913daf824356d42396aa7e8403696e74e5442e2ccc20cdb3125ff52c21b8622b66d5e7cb09d6
+  - {fileID: 6768441564725277544}
+  m_RendererFeatureMap: 12c39aa2e3898e718343020fc249cd3cba6a913daf824356d42396aa7e8403696e74e5442e2ccc20cdb3125ff52c21b8622b66d5e7cb09d66873700cbe55ee5d
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -166,6 +167,21 @@ MonoBehaviour:
   m_Active: 1
   _applyToSceneView: 1
   _applyDistortionShader: {fileID: 4800000, guid: 4040547c0f97a42daaee2e90c4800bc5, type: 3}
+--- !u!114 &6768441564725277544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61758652ccd548040b463b2d425a411b, type: 3}
+  m_Name: CircleCutoutRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  _passMaterial: {fileID: 2100000, guid: c6951b5c1d6ff184485d48b98ff5f85f, type: 2}
+  _requirements: 5
 --- !u!114 &7567037478475277268
 MonoBehaviour:
   m_ObjectHideFlags: 0
