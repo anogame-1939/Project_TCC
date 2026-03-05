@@ -6,7 +6,7 @@ namespace AnoGame.Application.Rendering
 {
     /// <summary>
     /// 丸窓切り抜き用 RendererFeature（2パス方式）。
-    /// Pass1: 対象レイヤーを除外した状態のカラーバッファを背景RTにコピー
+    /// Pass1: Wall レイヤーを除外してシーンを背景RTに直接描画
     /// Pass2: フルスクリーンパスで切り抜きエリア内を背景RTに差し替え
     /// MainCamera タグのカメラでのみ実行。
     /// </summary>
@@ -19,12 +19,12 @@ namespace AnoGame.Application.Rendering
         [Tooltip("このレイヤーのオブジェクトが丸窓内で透過される")]
         [SerializeField] private LayerMask _cuttableLayerMask;
 
-        private CopyBackgroundPass _copyPass;
+        private DrawBackgroundPass _drawBackgroundPass;
         private CircleCutoutRenderPass _cutoutPass;
 
         public override void Create()
         {
-            _copyPass = new CopyBackgroundPass
+            _drawBackgroundPass = new DrawBackgroundPass
             {
                 renderPassEvent = RenderPassEvent.AfterRenderingOpaques
             };
@@ -39,51 +39,95 @@ namespace AnoGame.Application.Rendering
             if (_passMaterial == null) return;
             if (!renderingData.cameraData.camera.CompareTag("MainCamera")) return;
 
-            _copyPass.Setup();
-            renderer.EnqueuePass(_copyPass);
+            _drawBackgroundPass.Setup(_cuttableLayerMask);
+            renderer.EnqueuePass(_drawBackgroundPass);
 
-            _cutoutPass.Setup(_passMaterial, _copyPass.BackgroundTexture);
+            _cutoutPass.Setup(_passMaterial);
             renderer.EnqueuePass(_cutoutPass);
         }
 
         protected override void Dispose(bool disposing)
         {
-            _copyPass?.Dispose();
+            _drawBackgroundPass?.Dispose();
             _cutoutPass?.Dispose();
         }
 
         /// <summary>
-        /// 対象レイヤー除外状態のカラーバッファを背景としてコピーするパス。
-        /// 現時点のカラーバッファ（Opaque描画後）を一時RTにコピーする。
+        /// 切り抜き対象レイヤーを除外してシーンを背景RTに直接描画するパス。
         /// </summary>
-        private class CopyBackgroundPass : ScriptableRenderPass
+        private class DrawBackgroundPass : ScriptableRenderPass
         {
             private RTHandle _backgroundRT;
-            public RTHandle BackgroundTexture => _backgroundRT;
+            private RTHandle _backgroundDepthRT;
+            private LayerMask _excludeMask;
 
             private static readonly int BackgroundTexId = Shader.PropertyToID("_CircleCutoutBackground");
 
-            public void Setup()
+            private static readonly ShaderTagId[] ShaderTags = new[]
             {
-                ConfigureInput(ScriptableRenderPassInput.Color);
+                new ShaderTagId("UniversalForward"),
+                new ShaderTagId("UniversalForwardOnly"),
+                new ShaderTagId("SRPDefaultUnlit"),
+                new ShaderTagId("LightweightForward"),
+            };
+
+            public void Setup(LayerMask excludeMask)
+            {
+                _excludeMask = excludeMask;
             }
 
             public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
             {
                 var desc = renderingData.cameraData.cameraTargetDescriptor;
-                desc.depthBufferBits = 0;
-                RenderingUtils.ReAllocateIfNeeded(ref _backgroundRT, desc, FilterMode.Bilinear,
+
+                var colorDesc = desc;
+                colorDesc.depthBufferBits = 0;
+                RenderingUtils.ReAllocateIfNeeded(ref _backgroundRT, colorDesc, FilterMode.Bilinear,
                     TextureWrapMode.Clamp, name: "_CircleCutoutBackground");
+
+                var depthDesc = desc;
+                depthDesc.colorFormat = RenderTextureFormat.Depth;
+                depthDesc.depthBufferBits = 32;
+                RenderingUtils.ReAllocateIfNeeded(ref _backgroundDepthRT, depthDesc, FilterMode.Point,
+                    TextureWrapMode.Clamp, name: "_CircleCutoutBackgroundDepth");
             }
 
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
-                var cmd = CommandBufferPool.Get("CircleCutout_CopyBackground");
-                var source = renderingData.cameraData.renderer.cameraColorTargetHandle;
+                var cmd = CommandBufferPool.Get("CircleCutout_DrawBackground");
 
-                Blitter.BlitCameraTexture(cmd, source, _backgroundRT);
+                // 背景RTをレンダーターゲットに設定してクリア
+                CoreUtils.SetRenderTarget(cmd, _backgroundRT, _backgroundDepthRT, ClearFlag.All,
+                    renderingData.cameraData.camera.backgroundColor);
+                context.ExecuteCommandBuffer(cmd);
+                cmd.Clear();
+
+                // 対象レイヤーを除外した LayerMask
+                int drawMask = ~_excludeMask.value;
+
+                // 描画設定
+                var drawingSettings = CreateDrawingSettings(
+                    ShaderTags[0], ref renderingData, SortingCriteria.CommonOpaque);
+                for (int i = 1; i < ShaderTags.Length; i++)
+                {
+                    drawingSettings.SetShaderPassName(i, ShaderTags[i]);
+                }
+
+                // フィルタリング: Opaque キュー、対象レイヤー除外
+                var filteringSettings = new FilteringSettings(
+                    RenderQueueRange.opaque, drawMask);
+
+                // シーンを背景RTに描画（Wall なし）
+                context.DrawRenderers(
+                    renderingData.cullResults, ref drawingSettings, ref filteringSettings);
+
+                // ★ レンダーターゲットをカメラのカラーバッファに戻す
+                var cameraTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
+                var cameraDepth = renderingData.cameraData.renderer.cameraDepthTargetHandle;
+                CoreUtils.SetRenderTarget(cmd, cameraTarget, cameraDepth);
+
+                // グローバルテクスチャとして設定
                 cmd.SetGlobalTexture(BackgroundTexId, _backgroundRT);
-
                 context.ExecuteCommandBuffer(cmd);
                 CommandBufferPool.Release(cmd);
             }
@@ -91,23 +135,21 @@ namespace AnoGame.Application.Rendering
             public void Dispose()
             {
                 _backgroundRT?.Release();
+                _backgroundDepthRT?.Release();
             }
         }
 
         /// <summary>
         /// フルスクリーン切り抜きパス。
-        /// 切り抜きエリア内のピクセルを背景RT（対象レイヤーなし）に差し替える。
         /// </summary>
         private class CircleCutoutRenderPass : ScriptableRenderPass
         {
             private Material _material;
             private RTHandle _copiedColor;
-            private RTHandle _backgroundRT;
 
-            public void Setup(Material material, RTHandle backgroundRT)
+            public void Setup(Material material)
             {
                 _material = material;
-                _backgroundRT = backgroundRT;
                 ConfigureInput(ScriptableRenderPassInput.Color | ScriptableRenderPassInput.Depth);
             }
 
@@ -126,11 +168,9 @@ namespace AnoGame.Application.Rendering
                 var cmd = CommandBufferPool.Get("CircleCutout_Composite");
                 var source = renderingData.cameraData.renderer.cameraColorTargetHandle;
 
-                // カラーバッファをコピー
                 Blitter.BlitCameraTexture(cmd, source, _copiedColor);
                 _material.SetTexture("_BlitTexture", _copiedColor);
 
-                // フルスクリーン描画
                 CoreUtils.SetRenderTarget(cmd, source);
                 CoreUtils.DrawFullScreen(cmd, _material);
 

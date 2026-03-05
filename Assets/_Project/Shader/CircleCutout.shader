@@ -5,14 +5,13 @@ Shader "Custom/PostProcess/CircleCutout"
         [Header(Circle Cutout)]
         _CutoutRadius ("Cutout Radius", Range(0, 50)) = 3
         _CutoutFadeWidth ("Fade Width", Range(0, 20)) = 1
-        _HeightOffset ("Height Offset", Range(-5, 10)) = 0.5
         _PlayerWorldPos ("Player World Pos", Vector) = (0, 0, 0, 0)
 
         [Header(Source Select)]
         [Toggle] _UseGlobalParams ("Use Global Params", Float) = 1
 
         [Header(Debug)]
-        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, WORLD_Y)] _Debug ("Debug View", Float) = 0
+        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, WORLD_POS)] _Debug ("Debug View", Float) = 0
     }
 
     SubShader
@@ -33,22 +32,17 @@ Shader "Custom/PostProcess/CircleCutout"
             TEXTURE2D_X(_BlitTexture);
             SAMPLER(sampler_LinearClamp);
 
-            // Background texture (scene WITHOUT cuttable objects)
             TEXTURE2D_X(_CircleCutoutBackground);
 
-            // Depth
             TEXTURE2D_X_FLOAT(_CameraDepthTexture);
             SAMPLER(sampler_CameraDepthTexture);
 
-            // Material properties
             float4 _PlayerWorldPos;
             float  _CutoutRadius;
             float  _CutoutFadeWidth;
-            float  _HeightOffset;
             float  _UseGlobalParams;
             float  _Debug;
 
-            // Global properties (from CircleCutoutController)
             float4 _Global_PlayerWorldPos;
             float  _Global_CutoutRadius;
             float  _Global_CutoutFadeWidth;
@@ -81,13 +75,11 @@ Shader "Custom/PostProcess/CircleCutout"
                 // Debug views
                 if (_Debug > 0.5 && _Debug < 1.5)
                 {
-                    // DEPTH_RAW
                     float d = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
                     return half4(d, d, d, 1.0);
                 }
                 if (_Debug > 1.5 && _Debug < 2.5)
                 {
-                    // BACKGROUND: show the background texture
                     return background;
                 }
 
@@ -98,7 +90,7 @@ Shader "Custom/PostProcess/CircleCutout"
                 // Sample depth
                 float rawDepth = SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, uv).r;
 
-                // Skip skybox
+                // Skip skybox - keep full scene
                 #if UNITY_REVERSED_Z
                     if (rawDepth < 0.0001) return color;
                 #else
@@ -117,26 +109,21 @@ Shader "Custom/PostProcess/CircleCutout"
                 float4 worldPos4 = mul(UNITY_MATRIX_I_VP, clipPos);
                 float3 worldPos = worldPos4.xyz / worldPos4.w;
 
-                // Debug: world Y
+                // Debug: world pos (R=X, G=Y, B=Z normalized)
                 if (_Debug > 2.5)
                 {
-                    float yNorm = saturate((worldPos.y - playerPos.y) / 10.0);
-                    return half4(yNorm, 0, 1.0 - yNorm, 1.0);
+                    float3 relPos = (worldPos - playerPos.xyz) / 20.0 + 0.5;
+                    return half4(saturate(relPos), 1.0);
                 }
-
-                // Height filter: keep ground (at or below player height + offset)
-                if (worldPos.y <= playerPos.y + _HeightOffset)
-                    return color;
 
                 // XZ distance to player
                 float dist = length(worldPos.xz - playerPos.xz);
 
-                // Cutout: blend between full scene and background (without cuttable objects)
-                float alpha = saturate((dist - radius) / max(fadeWidth, 0.001));
-
-                // alpha=0 inside cutout -> show background (ground visible)
-                // alpha=1 outside cutout -> show normal scene
-                return lerp(background, color, alpha);
+                // Cutout blend
+                // t=0 (inside radius) -> background (Wall hidden)
+                // t=1 (outside radius) -> color (Wall visible)
+                float t = saturate((dist - radius) / max(fadeWidth, 0.001));
+                return lerp(background, color, t);
             }
             ENDHLSL
         }
