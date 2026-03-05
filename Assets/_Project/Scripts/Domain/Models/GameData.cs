@@ -1,0 +1,343 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+
+namespace AnoGame.Domain.Data.Models
+{
+    [Serializable]
+    public class GameData
+    {
+        [JsonProperty]
+        public int Score { get; private set; }
+        [JsonProperty]
+        public string PlayerName { get; private set; }
+        [JsonProperty]
+        public StoryProgress StoryProgress { get; private set; }
+        [JsonProperty]
+        public Inventory Inventory { get; private set; }
+        [JsonProperty]
+        public PlayerPosition PlayerPosition { get; private set; }
+        [JsonProperty]
+        public EventHistory EventHistory { get; private set; }
+        [JsonProperty]
+        public int CurrentHealth { get; private set; }
+        [JsonProperty]
+        public int RetryCount { get; private set; }
+
+        [JsonConstructor]
+        public GameData()
+        {
+        }
+        public GameData(
+            int score,
+            string playerName,
+            StoryProgress storyProgress,
+            Inventory inventory,
+            PlayerPosition position,
+            EventHistory eventHistory,
+            int currentHealth = 2,
+            int retryCount = 0)
+        {
+            Score = score;
+            PlayerName = playerName;
+            StoryProgress = storyProgress;
+            Inventory = inventory;
+            PlayerPosition = position;
+            EventHistory = eventHistory;
+            CurrentHealth = currentHealth;
+            RetryCount = retryCount;
+        }
+
+        public void UpdateStoryProgress(StoryProgress storyProgress)
+        {
+            StoryProgress = storyProgress;
+        }
+
+        public void UpdatePosition(Position3D position, Rotation3D rotation, string mapId, string areaId)
+        {
+            PlayerPosition = PlayerPosition.UpdatePosition(position, rotation, mapId, areaId);
+        }
+
+        public void AddClearedEvent(string eventId)
+        {
+            EventHistory.AddEvent(eventId);
+        }
+
+        public void RemoveClearedEvent(string eventId)
+        {
+            EventHistory.RemoveEvent(eventId);
+        }
+
+        public void UpdateCurrentHealth(int health)
+        {
+            CurrentHealth = health;
+        }
+
+        public void IncrementRetryCount()
+        {
+            RetryCount++;
+        }
+    }
+
+    [Serializable]
+    public class PlayerPosition
+    {
+        public Position3D Position { get; }
+        public Rotation3D Rotation { get; }
+        public string CurrentMapId { get; }
+        public string CurrentAreaId { get; }
+        public string LastCheckpointId { get; }
+        public Position3D? LastCheckpointPosition { get; }
+        public Position3D? RespawnPosition { get; }
+
+
+        public PlayerPosition(
+            Position3D position,
+            Rotation3D rotation,
+            string currentMapId,
+            string currentAreaId,
+            string lastCheckpointId = null,
+            Position3D? lastCheckpointPosition = null,
+            Position3D? respawnPosition = null)
+        {
+            Position = position;
+            Rotation = rotation;
+            CurrentMapId = currentMapId;
+            CurrentAreaId = currentAreaId;
+            LastCheckpointId = lastCheckpointId;
+            LastCheckpointPosition = lastCheckpointPosition;
+            RespawnPosition = respawnPosition;
+        }
+
+        public PlayerPosition UpdatePosition(Position3D newPosition, Rotation3D newRotation, string mapId, string areaId)
+        {
+            return new PlayerPosition(
+                newPosition,
+                newRotation,
+                mapId,
+                areaId,
+                LastCheckpointId,
+                LastCheckpointPosition,
+                RespawnPosition
+            );
+        }
+
+        public PlayerPosition UpdateCheckpoint(string checkpointId, Position3D checkpointPosition)
+        {
+            return new PlayerPosition(
+                Position,
+                Rotation,
+                CurrentMapId,
+                CurrentAreaId,
+                checkpointId,
+                checkpointPosition,
+                RespawnPosition
+            );
+        }
+    }
+
+    [Serializable]
+    public readonly struct Position3D
+    {
+        public float X { get; }
+        public float Y { get; }
+        public float Z { get; }
+
+        public Position3D(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
+
+    [Serializable]
+    public readonly struct Rotation3D
+    {
+        public float X { get; }
+        public float Y { get; }
+        public float Z { get; }
+        public float W { get; }
+
+        public Rotation3D(float x, float y, float z, float w)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
+        }
+    }
+
+    [Serializable]
+    public class StoryProgress
+    {
+        [JsonProperty]
+        public int CurrentStoryIndex { get; private set; }
+
+        [JsonProperty]
+        public int CurrentChapterIndex { get; private set; }
+
+        [JsonProperty]
+        public int CurrentSceneIndex { get; private set; }
+
+        public StoryProgress(int storyIndex, int chapterIndex)
+        {
+            CurrentStoryIndex = storyIndex;
+            CurrentChapterIndex = chapterIndex;
+        }
+
+        public void AdvanceScene()
+        {
+            CurrentSceneIndex++;
+        }
+
+        public void AdvanceChapter()
+        {
+            CurrentChapterIndex++;
+            CurrentSceneIndex = 0;
+        }
+    }
+
+    [Serializable]
+    public class Inventory
+    {
+        [JsonProperty("Items")]
+        private readonly List<InventoryItem> _items = new();
+
+        [JsonIgnore]
+        public IReadOnlyList<InventoryItem> Items => _items.AsReadOnly();
+
+        [JsonConstructor]
+        public Inventory()
+        {
+        }
+
+        public void AddItem(InventoryItem item)
+        {
+            _items.Add(item);
+        }
+
+        public void RemoveItem(string itemId)
+        {
+            var item = _items.FirstOrDefault(x => x.UniqueId == itemId);
+            if (item != null)
+            {
+                _items.Remove(item);
+            }
+        }
+    }
+
+    [Serializable]
+    public class InventoryItem
+    {
+        [JsonProperty]
+        public string ItemName { get; private set; }
+        [JsonProperty]
+        public int Quantity { get; private set; }
+        [JsonProperty]
+        public string Description { get; private set; }
+        [JsonProperty]
+        public string UniqueId { get; private set; }
+        [JsonProperty]
+        public bool IsConsumable { get; private set; }
+
+        [JsonProperty("UniqueIds")]
+        private readonly List<string> _uniqueIds = new();
+
+        [JsonIgnore]
+        public IReadOnlyList<string> UniqueIds => _uniqueIds.AsReadOnly();
+
+        [JsonConstructor]
+        public InventoryItem()
+        {
+        }
+
+        public InventoryItem(string itemName, int quantity, string description, string uniqueId, bool isConsumable = true)
+        {
+            ItemName = itemName;
+            Quantity = quantity;
+            Description = description;
+            UniqueId = uniqueId;
+            IsConsumable = isConsumable;
+        }
+
+        public void AddQuantity(int amount)
+        {
+            if (amount < 0) throw new ArgumentException("Amount must be positive");
+            Quantity += amount;
+        }
+
+        public void RemoveQuantity(int amount)
+        {
+            if (amount < 0) throw new ArgumentException("Amount must be positive");
+            if (amount > Quantity) throw new ArgumentException($"Cannot remove {amount} from {Quantity}");
+            Quantity -= amount;
+        }
+    }
+
+    [Serializable]
+    public class EventHistory
+    {
+        [JsonProperty("ClearedEvents")]
+        private readonly HashSet<string> _clearedEvents = new();
+
+        [JsonProperty("ActiveTags")]
+        private readonly HashSet<string> _activeTags = new();
+
+        [JsonIgnore]
+        public IReadOnlyCollection<string> ClearedEvents => _clearedEvents;
+
+        [JsonIgnore]
+        public IReadOnlyCollection<string> ActiveTags => _activeTags;
+
+        [JsonConstructor]
+        public EventHistory()
+        {
+        }
+
+        public void AddEvent(string eventId)
+        {
+            _clearedEvents.Add(eventId);
+        }
+
+        public bool HasCompleted(string eventId)
+        {
+            return _clearedEvents.Contains(eventId);
+        }
+
+        public void RemoveEvent(string eventId)
+        {
+            if (_clearedEvents.Contains(eventId))
+            {
+                _clearedEvents.Remove(eventId);
+            }
+        }
+
+        public void AddTag(string tag)
+        {
+            _activeTags.Add(tag);
+        }
+
+        public void AddTags(IEnumerable<string> tags)
+        {
+            foreach (var tag in tags)
+            {
+                if (!string.IsNullOrEmpty(tag))
+                {
+                    _activeTags.Add(tag);
+                }
+            }
+        }
+
+        public bool HasTag(string tag)
+        {
+            return _activeTags.Contains(tag);
+        }
+
+        public HashSet<string> GetActiveTags()
+        {
+            return new HashSet<string>(_activeTags);
+        }
+    }
+}
