@@ -30,10 +30,15 @@ Shader "Custom/PostProcess/CircleCutout"
                 // Sample the original color
                 half4 color = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, input.texcoord);
 
-                // Sample depth
-                float depth = SampleSceneDepth(input.texcoord);
+                // Passthrough when effect is disabled (radius <= 0)
+                if (_CutoutRadius <= 0.0 && _CutoutFadeWidth <= 0.0)
+                    return color;
 
-                // Skip skybox (far plane)
+                // Sample depth
+                float2 uv = input.texcoord;
+                float depth = SampleSceneDepth(uv);
+
+                // Skip skybox (far plane) - keep original color
                 #if UNITY_REVERSED_Z
                     if (depth < 0.0001)
                         return color;
@@ -42,22 +47,8 @@ Shader "Custom/PostProcess/CircleCutout"
                         return color;
                 #endif
 
-                // Reconstruct world position from depth
-                float2 uv = input.texcoord;
-                #if UNITY_UV_STARTS_AT_TOP
-                    uv.y = 1.0 - uv.y;
-                #endif
-
-                float4 ndc = float4(uv * 2.0 - 1.0, depth, 1.0);
-
-                #if UNITY_REVERSED_Z
-                    ndc.z = depth;
-                #else
-                    ndc.z = depth * 2.0 - 1.0;
-                #endif
-
-                float4 worldPos = mul(UNITY_MATRIX_I_VP, ndc);
-                worldPos.xyz /= worldPos.w;
+                // Reconstruct world position from depth using URP's built-in function
+                float3 worldPos = ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
 
                 // Calculate XZ distance to player
                 float2 diff = worldPos.xz - _PlayerWorldPos.xz;
@@ -70,9 +61,8 @@ Shader "Custom/PostProcess/CircleCutout"
                 float outerRadius = _CutoutRadius + _CutoutFadeWidth;
                 float alpha = saturate((dist - innerRadius) / max(_CutoutFadeWidth, 0.001));
 
-                // Lerp to transparent (checkerboard or just fade to background)
+                // Fade the color (black in cutout area)
                 color.rgb *= alpha;
-                color.a = alpha;
 
                 return color;
             }
