@@ -1,7 +1,9 @@
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -15,9 +17,15 @@ namespace Unity.TinyCharacterController.Check
     [AddComponentMenu(MenuList.MenuCheck + nameof(ReachHeightCheck))]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.HeightBasedHeadCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.HeightBasedOverheadDetection")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Unity.TinyCharacterController.Check.HeightBasedOverheadDetection")]
+#endif
     public class ReachHeightCheck : MonoBehaviour,
         IOverheadDetection
     {

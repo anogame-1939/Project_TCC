@@ -10,7 +10,9 @@ namespace Unity.Utility
     /// </summary>
     [AddComponentMenu("")]
     [DisallowMultipleComponent]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("GameDevUtility.GameObjectFolder")]
+#endif
     public class GameObjectFolder : MonoBehaviour
     {
 #if UNITY_EDITOR

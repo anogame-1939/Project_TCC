@@ -1,5 +1,7 @@
 using System;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -18,7 +20,9 @@ namespace Unity.SceneManagement
     /// Scene management is done using Addressable.
     /// </summary>
     [DisallowMultipleComponent]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Tcc.SceneManagement.SceneLoader")]
+#endif
     public class SceneLoader : MonoBehaviour
     {
         /// <summary>
@@ -60,7 +64,9 @@ namespace Unity.SceneManagement
         /// <summary>
         /// 
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("Scene")]
+#endif
         public Scene LoadedScene { get; private set; }
 
         private ISceneLoaderManager Manager => SceneLoaderManager.Instance;

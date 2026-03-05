@@ -14,7 +14,9 @@ namespace Unity.TinyCharacterController.Utility
     /// </summary>
     [DefaultExecutionOrder(Order.IndicatorRegister)]
     [AddComponentMenu(MenuList.Ui + nameof(IndicatorRegister))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Utility.IndicatorRegister")]
+#endif
     public class IndicatorRegister : MonoBehaviour
     {
         /// <summary>

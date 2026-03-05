@@ -1,4 +1,6 @@
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,7 +11,9 @@ namespace Unity.TinyCharacterController.Interfaces.Components
     /// Used for constructing GameObject pools.
     /// Utilized for object acquisition, return, destruction, and also for searching objects from the manager.
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Unity.TinyCharacterController.Interfaces.Components.IGameObjectPool")]
+#endif
     public interface IGameObjectPool
     {
         /// <summary>

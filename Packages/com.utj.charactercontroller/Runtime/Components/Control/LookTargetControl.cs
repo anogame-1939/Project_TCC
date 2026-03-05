@@ -1,6 +1,8 @@
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.TinyCharacterController.Control
@@ -14,9 +16,15 @@ namespace Unity.TinyCharacterController.Control
     [AddComponentMenu(MenuList.MenuControl + nameof(LookTargetControl))]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.LookTarget")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.LookTargetControl")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Control.LookTargetControl")]
+#endif
     public class LookTargetControl : MonoBehaviour, 
         ITurn
     {
@@ -24,7 +32,9 @@ namespace Unity.TinyCharacterController.Control
         /// Transform of the target to point at.
         /// If this value is null, priority is disabled.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [AllowsNull]
+#endif
         public Transform Target;
         
         /// <summary>

@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using Unity.TinyCharacterController.Attributes;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -19,8 +21,12 @@ namespace Unity.TinyCharacterController.Check
     [AddComponentMenu(MenuList.MenuCheck + nameof(HighPriorityTargetSearch))]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.HighPriorityTargetSearch")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.HighPriorityTargetSearch")]
+#endif
     public class HighPriorityTargetSearch : MonoBehaviour
     {
         private const int Capacity = 100;

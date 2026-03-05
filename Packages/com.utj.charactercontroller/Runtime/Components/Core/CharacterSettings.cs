@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Unity.TinyCharacterController.Interfaces.Components;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using Unity.TinyCharacterController.Attributes;
 using Unity.TinyCharacterController.Utility;
@@ -13,7 +15,9 @@ namespace Unity.TinyCharacterController
     [SelectionBase]
     [AddComponentMenu(MenuList.MenuBrain + "Character Settings")]
     [RequireInterface(typeof(IBrain))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.CharacterSettings")]
+#endif
     public class CharacterSettings : MonoBehaviour
     {
         /// <summary>
@@ -37,7 +41,9 @@ namespace Unity.TinyCharacterController
         /// <summary>
         ///     Layer for recognizing terrain colliders.
         /// </summary>
-        [Header("Environment Settings")] [SerializeField] [Tooltip("Layer for recognizing terrain colliders")]
+        [Header("Environment Settings")]
+        [SerializeField]
+        [Tooltip("Layer for recognizing terrain colliders")]
         private LayerMask _environmentLayer;
 
         /// <summary>
@@ -51,13 +57,15 @@ namespace Unity.TinyCharacterController
         /// <summary>
         ///     Character's height.
         /// </summary>
-        [SerializeField] [Tooltip("Character's height")]
+        [SerializeField]
+        [Tooltip("Character's height")]
         private float _height = 1.4f;
 
         /// <summary>
         ///     Character's width.
         /// </summary>
-        [SerializeField] [Tooltip("Character's width")]
+        [SerializeField]
+        [Tooltip("Character's width")]
         private float _radius = 0.5f;
 
         /// <summary>
@@ -303,13 +311,13 @@ namespace Unity.TinyCharacterController
         /// </summary>
         private void UpdateSettings()
         {
-            var controls = ListPool<ICharacterSettingUpdateReceiver>.New();
+            var controls = UnityEngine.Pool.ListPool<ICharacterSettingUpdateReceiver>.Get();
 
             GetComponents(controls);
             foreach (var control in controls)
                 control.OnUpdateSettings(this);
 
-            ListPool<ICharacterSettingUpdateReceiver>.Free(controls);
+            UnityEngine.Pool.ListPool<ICharacterSettingUpdateReceiver>.Release(controls);
         }
     }
 }

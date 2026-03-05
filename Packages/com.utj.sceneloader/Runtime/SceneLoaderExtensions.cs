@@ -1,9 +1,13 @@
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.SceneManagement
 {
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Tcc.SceneManagement.SceneLoaderExtensions")]
+#endif
     public static class SceneLoaderExtensions 
     {
         /// <summary>

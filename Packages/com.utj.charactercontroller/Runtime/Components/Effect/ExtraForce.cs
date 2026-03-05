@@ -1,4 +1,6 @@
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.TinyCharacterController.Core;
@@ -14,8 +16,12 @@ namespace Unity.TinyCharacterController.Effect
     /// </summary>
     [AddComponentMenu(MenuList.MenuEffect + nameof(ExtraForce))]
     [DisallowMultipleComponent]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.ExtraForce")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Effect.ExtraForce")]
+#endif
     public class ExtraForce : ComponentBase,
         IEffect,
         IEarlyUpdateComponent
@@ -40,7 +46,7 @@ namespace Unity.TinyCharacterController.Effect
         /// <summary>
         ///     Reflectance strength of the character. 1 for full reflection, 0 to stop upon collision.
         /// </summary>
-        [SerializeField] [Range(0, 1)] private float _bounce = 0f;
+        [SerializeField][Range(0, 1)] private float _bounce = 0f;
 
         /// <summary>
         ///     Callbacks when hit other collider.
@@ -121,12 +127,12 @@ namespace Unity.TinyCharacterController.Effect
 
                             // Add acceleration to self and the target of the collision.
                             other.AddForce(velocity * other._bounce);
-                            _velocity = Vector3.Reflect(velocity , closestHit.normal) * _bounce;
+                            _velocity = Vector3.Reflect(velocity, closestHit.normal) * _bounce;
                         }
                         else
                         {
                             _velocity = Vector3.Reflect(_velocity, closestHit.normal) * _bounce;
-                        }                        
+                        }
                     }
                 }
 
@@ -221,7 +227,7 @@ namespace Unity.TinyCharacterController.Effect
             var distance = _settings.Radius * 0.5f + _velocity.magnitude * deltaTime;
 
             // Create an array for collision detection.
-            var hits = ArrayPool<RaycastHit>.New(HitCapacity);
+            var hits = new RaycastHit[HitCapacity];
 
             // Perform collision detection with the character's shape.
             var hitCount = Physics.CapsuleCastNonAlloc(top, bottom,
@@ -233,7 +239,7 @@ namespace Unity.TinyCharacterController.Effect
             var isCapsuleHit = _settings.ClosestHit(hits, hitCount, distance, out var hit);
 
             // Release the used array.
-            ArrayPool<RaycastHit>.Free(hits);
+            // Buffer is GC-managed, no explicit release needed.
 
             if (isCapsuleHit)
             {

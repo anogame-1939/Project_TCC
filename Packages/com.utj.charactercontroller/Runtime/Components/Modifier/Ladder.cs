@@ -1,5 +1,7 @@
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.TinyCharacterController.Modifier
@@ -11,8 +13,12 @@ namespace Unity.TinyCharacterController.Modifier
     /// </summary>
     [AddComponentMenu(MenuList.Gimmick + "Ladder")]
     [DisallowMultipleComponent]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Ladder")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Modifier.Ladder")]
+#endif
     public class Ladder : MonoBehaviour
     {
         [Header("Ladder Length")] [Tooltip("Starting point of the ladder")] [SerializeField]

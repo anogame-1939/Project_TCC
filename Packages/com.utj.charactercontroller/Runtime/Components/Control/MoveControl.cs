@@ -1,5 +1,7 @@
 using Unity.TinyCharacterController.Interfaces.Components;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 using Unity.TinyCharacterController.Interfaces.Core;
@@ -18,8 +20,12 @@ namespace Unity.TinyCharacterController.Control
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Transform))]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.MoveControl")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Control.MoveControl")]
+#endif
     public class MoveControl : MonoBehaviour, 
         ITurn, 
         IMove, 

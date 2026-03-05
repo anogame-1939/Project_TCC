@@ -17,8 +17,12 @@ namespace Unity.TinyCharacterController.Effect
     [RequireInterface(typeof(IGroundContact))]
     [RequireInterface(typeof(IGroundObject))]
     [RequireInterface(typeof(IGravity))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.MoveWithPlatform")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Effect.MoveWithPlatform")]
+#endif
     public class MoveWithPlatform : MonoBehaviour, 
         IEffect, 
         IEarlyUpdateComponent

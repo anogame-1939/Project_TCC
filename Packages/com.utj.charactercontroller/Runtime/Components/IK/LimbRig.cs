@@ -1,18 +1,26 @@
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Unity.TinyCharacterController.Ik
 {
     [AddComponentMenu(MenuList.Ik + "LimbRig")]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.LimbRig")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Ik.LimbRig")]
+#endif
     public class LimbRig : MonoBehaviour, IIkRig
     {
         [FormerlySerializedAs("isWorking")] 
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("isWorking")]
+#endif
         public bool IsWorking = true;
 
         [SerializeField] private AvatarIKGoal _ikGoal;
@@ -21,11 +29,15 @@ namespace Unity.TinyCharacterController.Ik
         [SerializeField] private  Transform _hint;
         
         [FormerlySerializedAs("transitionToEnable")] 
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("transitionToEnable")]
+#endif
         public float TransitionToEnable;
         
         [FormerlySerializedAs("transitionToDisable")] 
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("transitionToDisable")]
+#endif
         public float TransitionToDisable = 0.3f;
         
         private float _weight;

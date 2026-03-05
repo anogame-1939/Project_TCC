@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Utility;
 
+#if PACKAGE_VISUAL_SCRIPTING
 [assembly: RenamedNamespace("TinyCharacterController.Utility", "Utj.TinyCharacterController.Manager")]
+#endif
 namespace Unity.TinyCharacterController.Manager
 {
     /// <summary>
@@ -15,8 +19,10 @@ namespace Unity.TinyCharacterController.Manager
     /// or retrieves <see cref="IGameObjectPool"/> instances in the scene based on the key.
     /// </summary>
     /// <seealso cref="GameObjectPool"/>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Utility.GameObjectPoolManager")]
     [RenamedFrom("TinyCharacterController.Manager.GameObjectPoolManager")]
+#endif
     public class GameObjectPoolManager : Utility.Singleton<GameObjectPoolManager>
     {
         /// <summary>

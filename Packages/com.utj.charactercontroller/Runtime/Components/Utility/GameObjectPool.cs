@@ -23,7 +23,9 @@ namespace Unity.TinyCharacterController.Utility
     /// <seealso cref="PooledGameObject"/>
     [DefaultExecutionOrder(Order.GameObjectPool)]
     [AddComponentMenu(MenuList.Utility + nameof(GameObjectPool))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Utility.GameObjectPool")]
+#endif
     public class GameObjectPool : ComponentBase,
         IGameObjectPool,
         IEquatable<GameObjectPool>

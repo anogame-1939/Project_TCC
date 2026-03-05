@@ -2,7 +2,9 @@ using Unity.TinyCharacterController.Attributes;
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.TinyCharacterController.Control
@@ -15,9 +17,15 @@ namespace Unity.TinyCharacterController.Control
     [AddComponentMenu(MenuList.MenuControl + nameof(SyncTransformControl))]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.FixPositionControl")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Control.FixPositionControl")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Utj.TinyCharacterController.Control.FixPositionControl")]
+#endif
     public class SyncTransformControl : MonoBehaviour, 
         IUpdateComponent,
         IMove,
@@ -96,7 +104,9 @@ namespace Unity.TinyCharacterController.Control
         /// <summary>
         /// The Transform to synchronize the character's position.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [AllowsNull]
+#endif
         public Transform Target
         {
             get => _targetTransform;

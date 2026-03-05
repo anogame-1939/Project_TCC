@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.SaveData.Core;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.SaveData
@@ -10,7 +12,9 @@ namespace Unity.SaveData
     /// <summary>
     /// Manages the inventory of items for a character or entity.
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("DataStore.InventoryContainer")]
+#endif
     public class InventoryContainer : MonoBehaviour, IDataContainer
     {
         /// <summary>

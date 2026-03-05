@@ -3,7 +3,9 @@ using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Interfaces.Utility;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -19,9 +21,15 @@ namespace Unity.TinyCharacterController.Check
     [RequireComponent(typeof(CharacterSettings))]
     [AddComponentMenu(MenuList.MenuCheck + nameof(HeadContactCheck))]
     [DisallowMultipleComponent]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.HeadCollisionCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.HeadCollisionCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("Unity.TinyCharacterController.Check.HeadCollisionCheck")]
+#endif
     public class HeadContactCheck : MonoBehaviour,
         IOverheadDetection,
         IEarlyUpdateComponent,
@@ -50,7 +58,9 @@ namespace Unity.TinyCharacterController.Check
         ///     This value must always be higher than the height of <see cref="CharacterSettings.Height" />.
         /// </summary>
         [FormerlySerializedAs("MaxRange")]
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("_maxHeight")]
+#endif
         [SerializeField]
         [Tooltip("Maximum distance at which upward objects can be detected")]
         [Range(0, 10f)]
@@ -74,7 +84,9 @@ namespace Unity.TinyCharacterController.Check
         /// <summary>
         ///     Returns true if the head is in contact with other objects during this frame.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsContactHeadCollisionInThisFrame")]
+#endif
         public bool IsHitCollisionInThisFrame { get; private set; }
 
         /// <summary>
@@ -197,15 +209,23 @@ namespace Unity.TinyCharacterController.Check
         /// <summary>
         ///     Returns true if the head is in contact with other objects.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsContactHeadCollision")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsHitCollision")]
+#endif
         public bool IsHeadContact { get; private set; }
 
         /// <summary>
         ///     Returns true if there is a collider within the character's head to Max Range range.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsContactHead")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsInRange")]
+#endif
         public bool IsObjectOverhead { get; private set; }
 
         /// <summary>
@@ -219,7 +239,9 @@ namespace Unity.TinyCharacterController.Check
         ///     Returns the collided gameObject. Returns null if <see cref="IsHeadContact" /> is false.
         ///     It is recommended to check the existence of <see cref="IsHeadContact" /> before using this property.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("ContactedCollider")]
+#endif
         public GameObject ContactedObject { get; private set; }
 
         /// <summary>

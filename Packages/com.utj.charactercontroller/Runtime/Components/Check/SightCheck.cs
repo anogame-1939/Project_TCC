@@ -3,7 +3,9 @@ using Unity.TinyCharacterController.Attributes;
 using Unity.TinyCharacterController.Components.Utility;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -18,8 +20,12 @@ namespace Unity.TinyCharacterController.Check
     [AddComponentMenu(MenuList.MenuCheck + nameof(SightCheck))]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.SightCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.SightCheck")]
+#endif
     public class SightCheck : MonoBehaviour, IEarlyUpdateComponent
     {
         /// <summary>
@@ -33,21 +39,27 @@ namespace Unity.TinyCharacterController.Check
         /// The range of the sight.
         /// </summary>
         [FormerlySerializedAs("range")]
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("range")]
+#endif
         public int Range = 10;
 
         /// <summary>
         /// The angle of the sight.
         /// </summary>
         [FormerlySerializedAs("angle")]
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("angle")]
+#endif
         public int Angle = 30;
 
         /// <summary>
         /// The layer to use for detection. Objects in this layer will be visible.
         /// </summary>
         [FormerlySerializedAs("layer")]
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("layer")]
+#endif
         public LayerMask VisibleLayerMask;
 
         /// <summary>
@@ -62,14 +74,16 @@ namespace Unity.TinyCharacterController.Check
         /// Gets a list of objects within the sight.
         /// </summary>
         public List<GameObject> InsightTargets { get; private set; } = new();
-        
+
         /// <summary>
         /// If true, check for the presence of obstacles.
         /// Obstacle detection uses <see cref="CharacterSettings._environmentLayer"/>.
         /// </summary>
         [FormerlySerializedAs("raycastCheck")]
         [Header("Options")]
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("raycastCheck")]
+#endif
         public bool RaycastCheck = true;
 
         /// <summary>
@@ -91,7 +105,7 @@ namespace Unity.TinyCharacterController.Check
         /// The maximum number of objects that can be detected at once.
         /// </summary>
         private const int Capacity = 100;
-        
+
         private static readonly Collider[] Results = new Collider[Capacity];
         private CharacterSettings _settings;
 
@@ -127,10 +141,10 @@ namespace Unity.TinyCharacterController.Check
             var deltaPosition = (targetPosition - position);
             var direction = deltaPosition.normalized;
             var distance = deltaPosition.magnitude;
-            
+
             // Allocate a buffer.
-            var hits = ArrayPool<RaycastHit>.New(Capacity);
-            
+            var hits = new RaycastHit[Capacity];
+
             // Check if the sight is clear towards the target from the sensor.
             var count = Physics.RaycastNonAlloc(position, direction, hits, distance, _settings.EnvironmentLayer,
                 QueryTriggerInteraction.Ignore);
@@ -150,8 +164,8 @@ namespace Unity.TinyCharacterController.Check
             }
 
             // Release the buffer.
-            ArrayPool<RaycastHit>.Free(hits);
-            
+            // Buffer is GC-managed, no explicit release needed.
+
             // Return false if obstructed.
             return isCollide;
         }
@@ -163,7 +177,7 @@ namespace Unity.TinyCharacterController.Check
         {
             TryGetComponent(out _settings);
         }
-        
+
         private void OnDrawGizmosSelected()
         {
             // Do nothing if the game is not playing.
@@ -182,13 +196,13 @@ namespace Unity.TinyCharacterController.Check
         {
             // Cache the previous information to detect changes in the sight.
             var isAnyInsightTargetPreviousFrame = IsInsightAnyTarget;
-            
+
             // Get the coordinates and direction of the sensor's position.
             var headPosition = _headTransform.position;
             var forward = _headTransform.forward;
 
             // Collect all colliders around the character.
-            var count = Physics.OverlapSphereNonAlloc(headPosition, Range, Results, 
+            var count = Physics.OverlapSphereNonAlloc(headPosition, Range, Results,
                 VisibleLayerMask, QueryTriggerInteraction.Ignore);
 
             // Extract targets from the list of colliders.
@@ -205,7 +219,7 @@ namespace Unity.TinyCharacterController.Check
                 // Detect the position of the closest edge within the sight.
                 var closestPoint = col.ClosestPointOnBounds(headPosition);
                 var deltaPosition = closestPoint - headPosition;
-                
+
                 // Skip processing if the target is outside the sight.
                 if (Vector3.Angle(forward, deltaPosition) > Angle * 0.5f)
                     continue;
@@ -216,7 +230,7 @@ namespace Unity.TinyCharacterController.Check
                     continue;
 
                 // Add the object to the list of objects within the sight.
-                if( InsightTargets.Contains(col.gameObject) == false)
+                if (InsightTargets.Contains(col.gameObject) == false)
                     InsightTargets.Add(col.gameObject);
             }
 

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Unity.TinyCharacterController.Attributes;
 using Unity.TinyCharacterController.Core;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -78,7 +80,9 @@ namespace Unity.TinyCharacterController.Components.Utility
         ///     List of GameObjects hit during the current frame.
         ///     The type of objects stored may vary depending on the value of <see cref="CacheTargetType" />.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("HitObjectInThisFrame")]
+#endif
         public List<GameObject> HitObjectsInThisFrame { get; } = new();
 
 
@@ -107,7 +111,9 @@ namespace Unity.TinyCharacterController.Components.Utility
         /// Gets or sets the owner of the collision detection.
         /// Components do not collide with the Collider held by <see cref="Owner"/>.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [AllowsNull]
+#endif
         public CharacterSettings Owner
         {
             get => _owner;

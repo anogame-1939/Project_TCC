@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
@@ -11,7 +13,9 @@ namespace Unity.SceneManagement
     /// <summary>
     /// Manages SceneLoader.
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Tcc.SceneManagement.SceneLoaderManager")]
+#endif
     public class SceneLoaderManager : ISceneLoaderManager
     {
         public static SceneLoaderManager Instance { get; } = new();

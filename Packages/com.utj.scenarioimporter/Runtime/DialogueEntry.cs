@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.ScenarioImporter
@@ -10,8 +12,12 @@ namespace Unity.ScenarioImporter
     /// This class is used to represent the flow of scenarios and dialogues.
     /// </summary>
     [System.Serializable]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Scenario.Message")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Utj.ScenarioImporter.DialogueEntry")]
+#endif
     public class DialogueEntry
     {
         /// <summary>

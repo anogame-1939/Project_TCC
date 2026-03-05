@@ -15,8 +15,12 @@ namespace Unity.TinyCharacterController.Brain
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(CharacterSettings))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.CharacterBrain")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Brain.CharacterBrain")]
+#endif
     [DefaultExecutionOrder(Order.UpdateBrain)]
     public class CharacterBrain : BrainBase,  
         ICharacterSettingUpdateReceiver

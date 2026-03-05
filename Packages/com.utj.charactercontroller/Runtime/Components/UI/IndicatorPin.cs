@@ -1,7 +1,9 @@
 using Unity.TinyCharacterController.Core;
 using Unity.TinyCharacterController.Manager;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -12,9 +14,15 @@ namespace Unity.TinyCharacterController.UI
     /// Adjusts the position of the UI to align with the coordinates specified in <see cref="WorldPosition"/>.
     /// Uses <see cref="CanvasGroup"/> to hide the UI when it goes off-screen.
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.UIPin.UiPin")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.UI.UiPin")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("Unity.TinyCharacterController.UI.UiPin")]
+#endif
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(RectTransform))]
     [AddComponentMenu(MenuList.Ui + nameof(IndicatorPin))]
@@ -45,7 +53,9 @@ namespace Unity.TinyCharacterController.UI
         /// <summary>
         /// Position where the UI is displayed.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("Position")]
+#endif
         public Vector3 WorldPosition
         {
             get => _worldPosition;

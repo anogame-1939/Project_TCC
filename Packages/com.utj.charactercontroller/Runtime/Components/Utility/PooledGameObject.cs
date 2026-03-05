@@ -14,7 +14,9 @@ namespace Unity.TinyCharacterController.Utility
     /// </summary>
     /// <seealso cref="GameObjectPool"/>
     [AddComponentMenu(MenuList.Utility + nameof(PooledGameObject))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Utility.PooledGameObject")]
+#endif
     public class PooledGameObject : ComponentBase, IPooledObject
     {
         /// <summary>

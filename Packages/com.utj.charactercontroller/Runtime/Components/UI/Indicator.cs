@@ -1,7 +1,9 @@
 using Unity.TinyCharacterController.Core;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.TinyCharacterController.Manager;
@@ -19,8 +21,12 @@ namespace Unity.TinyCharacterController.UI
     // [RenamedFrom("Indicator")]
     [DisallowMultipleComponent]
     [AddComponentMenu(MenuList.Ui + nameof(Indicator))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Indicator.Indicator")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.UI.Indicator")]
+#endif
     [RequireComponent(typeof(RectTransform))]
     public class Indicator : ComponentBase
     {
@@ -95,7 +101,9 @@ namespace Unity.TinyCharacterController.UI
         ///     Specify the target's Transform.
         ///     Setting it to Null will stop the Indicator's operation.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [AllowsNull]
+#endif
         public Transform Target
         {
             get => _target;

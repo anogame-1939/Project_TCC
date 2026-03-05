@@ -3,7 +3,9 @@ using Unity.TinyCharacterController.Attributes;
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -22,8 +24,12 @@ namespace Unity.TinyCharacterController.Effect
     [AddComponentMenu(MenuList.MenuEffect + nameof(Gravity))]
     [RequireComponent(typeof(CharacterSettings))]
     [RequireInterface(typeof(IGroundContact))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Gravity")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Effect.Gravity")]
+#endif
     public class Gravity : MonoBehaviour, 
         IGravity, 
         IGravityEvent,

@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.TinyCharacterController.Ik
@@ -11,8 +13,12 @@ namespace Unity.TinyCharacterController.Ik
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(Order.UpdateIK)]
     [AddComponentMenu(MenuList.Ik + nameof(IKBrain))]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.IKBrain")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Ik.IKBrain")]
+#endif
     public class IKBrain : MonoBehaviour
     {
         private readonly List<IIkRig> _additionalRigs = new ();

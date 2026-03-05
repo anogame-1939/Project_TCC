@@ -1,5 +1,7 @@
 using Unity.TinyCharacterController.Core;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using Unity.TinyCharacterController.Interfaces.Core;
 
@@ -8,7 +10,9 @@ namespace Unity.TinyCharacterController.Interfaces.Components
     /// <summary>
     /// Interface for accessing the behavior results of the Brain
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("TinyCharacterController.Interfaces.Components.IBrain")]
+#endif
     public interface IBrain 
     {
         /// <summary>
@@ -19,13 +23,17 @@ namespace Unity.TinyCharacterController.Interfaces.Components
         /// <summary>
         /// Velocity of the currently active Control
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("ControllableVelocity")]
+#endif
         Vector3 ControlVelocity { get;  }
         
         /// <summary>
         /// Total Velocity of Effects
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("AdditionalVelocity")]
+#endif
         Vector3 EffectVelocity { get; }
         
         /// <summary>
@@ -46,7 +54,9 @@ namespace Unity.TinyCharacterController.Interfaces.Components
         /// <summary>
         /// Current character movement speed
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("Speed")]
+#endif
         float CurrentSpeed { get; }
         
         /// <summary>

@@ -18,9 +18,15 @@ namespace Unity.TinyCharacterController.Check
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterSettings))]
     [RequireComponent(typeof(CharacterSettings))]    
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.AnimationModifierCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.AnimationModifierCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.AnimatorModifierCheck")]
+#endif
     public class AnimatorModifierCheck : MonoBehaviour, 
         IAnimationModifierUpdate
     {

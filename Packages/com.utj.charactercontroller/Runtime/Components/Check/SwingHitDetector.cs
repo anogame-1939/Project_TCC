@@ -24,7 +24,9 @@ namespace Unity.TinyCharacterController.Utility
     [BurstCompile]
     [DefaultExecutionOrder(Order.Check)]
     [AddComponentMenu(MenuList.MenuCheck + nameof(SwingHitDetector))]
-    [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Utility.SwingHitDetector")]   
+#if PACKAGE_VISUAL_SCRIPTING
+    [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Utility.SwingHitDetector")]
+#endif
     public class SwingHitDetector : CollisionDetectorBase
     {
         /// <summary>

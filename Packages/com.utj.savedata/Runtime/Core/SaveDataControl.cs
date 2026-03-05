@@ -1,5 +1,7 @@
 using Unity.SaveData.Core;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,7 +11,9 @@ namespace Unity.SaveData
     /// Controls the save and load operations for game data using <see cref="DataContainerManager"/>,
     /// <see cref="Unity.SaveData.SaveLoadManager"/>, and <see cref="FileManagerBase"/>.
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("DataStore.SaveDataControl")]
+#endif
     public class SaveDataControl : MonoBehaviour
     {
         /// <summary>
@@ -29,7 +33,7 @@ namespace Unity.SaveData
         /// </summary>
         public FileManagerBase FileManager;
 
-        private readonly DataContainerManager _dataContainerManager = new ();
+        private readonly DataContainerManager _dataContainerManager = new();
 
         /// <summary>
         /// Gets the file name for saving data. Uses the GameObject's name if _fileName is not set.
@@ -46,7 +50,7 @@ namespace Unity.SaveData
             if (FileManager == null)
                 FileManager = Unity.SaveData.FileManager.Instance;
 
-            
+
             if (SaveLoadManager == null)
                 SaveLoadManager = Unity.SaveData.SaveLoadManager.Instance;
         }
@@ -95,8 +99,14 @@ namespace Unity.SaveData
         /// </summary>
         /// <param name="folder">The folder to check within.</param>
         /// <returns>True if the file exists, otherwise false.</returns>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("Exists")]
-        public bool IsExists([RenamedFrom("saveDataName")] string folder)
+#endif
+        public bool IsExists(
+#if PACKAGE_VISUAL_SCRIPTING
+            [RenamedFrom("saveDataName")]
+#endif
+            string folder)
         {
             return FileManager.IsExists(folder, FileName);
         }
@@ -105,7 +115,11 @@ namespace Unity.SaveData
         /// Removes the save data file.
         /// </summary>
         /// <param name="folder">The folder containing the save data file to remove.</param>
-        public void Remove([RenamedFrom("saveDataName")] string folder)
+        public void Remove(
+#if PACKAGE_VISUAL_SCRIPTING
+            [RenamedFrom("saveDataName")]
+#endif
+            string folder)
         {
             FileManager.Remove(folder, FileName);
         }

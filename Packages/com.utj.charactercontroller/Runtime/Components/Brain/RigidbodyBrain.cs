@@ -22,8 +22,12 @@ namespace Unity.TinyCharacterController.Brain
     [RequireComponent(typeof(CapsuleCollider))]
     [RequireInterface(typeof(IGravity))]
     [RequireInterface(typeof(IGroundContact))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Brain.RigidbodyBrain")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.RigidbodyBrain")]
+#endif
     public class RigidbodyBrain : BrainBase, 
         ICharacterSettingUpdateReceiver
     {

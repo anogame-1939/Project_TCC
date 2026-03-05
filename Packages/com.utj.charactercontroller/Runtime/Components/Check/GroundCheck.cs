@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using Unity.TinyCharacterController.Interfaces.Components;
 using Unity.TinyCharacterController.Interfaces.Core;
 using Unity.TinyCharacterController.Utility;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -19,8 +21,12 @@ namespace Unity.TinyCharacterController.Check
     [RequireComponent(typeof(CharacterSettings))]
     [AddComponentMenu(MenuList.MenuCheck + nameof(GroundCheck))]
     [DisallowMultipleComponent]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.GroundCheck")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.GroundCheck")]
+#endif
     public class GroundCheck : MonoBehaviour, 
         IGroundContact, 
         IGroundObject, 
@@ -69,14 +75,18 @@ namespace Unity.TinyCharacterController.Check
         /// Returns true if there is a collider within range.
         /// This calculation result used when you want to avoid small fluctuations in ground detection, such as for between Animator state.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsGrounded")]
+#endif
         public bool IsOnGround { get; private set; }
         
         /// <summary>
         /// Returns true if the character is in contact with the ground.
         /// This property is stricter than IsGrounded. This property is mainly used for positioning the character.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("IsGroundedStrictly")]
+#endif
         public bool IsFirmlyOnGround { get; private set; }
 
         /// <summary>
@@ -87,14 +97,18 @@ namespace Unity.TinyCharacterController.Check
         /// <summary>
         /// Returns the orientation of the ground surface. If not grounded, it returns Vector3.Up.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("GroundNormal")]
+#endif
         public Vector3 GroundSurfaceNormal { get; private set; } = Vector3.up;
 
         /// <summary>
         /// Get the grounded position.
         /// If not grounded, return Vector3.Zero.
         /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("ContactPoint")]
+#endif
         public Vector3 GroundContactPoint { get; private set; }
 
         /// <summary>

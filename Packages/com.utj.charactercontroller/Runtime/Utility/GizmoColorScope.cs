@@ -1,6 +1,8 @@
 using System;
 using Unity.Mathematics;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 
 namespace Unity.TinyCharacterController.Utility

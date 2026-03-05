@@ -29,6 +29,7 @@
 | `AnoGame/Tools/Workspace Switcher` | WorkspaceSwitcher.cs | EditorWindow | ワークスペース（タブ構成）の保存・切り替え |
 | `Tools/Scene Pin Placement` | ScenePinPlacementTool.cs | MenuItem (Toggle) | シーン上にピンを立てオブジェクトを移動する配置ツール |
 | `Tools/AnoEventRoot Visualizer` | AnoEventRootVisualizer.cs | MenuItem (Toggle) + Overlay | AnoEventRootの球体ギズモ可視化・移動ツール + イベント配置モード |
+| `Tools/AnoGame/Download Fonts` | FontDownloader.cs | InitializeOnLoad + MenuItem | Fontsフォルダ空検出時のGoogleドライブ自動DL（フォールバック: ブラウザ誘導） |
 
 ---
 

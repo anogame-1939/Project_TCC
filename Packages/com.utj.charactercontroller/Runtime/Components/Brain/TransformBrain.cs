@@ -13,8 +13,12 @@ namespace Unity.TinyCharacterController.Brain
     [DefaultExecutionOrder(Order.UpdateBrain)]
     [AddComponentMenu(MenuList.MenuBrain + "Transform Brain")]
     [RequireComponent(typeof(CharacterSettings))]   
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.TransformBrain")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Brain.TransformBrain")]
+#endif
     public class TransformBrain : BrainBase
     {
         private EarlyUpdateBrainBase _earlyUpdate;

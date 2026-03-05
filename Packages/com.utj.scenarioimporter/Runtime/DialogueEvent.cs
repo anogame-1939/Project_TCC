@@ -1,5 +1,6 @@
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
-
+#endif
 namespace Unity.ScenarioImporter
 {
     /// <summary>
@@ -8,8 +9,12 @@ namespace Unity.ScenarioImporter
     /// This struct is used to add dynamic elements to dialogues and scenarios.
     /// </summary>
     [System.Serializable]
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Scenario.MessageEvent")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Utj.ScenarioImporter.DialogueEvent")]
+#endif
     public struct DialogueEvent
     {
         /// <summary>

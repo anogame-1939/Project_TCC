@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+#if PACKAGE_VISUAL_SCRIPTING
 using Unity.VisualScripting;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -10,15 +12,21 @@ namespace Unity.ScenarioImporter
     /// This class stores different sections and messages within a scenario
     /// and provides functionality to retrieve specific scenario sections based on tags.
     /// </summary>
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Scenario.ScenarioData")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
     [RenamedFrom("Utj.ScenarioImporter.DialogueScript")]
+#endif
     public class DialogueScript : ScriptableObject
     {
         /// <summary>
         /// List of DialogueEntry
         /// </summary>
         [FormerlySerializedAs("Messages")] 
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("Messages")]
+#endif
         public List<DialogueEntry> DialogueEntries = new();
 
         /// <summary>
@@ -41,8 +49,12 @@ namespace Unity.ScenarioImporter
         /// </summary>
         /// <param name="tag">Tag</param>
         /// <returns>List of messages within the scenario</returns>
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("GetSlicedScenario")]
+#endif
+#if PACKAGE_VISUAL_SCRIPTING
         [RenamedFrom("GetMessages")]
+#endif
         public List<DialogueEntry> GetDialogueEntriesWithTag(string tag)
         {
             GetSliceIndex(tag, out var start, out var end);

@@ -17,7 +17,9 @@ namespace TinyCharacterController
     /// </summary>
     [DisallowMultipleComponent]
     [AddComponentMenu(MenuList.MenuCheck + nameof(DistanceFromPlayerCheck))]
+#if PACKAGE_VISUAL_SCRIPTING
     [Unity.VisualScripting.RenamedFrom("TinyCharacterController.Check.DistanceFromPlayerCheck")]
+#endif
     [DefaultExecutionOrder(Order.Check)]
     [Obsolete]
     public class DistanceFromPlayerCheck : ComponentBase
