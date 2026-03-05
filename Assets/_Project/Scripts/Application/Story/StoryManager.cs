@@ -1,0 +1,568 @@
+using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using AnoGame.Application.Core;
+using AnoGame.Application.Data;
+using AnoGame.Domain.Data.Models;
+using AnoGame.Application.Core.Scene;
+using Cysharp.Threading.Tasks;
+using System.Linq;
+using VContainer;
+using AnoGame.Domain.Event.Services;
+using AnoGame.Domain.Inventory.Services;
+
+namespace AnoGame.Application.Story
+{
+    public class StoryManager : SingletonMonoBehaviour<StoryManager>
+    {
+        [SerializeField]
+        string[] ignoreScenes;
+        public event Action<bool> StoryLoaded;
+        public event Action<bool> ChapterLoaded;
+
+        [SerializeField]
+        private List<StoryData> _storyDataList;
+
+        private List<GameObject> _spawnedObjects = new List<GameObject>();
+        private int _currentStoryIndex = 0;
+        private int _currentChapterIndex = 0;
+
+        private ISceneLoader _sceneLoader;
+        private List<UnityEngine.SceneManagement.Scene> _loadedStoryScenes = new List<UnityEngine.SceneManagement.Scene>();
+        private SceneReference _mainMapScene;
+
+        // インスペクターでメインシーン名を設定
+        [SerializeField]
+        private string mainSceneName;
+        private UnityEngine.SceneManagement.Scene _mainScene;
+        public UnityEngine.SceneManagement.Scene MainScene => _mainScene;
+
+        private bool _isLoadingScene = false;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _sceneLoader = new SceneLoader();
+            // GetActiveScene() は使わず、mainSceneName からシーンを取得する
+            _mainScene = SceneManager.GetSceneByName(mainSceneName);
+            GameManager.Instance.LoadGameData += OnLoadGameData;
+        }
+
+        [Inject]
+        public void Construct(
+            IEventService eventService,
+            IInventoryService inventoryService
+            )
+        {
+            _eventService = eventService;
+            _inventoryService = inventoryService;
+        }
+
+        private IEventService _eventService;
+        private IInventoryService _inventoryService;
+
+        private void Start()
+        {
+            // ゲームデータがロード済みの場合、ロード済みのデータを使用してゲームを再開
+            if (GameManager.Instance.DataLoaded)
+            {
+                OnLoadGameData(GameManager.Instance.CurrentGameData);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadGameData -= OnLoadGameData;
+            }
+        }
+
+        private async void OnLoadGameData(GameData gameData)
+        {
+            if (gameData == null || gameData.StoryProgress == null) return;
+
+            // ストーリ進捗状況をロード
+            _currentStoryIndex = gameData.StoryProgress.CurrentStoryIndex;
+            _currentChapterIndex = gameData.StoryProgress.CurrentChapterIndex;
+
+            if (AnoGame.Application.GameStateManager.Instance.CurrentState == AnoGame.Application.GameState.GameOver)
+            {
+                Debug.Log("Game Over: Skipping LoadCurrentScene in OnLoadGameData.");
+                return;
+            }
+
+            StoryData storyData = _storyDataList[_currentStoryIndex];
+            if (_mainMapScene != storyData.mainMapScene)
+            {
+                SceneReference tmpMainScene;
+                if (_mainMapScene != null)
+                {
+                    tmpMainScene = _mainMapScene;
+                    Debug.Log($"{_mainMapScene.ScenePath} をアンロード");
+
+                    // _sceneLoader.HideAllGameObjects(tmpMainScene);
+
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                    await _sceneLoader.UnloadSceneAsync(tmpMainScene);
+                }
+                else
+                {
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                }
+            }
+
+            LoadCurrentScene();
+        }
+
+        private async UniTask LoadScenesAsync(SceneReference mainMapScene)
+        {
+            await _sceneLoader.LoadSceneAsync(mainMapScene, LoadSceneMode.Additive);
+        }
+
+        public void UpdateGameData()
+        {
+            GameData gameData = GameManager.Instance.CurrentGameData;
+            // if (gameData.StoryProgress == null)
+            // {
+            // }
+            GameManager.Instance.CurrentGameData.UpdateStoryProgress(new StoryProgress(_currentStoryIndex, _currentChapterIndex));
+        }
+
+        public async void ResetStoryProgress()
+        {
+            // 現在のストーリーデータを取得
+            // 現在のストーリーデータを取得
+            _currentStoryIndex = GameManager.Instance.CurrentGameData.StoryProgress.CurrentStoryIndex;
+
+            if (_currentStoryIndex < 0 || _currentStoryIndex >= _storyDataList.Count)
+            {
+                Debug.LogError($"Invalid story index: {_currentStoryIndex}");
+                return;
+            }
+            StoryData currentStoryData = _storyDataList[_currentStoryIndex];
+
+            // リトライ時はStoryDataに設定されているChapterから再開する
+            _currentChapterIndex = currentStoryData.retryChapterIndex;
+
+            // リトライ位置を設定
+            // PositionがZeroの場合は設定されていないとみなす（必要に応じてフラグ管理でも良いが簡略化）
+            if (currentStoryData.retryPosition != Vector3.zero)
+            {
+                PlayerSpawnManager.Instance.SetExplicitRetryPoint(currentStoryData.retryPosition, Quaternion.Euler(currentStoryData.retryRotationEuler));
+            }
+
+            // 関連イベントIDを削除
+            // 関連イベントIDを削除
+            if (currentStoryData.associatedEvents != null)
+            {
+                foreach (AnoGame.Data.EventData eventData in currentStoryData.associatedEvents)
+                {
+                    if (eventData == null) continue;
+
+                    if (GameManager.Instance.CurrentGameData.EventHistory.HasCompleted(eventData.EventId))
+                    {
+                        GameManager.Instance.CurrentGameData.RemoveClearedEvent(eventData.EventId);
+                        _eventService?.RemoveClearedEvent(eventData.EventId);
+                    }
+                }
+            }
+
+            // 関連アイテムを削除
+            if (currentStoryData.associatedItems != null)
+            {
+                var inventory = GameManager.Instance.CurrentGameData.Inventory;
+                foreach (var itemData in currentStoryData.associatedItems)
+                {
+                    if (itemData == null) continue;
+
+                    // アイテム名で一致するものを探して削除
+                    var itemsToRemove = inventory.Items
+                        .Where(i => i.ItemName == itemData.ItemName)
+                        .ToList();
+
+                    foreach (var item in itemsToRemove)
+                    {
+                        Debug.Log($"Resetting Item: {item.ItemName}");
+                        inventory.RemoveItem(item.UniqueId);
+                        _inventoryService?.NotifyItemRemoved(item.ItemName);
+                    }
+                }
+            }
+
+            // ゲームデータを更新（StoryProgressをリセット）
+            UpdateGameData();
+
+            // 変更を保存 (GameManagerの実装に依存するが、ここでは保存処理が必要な場合を想定)
+            await GameManager.Instance.SaveCurrentGameState();
+
+            // ストーリーをロードし直す (useRetryPoint = true でリトライポイントを使用)
+            // GameOverManager.OnRetryGame() で ReloadStoryScene() が呼ばれるが、
+            // そちらは初期状態で呼び出される。
+            // ここで呼び出すのではなく、GameOverManagerの流れに任せるか？
+            // GameOverManager.OnRetryGame -> ReloadStoryScene -> LoadStory(..., false)
+            // になっているので、ReloadStorySceneの内容を変えるべきか、あるいはここでロードするか。
+            // GameOverManager.OnRetryGameのフローを確認すると、
+            // 1. Save 2. State=Gameplay 3. ReloadStoryScene
+            // となっている。ReloadStorySceneは LoadStory(current, false) を呼んでいる。
+            // これを true に変える必要がある。
+            // あるいは ResetStoryProgress 内ではロードせず、パラメータセットだけ行うのが責務。
+            // GameOverManager が ReloadData() -> ResetStoryProgress() を呼んでいる。
+            // その後 OnRetryGame() が呼ばれるわけではなく、ボタン押下で OnRetryGame() が呼ばれる。
+            // GameOverManager.OnGameOver() -> ReloadData() -> ResetStoryProgress()
+            // つまりゲームオーバーになった時点で「次はここから」という状態にセットしておくのが正しい。
+
+            // 実際のロードは GameOverManager.OnRetryGame() -> ReloadStoryScene() で行われる。
+        }
+
+        public void ReloadStoryScene()
+        {
+            // リトライ扱いなので useRetryPoint = true でロードする
+            LoadStory(_currentStoryIndex, true);
+        }
+
+        public void StartStory()
+        {
+            if (_storyDataList.Count == 0)
+            {
+                Debug.LogError("No StoryData available in the StoryManager.");
+                return;
+            }
+
+            _currentStoryIndex = 0;
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            currentStory.currentChapterIndex = 0;
+            currentStory.currentSceneIndex = 0;
+            LoadCurrentScene();
+        }
+
+        public void MoveToNextScene()
+        {
+            if (_currentStoryIndex >= _storyDataList.Count)
+            {
+                Debug.LogError("Invalid story index.");
+                return;
+            }
+
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            currentStory.MoveToNextScene();
+            LoadCurrentScene(false); // 次のシーンは常にスタートポイントから
+        }
+
+        public async void LoadStory(int storyIndex, bool useRetryPoint = false)
+        {
+            _currentStoryIndex = storyIndex;
+            StoryData storyData = _storyDataList[_currentStoryIndex];
+            _currentChapterIndex = storyData.retryChapterIndex;
+            if (_mainMapScene != storyData.mainMapScene)
+            {
+                SceneReference tmpMainScene;
+                if (_mainMapScene != null)
+                {
+                    tmpMainScene = _mainMapScene;
+                    Debug.Log($"{_mainMapScene.ScenePath} をアンロード2");
+
+                    // _sceneLoader.HideAllGameObjects(tmpMainScene);
+
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                    await _sceneLoader.UnloadSceneAsync(tmpMainScene);
+                }
+                else
+                {
+                    _mainMapScene = storyData.mainMapScene;
+                    await LoadScenesAsync(storyData.mainMapScene);
+                }
+            }
+            StoryLoaded?.Invoke(useRetryPoint);
+
+            LoadCurrentScene(useRetryPoint);
+        }
+
+        public void LoadChapter(int chapterIndex, bool useRetryPoint = false, bool enableFade = false)
+        {
+            _currentChapterIndex = chapterIndex;
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+            LoadCurrentScene(useRetryPoint, enableFade);
+        }
+
+        public void LoadChapter2(int chapterIndex, bool useRetryPoint = false)
+        {
+            _currentChapterIndex = chapterIndex;
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+            LoadCurrentScene(useRetryPoint);
+        }
+
+        public void LoadChapterScene(int chapterIndex, int sceneIndex)
+        {
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+
+            if (sceneIndex < 0 || sceneIndex >= currentStory.chapters[chapterIndex].scenes.Count)
+            {
+                Debug.LogError($"Invalid scene index: {sceneIndex} for chapter: {chapterIndex}");
+                return;
+            }
+
+            currentStory.currentChapterIndex = chapterIndex;
+            currentStory.currentSceneIndex = sceneIndex;
+            LoadCurrentScene();
+        }
+
+        public void RetyrCurrentScene()
+        {
+            LoadCurrentScene(true);
+        }
+
+        private void LoadCurrentScene(bool useRetryPoint = false, bool enableFade = false)
+        {
+            Debug.Log($"LoadCurrentScene:{useRetryPoint}");
+            StartCoroutine(LoadSceneCoroutine(useRetryPoint, enableFade));
+        }
+
+        private IEnumerator LoadSceneCoroutine(bool useRetryPoint, bool enableFade)
+        {
+            // 変更後：インスペクターで設定した mainSceneName からシーンを取得して待機
+            UnityEngine.SceneManagement.Scene scene = SceneManager.GetSceneByName(mainSceneName);
+            while (!scene.isLoaded)
+            {
+                Debug.Log($"メインシーン {mainSceneName} の読み込みが完了するまで待機中...");
+                yield return null;
+                scene = SceneManager.GetSceneByName(mainSceneName);
+            }
+            // 正常に読み込まれたら _mainScene を更新
+            _mainScene = scene;
+
+            if (_isLoadingScene)
+            {
+                Debug.LogWarning("Scene loading is already in progress");
+                yield break;
+            }
+
+            _isLoadingScene = true;
+
+            if (enableFade)
+            {
+                AnoGame.Application.UI.FadeManager.Instance.FadeOut(0.5f);
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            yield return UnloadCurrentScenesCoroutine();
+            yield return LoadNewSceneCoroutine();
+
+            if (enableFade)
+            {
+                AnoGame.Application.UI.FadeManager.Instance.FadeIn(0.5f);
+            }
+
+            _isLoadingScene = false;
+
+            // チャプターのロード完了イベントを通知
+            ChapterLoaded?.Invoke(useRetryPoint);
+        }
+
+        private IEnumerator LoadNewSceneCoroutine()
+        {
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            StoryData.SceneData currentScene = currentStory.chapters[_currentChapterIndex].scenes[0];
+
+            if (currentScene == null)
+            {
+                Debug.Log("Current story completed or no more scenes available.");
+                yield break;
+            }
+
+            AsyncOperation loadOperation = null;
+            try
+            {
+                loadOperation = SceneManager.LoadSceneAsync(
+                    currentScene.sceneReference.ScenePath,
+                    LoadSceneMode.Additive
+                );
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to start scene loading: {ex.Message}");
+                yield break;
+            }
+
+            if (loadOperation == null)
+            {
+                Debug.LogError("Failed to start scene loading operation");
+                yield break;
+            }
+
+            yield return loadOperation;
+
+            UnityEngine.SceneManagement.Scene newScene = SceneManager.GetSceneByPath(
+                currentScene.sceneReference.ScenePath
+            );
+
+            if (newScene.IsValid())
+            {
+                _loadedStoryScenes.Add(newScene);
+                SceneManager.SetActiveScene(newScene);
+                yield return SpawnSceneEventsCoroutine(currentScene);
+            }
+            else
+            {
+                Debug.LogError($"Failed to load scene: {currentScene.sceneReference.ScenePath}");
+            }
+        }
+
+        private IEnumerator UnloadCurrentScenesCoroutine()
+        {
+            var scenesToUnload = new List<UnityEngine.SceneManagement.Scene>(_loadedStoryScenes);
+            Debug.Log($"Starting to unload {scenesToUnload.Count} story scenes");
+
+            foreach (var scene in scenesToUnload)
+            {
+                if (ignoreScenes.Contains(scene.name))
+                {
+                    continue;
+                }
+                if (!scene.isLoaded || !scene.IsValid())
+                {
+                    Debug.Log($"Skipping scene {scene.path}: not loaded or invalid");
+                    continue;
+                }
+
+                AsyncOperation unloadOperation = null;
+                try
+                {
+                    Debug.Log($"Unloading scene: {scene.path}");
+                    unloadOperation = SceneManager.UnloadSceneAsync(scene);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to unload scene {scene.path}: {ex.Message}");
+                    continue;
+                }
+
+                if (unloadOperation != null)
+                {
+                    yield return unloadOperation;
+                    Debug.Log($"Successfully unloaded scene: {scene.path}");
+                }
+            }
+
+            ClearSpawnedObjects();
+            _loadedStoryScenes.Clear();
+
+            if (_mainScene.IsValid())
+            {
+                Debug.Log($"Setting active scene back to main scene: {_mainScene.path}");
+                SceneManager.SetActiveScene(_mainScene);
+            }
+        }
+        private IEnumerator SpawnSceneEventsCoroutine(StoryData.SceneData sceneData)
+        {
+            foreach (var eventData in sceneData.events)
+            {
+                if (eventData.eventPrefab == null) continue;
+
+                try
+                {
+                    GameObject spawnedEvent = Instantiate(eventData.eventPrefab);
+                    _spawnedObjects.Add(spawnedEvent);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Failed to spawn event: {ex.Message}");
+                }
+
+                yield return null;
+            }
+        }
+
+        private void ClearSpawnedObjects()
+        {
+            foreach (var obj in _spawnedObjects)
+            {
+                if (obj != null)
+                {
+                    Destroy(obj);
+                }
+            }
+            _spawnedObjects.Clear();
+        }
+
+        public void SwitchToChapterInStory(int storyIndex, int chapterIndex, bool useRetryPoint = false)
+        {
+            // ストーリーとチャプターの状態を更新
+            _currentStoryIndex = storyIndex;
+            _currentChapterIndex = chapterIndex;
+            UpdateGameData();
+
+            // シーンのロードを一度だけ実行
+            LoadCurrentScene(useRetryPoint);
+
+            ChapterLoaded?.Invoke(useRetryPoint);
+        }
+
+        private void SwitchToStory(int storyIndex)
+        {
+            if (storyIndex < 0 || storyIndex >= _storyDataList.Count)
+            {
+                Debug.LogError($"Invalid story index: {storyIndex}");
+                return;
+            }
+
+            _currentStoryIndex = storyIndex;
+            StoryData newStory = _storyDataList[_currentStoryIndex];
+            newStory.currentChapterIndex = 0;
+            newStory.currentSceneIndex = 0;
+        }
+
+        private void LoadChapter(int chapterIndex)
+        {
+            StoryData currentStory = _storyDataList[_currentStoryIndex];
+            if (chapterIndex < 0 || chapterIndex >= currentStory.chapters.Count)
+            {
+                Debug.LogError($"Invalid chapter index: {chapterIndex}");
+                return;
+            }
+
+            currentStory.currentChapterIndex = chapterIndex;
+            currentStory.currentSceneIndex = 0;
+        }
+
+        public StoryProgress GetCurrentProgress()
+        {
+            return new StoryProgress
+            (
+                _currentStoryIndex,
+                _currentChapterIndex
+            );
+        }
+
+        public List<StoryData> GetStoryList()
+        {
+            return _storyDataList;
+        }
+
+        public bool IsLoadingScene()
+        {
+            return _isLoadingScene;
+        }
+    }
+}
+
