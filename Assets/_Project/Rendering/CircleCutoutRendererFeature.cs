@@ -30,10 +30,7 @@ namespace AnoGame.Application.Rendering
             };
             _cutoutPass = new CircleCutoutRenderPass
             {
-                // AfterRenderingTransparents: 全Opaque/Transparent描画完了後に合成を実行
-                // BeforeRenderingPostProcessing ではSpeedTree等の一部シェーダが
-                // まだ描画されていない場合があるため、より確実なタイミングを使用
-                renderPassEvent = RenderPassEvent.AfterRenderingTransparents
+                renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing
             };
         }
 
