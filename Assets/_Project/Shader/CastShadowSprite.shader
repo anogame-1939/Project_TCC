@@ -66,7 +66,6 @@ Shader "Custom/CastShadowSprite"
                 half4  vertexColor : TEXCOORD1;
                 float3 positionWS  : TEXCOORD2;
                 float  fogFactor   : TEXCOORD3;
-                float  footDepth   : TEXCOORD4; // 足元の深度値
             };
 
             VOut Vert(VIn i)
@@ -78,24 +77,16 @@ Shader "Custom/CastShadowSprite"
                 o.uv          = TRANSFORM_TEX(i.uv, _MainTex);
                 o.vertexColor = i.color;
                 o.fogFactor   = ComputeFogFactor(posInputs.positionCS.z);
-
-                // 足元（オブジェクト原点）のクリップ空間深度を計算
-                float4 footCS = TransformObjectToHClip(float3(0, 0, 0));
-                o.footDepth = footCS.z / footCS.w;
-
                 return o;
             }
 
-            half4 Frag(VOut i, out float depth : SV_Depth) : SV_Target
+            half4 Frag(VOut i) : SV_Target
             {
                 // テクスチャサンプリング
                 half4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
 
                 // Alpha clip
                 clip(texColor.a - 0.5);
-
-                // 深度を足元に固定（壁めり込み防止）
-                depth = i.footDepth;
 
                 // Ambient 疑似ライティング（既存ロジック再現）
                 // lerp(AmbientSkyColor, white, 1-SkyColor)
@@ -238,7 +229,6 @@ Shader "Custom/CastShadowSprite"
             {
                 float4 positionHCS : SV_POSITION;
                 float2 uv          : TEXCOORD0;
-                float  footDepth   : TEXCOORD1;
             };
 
             DepthVOut DepthVert(DepthVIn i)
@@ -246,19 +236,13 @@ Shader "Custom/CastShadowSprite"
                 DepthVOut o;
                 o.positionHCS = TransformObjectToHClip(i.positionOS.xyz);
                 o.uv = TRANSFORM_TEX(i.uv, _MainTex);
-
-                // 足元の深度
-                float4 footCS = TransformObjectToHClip(float3(0, 0, 0));
-                o.footDepth = footCS.z / footCS.w;
-
                 return o;
             }
 
-            half4 DepthFrag(DepthVOut i, out float depth : SV_Depth) : SV_Target
+            half4 DepthFrag(DepthVOut i) : SV_Target
             {
                 half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv).a;
                 clip(alpha - 0.5);
-                depth = i.footDepth;
                 return 0;
             }
             ENDHLSL
