@@ -23,12 +23,16 @@ namespace AnoGame.Application.Player.Effects
         [Tooltip("フェードエッジの幅（スクリーン空間、0〜1）")]
         [SerializeField, Range(0.01f, 0.5f)] private float _fadeWidth = 0.05f;
 
+        [Tooltip("切り抜き内の不透明度（0=完全透過、1=完全不透明＝切り抜き無効）")]
+        [SerializeField, Range(0f, 1f)] private float _opacity = 0f;
+
         [Header("有効/無効")]
         [SerializeField] private bool _enabled = true;
 
         private static readonly int PlayerScreenPosId = Shader.PropertyToID("_Global_PlayerScreenPos");
         private static readonly int CutoutRadiusId = Shader.PropertyToID("_Global_CutoutRadius");
         private static readonly int CutoutFadeWidthId = Shader.PropertyToID("_Global_CutoutFadeWidth");
+        private static readonly int CutoutOpacityId = Shader.PropertyToID("_Global_CutoutOpacity");
 
         private Camera _camera;
 
@@ -44,6 +48,13 @@ namespace AnoGame.Application.Player.Effects
         {
             get => _fadeWidth;
             set => _fadeWidth = Mathf.Max(0.001f, value);
+        }
+
+        /// <summary>切り抜き内の不透明度（0=完全透過、1=完全不透明）</summary>
+        public float Opacity
+        {
+            get => _opacity;
+            set => _opacity = Mathf.Clamp01(value);
         }
 
         /// <summary>ターゲットからのオフセット</summary>
@@ -81,6 +92,7 @@ namespace AnoGame.Application.Player.Effects
             Shader.SetGlobalVector(PlayerScreenPosId, new Vector4(viewportPos.x, viewportPos.y, 0f, 0f));
             Shader.SetGlobalFloat(CutoutRadiusId, _radius);
             Shader.SetGlobalFloat(CutoutFadeWidthId, _fadeWidth);
+            Shader.SetGlobalFloat(CutoutOpacityId, _opacity);
         }
 
         private void OnDisable()
