@@ -11,7 +11,7 @@ Shader "Custom/PostProcess/CircleCutout"
         [Toggle] _UseGlobalParams ("Use Global Params", Float) = 1
 
         [Header(Debug)]
-        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, DISTANCE)] _Debug ("Debug View", Float) = 0
+        [KeywordEnum(OFF, DEPTH_RAW, BACKGROUND, DISTANCE, SOLID)] _Debug ("Debug View", Float) = 0
     }
 
     SubShader
@@ -94,11 +94,18 @@ Shader "Custom/PostProcess/CircleCutout"
                 float dist = length(diff);
 
                 // Debug: distance visualization
-                if (_Debug > 2.5)
+                if (_Debug > 2.5 && _Debug < 3.5)
                 {
                     float vis = saturate(dist / 0.5);
                     float edge = 1.0 - smoothstep(radius - 0.002, radius + 0.002, dist);
                     return half4(vis, vis * 0.5, edge, 1.0);
+                }
+
+                // Debug: SOLID - inside circle = magenta, outside = normal
+                if (_Debug > 3.5 && _Debug < 4.5)
+                {
+                    float t_dbg = saturate((dist - radius) / max(fadeWidth, 0.001));
+                    return lerp(half4(1.0, 0.0, 1.0, 1.0), color, t_dbg);
                 }
 
                 // Cutout blend

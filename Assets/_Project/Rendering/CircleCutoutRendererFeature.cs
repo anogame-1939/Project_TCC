@@ -30,8 +30,7 @@ namespace AnoGame.Application.Rendering
             };
             _cutoutPass = new CircleCutoutRenderPass
             {
-                // 診断用: 全描画完了後に合成を実行
-                renderPassEvent = RenderPassEvent.AfterRendering
+                renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing
             };
         }
 
