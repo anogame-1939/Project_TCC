@@ -26,7 +26,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
-  - _DEPTHDEBUG_DIFF
+  - _DEPTHDEBUG_OFF
   - _USEFOOTDEPTH_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -97,7 +97,8 @@ Material:
     - _BUILTIN_QueueOffset: 0
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _DepthDebug: 3
+    - _DepthBias: 0.001
+    - _DepthDebug: 0
     - _DepthOffsetOS: 0
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
