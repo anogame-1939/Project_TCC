@@ -7,6 +7,13 @@ Shader "Custom/CastShadowSprite"
         _SkyColor ("Sky Color Influence", Range(0, 1)) = 0
         _ShadowColor ("Shadow Color", Color) = (0.3, 0.3, 0.5, 1)
         _ShadowIntensity ("Shadow Intensity", Range(0, 1)) = 0.6
+
+        [Header(Depth Override)]
+        [Toggle] _UseFootDepth ("Use Foot Depth", Float) = 1
+        _DepthBias ("Depth Bias (push toward camera)", Range(0, 0.01)) = 0.001
+
+        [Header(Debug)]
+        [KeywordEnum(OFF, FOOT_DEPTH, ACTUAL_DEPTH, DIFF)] _DepthDebug ("Depth Debug", Float) = 0
     }
 
     SubShader
@@ -50,6 +57,9 @@ Shader "Custom/CastShadowSprite"
                 half   _SkyColor;
                 half4  _ShadowColor;
                 half   _ShadowIntensity;
+                float  _UseFootDepth;
+                float  _DepthBias;
+                float  _DepthDebug;
             CBUFFER_END
 
             struct VIn
@@ -66,6 +76,8 @@ Shader "Custom/CastShadowSprite"
                 half4  vertexColor : TEXCOORD1;
                 float3 positionWS  : TEXCOORD2;
                 float  fogFactor   : TEXCOORD3;
+                float  footDepth   : TEXCOORD4;
+                float  actualDepth : TEXCOORD5;
             };
 
             VOut Vert(VIn i)
@@ -77,16 +89,47 @@ Shader "Custom/CastShadowSprite"
                 o.uv          = TRANSFORM_TEX(i.uv, _MainTex);
                 o.vertexColor = i.color;
                 o.fogFactor   = ComputeFogFactor(posInputs.positionCS.z);
+
+                // 実際の深度
+                o.actualDepth = posInputs.positionCS.z / posInputs.positionCS.w;
+
+                // 足元（オブジェクト原点）の深度を計算
+                float4 footCS = TransformObjectToHClip(float3(0, 0, 0));
+                o.footDepth = footCS.z / footCS.w;
+
                 return o;
             }
 
-            half4 Frag(VOut i) : SV_Target
+            half4 Frag(VOut i, out float depth : SV_Depth) : SV_Target
             {
-                // テクスチャサンプリング
                 half4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-
-                // Alpha clip
                 clip(texColor.a - 0.5);
+
+                // 深度上書き + バイアス（カメラ方向に押し出す）
+                float baseDepth = _UseFootDepth > 0.5 ? i.footDepth : i.actualDepth;
+                #if UNITY_REVERSED_Z
+                    depth = baseDepth + _DepthBias; // Reversed-Z: 大きい値 = 手前
+                #else
+                    depth = baseDepth - _DepthBias; // Normal-Z: 小さい値 = 手前
+                #endif
+
+                // デバッグ表示
+                if (_DepthDebug > 0.5 && _DepthDebug < 1.5)
+                {
+                    // FOOT_DEPTH: 足元深度をグレースケールで表示
+                    return half4(i.footDepth, i.footDepth, i.footDepth, 1);
+                }
+                if (_DepthDebug > 1.5 && _DepthDebug < 2.5)
+                {
+                    // ACTUAL_DEPTH: 実際の深度をグレースケールで表示
+                    return half4(i.actualDepth, i.actualDepth, i.actualDepth, 1);
+                }
+                if (_DepthDebug > 2.5)
+                {
+                    // DIFF: 差分表示（足元が浅い=緑、深い=赤）
+                    float diff = (i.footDepth - i.actualDepth) * 100.0;
+                    return half4(saturate(diff), saturate(-diff), 0, 1);
+                }
 
                 // Ambient 疑似ライティング（既存ロジック再現）
                 // lerp(AmbientSkyColor, white, 1-SkyColor)
@@ -132,6 +175,9 @@ Shader "Custom/CastShadowSprite"
             #pragma vertex ShadowVert
             #pragma fragment ShadowFrag
 
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile _ _SHADOWS_SOFT
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
@@ -144,6 +190,9 @@ Shader "Custom/CastShadowSprite"
                 half   _SkyColor;
                 half4  _ShadowColor;
                 half   _ShadowIntensity;
+                float  _UseFootDepth;
+                float  _DepthBias;
+                float  _DepthDebug;
             CBUFFER_END
 
             float3 _LightDirection;
@@ -217,6 +266,9 @@ Shader "Custom/CastShadowSprite"
                 half   _SkyColor;
                 half4  _ShadowColor;
                 half   _ShadowIntensity;
+                float  _UseFootDepth;
+                float  _DepthOffsetOS;
+                float  _DepthDebug;
             CBUFFER_END
 
             struct DepthVIn
@@ -229,6 +281,7 @@ Shader "Custom/CastShadowSprite"
             {
                 float4 positionHCS : SV_POSITION;
                 float2 uv          : TEXCOORD0;
+                float  footDepth   : TEXCOORD1;
             };
 
             DepthVOut DepthVert(DepthVIn i)
@@ -236,13 +289,19 @@ Shader "Custom/CastShadowSprite"
                 DepthVOut o;
                 o.positionHCS = TransformObjectToHClip(i.positionOS.xyz);
                 o.uv = TRANSFORM_TEX(i.uv, _MainTex);
+
+                // 足元基準の深度
+                float4 footCS = TransformObjectToHClip(float3(0, 0, 0));
+                o.footDepth = footCS.z / footCS.w;
+
                 return o;
             }
 
-            half4 DepthFrag(DepthVOut i) : SV_Target
+            half4 DepthFrag(DepthVOut i, out float depth : SV_Depth) : SV_Target
             {
                 half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv).a;
                 clip(alpha - 0.5);
+                depth = i.footDepth;
                 return 0;
             }
             ENDHLSL
