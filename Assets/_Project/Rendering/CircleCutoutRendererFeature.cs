@@ -113,13 +113,23 @@ namespace AnoGame.Application.Rendering
                     drawingSettings.SetShaderPassName(i, ShaderTags[i]);
                 }
 
-                // フィルタリング: Opaque キュー、対象レイヤー除外
-                var filteringSettings = new FilteringSettings(
+                // Opaque キュー描画（対象レイヤー除外）
+                var opaqueFilter = new FilteringSettings(
                     RenderQueueRange.opaque, drawMask);
-
-                // シーンを背景RTに描画（Wall なし）
                 context.DrawRenderers(
-                    renderingData.cullResults, ref drawingSettings, ref filteringSettings);
+                    renderingData.cullResults, ref drawingSettings, ref opaqueFilter);
+
+                // Transparent キュー描画（パーティクル・エフェクト等も背景RTに含める）
+                var transparentDrawSettings = CreateDrawingSettings(
+                    ShaderTags[0], ref renderingData, SortingCriteria.CommonTransparent);
+                for (int i = 1; i < ShaderTags.Length; i++)
+                {
+                    transparentDrawSettings.SetShaderPassName(i, ShaderTags[i]);
+                }
+                var transparentFilter = new FilteringSettings(
+                    RenderQueueRange.transparent, drawMask);
+                context.DrawRenderers(
+                    renderingData.cullResults, ref transparentDrawSettings, ref transparentFilter);
 
                 // ★ レンダーターゲットをカメラのカラーバッファに戻す
                 var cameraTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;

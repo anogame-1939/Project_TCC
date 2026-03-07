@@ -20245,7 +20245,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 207.77762}
+  m_AnchoredPosition: {x: 0, y: 207.77792}
   m_SizeDelta: {x: 0, y: 486.223}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &660101641
@@ -33341,7 +33341,6 @@ GameObject:
   - component: {fileID: 1247175354}
   - component: {fileID: 1247175353}
   - component: {fileID: 1247175357}
-  - component: {fileID: 1247175359}
   - component: {fileID: 1247175358}
   - component: {fileID: 1247175361}
   - component: {fileID: 1247175360}
@@ -33465,19 +33464,6 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
---- !u!114 &1247175359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1247175352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2f313ac0288b4b41a9aedfa1e92168b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableSelectedObject: 1
 --- !u!114 &1247175360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40339,8 +40325,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 996609995}
   m_HandleRect: {fileID: 996609993}
   m_Direction: 2
-  m_Value: 0.00000014687612
-  m_Size: 0.57267
+  m_Value: -0.0000013218851
+  m_Size: 0.5726527
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -53663,6 +53649,7 @@ MonoBehaviour:
   _targetOffset: {x: 5, y: 5.75, z: 5}
   _radius: 0.247
   _fadeWidth: 0.155
+  _opacity: 0
   _enabled: 1
 --- !u!222 &5631294320101110924
 CanvasRenderer:
